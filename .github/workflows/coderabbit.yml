@@ -1,0 +1,17 @@
+name: CodeRabbit Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  coderabbit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CodeRabbit Review
+        uses: coderabbitai/coderabbit-action@v1
+        with:
+          # GitHub 토큰 (자동 제공)
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # CodeRabbit API 키 (GitHub Secrets에 추가 필요)
+          # coderabbit-api-key: ${{ secrets.CODERABBIT_API_KEY }}
