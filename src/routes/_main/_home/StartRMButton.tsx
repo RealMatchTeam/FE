@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 export default function StartMatchingTestButton() {
   return (
     <Link
-      to="/matchingTest"
+      to="/matchingTest/step1"
       className={[
         "flex items-center justify-center gap-[10px]",
         "w-[342px] h-[52px]",

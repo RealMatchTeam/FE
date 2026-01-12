@@ -1,4 +1,4 @@
-import SelectChip from "./SelectChip";
+import SelectChip from "./components/SelectChip";
 
 type SectionKey = "style" | "function" | "skinType" | "skinTone" | "makeupStyle";
 
@@ -49,7 +49,7 @@ export default function MatchingTestContent({
       </div>
 
       {/* ✅ 버튼 sticky라서 본문 하단 여백 확보 */}
-      <main className="flex-1 px-6 pt-6 pb-24">
+      <main className="flex-1 px-6 pt-6">
         {/* 상단 헤더 */}
         <div className="relative flex items-center justify-center mb-6">
           <button
