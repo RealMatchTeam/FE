@@ -20,7 +20,7 @@ const variantStyles: Record<ButtonVariant, string> = {
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "h-10 px-4 text-callout2 rounded-lg",
   md: "h-12 px-5 text-title2 rounded-xl",
-  lg: "h-14 px-6 text-title rounded-2xl",
+  lg: "h-14 px-6 text-title7 rounded-2xl",
 };
 
 const disabledStyles = "bg-text-gray5 text-text-gray4 cursor-not-allowed hover:brightness-100";
@@ -34,7 +34,7 @@ function Button({
   children,
   ...props
 }: ButtonProps) {
-  const baseStyles = "font-semibold transition-all active:scale-[0.98] flex items-center justify-center";
+  const baseStyles = "font-semibold transition-all active:scale-[0.98] flex items-center justify-center cursor-pointer";
   const widthStyle = fullWidth ? "w-full" : "";
 
   const combinedStyles = disabled
