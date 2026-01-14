@@ -17,6 +17,10 @@
   --color-core-70: #B7B7F3B2;
   ;
 
+  /* State 컬러 */
+  --color-error: #F84343;
+  --color-success: #6666e5;
+
   /* Text 컬러 */
   --color-text-black: #171718;
   --color-text-gray1: #494a50;
@@ -172,6 +176,21 @@
     line-height: 18px;
   }
 
+  /* 에러/성공 메시지 스타일 */
+  .text-error {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 12px;
+    color: var(--color-error);
+  }
+
+  .text-success {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 12px;
+    color: var(--color-success);
+  }
+
   /* 비밀번호 입력 필드 스타일 */
   input[type="password"] {
     letter-spacing: 0.1em;
@@ -183,6 +202,16 @@
 }
 
 @layer utilities {
+  /* 스크롤바 숨기기 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE, Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+
   /* Safe Area 대응 (iOS 노치) */
   .safe-area-top {
     padding-top: env(safe-area-inset-top);

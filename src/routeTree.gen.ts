@@ -14,6 +14,10 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
 import { Route as AuthSignupTypeRouteRouteImport } from './routes/_auth/signup/type/route'
 import { Route as AuthSignupTermsRouteRouteImport } from './routes/_auth/signup/terms/route'
+import { Route as AuthSignupSuccessRouteRouteImport } from './routes/_auth/signup/success/route'
+import { Route as AuthSignupPurposeRouteRouteImport } from './routes/_auth/signup/purpose/route'
+import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/_auth/signup/info-more/route'
+import { Route as AuthSignupInfoRouteRouteImport } from './routes/_auth/signup/info/route'
 
 const MainRoute = MainRouteImport.update({
   id: '/_main',
@@ -38,14 +42,42 @@ const AuthSignupTermsRouteRoute = AuthSignupTermsRouteRouteImport.update({
   path: '/signup/terms',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSignupSuccessRouteRoute = AuthSignupSuccessRouteRouteImport.update({
+  id: '/signup/success',
+  path: '/signup/success',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupPurposeRouteRoute = AuthSignupPurposeRouteRouteImport.update({
+  id: '/signup/purpose',
+  path: '/signup/purpose',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupInfoMoreRouteRoute = AuthSignupInfoMoreRouteRouteImport.update({
+  id: '/signup/info-more',
+  path: '/signup/info-more',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
+  id: '/signup/info',
+  path: '/signup/info',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRouteRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
   '/signup/terms': typeof AuthSignupTermsRouteRoute
   '/signup/type': typeof AuthSignupTypeRouteRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRouteRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
   '/signup/terms': typeof AuthSignupTermsRouteRoute
   '/signup/type': typeof AuthSignupTypeRouteRoute
 }
@@ -54,19 +86,41 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_main': typeof MainRoute
   '/_auth/login': typeof AuthLoginRouteRoute
+  '/_auth/signup/info': typeof AuthSignupInfoRouteRoute
+  '/_auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/_auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/_auth/signup/success': typeof AuthSignupSuccessRouteRoute
   '/_auth/signup/terms': typeof AuthSignupTermsRouteRoute
   '/_auth/signup/type': typeof AuthSignupTypeRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/signup/terms' | '/signup/type'
+  fullPaths:
+    | '/login'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/signup/terms' | '/signup/type'
+  to:
+    | '/login'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
   id:
     | '__root__'
     | '/_auth'
     | '/_main'
     | '/_auth/login'
+    | '/_auth/signup/info'
+    | '/_auth/signup/info-more'
+    | '/_auth/signup/purpose'
+    | '/_auth/signup/success'
     | '/_auth/signup/terms'
     | '/_auth/signup/type'
   fileRoutesById: FileRoutesById
@@ -113,17 +167,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupTermsRouteRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/signup/success': {
+      id: '/_auth/signup/success'
+      path: '/signup/success'
+      fullPath: '/signup/success'
+      preLoaderRoute: typeof AuthSignupSuccessRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/purpose': {
+      id: '/_auth/signup/purpose'
+      path: '/signup/purpose'
+      fullPath: '/signup/purpose'
+      preLoaderRoute: typeof AuthSignupPurposeRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/info-more': {
+      id: '/_auth/signup/info-more'
+      path: '/signup/info-more'
+      fullPath: '/signup/info-more'
+      preLoaderRoute: typeof AuthSignupInfoMoreRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/info': {
+      id: '/_auth/signup/info'
+      path: '/signup/info'
+      fullPath: '/signup/info'
+      preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthLoginRouteRoute: typeof AuthLoginRouteRoute
+  AuthSignupInfoRouteRoute: typeof AuthSignupInfoRouteRoute
+  AuthSignupInfoMoreRouteRoute: typeof AuthSignupInfoMoreRouteRoute
+  AuthSignupPurposeRouteRoute: typeof AuthSignupPurposeRouteRoute
+  AuthSignupSuccessRouteRoute: typeof AuthSignupSuccessRouteRoute
   AuthSignupTermsRouteRoute: typeof AuthSignupTermsRouteRoute
   AuthSignupTypeRouteRoute: typeof AuthSignupTypeRouteRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRouteRoute: AuthLoginRouteRoute,
+  AuthSignupInfoRouteRoute: AuthSignupInfoRouteRoute,
+  AuthSignupInfoMoreRouteRoute: AuthSignupInfoMoreRouteRoute,
+  AuthSignupPurposeRouteRoute: AuthSignupPurposeRouteRoute,
+  AuthSignupSuccessRouteRoute: AuthSignupSuccessRouteRoute,
   AuthSignupTermsRouteRoute: AuthSignupTermsRouteRoute,
   AuthSignupTypeRouteRoute: AuthSignupTypeRouteRoute,
 }

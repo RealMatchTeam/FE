@@ -1,0 +1,29 @@
+interface IconProps {
+  width?: number;
+  height?: number;
+  className?: string;
+}
+
+export function CheckCircleIcon({ width = 64, height = 64, className = "" }: IconProps) {
+  return (
+    <div
+      className={`flex justify-center items-center gap-[10px] rounded-[41px] bg-core-1 ${className}`}
+      style={{ width, height, padding: 18, aspectRatio: "1/1" }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="28"
+        viewBox="0 0 14 14"
+        className="text-white"
+      >
+        <path
+          fill="currentColor"
+          fillRule="evenodd"
+          d="M13.637 1.198a1 1 0 0 1 .134 1.408l-8.04 9.73l-.003.002a1.92 1.92 0 0 1-1.5.693a1.92 1.92 0 0 1-1.499-.748l-.001-.002L.21 9.045a1 1 0 1 1 1.578-1.228l2.464 3.167l7.976-9.652a1 1 0 0 1 1.408-.134Z"
+          clipRule="evenodd"
+        />
+      </svg>
+    </div>
+  );
+}

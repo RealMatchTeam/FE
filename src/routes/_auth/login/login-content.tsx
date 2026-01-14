@@ -28,6 +28,11 @@ function LoginContent() {
     navigate({ to: "/signup/type" });
   };
 
+  const openSocialSignUp = () => {
+    // 소셜 회원가입도 타입 선택 페이지로
+    navigate({ to: "/signup/type", search: { type: "social" } });
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen px-6 pt-32 py-6 bg-grad-auth">
       {/* 로고 영역 */}
@@ -83,7 +88,7 @@ function LoginContent() {
       </div>
 
       {/* 소셜 로그인 */}
-      <SocialLoginSection onKakaoClick={openSignUp} onNaverClick={openSignUp} />
+      <SocialLoginSection onKakaoClick={openSocialSignUp} onNaverClick={openSocialSignUp} />
     </div>
   );
 }

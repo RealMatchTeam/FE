@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 
 interface FlowNavigationProps {
   currentStep: number;
@@ -7,13 +7,13 @@ interface FlowNavigationProps {
 }
 
 export function FlowNavigation({ currentStep, totalSteps, onBack }: FlowNavigationProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else {
-      navigate({ to: "/login" });
+      router.history.back();
     }
   };
 

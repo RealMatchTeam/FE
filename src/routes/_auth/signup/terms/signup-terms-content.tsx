@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import Button from "../../../../components/common/Button";
 import { CheckIcon } from "../../components/CheckIcon";
 import { FlowNavigation } from "../../components/FlowNavigation";
@@ -6,6 +7,10 @@ import { TermsSection } from "./components/TermsSection";
 import { SubTermsSection } from "./components/SubTermsSection";
 
 function SignUpTermsContent() {
+  const navigate = useNavigate();
+  const { type } = useSearch({ from: "/_auth/signup/terms" });
+  const isSocial = type === "social";
+  const totalSteps = isSocial ? 3 : 4;
   const [allAgree, setAllAgree] = useState(false);
   const [age14, setAge14] = useState(false);
   const [serviceTerms, setServiceTerms] = useState(false);
@@ -38,21 +43,20 @@ function SignUpTermsContent() {
 
   const handleNext = () => {
     if (requiredChecked) {
-      // 다음 페이지로 이동
-      console.log("약관 동의 완료");
+      navigate({ to: "/signup/info", search: { type } });
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-grad-auth">
       {/* 플로우 네비게이션 */}
-      <FlowNavigation currentStep={1} totalSteps={4} />
+      <FlowNavigation currentStep={1} totalSteps={totalSteps} />
 
       <div className="flex flex-col flex-1 px-6 py-6">
 
       {/* 헤더 */}
-      <div className="flex-1 pt-7.5">
-        <h2 className="text-title text-text-black text-center mb-15.5">
+      <div className="flex-1">
+        <h2 className="text-title text-text-black text-center mb-15">
           약관에 동의해주세요
         </h2>
 
@@ -98,7 +102,7 @@ function SignUpTermsContent() {
           fullWidth
           disabled={!requiredChecked}
           onClick={handleNext}
-          className={!requiredChecked ? "!bg-core-1 !text-white !cursor-not-allowed" : ""}
+          className={!requiredChecked ? "bg-core-1! text-white! cursor-not-allowed!" : ""}
         >
           다음
         </Button>
