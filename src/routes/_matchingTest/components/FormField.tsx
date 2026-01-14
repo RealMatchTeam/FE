@@ -13,6 +13,11 @@ export default function FormField({
 }: FormFieldProps) {
   const hasValue = value.trim().length > 0;
 
+
+
+
+
+  
   return (
     <button
       type="button"
@@ -24,7 +29,7 @@ export default function FormField({
         // ✅ Figma: 좌우 16px
         "px-4",
         // ✅ 입력 전/후 높이
-        hasValue ? "h-[46px]" : "h-[52px]",
+hasValue ? "min-h-[46px] py-2" : "h-[52px]",
         "active:opacity-90 transition-[height] duration-150",
         // ✅ 레이아웃
         hasValue
@@ -42,8 +47,14 @@ export default function FormField({
         </div>
       ) : (
         // ✅ 입력 후 (라벨 안 보임, 값만 중앙)
-        <span className="text-title1 text-core-1">{value}</span>
-      )}
+<span
+  className={[
+    "text-title1 text-core-1 text-center",
+    "whitespace-pre-line", // ✅ \n 줄바꿈 렌더
+  ].join(" ")}
+>
+  {hasValue ? value : placeholder}
+</span>      )}
     </button>
   );
 }

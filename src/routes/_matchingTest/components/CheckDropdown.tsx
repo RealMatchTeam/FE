@@ -1,29 +1,28 @@
 interface CheckDropdownProps<T extends readonly string[]> {
   options: T;
-  value: string; // 단일 선택
-  onChange: (v: T[number]) => void;
+  values: string[]; // ✅ 다중 선택
+  onToggle: (v: T[number]) => void; // ✅ 토글
   onDone: () => void;
 }
 
 export default function CheckDropdown<T extends readonly string[]>({
   options,
-  value,
-  onChange,
+  values,
+  onToggle,
   onDone,
 }: CheckDropdownProps<T>) {
   return (
-    // ✅ 작은 카드 하나만
     <div className="mx-auto w-full max-w-[260px] rounded-2xl border border-text-gray4 bg-white px-4 py-4">
       {/* 옵션 */}
       <div className="flex flex-col items-center gap-4">
         {options.map((opt) => {
-          const checked = opt === value;
+          const checked = values.includes(opt);
 
           return (
             <button
               key={opt}
               type="button"
-              onClick={() => onChange(opt)}
+              onClick={() => onToggle(opt)}
               className="flex items-center gap-3 active:opacity-90"
             >
               {/* 체크박스 */}

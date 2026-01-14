@@ -67,9 +67,8 @@ export default function MatchingTestStep3Content({
     }),
     [step3Chips]
   );
-
-  const genderValue = step3Selected.gender[0] ?? "";
-  const ageValue = step3Selected.ageGroup[0] ?? "";
+const genderValue = step3Selected.gender.join("\n");
+const ageValue = step3Selected.ageGroup.join("\n");
   const lenValue = step3Selected.videoLength[0] ?? "";
   const viewsValue = step3Selected.views[0] ?? "";
 
@@ -230,33 +229,31 @@ export default function MatchingTestStep3Content({
         </BottomSheet>
       ) : null}
 
+
+
 {sheet === "gender" ? (
   <BottomSheet title="성별" onClose={close}>
-    <div className="flex justify-center">
-      <CheckDropdown
-        title="성별"
-        options={GENDER}
-        value={genderValue}
-        onChange={(v) => setSingleSelect("gender", v)}
-        onDone={close}
-      />
-    </div>
+    <CheckDropdown
+      options={GENDER}
+      values={step3Selected.gender}
+      onToggle={(v) => onToggleSelect("gender", v)}
+      onDone={close}
+    />
   </BottomSheet>
 ) : null}
 
+
 {sheet === "ageGroup" ? (
   <BottomSheet title="나이대" onClose={close}>
-    <div className="flex justify-center">
-      <CheckDropdown
-        title="나이대"
-        options={AGE}
-        value={ageValue}
-        onChange={(v) => setSingleSelect("ageGroup", v)}
-        onDone={close}
-      />
-    </div>
+    <CheckDropdown
+      options={AGE}
+      values={step3Selected.ageGroup}
+      onToggle={(v) => onToggleSelect("ageGroup", v)}
+      onDone={close}
+    />
   </BottomSheet>
 ) : null}
+
 
       {sheet === "videoLength" ? (
         <BottomSheet title="영상 길이" onClose={close}>
