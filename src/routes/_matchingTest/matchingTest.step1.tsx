@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import MatchingTestContent from "./matchingTestContent";
+import MatchingTestContent from "./matchingTest.step1Content";
 import { useMatchingTestStore, type SectionKey } from "./matchingTest.store";
 
 const SECTIONS: Array<{
@@ -48,7 +48,7 @@ function MatchingTestStep1Page() {
       isSelected={isSelected}
       onToggle={(section, label) => toggleStore(section, label, MAX_PER_SECTION)}
       canGoNext={canGoNext}
-      onBack={() => history.back()}
+      onBack={() => navigate({ to: "/" })}
       onNext={() => navigate({ to: "/matchingTest/step2" })}
     />
   );

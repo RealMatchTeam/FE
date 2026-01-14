@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
-import type {
-  Step3ChipKey,
-  Step3ChipsState,
-  Step3SelectKey,
-  Step3SelectedState,
-} from "./matchingTest.store.ts";
+import type { Step3ChipKey, Step3ChipsState, Step3SelectKey, Step3SelectedState } from "./matchingTest.store.ts";
 
+import MatchingTestTopBar from "./components/matchingTestHeader.tsx";
 import SelectChip from "./components/SelectChip";
 import FormField from "./components/FormField";
 import BottomSheet from "./components/BottomSheet";
@@ -13,10 +9,7 @@ import InputSheet from "./components/InputSheet";
 import SelectSheet from "./components/SelectSheet";
 import CheckDropdown from "./components/CheckDropdown";
 
-
 type Props = {
-  progressText: string;
-
   snsUrl: string;
   onSnsUrlChange: (v: string) => void;
   isValidInstagramUrl: boolean;
@@ -35,8 +28,6 @@ type Props = {
 
 type Sheet = null | "snsUrl" | "gender" | "ageGroup" | "videoLength" | "views";
 
-const CONTAINER = "mx-auto w-full max-w-[420px]";
-
 const GENDER = ["여성", "남성"] as const;
 const AGE = ["10~20대", "20~30대", "30~40대", "40~50대", "50대~"] as const;
 const VIDEO_LEN = ["~15초", "15~30초", "30~45초", "45~60초"] as const;
@@ -49,7 +40,6 @@ const CONTENT_HARDNESS = ["관여 안함", "가이드라인만 제공", "대본 
 const EDITING_RANGE = ["크리에이터 1차 활용", "브랜드 2차 활용"] as const;
 
 export default function MatchingTestStep3Content({
-  progressText,
   snsUrl,
   onSnsUrlChange,
   isValidInstagramUrl,
@@ -67,15 +57,16 @@ export default function MatchingTestStep3Content({
   const close = () => setSheet(null);
 
   const max = 5;
-  const chipDisabled = useMemo(() => {
-    return {
+  const chipDisabled = useMemo(
+    () => ({
       contentFormat: step3Chips.contentFormat.length >= max,
       contentType: step3Chips.contentType.length >= max,
       contentTone: step3Chips.contentTone.length >= max,
       contentHardness: step3Chips.contentHardness.length >= max,
       editingRange: step3Chips.editingRange.length >= max,
-    };
-  }, [step3Chips]);
+    }),
+    [step3Chips]
+  );
 
   const genderValue = step3Selected.gender[0] ?? "";
   const ageValue = step3Selected.ageGroup[0] ?? "";
@@ -84,168 +75,147 @@ export default function MatchingTestStep3Content({
 
   return (
     <div className="min-h-dvh bg-white">
-      <div className={CONTAINER}>
-        {/* progress */}
-        <div className="pt-2">
-          <div className="h-[2px] w-full bg-bluegray-2">
-            <div className="h-[2px] w-full bg-core-1" />
+      {/* ✅ step1과 동일한 상단 컴포넌트만 사용 */}
+      <MatchingTestTopBar step={3} totalSteps={3} onBack={onBack} />
+
+      {/* ✅ step1 기준: px-6 */}
+      <div className="px-6 pb-6">
+        <h1 className="text-title1 text-text-black">
+          <span className="text-core-1">콘텐츠 특성</span>을 모두 선택해주세요
+        </h1>
+
+        <div className="mt-6">
+          <div className="text-sm font-semibold text-text-black">SNS 정보</div>
+          <div className="mt-2 text-body2 text-text-gray3">SNS 주소를 입력해주세요</div>
+
+          <div className="mt-2">
+            <FormField
+              label="인스타그램 주소"
+              value={snsUrl}
+              placeholder="입력하기"
+              onClick={() => open("snsUrl")}
+            />
+          </div>
+
+          <div className="mt-4 text-body2 text-text-gray3">주 시청자 정보를 선택해주세요</div>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <FormField label="성별" value={genderValue} placeholder="선택하기" onClick={() => open("gender")} />
+            <FormField label="나이대" value={ageValue} placeholder="선택하기" onClick={() => open("ageGroup")} />
+          </div>
+
+          <div className="mt-3 text-body2 text-text-gray3">평균 영상 길이 및 조회수를 선택해주세요</div>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <FormField label="영상 길이" value={lenValue} placeholder="선택하기" onClick={() => open("videoLength")} />
+            <FormField label="조회수" value={viewsValue} placeholder="선택하기" onClick={() => open("views")} />
           </div>
         </div>
 
-        <div className="px-5 pb-6 pt-4">
-          {/* header */}
-          <div className="relative mb-5 flex items-start justify-center">
-            <button
-              type="button"
-              onClick={onBack}
-              className="absolute left-0 top-0 rounded-md p-2 text-text-gray2 active:opacity-90"
-              aria-label="back"
-            >
-              ←
-            </button>
-            <div className="text-sm text-text-gray3">{progressText}</div>
-          </div>
+        <Section title="콘텐츠 형식">
+          <ChipRow>
+            {CONTENT_FORMAT.map((x) => {
+              const sel = step3Chips.contentFormat.includes(x);
+              const disabled = !sel && chipDisabled.contentFormat;
+              return (
+                <SelectChip
+                  key={x}
+                  label={x}
+                  isSelected={sel}
+                  disabled={disabled}
+                  onToggle={() => onToggleChip("contentFormat", x)}
+                />
+              );
+            })}
+          </ChipRow>
+        </Section>
 
-          <h1 className="text-title1 text-text-black">
-            <span className="text-core-1">콘텐츠 특성</span>을 모두 선택해주세요
-          </h1>
+        <Section title="콘텐츠 종류">
+          <ChipRow>
+            {CONTENT_TYPE.map((x) => {
+              const sel = step3Chips.contentType.includes(x);
+              const disabled = !sel && chipDisabled.contentType;
+              return (
+                <SelectChip
+                  key={x}
+                  label={x}
+                  isSelected={sel}
+                  disabled={disabled}
+                  onToggle={() => onToggleChip("contentType", x)}
+                />
+              );
+            })}
+          </ChipRow>
+        </Section>
 
-          {/* SNS */}
-          <div className="mt-6">
-            <div className="text-sm font-semibold text-text-black">SNS 정보</div>
-            <div className="mt-2 text-body2 text-text-gray3">SNS 주소를 입력해주세요</div>
+        <Section title="콘텐츠 톤">
+          <ChipRow>
+            {CONTENT_TONE.map((x) => {
+              const sel = step3Chips.contentTone.includes(x);
+              const disabled = !sel && chipDisabled.contentTone;
+              return (
+                <SelectChip
+                  key={x}
+                  label={x}
+                  isSelected={sel}
+                  disabled={disabled}
+                  onToggle={() => onToggleChip("contentTone", x)}
+                />
+              );
+            })}
+          </ChipRow>
+        </Section>
 
-            <div className="mt-2">
-              <FormField
-                label="인스타그램 주소"
-                value={snsUrl}
-                placeholder="입력하기"
-                onClick={() => open("snsUrl")}
-              />
-            </div>
+        <Section title="콘텐츠 관여도">
+          <ChipRow>
+            {CONTENT_HARDNESS.map((x) => {
+              const sel = step3Chips.contentHardness.includes(x);
+              const disabled = !sel && chipDisabled.contentHardness;
+              return (
+                <SelectChip
+                  key={x}
+                  label={x}
+                  isSelected={sel}
+                  disabled={disabled}
+                  onToggle={() => onToggleChip("contentHardness", x)}
+                />
+              );
+            })}
+          </ChipRow>
+        </Section>
 
-            <div className="mt-4 text-body2 text-text-gray3">주 시청자 정보를 선택해주세요</div>
-            <div className="mt-2 grid grid-cols-2 gap-3">
-              <FormField label="성별" value={genderValue} placeholder="선택하기" onClick={() => open("gender")} />
-              <FormField label="나이대" value={ageValue} placeholder="선택하기" onClick={() => open("ageGroup")} />
-            </div>
-
-            <div className="mt-3 text-body2 text-text-gray3">평균 영상 길이 및 조회수를 선택해주세요</div>
-            <div className="mt-2 grid grid-cols-2 gap-3">
-              <FormField label="영상 길이" value={lenValue} placeholder="선택하기" onClick={() => open("videoLength")} />
-              <FormField label="조회수" value={viewsValue} placeholder="선택하기" onClick={() => open("views")} />
-            </div>
-          </div>
-
-          {/* Chips */}
-          <Section title="콘텐츠 형식">
-            <ChipRow>
-              {CONTENT_FORMAT.map((x) => {
-                const sel = step3Chips.contentFormat.includes(x);
-                const disabled = !sel && chipDisabled.contentFormat;
-                return (
-                  <SelectChip
-                    key={x}
-                    label={x}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggleChip("contentFormat", x)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
-
-          <Section title="콘텐츠 종류">
-            <ChipRow>
-              {CONTENT_TYPE.map((x) => {
-                const sel = step3Chips.contentType.includes(x);
-                const disabled = !sel && chipDisabled.contentType;
-                return (
-                  <SelectChip
-                    key={x}
-                    label={x}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggleChip("contentType", x)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
-
-          <Section title="콘텐츠 톤">
-            <ChipRow>
-              {CONTENT_TONE.map((x) => {
-                const sel = step3Chips.contentTone.includes(x);
-                const disabled = !sel && chipDisabled.contentTone;
-                return (
-                  <SelectChip
-                    key={x}
-                    label={x}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggleChip("contentTone", x)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
-
-          <Section title="콘텐츠 관여도">
-            <ChipRow>
-              {CONTENT_HARDNESS.map((x) => {
-                const sel = step3Chips.contentHardness.includes(x);
-                const disabled = !sel && chipDisabled.contentHardness;
-                return (
-                  <SelectChip
-                    key={x}
-                    label={x}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggleChip("contentHardness", x)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
-
-          <Section title="콘텐츠 희망 활용 범위">
-            <ChipRow>
-              {EDITING_RANGE.map((x) => {
-                const sel = step3Chips.editingRange.includes(x);
-                const disabled = !sel && chipDisabled.editingRange;
-                return (
-                  <SelectChip
-                    key={x}
-                    label={x}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggleChip("editingRange", x)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
-        </div>
-
-        {/* CTA */}
-        <div className="sticky bottom-0 bg-white px-5 pb-6 pt-3">
-          <button
-            type="button"
-            disabled={!canGoNext}
-            onClick={onNext}
-            className={[
-              "w-full rounded-2xl py-4 text-title1",
-              canGoNext ? "bg-core-1 text-white active:opacity-90" : "bg-bluegray-2 text-text-gray3",
-            ].join(" ")}
-          >
-            다음
-          </button>
-        </div>
+        <Section title="콘텐츠 희망 활용 범위">
+          <ChipRow>
+            {EDITING_RANGE.map((x) => {
+              const sel = step3Chips.editingRange.includes(x);
+              const disabled = !sel && chipDisabled.editingRange;
+              return (
+                <SelectChip
+                  key={x}
+                  label={x}
+                  isSelected={sel}
+                  disabled={disabled}
+                  onToggle={() => onToggleChip("editingRange", x)}
+                />
+              );
+            })}
+          </ChipRow>
+        </Section>
       </div>
 
-      {/* Sheets */}
+      {/* ✅ step1 기준: px-6 */}
+      <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
+        <button
+          type="button"
+          disabled={!canGoNext}
+          onClick={onNext}
+          className={[
+            "w-full rounded-2xl py-4 text-title1",
+            canGoNext ? "bg-core-1 text-white active:opacity-90" : "bg-bluegray-2 text-text-gray3",
+          ].join(" ")}
+        >
+          다음
+        </button>
+      </div>
+
       {sheet === "snsUrl" ? (
         <BottomSheet title="인스타그램 주소 입력" onClose={close}>
           <InputSheet
@@ -260,29 +230,33 @@ export default function MatchingTestStep3Content({
         </BottomSheet>
       ) : null}
 
-      {sheet === "gender" ? (
-        <BottomSheet title="성별" onClose={close}>
-          <CheckDropdown
-            title="성별"
-            options={GENDER}
-            value={genderValue}
-            onChange={(v) => setSingleSelect("gender", v)}
-            onDone={close}
-          />
-        </BottomSheet>
-      ) : null}
+{sheet === "gender" ? (
+  <BottomSheet title="성별" onClose={close}>
+    <div className="flex justify-center">
+      <CheckDropdown
+        title="성별"
+        options={GENDER}
+        value={genderValue}
+        onChange={(v) => setSingleSelect("gender", v)}
+        onDone={close}
+      />
+    </div>
+  </BottomSheet>
+) : null}
 
-      {sheet === "ageGroup" ? (
-        <BottomSheet title="나이대" onClose={close}>
-          <CheckDropdown
-            title="나이대"
-            options={AGE}
-            value={ageValue}
-            onChange={(v) => setSingleSelect("ageGroup", v)}
-            onDone={close}
-          />
-        </BottomSheet>
-      ) : null}
+{sheet === "ageGroup" ? (
+  <BottomSheet title="나이대" onClose={close}>
+    <div className="flex justify-center">
+      <CheckDropdown
+        title="나이대"
+        options={AGE}
+        value={ageValue}
+        onChange={(v) => setSingleSelect("ageGroup", v)}
+        onDone={close}
+      />
+    </div>
+  </BottomSheet>
+) : null}
 
       {sheet === "videoLength" ? (
         <BottomSheet title="영상 길이" onClose={close}>
@@ -290,7 +264,6 @@ export default function MatchingTestStep3Content({
             options={VIDEO_LEN}
             value={lenValue}
             onSelect={(v) => {
-              // 기존 토글 방식 유지 (원하면 이것도 단일 set으로 바꿀 수 있음)
               if (lenValue && lenValue !== v) onToggleSelect("videoLength", lenValue);
               if (lenValue !== v) onToggleSelect("videoLength", v);
               close();
@@ -318,10 +291,10 @@ export default function MatchingTestStep3Content({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mt-6">
+    <section className="mt-6">
       <div className="text-sm font-semibold text-text-black">{title}</div>
       <div className="mt-2">{children}</div>
-    </div>
+    </section>
   );
 }
 

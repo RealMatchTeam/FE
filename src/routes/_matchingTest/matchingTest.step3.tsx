@@ -25,8 +25,8 @@ function MatchingTestStep3Page() {
   const toggleChip = useMatchingTestStore((s) => s.toggleStep3Chip);
 
   const onToggleSelect = (key: Step3SelectKey, label: string) => {
-    // ✅ 성별/나이대는 다중선택, 영상길이/조회수는 단일 선택이 스샷에 더 가까움
-    const max =
+    // ✅ 성별/나이대는 다중선택, 영상길이/조회수는 단일 선택
+    const max = 
       key === "videoLength" || key === "views" ? 1 : MAX_MULTI;
     toggleSelect(key, label, max);
   };
@@ -43,7 +43,7 @@ function MatchingTestStep3Page() {
     const lenOk = step3Selected.videoLength.length > 0;
     const viewsOk = step3Selected.views.length > 0;
 
-    // 칩은 최소 1개씩 원하면 아래처럼
+    // 칩은 최소 1개씩 원함
     const chipsOk =
       step3Chips.contentFormat.length > 0 &&
       step3Chips.contentType.length > 0 &&
@@ -56,13 +56,12 @@ function MatchingTestStep3Page() {
 
   return (
 <MatchingTestStep3Content
-  progressText="3 / 3"
   snsUrl={snsUrl}
   onSnsUrlChange={setSnsUrl}
-  isValidInstagramUrl={isValidInstagramUrl}   // ✅ 추가
+  isValidInstagramUrl={isValidInstagramUrl}
   step3Selected={step3Selected}
   onToggleSelect={onToggleSelect}
-    setSingleSelect={setSingleSelect}   // ✅ 이 줄 추가!
+    setSingleSelect={setSingleSelect}  
 
   step3Chips={step3Chips}
   onToggleChip={onToggleChip}

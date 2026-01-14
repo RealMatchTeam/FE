@@ -6,10 +6,9 @@ import FormField from "./components/FormField";
 import BottomSheet from "./components/BottomSheet";
 import InputSheet from "./components/InputSheet";
 import SelectSheet from "./components/SelectSheet";
-
+import MatchingTestTopBar from "./components/matchingTestHeader";
 
 type Props = {
-  progressText: string;
   maxText: string;
   maxPerSection: number;
 
@@ -35,7 +34,6 @@ type Props = {
 const CONTAINER = "mx-auto w-full max-w-[420px]";
 type SheetType = null | "height" | "bodyShape" | "topSize" | "bottomSize";
 
-// ✅ 옵션은 네 서비스에 맞게 바꿔도 됨
 const STYLE = ["미니멀", "페미닌", "러블리", "비즈니스 캐주얼", "캐주얼", "스트리트"] as const;
 const ITEM = ["의류", "가방", "신발", "주얼리", "패션 소품"] as const;
 const BRAND = ["SPA", "빈티지", "중가 브랜드", "디자이너 브랜드", "명품 브랜드"] as const;
@@ -44,7 +42,8 @@ const BODY_SHAPE_OPTIONS = ["마름", "표준", "통통", "근육형", "웨이�
 const TOP_SIZE_OPTIONS = ["33", "44", "55", "66", "77"] as const;
 
 export default function MatchingTestStep2Content({
-  progressText,
+  // progressText는 이제 TopBar가 step/total로 그리므로 사실상 불필요하지만,
+  // 부모 props 변경이 귀찮으면 일단 유지해도 됨.
   maxText,
   maxPerSection,
   selected,
@@ -66,7 +65,6 @@ export default function MatchingTestStep2Content({
   const open = (t: SheetType) => setSheet(t);
   const close = () => setSheet(null);
 
-  // ✅ step1과 동일한 UX: max 도달 시 “선택 안 된 것들만” disabled 처리
   const chipDisabled = useMemo(() => {
     return {
       fashionStyle: selected.fashionStyle.length >= maxPerSection,
@@ -78,27 +76,10 @@ export default function MatchingTestStep2Content({
   return (
     <div className="min-h-dvh bg-white">
       <div className={CONTAINER}>
-        {/* progress */}
-        <div className="pt-2">
-          <div className="h-[2px] w-full bg-bluegray-2">
-            <div className="h-[2px] w-2/3 bg-core-1" />
-          </div>
-        </div>
+        {/* ✅ 공용 상단 (2/3) */}
+        <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
-        <div className="px-5 pb-6 pt-4">
-          {/* header */}
-          <div className="relative mb-5 flex items-start justify-center">
-            <button
-              type="button"
-              onClick={onBack}
-              className="absolute left-0 top-0 rounded-md p-2 text-text-gray2 active:opacity-90"
-              aria-label="back"
-            >
-              ←
-            </button>
-            <div className="text-sm text-text-gray3">{progressText}</div>
-          </div>
-
+        <div className="px-5 pb-6">
           <h1 className="text-title1 text-text-black">
             관심 있는 <span className="text-core-1">패션 특성</span>을 <br />
             모두 선택해주세요!

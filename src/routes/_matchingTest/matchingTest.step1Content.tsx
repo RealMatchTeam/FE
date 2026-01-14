@@ -1,4 +1,5 @@
 import SelectChip from "./components/SelectChip";
+import MatchingTestTopBar from "./components/matchingTestHeader";
 
 type SectionKey = "style" | "function" | "skinType" | "skinTone" | "makeupStyle";
 
@@ -11,7 +12,8 @@ interface MatchingSection {
 type SelectedState = Record<SectionKey, string[]>;
 
 interface MatchingTestContentProps {
-  progressText: string;
+  // 기존 props 유지(부모에서 내려주고 있으면 안 깨지게)
+  progressText: string; // 이제 TopBar가 step/total로 직접 보여주므로 사실상 불필요하지만 유지
   maxText: string;
 
   sections: readonly MatchingSection[];
@@ -28,7 +30,7 @@ interface MatchingTestContentProps {
 }
 
 export default function MatchingTestContent({
-  progressText,
+  // progressText는 더 이상 쓰지 않지만(부모 변경 전까지) props는 유지 가능
   maxText,
   sections,
   selected,
@@ -41,29 +43,11 @@ export default function MatchingTestContent({
 }: MatchingTestContentProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* ✅ 진행바 위 여백 38px */}
-      <div className="pt-[38px]">
-        <div className="h-1 w-full bg-bluegray-1">
-          <div className="h-1 w-[133px] bg-core-1 rounded-full" />
-        </div>
-      </div>
+      {/* ✅ 공용 상단 (1/3) */}
+      <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
 
-      {/* ✅ 버튼 sticky라서 본문 하단 여백 확보 */}
-      <main className="flex-1 px-6 pt-6">
-        {/* 상단 헤더 */}
-        <div className="relative flex items-center justify-center mb-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className="absolute left-0 text-text-gray3 text-[24px] leading-none active:opacity-90"
-            aria-label="뒤로가기"
-          >
-            ‹
-          </button>
-
-          <span className="text-body1 text-text-gray3">{progressText}</span>
-        </div>
-
+      {/* ✅ 본문 */}
+      <main className="flex-1 px-6">
         {/* 타이틀 */}
         <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
           관심 있는 <span className="text-core-1">뷰티 특성</span>을
@@ -86,9 +70,6 @@ export default function MatchingTestContent({
               <div className="flex flex-wrap gap-3">
                 {section.items.map((label) => {
                   const checked = isSelected(section.key, label);
-
-                  // ✅ 섹션에서 2개 꽉 찼으면 “추가 선택”만 막고,
-                  // 이미 선택된 칩은 해제 가능해야 함
                   const disabled = !checked && sectionLimitReached;
 
                   return (
@@ -107,7 +88,7 @@ export default function MatchingTestContent({
         })}
       </main>
 
-      {/* ✅ 하단 고정(컨테이너 폭 안에서): sticky */}
+      {/* ✅ 하단 고정 */}
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
         <button
           type="button"

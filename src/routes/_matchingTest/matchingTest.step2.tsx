@@ -41,7 +41,6 @@ function MatchingTestStep2Page() {
 
   return (
     <MatchingTestStep2Content
-      progressText="2 / 3"
       maxText="*최대 5개까지 선택 가능합니다."
       maxPerSection={MAX_PER_SECTION}
       selected={selected}

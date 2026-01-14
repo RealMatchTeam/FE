@@ -9,24 +9,31 @@ interface BottomSheetProps {
 export default function BottomSheet({ title, children, onClose }: BottomSheetProps) {
   return (
     <div className="fixed inset-0 z-50">
+      {/* dim */}
       <button
         type="button"
         aria-label="close"
         onClick={onClose}
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-black/40"
       />
-      <div className="absolute bottom-0 left-1/2 w-full max-w-[420px] -translate-x-1/2 rounded-t-2xl bg-white px-5 pb-6 pt-4">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="text-sm font-semibold text-gray-900">{title}</div>
+
+      {/* sheet */}
+      <div className="absolute bottom-0 left-1/2 w-full max-w-[430px] -translate-x-1/2 rounded-t-2xl bg-white shadow-xl">
+        {/* header: 좌 타이틀 / 우 닫기 */}
+        <div className="flex items-center justify-between px-5 pt-5">
+          <div className="text-[14px] font-semibold text-text-black">{title}</div>
+
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md px-2 py-1 text-sm text-gray-500 active:opacity-90"
+            className="text-[13px] font-medium text-text-gray3 active:opacity-90"
           >
             닫기
           </button>
         </div>
-        {children}
+
+        {/* content */}
+        <div className="px-5 pb-6 pt-4">{children}</div>
       </div>
     </div>
   );
