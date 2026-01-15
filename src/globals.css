@@ -202,6 +202,20 @@
 }
 
 @layer utilities {
+  /* 슬라이드 업 애니메이션 */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
   /* 스크롤바 숨기기 */
   .scrollbar-hide {
     -ms-overflow-style: none;  /* IE, Edge */

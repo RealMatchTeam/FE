@@ -6,39 +6,63 @@ import { FlowNavigation } from "../../components/FlowNavigation";
 import { TermsSection } from "./components/TermsSection";
 import { SubTermsSection } from "./components/SubTermsSection";
 
+// 약관 동의 상태 타입 정의
+interface TermsState {
+  age14: boolean;
+  serviceTerms: boolean;
+  privacyCollection: boolean;
+  privacy3rdParty: boolean;
+  eventMarketing: boolean;
+  privacyUsage: boolean;
+  emailPush: boolean;
+}
+
+// 초기 상태
+const initialTermsState: TermsState = {
+  age14: false,
+  serviceTerms: false,
+  privacyCollection: false,
+  privacy3rdParty: false,
+  eventMarketing: false,
+  privacyUsage: false,
+  emailPush: false,
+};
+
 function SignUpTermsContent() {
   const navigate = useNavigate();
   const { type } = useSearch({ from: "/_auth/signup/terms" });
   const isSocial = type === "social";
   const totalSteps = isSocial ? 3 : 4;
-  const [allAgree, setAllAgree] = useState(false);
-  const [age14, setAge14] = useState(false);
-  const [serviceTerms, setServiceTerms] = useState(false);
-  const [privacyCollection, setPrivacyCollection] = useState(false);
-  const [privacy3rdParty, setPrivacy3rdParty] = useState(false);
-  const [eventMarketing, setEventMarketing] = useState(false);
-  const [privacyUsage, setPrivacyUsage] = useState(false);
-  const [emailPush, setEmailPush] = useState(false);
 
-  // 필수 항목이 모두 체크되었는지 확인
-  const requiredChecked = age14 && serviceTerms && privacyCollection && privacy3rdParty;
+  // 관련 상태를 하나의 객체로 그룹화
+  const [terms, setTerms] = useState<TermsState>(initialTermsState);
+
+  // 전체 동의 여부는 상태에서 파생
+  const allAgree = Object.values(terms).every(Boolean);
+
+  // 필수 항목이 모두 체크되었는지 확인 
+  const requiredChecked =
+    terms.age14 && terms.serviceTerms && terms.privacyCollection && terms.privacy3rdParty;
 
   // 전체 동의 토글
   const handleAllAgree = (checked: boolean) => {
-    setAllAgree(checked);
-    setAge14(checked);
-    setServiceTerms(checked);
-    setPrivacyCollection(checked);
-    setPrivacy3rdParty(checked);
-    setEventMarketing(checked);
-    setPrivacyUsage(checked);
-    setEmailPush(checked);
+    setTerms({
+      age14: checked,
+      serviceTerms: checked,
+      privacyCollection: checked,
+      privacy3rdParty: checked,
+      eventMarketing: checked,
+      privacyUsage: checked,
+      emailPush: checked,
+    });
   };
 
-  // 개별 항목 변경 시 전체 동의 상태 업데이트
-  const updateAllAgree = () => {
-    const allChecked = age14 && serviceTerms && privacyCollection && privacy3rdParty && eventMarketing && privacyUsage && emailPush;
-    setAllAgree(allChecked);
+  // 개별 항목 토글 - 새로운 값을 기반으로 상태 업데이트
+  const handleTermChange = (key: keyof TermsState) => {
+    setTerms((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
   const handleNext = () => {
@@ -71,25 +95,25 @@ function SignUpTermsContent() {
 
         {/* 개별 약관 */}
         <TermsSection
-          age14={age14}
-          serviceTerms={serviceTerms}
-          privacyCollection={privacyCollection}
-          privacy3rdParty={privacy3rdParty}
-          eventMarketing={eventMarketing}
-          onAge14Change={() => { setAge14(!age14); updateAllAgree(); }}
-          onServiceTermsChange={() => { setServiceTerms(!serviceTerms); updateAllAgree(); }}
-          onPrivacyCollectionChange={() => { setPrivacyCollection(!privacyCollection); updateAllAgree(); }}
-          onPrivacy3rdPartyChange={() => { setPrivacy3rdParty(!privacy3rdParty); updateAllAgree(); }}
-          onEventMarketingChange={() => { setEventMarketing(!eventMarketing); updateAllAgree(); }}
+          age14={terms.age14}
+          serviceTerms={terms.serviceTerms}
+          privacyCollection={terms.privacyCollection}
+          privacy3rdParty={terms.privacy3rdParty}
+          eventMarketing={terms.eventMarketing}
+          onAge14Change={() => handleTermChange("age14")}
+          onServiceTermsChange={() => handleTermChange("serviceTerms")}
+          onPrivacyCollectionChange={() => handleTermChange("privacyCollection")}
+          onPrivacy3rdPartyChange={() => handleTermChange("privacy3rdParty")}
+          onEventMarketingChange={() => handleTermChange("eventMarketing")}
         />
 
         {/* 하위 항목들 (개인정보 이용 동의, 이메일/앱 푸시 수신 동의) */}
         <div className="mt-4 px-12">
           <SubTermsSection
-            privacyUsage={privacyUsage}
-            emailPush={emailPush}
-            onPrivacyUsageChange={() => { setPrivacyUsage(!privacyUsage); updateAllAgree(); }}
-            onEmailPushChange={() => { setEmailPush(!emailPush); updateAllAgree(); }}
+            privacyUsage={terms.privacyUsage}
+            emailPush={terms.emailPush}
+            onPrivacyUsageChange={() => handleTermChange("privacyUsage")}
+            onEmailPushChange={() => handleTermChange("emailPush")}
           />
         </div>
       </div>

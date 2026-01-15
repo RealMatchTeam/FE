@@ -16,6 +16,15 @@ export function ContentCategorySection({
 
   const handleToggle = (category: string) => {
     onToggleCategory(category);
+    
+    // 모든 카테고리가 선택되면 자동으로 드롭다운 닫기
+    const willBeSelected = selectedCategories.includes(category)
+      ? selectedCategories.filter((c) => c !== category)
+      : [...selectedCategories, category];
+    
+    if (willBeSelected.length === CONTENT_CATEGORIES.length) {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -44,19 +53,26 @@ export function ContentCategorySection({
             )}
           </button>
           {isOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-core-2 rounded-xl overflow-hidden shadow-lg">
-              {CONTENT_CATEGORIES.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => handleToggle(category)}
-                  className="w-full px-4 py-3 flex items-center justify-center gap-2 text-title4 text-core-1 hover:bg-core-70 transition-colors"
-                >
-                  <CheckIcon checked={selectedCategories.includes(category)} />
-                  <span>{category}</span>
-                </button>
-              ))}
-            </div>
+            <>
+              {/* 외부 클릭 감지용 오버레이 */}
+              <div
+                className="fixed inset-0 z-0"
+                onClick={() => setIsOpen(false)}
+              />
+              <div className="absolute z-10 w-full mt-1 bg-white border border-core-2 rounded-xl overflow-hidden shadow-lg">
+                {CONTENT_CATEGORIES.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => handleToggle(category)}
+                    className="w-full px-4 py-3 flex items-center justify-center gap-2 text-title4 text-core-1 hover:bg-core-70 transition-colors"
+                  >
+                    <CheckIcon checked={selectedCategories.includes(category)} />
+                    <span>{category}</span>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>

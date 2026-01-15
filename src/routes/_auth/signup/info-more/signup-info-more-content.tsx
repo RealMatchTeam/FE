@@ -51,8 +51,7 @@ function SignUpInfoMoreContent() {
         <form className="space-y-6">
           {/* 나이 입력 필드 */}
           <AgeSection<InfoMoreFormData>
-            register={form.register}
-            errors={form.formState.errors}
+            setValue={form.setValue}
           />
           {/* 성별 선택 필드 */}
           <GenderSection<InfoMoreFormData>

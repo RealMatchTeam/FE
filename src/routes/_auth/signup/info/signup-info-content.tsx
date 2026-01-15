@@ -168,8 +168,7 @@ function SignUpInfoContent() {
             />
             {/* 나이 입력 필드 */}
             <AgeSection<SocialFormData>
-              register={socialForm.register}
-              errors={socialForm.formState.errors}
+              setValue={socialForm.setValue}
             />
             {/* 성별 선택 필드 */}
             <GenderSection<SocialFormData>

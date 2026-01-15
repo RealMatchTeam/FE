@@ -1,20 +1,50 @@
-import type { FieldErrors, FieldValues, Path, UseFormRegister } from "react-hook-form";
-import { InputField } from "../../components/InputField";
+import { useState } from "react";
+import type { FieldValues, UseFormSetValue, Path } from "react-hook-form";
+import { DatePickerModal } from "./DatePickerModal";
 
 interface AgeSectionProps<T extends FieldValues> {
-  register: UseFormRegister<T>;
-  errors: FieldErrors<T>;
+  setValue: UseFormSetValue<T>;
 }
 
-export function AgeSection<T extends FieldValues>({ register, errors }: AgeSectionProps<T>) {
+export function AgeSection<T extends FieldValues>({ setValue }: AgeSectionProps<T>) {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<{
+    year: string;
+    month: string;
+    day: string;
+  } | null>(null);
+
+  const handleDateSelect = (date: { year: string; month: string; day: string }) => {
+    setSelectedDate(date);
+    // form에 생년월일 저장 (YYYY-MM-DD 형식)
+    const formattedDate = `${date.year}-${date.month.padStart(2, "0")}-${date.day.padStart(2, "0")}`;
+    setValue("birthDate" as Path<T>, formattedDate as T[Path<T>]);
+  };
+
+  const displayText = selectedDate
+    ? `${selectedDate.year}. ${selectedDate.month}. ${selectedDate.day}`
+    : null;
+
   return (
     <div className="space-y-1">
-      <h3 className="text-title1 text-text-black">나이</h3>
-      <InputField
-        type="number"
-        placeholder="나이를 입력해주세요"
-        {...register("age" as Path<T>, { required: "나이를 입력해주세요" })}
-        error={(errors.age as { message?: string } | undefined)?.message}
+      <h3 className="text-title1 text-text-black">생년월일</h3>
+      <button
+        type="button"
+        onClick={() => setIsPickerOpen(true)}
+        className="flex w-full h-[46px] px-4 items-center pl-4 rounded-xl border border-core-2 bg-bg-w-80"
+      >
+        {displayText ? (
+          <span className="text-callout1 text-text-gray1">{displayText}</span>
+        ) : (
+          <span className="flex w-full text-button text-core-1 justify-center">선택하기</span>
+        )}
+      </button>
+
+      <DatePickerModal
+        isOpen={isPickerOpen}
+        onClose={() => setIsPickerOpen(false)}
+        onSelect={handleDateSelect}
+        initialValue={selectedDate || undefined}
       />
     </div>
   );
