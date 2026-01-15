@@ -31,9 +31,6 @@ function MatchingTestStep3Page() {
     toggleSelect(key, label, max);
   };
 
-  const setSingleSelect = useMatchingTestStore((s) => s.setSingleStep3Select);
-
-
   const onToggleChip = (key: Step3ChipKey, label: string) => toggleChip(key, label, MAX_CHIP);
 
   const canGoNext = useMemo(() => {
@@ -61,13 +58,11 @@ function MatchingTestStep3Page() {
   isValidInstagramUrl={isValidInstagramUrl}
   step3Selected={step3Selected}
   onToggleSelect={onToggleSelect}
-    setSingleSelect={setSingleSelect}  
-
   step3Chips={step3Chips}
   onToggleChip={onToggleChip}
   canGoNext={canGoNext}
   onBack={() => navigate({ to: "/matchingTest/step2" })}
-onNext={() => navigate({ to: "/matchingResult" })}
+  onNext={() => navigate({ to: "/matchingResult" })}
 />
 
   );

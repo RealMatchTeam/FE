@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Step3ChipKey, Step3ChipsState, Step3SelectKey, Step3SelectedState } from "./matchingTest.store.ts";
 
-import MatchingTestTopBar from "./components/matchingTestHeader.tsx";
+import MatchingTestTopBar from "./components/MatchingTestHeader";
 import SelectChip from "./components/SelectChip";
 import FormField from "./components/FormField";
 import BottomSheet from "./components/BottomSheet";
@@ -16,7 +16,6 @@ type Props = {
 
   step3Selected: Step3SelectedState;
   onToggleSelect: (key: Step3SelectKey, label: string) => void;
-  setSingleSelect: (key: Step3SelectKey, label: string) => void;
 
   step3Chips: Step3ChipsState;
   onToggleChip: (key: Step3ChipKey, label: string) => void;
@@ -45,7 +44,6 @@ export default function MatchingTestStep3Content({
   isValidInstagramUrl,
   step3Selected,
   onToggleSelect,
-  setSingleSelect,
   step3Chips,
   onToggleChip,
   canGoNext,

@@ -6,7 +6,7 @@ import FormField from "./components/FormField";
 import BottomSheet from "./components/BottomSheet";
 import InputSheet from "./components/InputSheet";
 import SelectSheet from "./components/SelectSheet";
-import MatchingTestTopBar from "./components/matchingTestHeader";
+import MatchingTestTopBar from "./components/MatchingTestHeader";
 
 type Props = {
   maxText: string;

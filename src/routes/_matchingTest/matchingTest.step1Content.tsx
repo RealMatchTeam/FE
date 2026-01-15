@@ -1,5 +1,5 @@
 import SelectChip from "./components/SelectChip";
-import MatchingTestTopBar from "./components/matchingTestHeader";
+import MatchingTestTopBar from "./components/MatchingTestHeader";
 
 type SectionKey = "style" | "function" | "skinType" | "skinTone" | "makeupStyle";
 
