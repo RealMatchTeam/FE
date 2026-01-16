@@ -9,9 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MatchingTestRouteImport } from './routes/_matchingTest'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as MatchingTestMatchingResultRouteImport } from './routes/_matchingTest/matchingResult'
+import { Route as MainHomeRouteImport } from './routes/_main/_home'
 import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
+import { Route as MainHomeIndexRouteImport } from './routes/_main/_home/index'
+import { Route as MatchingTestMatchingTestStep3RouteImport } from './routes/_matchingTest/matchingTest.step3'
+import { Route as MatchingTestMatchingTestStep2RouteImport } from './routes/_matchingTest/matchingTest.step2'
+import { Route as MatchingTestMatchingTestStep1RouteImport } from './routes/_matchingTest/matchingTest.step1'
 import { Route as AuthSignupTypeRouteRouteImport } from './routes/_auth/signup/type/route'
 import { Route as AuthSignupTermsRouteRouteImport } from './routes/_auth/signup/terms/route'
 import { Route as AuthSignupSuccessRouteRouteImport } from './routes/_auth/signup/success/route'
@@ -19,6 +26,10 @@ import { Route as AuthSignupPurposeRouteRouteImport } from './routes/_auth/signu
 import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/_auth/signup/info-more/route'
 import { Route as AuthSignupInfoRouteRouteImport } from './routes/_auth/signup/info/route'
 
+const MatchingTestRoute = MatchingTestRouteImport.update({
+  id: '/_matchingTest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainRoute = MainRouteImport.update({
   id: '/_main',
   getParentRoute: () => rootRouteImport,
@@ -27,11 +38,44 @@ const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MatchingTestMatchingResultRoute =
+  MatchingTestMatchingResultRouteImport.update({
+    id: '/matchingResult',
+    path: '/matchingResult',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MainHomeRoute = MainHomeRouteImport.update({
+  id: '/_home',
+  getParentRoute: () => MainRoute,
+} as any)
 const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const MainHomeIndexRoute = MainHomeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainHomeRoute,
+} as any)
+const MatchingTestMatchingTestStep3Route =
+  MatchingTestMatchingTestStep3RouteImport.update({
+    id: '/matchingTest/step3',
+    path: '/matchingTest/step3',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MatchingTestMatchingTestStep2Route =
+  MatchingTestMatchingTestStep2RouteImport.update({
+    id: '/matchingTest/step2',
+    path: '/matchingTest/step2',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MatchingTestMatchingTestStep1Route =
+  MatchingTestMatchingTestStep1RouteImport.update({
+    id: '/matchingTest/step1',
+    path: '/matchingTest/step1',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
 const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
   id: '/signup/type',
   path: '/signup/type',
@@ -65,73 +109,115 @@ const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRouteRoute
+  '/matchingResult': typeof MatchingTestMatchingResultRoute
   '/signup/info': typeof AuthSignupInfoRouteRoute
   '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
   '/signup/purpose': typeof AuthSignupPurposeRouteRoute
   '/signup/success': typeof AuthSignupSuccessRouteRoute
   '/signup/terms': typeof AuthSignupTermsRouteRoute
   '/signup/type': typeof AuthSignupTypeRouteRoute
+  '/matchingTest/step1': typeof MatchingTestMatchingTestStep1Route
+  '/matchingTest/step2': typeof MatchingTestMatchingTestStep2Route
+  '/matchingTest/step3': typeof MatchingTestMatchingTestStep3Route
+  '/': typeof MainHomeIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRouteRoute
+  '/matchingResult': typeof MatchingTestMatchingResultRoute
   '/signup/info': typeof AuthSignupInfoRouteRoute
   '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
   '/signup/purpose': typeof AuthSignupPurposeRouteRoute
   '/signup/success': typeof AuthSignupSuccessRouteRoute
   '/signup/terms': typeof AuthSignupTermsRouteRoute
   '/signup/type': typeof AuthSignupTypeRouteRoute
+  '/matchingTest/step1': typeof MatchingTestMatchingTestStep1Route
+  '/matchingTest/step2': typeof MatchingTestMatchingTestStep2Route
+  '/matchingTest/step3': typeof MatchingTestMatchingTestStep3Route
+  '/': typeof MainHomeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
-  '/_main': typeof MainRoute
+  '/_main': typeof MainRouteWithChildren
+  '/_matchingTest': typeof MatchingTestRouteWithChildren
   '/_auth/login': typeof AuthLoginRouteRoute
+  '/_main/_home': typeof MainHomeRouteWithChildren
+  '/_matchingTest/matchingResult': typeof MatchingTestMatchingResultRoute
   '/_auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/_auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
   '/_auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
   '/_auth/signup/success': typeof AuthSignupSuccessRouteRoute
   '/_auth/signup/terms': typeof AuthSignupTermsRouteRoute
   '/_auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/_matchingTest/matchingTest/step1': typeof MatchingTestMatchingTestStep1Route
+  '/_matchingTest/matchingTest/step2': typeof MatchingTestMatchingTestStep2Route
+  '/_matchingTest/matchingTest/step3': typeof MatchingTestMatchingTestStep3Route
+  '/_main/_home/': typeof MainHomeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
+    | '/matchingResult'
     | '/signup/info'
     | '/signup/info-more'
     | '/signup/purpose'
     | '/signup/success'
     | '/signup/terms'
     | '/signup/type'
+    | '/matchingTest/step1'
+    | '/matchingTest/step2'
+    | '/matchingTest/step3'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/matchingResult'
     | '/signup/info'
     | '/signup/info-more'
     | '/signup/purpose'
     | '/signup/success'
     | '/signup/terms'
     | '/signup/type'
+    | '/matchingTest/step1'
+    | '/matchingTest/step2'
+    | '/matchingTest/step3'
+    | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/_main'
+    | '/_matchingTest'
     | '/_auth/login'
+    | '/_main/_home'
+    | '/_matchingTest/matchingResult'
     | '/_auth/signup/info'
     | '/_auth/signup/info-more'
     | '/_auth/signup/purpose'
     | '/_auth/signup/success'
     | '/_auth/signup/terms'
     | '/_auth/signup/type'
+    | '/_matchingTest/matchingTest/step1'
+    | '/_matchingTest/matchingTest/step2'
+    | '/_matchingTest/matchingTest/step3'
+    | '/_main/_home/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
-  MainRoute: typeof MainRoute
+  MainRoute: typeof MainRouteWithChildren
+  MatchingTestRoute: typeof MatchingTestRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_matchingTest': {
+      id: '/_matchingTest'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MatchingTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_main': {
       id: '/_main'
       path: ''
@@ -146,12 +232,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_matchingTest/matchingResult': {
+      id: '/_matchingTest/matchingResult'
+      path: '/matchingResult'
+      fullPath: '/matchingResult'
+      preLoaderRoute: typeof MatchingTestMatchingResultRouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_main/_home': {
+      id: '/_main/_home'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainHomeRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_main/_home/': {
+      id: '/_main/_home/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof MainHomeIndexRouteImport
+      parentRoute: typeof MainHomeRoute
+    }
+    '/_matchingTest/matchingTest/step3': {
+      id: '/_matchingTest/matchingTest/step3'
+      path: '/matchingTest/step3'
+      fullPath: '/matchingTest/step3'
+      preLoaderRoute: typeof MatchingTestMatchingTestStep3RouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_matchingTest/matchingTest/step2': {
+      id: '/_matchingTest/matchingTest/step2'
+      path: '/matchingTest/step2'
+      fullPath: '/matchingTest/step2'
+      preLoaderRoute: typeof MatchingTestMatchingTestStep2RouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_matchingTest/matchingTest/step1': {
+      id: '/_matchingTest/matchingTest/step1'
+      path: '/matchingTest/step1'
+      fullPath: '/matchingTest/step1'
+      preLoaderRoute: typeof MatchingTestMatchingTestStep1RouteImport
+      parentRoute: typeof MatchingTestRoute
     }
     '/_auth/signup/type': {
       id: '/_auth/signup/type'
@@ -220,9 +348,50 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface MainHomeRouteChildren {
+  MainHomeIndexRoute: typeof MainHomeIndexRoute
+}
+
+const MainHomeRouteChildren: MainHomeRouteChildren = {
+  MainHomeIndexRoute: MainHomeIndexRoute,
+}
+
+const MainHomeRouteWithChildren = MainHomeRoute._addFileChildren(
+  MainHomeRouteChildren,
+)
+
+interface MainRouteChildren {
+  MainHomeRoute: typeof MainHomeRouteWithChildren
+}
+
+const MainRouteChildren: MainRouteChildren = {
+  MainHomeRoute: MainHomeRouteWithChildren,
+}
+
+const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
+
+interface MatchingTestRouteChildren {
+  MatchingTestMatchingResultRoute: typeof MatchingTestMatchingResultRoute
+  MatchingTestMatchingTestStep1Route: typeof MatchingTestMatchingTestStep1Route
+  MatchingTestMatchingTestStep2Route: typeof MatchingTestMatchingTestStep2Route
+  MatchingTestMatchingTestStep3Route: typeof MatchingTestMatchingTestStep3Route
+}
+
+const MatchingTestRouteChildren: MatchingTestRouteChildren = {
+  MatchingTestMatchingResultRoute: MatchingTestMatchingResultRoute,
+  MatchingTestMatchingTestStep1Route: MatchingTestMatchingTestStep1Route,
+  MatchingTestMatchingTestStep2Route: MatchingTestMatchingTestStep2Route,
+  MatchingTestMatchingTestStep3Route: MatchingTestMatchingTestStep3Route,
+}
+
+const MatchingTestRouteWithChildren = MatchingTestRoute._addFileChildren(
+  MatchingTestRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
-  MainRoute: MainRoute,
+  MainRoute: MainRouteWithChildren,
+  MatchingTestRoute: MatchingTestRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
