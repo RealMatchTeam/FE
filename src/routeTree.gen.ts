@@ -11,10 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as AuthRouteImport } from './routes/_auth'
-import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainMypageRouteImport } from './routes/_main/mypage'
-import { Route as MainMatchingRouteImport } from './routes/_main/matching'
-import { Route as MainChatRouteImport } from './routes/_main/chat'
+import { Route as BusinessCalendarRouteImport } from './routes/_business/calendar'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 
 const MainRoute = MainRouteImport.update({
@@ -25,25 +22,10 @@ const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MainIndexRoute = MainIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MainRoute,
-} as any)
-const MainMypageRoute = MainMypageRouteImport.update({
-  id: '/mypage',
-  path: '/mypage',
-  getParentRoute: () => MainRoute,
-} as any)
-const MainMatchingRoute = MainMatchingRouteImport.update({
-  id: '/matching',
-  path: '/matching',
-  getParentRoute: () => MainRoute,
-} as any)
-const MainChatRoute = MainChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => MainRoute,
+const BusinessCalendarRoute = BusinessCalendarRouteImport.update({
+  id: '/_business/calendar',
+  path: '/calendar',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
@@ -53,47 +35,31 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
-  '/chat': typeof MainChatRoute
-  '/matching': typeof MainMatchingRoute
-  '/mypage': typeof MainMypageRoute
-  '/': typeof MainIndexRoute
+  '/calendar': typeof BusinessCalendarRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
-  '/chat': typeof MainChatRoute
-  '/matching': typeof MainMatchingRoute
-  '/mypage': typeof MainMypageRoute
-  '/': typeof MainIndexRoute
+  '/calendar': typeof BusinessCalendarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
-  '/_main': typeof MainRouteWithChildren
+  '/_main': typeof MainRoute
   '/_auth/login': typeof AuthLoginRoute
-  '/_main/chat': typeof MainChatRoute
-  '/_main/matching': typeof MainMatchingRoute
-  '/_main/mypage': typeof MainMypageRoute
-  '/_main/': typeof MainIndexRoute
+  '/_business/calendar': typeof BusinessCalendarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/chat' | '/matching' | '/mypage' | '/'
+  fullPaths: '/login' | '/calendar'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/chat' | '/matching' | '/mypage' | '/'
-  id:
-    | '__root__'
-    | '/_auth'
-    | '/_main'
-    | '/_auth/login'
-    | '/_main/chat'
-    | '/_main/matching'
-    | '/_main/mypage'
-    | '/_main/'
+  to: '/login' | '/calendar'
+  id: '__root__' | '/_auth' | '/_main' | '/_auth/login' | '/_business/calendar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
-  MainRoute: typeof MainRouteWithChildren
+  MainRoute: typeof MainRoute
+  BusinessCalendarRoute: typeof BusinessCalendarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -112,33 +78,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_main/': {
-      id: '/_main/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof MainIndexRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/mypage': {
-      id: '/_main/mypage'
-      path: '/mypage'
-      fullPath: '/mypage'
-      preLoaderRoute: typeof MainMypageRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/matching': {
-      id: '/_main/matching'
-      path: '/matching'
-      fullPath: '/matching'
-      preLoaderRoute: typeof MainMatchingRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/chat': {
-      id: '/_main/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof MainChatRouteImport
-      parentRoute: typeof MainRoute
+    '/_business/calendar': {
+      id: '/_business/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof BusinessCalendarRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_auth/login': {
       id: '/_auth/login'
@@ -160,25 +105,10 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
-interface MainRouteChildren {
-  MainChatRoute: typeof MainChatRoute
-  MainMatchingRoute: typeof MainMatchingRoute
-  MainMypageRoute: typeof MainMypageRoute
-  MainIndexRoute: typeof MainIndexRoute
-}
-
-const MainRouteChildren: MainRouteChildren = {
-  MainChatRoute: MainChatRoute,
-  MainMatchingRoute: MainMatchingRoute,
-  MainMypageRoute: MainMypageRoute,
-  MainIndexRoute: MainIndexRoute,
-}
-
-const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
-  MainRoute: MainRouteWithChildren,
+  MainRoute: MainRoute,
+  BusinessCalendarRoute: BusinessCalendarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
