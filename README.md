@@ -2,6 +2,7 @@
 
 ## 기술 스택
 
+- **패키지 매니저**: pnpm
 - **프레임워크**: Vite 7 + React 19
 - **라우팅**: TanStack Router (File-based Routing)
 - **언어**: TypeScript 5
@@ -106,13 +107,13 @@ Tailwind CSS v4에서는 `@theme` 블록에서 CSS 변수로 커스텀 색상을
 ### 설치
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 개발 서버 실행
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 브라우저에서 [http://localhost:5173](http://localhost:5173)을 열어 확인하세요.
@@ -150,8 +151,8 @@ PWA 설정은 `vite.config.ts`에 정의되어 있습니다:
 ## 빌드
 
 ```bash
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
 
 ## 개발 컨벤션
