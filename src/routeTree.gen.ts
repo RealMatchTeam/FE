@@ -14,7 +14,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
 import { Route as MainMypageRouteImport } from './routes/_main/mypage'
 import { Route as MainMatchingRouteImport } from './routes/_main/matching'
-import { Route as MainChatRouteImport } from './routes/_main/chat'
+import { Route as MainChatRouteImport } from './routes/_main/_chat/route'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as ChatComponentsTestRouteImport } from './routes/_chat/components/test'
 
