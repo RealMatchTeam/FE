@@ -2,7 +2,7 @@ import Header from "../../../components/layout/Header";
 import { useState, useMemo, useContext, useEffect } from "react";
 import { LayoutContext } from "../layout-context";
 import { type SortOption, SORT_LABEL } from "./types/SortOption";
-import { rooms } from "./data/mockData";
+import { rooms } from "../../../data/chat-room";
 import ChatListHeader from "./components/ChatListHeader";
 import SortFilterSheet from "./components/SortingSheet";
 import ChatList from "./components/ChatList";

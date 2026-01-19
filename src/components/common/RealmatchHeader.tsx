@@ -19,15 +19,15 @@ export default function RealMatchHeader({
 
     // 가능하면 라우터 상위로, 실패하면 브라우저 히스토리
     try {
-      navigate({ to: "/matchingTest/step3" });
+      navigate({ to: "/matching-test/matching-test/step3" });
     } catch {
       window.history.back();
     }
   };
 
   return (
-<header className="h-[56px] w-full bg-white">
-<div className="grid h-full w-full grid-cols-3 items-center px-4">
+    <header className="h-[56px] w-full bg-white">
+      <div className="grid h-full w-full grid-cols-3 items-center px-4">
         {/* Left: Back */}
         <div className="flex items-center">
           {showBack ? (
@@ -60,7 +60,7 @@ export default function RealMatchHeader({
         {/* Center: Logo + Text (정중앙 고정) */}
         <div className="flex items-center justify-center gap-2">
           <img
-            src= {RealMatchLogo}
+            src={RealMatchLogo}
             alt="Real Match"
             draggable={false}
           />
@@ -68,7 +68,7 @@ export default function RealMatchHeader({
       </div>
 
       {/* 하단 얇은 divider (스크린샷의 라인 느낌) */}
-  <div className="h-px w-full bg-black/5" />
+      <div className="h-px w-full bg-black/5" />
     </header>
   );
 }

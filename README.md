@@ -21,18 +21,42 @@ src/
 ├── main.tsx                # 엔트리 포인트
 ├── App.tsx                 # RouterProvider 및 Provider 설정
 ├── globals.css             # Tailwind v4 설정 및 디자인 시스템
+├── utils/                  # 유틸리티 함수
+├── stores/                 # Zustand 전역 상태 관리
+├── data/                   # Mock 데이터 및 상수
 ├── routes/                 # TanStack Router 파일 기반 라우팅
 │   ├── __root.tsx          # 최상위 루트 레이아웃 (MobileContainer)
-│   ├── _auth.tsx           # 인증 레이아웃 (탭바 없음)
-│   │   └── login/          # /login
+│   ├── auth/               # 인증 라우트 (/auth/*)
+│   │   └── login/          # /auth/login
 │   │       ├── route.tsx
 │   │       └── login-content.tsx
 │   ├── _main.tsx           # 메인 레이아웃 (BottomTab 포함)
-│   │   ├── components/     # _main 전용 컴포넌트 (BottomTab 등)
-│   │   └── _home/          # / (홈)
-│   │       ├── index.tsx       # 라우트 정의
-│   │       ├── home-content.tsx
-│   │       └── components/
+│   │   ├── layout-context.tsx   # BottomTab 표시 제어
+│   │   ├── components/     # _main 전용 컴포넌트
+│   │   │   └── BottomTab.tsx
+│   │   ├── _home/          # / (홈)
+│   │   │   ├── index.tsx
+│   │   │   ├── home-content.tsx
+│   │   │   └── components/
+│   │   └── _chat/          # /_main/_chat (채팅 목록)
+│   │       ├── route.tsx
+│   │       ├── chat-content.tsx
+│   │       ├── chatting-room.tsx  # /_main/_chat/chatting-room
+│   │       ├── components/
+│   │       └── types/
+│   ├── matching-test/      # 매칭 테스트 라우트 (/matching-test/*)
+│   │   ├── matching-test/  # /matching-test/matching-test/*
+│   │   │   ├── step1/
+│   │   │   │   ├── route.tsx
+│   │   │   │   └── step1-content.tsx
+│   │   │   ├── step2/
+│   │   │   └── step3/
+│   │   ├── matching-result/  # /matching-test/matching-result
+│   │   │   ├── route.tsx
+│   │   │   └── matching-result-content.tsx
+│   │   └── components/
+│   └── _business/          # 비즈니스 라우트
+│       └── calendar/       # /_business/calendar
 └── components/
     └── layout/             # 레이아웃 컴포넌트
         ├── MobileContainer.tsx  # 데스크톱 중앙 정렬 래퍼

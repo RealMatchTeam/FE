@@ -4,7 +4,7 @@ import WhiteLogo from "../../../../assets/whitelogo.svg"
 export default function StartMatchingTestButton() {
   return (
     <Link
-      to="/matchingTest/step1"
+      to="/matching-test/matching-test/step1"
       className={[
         " flex h-[44px] w-full items-center justify-center gap-[6px] rounded-2xl bg-[#6666E5] text-[14px] font-semibold text-white active:scale-[0.99]"
       ].join(" ")}
