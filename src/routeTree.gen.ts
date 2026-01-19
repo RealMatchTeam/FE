@@ -13,7 +13,6 @@ import { Route as MatchingTestRouteImport } from './routes/_matchingTest'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as MatchingTestMatchingResultRouteImport } from './routes/_matchingTest/matchingResult'
-import { Route as MainHomeRouteImport } from './routes/_main/_home'
 import { Route as MainChatRouteRouteImport } from './routes/_main/_chat/route'
 import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
 import { Route as MainHomeIndexRouteImport } from './routes/_main/_home/index'
@@ -46,10 +45,6 @@ const MatchingTestMatchingResultRoute =
     path: '/matchingResult',
     getParentRoute: () => MatchingTestRoute,
   } as any)
-const MainHomeRoute = MainHomeRouteImport.update({
-  id: '/_home',
-  getParentRoute: () => MainRoute,
-} as any)
 const MainChatRouteRoute = MainChatRouteRouteImport.update({
   id: '/_chat',
   getParentRoute: () => MainRoute,
@@ -60,9 +55,9 @@ const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 const MainHomeIndexRoute = MainHomeIndexRouteImport.update({
-  id: '/',
+  id: '/_home/',
   path: '/',
-  getParentRoute: () => MainHomeRoute,
+  getParentRoute: () => MainRoute,
 } as any)
 const MatchingTestMatchingTestStep3Route =
   MatchingTestMatchingTestStep3RouteImport.update({
@@ -155,7 +150,6 @@ export interface FileRoutesById {
   '/_matchingTest': typeof MatchingTestRouteWithChildren
   '/_auth/login': typeof AuthLoginRouteRoute
   '/_main/_chat': typeof MainChatRouteRouteWithChildren
-  '/_main/_home': typeof MainHomeRouteWithChildren
   '/_matchingTest/matchingResult': typeof MatchingTestMatchingResultRoute
   '/_auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/_auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -207,7 +201,6 @@ export interface FileRouteTypes {
     | '/_matchingTest'
     | '/_auth/login'
     | '/_main/_chat'
-    | '/_main/_home'
     | '/_matchingTest/matchingResult'
     | '/_auth/signup/info'
     | '/_auth/signup/info-more'
@@ -258,13 +251,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchingTestMatchingResultRouteImport
       parentRoute: typeof MatchingTestRoute
     }
-    '/_main/_home': {
-      id: '/_main/_home'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof MainHomeRouteImport
-      parentRoute: typeof MainRoute
-    }
     '/_main/_chat': {
       id: '/_main/_chat'
       path: ''
@@ -284,7 +270,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof MainHomeIndexRouteImport
-      parentRoute: typeof MainHomeRoute
+      parentRoute: typeof MainRoute
     }
     '/_matchingTest/matchingTest/step3': {
       id: '/_matchingTest/matchingTest/step3'
@@ -393,26 +379,14 @@ const MainChatRouteRouteWithChildren = MainChatRouteRoute._addFileChildren(
   MainChatRouteRouteChildren,
 )
 
-interface MainHomeRouteChildren {
-  MainHomeIndexRoute: typeof MainHomeIndexRoute
-}
-
-const MainHomeRouteChildren: MainHomeRouteChildren = {
-  MainHomeIndexRoute: MainHomeIndexRoute,
-}
-
-const MainHomeRouteWithChildren = MainHomeRoute._addFileChildren(
-  MainHomeRouteChildren,
-)
-
 interface MainRouteChildren {
   MainChatRouteRoute: typeof MainChatRouteRouteWithChildren
-  MainHomeRoute: typeof MainHomeRouteWithChildren
+  MainHomeIndexRoute: typeof MainHomeIndexRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
   MainChatRouteRoute: MainChatRouteRouteWithChildren,
-  MainHomeRoute: MainHomeRouteWithChildren,
+  MainHomeIndexRoute: MainHomeIndexRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
