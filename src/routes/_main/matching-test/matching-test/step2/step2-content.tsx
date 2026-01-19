@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Step2SectionKey, Step2SelectedState } from "../../../../stores/matching-test";
+import type { Step2SectionKey, Step2SelectedState } from "../../../../../stores/matching-test";
 
 import SelectChip from "../../components/SelectChip";
 import FormField from "../../components/FormField";

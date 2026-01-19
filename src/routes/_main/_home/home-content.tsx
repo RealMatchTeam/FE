@@ -1,28 +1,13 @@
 import StartMatchingTestButton from "./components/StartRMButton";
-import RMLOGO from "../../../assets/RealMatchLogo_ex.svg";
+
 import MainIcon from "../../../assets/MainIcon.svg";
 
 
 export default function HomeContent() {
   return (
     <div className="w-full bg-gradient-to-b from-[#F6F7FF] to-white">
-      {/* ✅ Header: 좌/중/우 3칸으로 '진짜 중앙' 고정 */}
-      <header className="h-[60px] w-full bg-white">
-        <div className="grid h-full w-full grid-cols-3 items-center">
-          {/* Left: back */}
-          <div className="flex items-center">
-          </div>
+      {/* Header */}
 
-          {/* Center: logo + text (정중앙) */}
-          <div className="flex items-center justify-center">
-            <img
-              src={RMLOGO}
-              alt="Real Match"
-              draggable={false}
-            />
-          </div>
-        </div>
-      </header>
 
       {/* Body */}
       <main className="flex w-full flex-col items-center px-6 text-center pt-[160px]">

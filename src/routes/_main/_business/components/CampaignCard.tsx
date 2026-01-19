@@ -1,6 +1,6 @@
-import BrandLogo from "../../../assets/brand-logo.png";
-import ArrowRight from "../../../assets/arrow-right.svg";
-import SearchIcon from "../../../assets/search.svg";
+import BrandLogo from "../../../../assets/brand-logo.png";
+import ArrowRight from "../../../../assets/arrow-right.svg";
+import SearchIcon from "../../../../assets/search.svg";
 
 interface CampaignCardProps {
   brand: string;
@@ -19,7 +19,7 @@ export default function CampaignCard({
   logo,
   showButton = true,
 }: CampaignCardProps) {
-  const BUTTON_WIDTH = '280px'; 
+  const BUTTON_WIDTH = '280px';
 
   return (
     <div className="flex p-4 bg-white rounded-2xl shadow-sm">
@@ -34,7 +34,7 @@ export default function CampaignCard({
         </div>
 
         {/* 2. 정보 및 버튼 영역 */}
-        <div 
+        <div
           className="flex flex-col h-[72px] justify-between"
           style={{ width: BUTTON_WIDTH }}
         >
@@ -58,17 +58,17 @@ export default function CampaignCard({
 
           {/* 캠페인 보기 버튼 */}
           {showButton && (
-            <button 
+            <button
               className="relative flex items-center justify-center bg-[#EBEEFB] rounded-[6px] transition-colors hover:bg-[#DEE2F5]"
               style={{ width: BUTTON_WIDTH, height: '50px' }}
             >
               {/* 돋보기 아이콘만 왼쪽 정렬 */}
-              <img 
-                src={SearchIcon} 
-                alt="돋보기" 
-                className="absolute left-[12px] w-3.5 h-3.5 object-contain" 
+              <img
+                src={SearchIcon}
+                alt="돋보기"
+                className="absolute left-[12px] w-3.5 h-3.5 object-contain"
               />
-              
+
               {/* 글자는 버튼의 정중앙에 위치 */}
               <span className="text-[13px] font-medium text-text-black">
                 캠페인 보기

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Step3ChipKey, Step3ChipsState, Step3SelectKey, Step3SelectedState } from "../../../../stores/matching-test";
+import type { Step3ChipKey, Step3ChipsState, Step3SelectKey, Step3SelectedState } from "../../../../../stores/matching-test";
 
 import MatchingTestTopBar from "../../components/MatchingTestHeader";
 import SelectChip from "../../components/SelectChip";

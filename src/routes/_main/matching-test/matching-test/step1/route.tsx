@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import MatchingTestContent from "./step1-content";
-import { useMatchingTestStore, type SectionKey } from "../../../../stores/matching-test";
+import { useMatchingTestStore, type SectionKey } from "../../../../../stores/matching-test";
 
 const SECTIONS: Array<{
   key: SectionKey;
@@ -19,7 +19,7 @@ const SECTIONS: Array<{
   { key: "makeupStyle", title: "메이크업 스타일", items: ["내추럴", "화려한", "글로우", "매트"] },
 ] as const;
 
-export const Route = createFileRoute("/matching-test/matching-test/step1")({
+export const Route = createFileRoute("/_main/matching-test/matching-test/step1")({
   component: MatchingTestStep1Page,
 });
 

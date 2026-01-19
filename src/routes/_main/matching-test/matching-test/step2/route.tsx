@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import MatchingTestStep2Content from "./step2-content";
-import { useMatchingTestStore, type Step2SectionKey } from "../../../../stores/matching-test";
+import { useMatchingTestStore, type Step2SectionKey } from "../../../../../stores/matching-test";
 
-export const Route = createFileRoute("/matching-test/matching-test/step2")({
+export const Route = createFileRoute("/_main/matching-test/matching-test/step2")({
   component: MatchingTestStep2Page,
 });
 

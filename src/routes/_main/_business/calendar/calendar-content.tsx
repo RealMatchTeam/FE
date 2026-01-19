@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import Header from "../../../components/layout/Header";
+
 import WeeklyCalendar from "../components/WeeklyCalendar";
 import MonthlyCalendar from "../components/MonthlyCalendar";
 import CampaignCard from "../components/CampaignCard";
@@ -12,7 +12,7 @@ export default function CalendarContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
-            <Header title="Real Match" />
+
 
             {/* 1. 상단 협업/매칭 현황 탭 */}
             <div className="flex w-full bg-white border-b border-gray-100">

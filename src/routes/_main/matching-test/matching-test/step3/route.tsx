@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import MatchingTestStep3Content from "./step3-content";
-import { useMatchingTestStore, type Step3ChipKey, type Step3SelectKey } from "../../../../stores/matching-test";
+import { useMatchingTestStore, type Step3ChipKey, type Step3SelectKey } from "../../../../../stores/matching-test";
 
-export const Route = createFileRoute("/matching-test/matching-test/step3")({
+export const Route = createFileRoute("/_main/matching-test/matching-test/step3")({
   component: MatchingTestStep3Page,
 });
 
@@ -25,7 +25,7 @@ function MatchingTestStep3Page() {
   const toggleChip = useMatchingTestStore((s) => s.toggleStep3Chip);
 
   const onToggleSelect = (key: Step3SelectKey, label: string) => {
-    // ✅ 성별/나이대는 다중선택, 영상길이/조회수는 단일 선택
+    // 성별/나이대는 다중선택, 영상길이/조회수는 단일 선택
     const max =
       key === "videoLength" || key === "views" ? 1 : MAX_MULTI;
     toggleSelect(key, label, max);

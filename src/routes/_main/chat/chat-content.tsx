@@ -1,4 +1,4 @@
-import Header from "../../../components/layout/Header";
+
 import { useState, useMemo, useContext, useEffect } from "react";
 import { LayoutContext } from "../layout-context";
 import { type SortOption, SORT_LABEL } from "./types/SortOption";
@@ -61,7 +61,7 @@ function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
-      <Header title="채팅" />
+
       <main className="p-4 pb-16">
         <ChatListHeader
           activeTab={activeTab}
