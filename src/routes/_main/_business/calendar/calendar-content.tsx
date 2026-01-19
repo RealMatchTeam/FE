@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Tabs from "../../../../components/common/Tabs";
 
 
 import WeeklyCalendar from "../components/WeeklyCalendar";
@@ -15,28 +16,14 @@ export default function CalendarContent() {
 
 
             {/* 1. 상단 협업/매칭 현황 탭 */}
-            <div className="flex w-full bg-white border-b border-gray-100">
-                <button
-                    onClick={() => setMainTab('collaboration')}
-                    className="flex-1 py-4 text-[16px] font-bold relative transition-colors"
-                    style={{ color: mainTab === 'collaboration' ? '#6666E5' : '#9B9BA1' }}
-                >
-                    협업 현황
-                    {mainTab === 'collaboration' && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120px] h-[2px] bg-[#6666E5]" />
-                    )}
-                </button>
-                <button
-                    onClick={() => setMainTab('matching')}
-                    className="flex-1 py-4 text-[16px] font-bold relative transition-colors"
-                    style={{ color: mainTab === 'matching' ? '#6666E5' : '#9B9BA1' }}
-                >
-                    매칭 현황
-                    {mainTab === 'matching' && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120px] h-[2px] bg-[#6666E5]" />
-                    )}
-                </button>
-            </div>
+            <Tabs
+                tabs={[
+                    { label: '협업 현황', value: 'collaboration' },
+                    { label: '매칭 현황', value: 'matching' }
+                ]}
+                activeTab={mainTab}
+                onTabChange={(val: string) => setMainTab(val as 'collaboration' | 'matching')}
+            />
 
             <main className="flex flex-col gap-6 px-4 py-6">
                 {/* 진행 중인 협업 섹션 */}

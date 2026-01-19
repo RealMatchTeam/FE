@@ -32,7 +32,7 @@ const tabs: TabItem[] = [
     ),
   },
   {
-    path: "/matching-list",
+    path: "/matching/brand",
     label: "매칭리스트",
     icon: (isActive) => (
       <img
