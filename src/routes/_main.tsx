@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import BottomTab from "../components/layout/BottomTab";
+import BottomTab from "./_main/components/BottomTab";
 import { createContext, useState } from "react";
 
 type LayoutContextType = {
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_main")({
 
 function MainLayout() {
   const [hideBottomTab, setHideBottomTab] = useState(false);
-  
+
   return (
     <LayoutContext.Provider value={{ hideBottomTab, setHideBottomTab }}>
       <div className={`min-h-screen bg-white ${hideBottomTab ? "pb-0" : "pb-16"}`}>
@@ -24,5 +24,5 @@ function MainLayout() {
       </div>
     </LayoutContext.Provider>
   );
-  
+
 }
