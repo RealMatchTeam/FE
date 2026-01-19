@@ -30,3 +30,4 @@ dist-ssr
 
 # TanStack Router auto-generated
 .tanstack/
+.tanstack/tmp
