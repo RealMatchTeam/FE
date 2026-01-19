@@ -9,15 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MatchingTestRouteImport } from './routes/_matchingTest'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as AuthRouteImport } from './routes/_auth'
-import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainMypageRouteImport } from './routes/_main/mypage'
-import { Route as MainMatchingRouteImport } from './routes/_main/matching'
-import { Route as MainChatRouteImport } from './routes/_main/_chat/route'
-import { Route as AuthLoginRouteImport } from './routes/_auth/login'
-import { Route as ChatComponentsTestRouteImport } from './routes/_chat/components/test'
+import { Route as MatchingTestMatchingResultRouteImport } from './routes/_matchingTest/matchingResult'
+import { Route as MainHomeRouteImport } from './routes/_main/_home'
+import { Route as MainChatRouteRouteImport } from './routes/_main/_chat/route'
+import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
+import { Route as MainHomeIndexRouteImport } from './routes/_main/_home/index'
+import { Route as MatchingTestMatchingTestStep3RouteImport } from './routes/_matchingTest/matchingTest.step3'
+import { Route as MatchingTestMatchingTestStep2RouteImport } from './routes/_matchingTest/matchingTest.step2'
+import { Route as MatchingTestMatchingTestStep1RouteImport } from './routes/_matchingTest/matchingTest.step1'
+import { Route as MainChatChatingRoomRouteImport } from './routes/_main/_chat/chatingRoom'
+import { Route as AuthSignupTypeRouteRouteImport } from './routes/_auth/signup/type/route'
+import { Route as AuthSignupTermsRouteRouteImport } from './routes/_auth/signup/terms/route'
+import { Route as AuthSignupSuccessRouteRouteImport } from './routes/_auth/signup/success/route'
+import { Route as AuthSignupPurposeRouteRouteImport } from './routes/_auth/signup/purpose/route'
+import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/_auth/signup/info-more/route'
+import { Route as AuthSignupInfoRouteRouteImport } from './routes/_auth/signup/info/route'
 
+const MatchingTestRoute = MatchingTestRouteImport.update({
+  id: '/_matchingTest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainRoute = MainRouteImport.update({
   id: '/_main',
   getParentRoute: () => rootRouteImport,
@@ -26,95 +40,203 @@ const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MainIndexRoute = MainIndexRouteImport.update({
-  id: '/',
-  path: '/',
+const MatchingTestMatchingResultRoute =
+  MatchingTestMatchingResultRouteImport.update({
+    id: '/matchingResult',
+    path: '/matchingResult',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MainHomeRoute = MainHomeRouteImport.update({
+  id: '/_home',
   getParentRoute: () => MainRoute,
 } as any)
-const MainMypageRoute = MainMypageRouteImport.update({
-  id: '/mypage',
-  path: '/mypage',
+const MainChatRouteRoute = MainChatRouteRouteImport.update({
+  id: '/_chat',
   getParentRoute: () => MainRoute,
 } as any)
-const MainMatchingRoute = MainMatchingRouteImport.update({
-  id: '/matching',
-  path: '/matching',
-  getParentRoute: () => MainRoute,
-} as any)
-const MainChatRoute = MainChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => MainRoute,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
+const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
-const ChatComponentsTestRoute = ChatComponentsTestRouteImport.update({
-  id: '/_chat/components/test',
-  path: '/components/test',
-  getParentRoute: () => rootRouteImport,
+const MainHomeIndexRoute = MainHomeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainHomeRoute,
+} as any)
+const MatchingTestMatchingTestStep3Route =
+  MatchingTestMatchingTestStep3RouteImport.update({
+    id: '/matchingTest/step3',
+    path: '/matchingTest/step3',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MatchingTestMatchingTestStep2Route =
+  MatchingTestMatchingTestStep2RouteImport.update({
+    id: '/matchingTest/step2',
+    path: '/matchingTest/step2',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MatchingTestMatchingTestStep1Route =
+  MatchingTestMatchingTestStep1RouteImport.update({
+    id: '/matchingTest/step1',
+    path: '/matchingTest/step1',
+    getParentRoute: () => MatchingTestRoute,
+  } as any)
+const MainChatChatingRoomRoute = MainChatChatingRoomRouteImport.update({
+  id: '/chatingRoom',
+  path: '/chatingRoom',
+  getParentRoute: () => MainChatRouteRoute,
+} as any)
+const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
+  id: '/signup/type',
+  path: '/signup/type',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupTermsRouteRoute = AuthSignupTermsRouteRouteImport.update({
+  id: '/signup/terms',
+  path: '/signup/terms',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupSuccessRouteRoute = AuthSignupSuccessRouteRouteImport.update({
+  id: '/signup/success',
+  path: '/signup/success',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupPurposeRouteRoute = AuthSignupPurposeRouteRouteImport.update({
+  id: '/signup/purpose',
+  path: '/signup/purpose',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupInfoMoreRouteRoute = AuthSignupInfoMoreRouteRouteImport.update({
+  id: '/signup/info-more',
+  path: '/signup/info-more',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
+  id: '/signup/info',
+  path: '/signup/info',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/login': typeof AuthLoginRoute
-  '/chat': typeof MainChatRoute
-  '/matching': typeof MainMatchingRoute
-  '/mypage': typeof MainMypageRoute
-  '/': typeof MainIndexRoute
-  '/components/test': typeof ChatComponentsTestRoute
+  '/login': typeof AuthLoginRouteRoute
+  '/matchingResult': typeof MatchingTestMatchingResultRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/signup/type': typeof AuthSignupTypeRouteRoute
+  '/chatingRoom': typeof MainChatChatingRoomRoute
+  '/matchingTest/step1': typeof MatchingTestMatchingTestStep1Route
+  '/matchingTest/step2': typeof MatchingTestMatchingTestStep2Route
+  '/matchingTest/step3': typeof MatchingTestMatchingTestStep3Route
+  '/': typeof MainHomeIndexRoute
 }
 export interface FileRoutesByTo {
-  '/login': typeof AuthLoginRoute
-  '/chat': typeof MainChatRoute
-  '/matching': typeof MainMatchingRoute
-  '/mypage': typeof MainMypageRoute
-  '/': typeof MainIndexRoute
-  '/components/test': typeof ChatComponentsTestRoute
+  '/login': typeof AuthLoginRouteRoute
+  '/matchingResult': typeof MatchingTestMatchingResultRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/signup/type': typeof AuthSignupTypeRouteRoute
+  '/chatingRoom': typeof MainChatChatingRoomRoute
+  '/matchingTest/step1': typeof MatchingTestMatchingTestStep1Route
+  '/matchingTest/step2': typeof MatchingTestMatchingTestStep2Route
+  '/matchingTest/step3': typeof MatchingTestMatchingTestStep3Route
+  '/': typeof MainHomeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/_main': typeof MainRouteWithChildren
-  '/_auth/login': typeof AuthLoginRoute
-  '/_main/chat': typeof MainChatRoute
-  '/_main/matching': typeof MainMatchingRoute
-  '/_main/mypage': typeof MainMypageRoute
-  '/_main/': typeof MainIndexRoute
-  '/_chat/components/test': typeof ChatComponentsTestRoute
+  '/_matchingTest': typeof MatchingTestRouteWithChildren
+  '/_auth/login': typeof AuthLoginRouteRoute
+  '/_main/_chat': typeof MainChatRouteRouteWithChildren
+  '/_main/_home': typeof MainHomeRouteWithChildren
+  '/_matchingTest/matchingResult': typeof MatchingTestMatchingResultRoute
+  '/_auth/signup/info': typeof AuthSignupInfoRouteRoute
+  '/_auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/_auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/_auth/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/_auth/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/_auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/_main/_chat/chatingRoom': typeof MainChatChatingRoomRoute
+  '/_matchingTest/matchingTest/step1': typeof MatchingTestMatchingTestStep1Route
+  '/_matchingTest/matchingTest/step2': typeof MatchingTestMatchingTestStep2Route
+  '/_matchingTest/matchingTest/step3': typeof MatchingTestMatchingTestStep3Route
+  '/_main/_home/': typeof MainHomeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
-    | '/chat'
-    | '/matching'
-    | '/mypage'
+    | '/matchingResult'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
+    | '/chatingRoom'
+    | '/matchingTest/step1'
+    | '/matchingTest/step2'
+    | '/matchingTest/step3'
     | '/'
-    | '/components/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/chat' | '/matching' | '/mypage' | '/' | '/components/test'
+  to:
+    | '/login'
+    | '/matchingResult'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
+    | '/chatingRoom'
+    | '/matchingTest/step1'
+    | '/matchingTest/step2'
+    | '/matchingTest/step3'
+    | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/_main'
+    | '/_matchingTest'
     | '/_auth/login'
-    | '/_main/chat'
-    | '/_main/matching'
-    | '/_main/mypage'
-    | '/_main/'
-    | '/_chat/components/test'
+    | '/_main/_chat'
+    | '/_main/_home'
+    | '/_matchingTest/matchingResult'
+    | '/_auth/signup/info'
+    | '/_auth/signup/info-more'
+    | '/_auth/signup/purpose'
+    | '/_auth/signup/success'
+    | '/_auth/signup/terms'
+    | '/_auth/signup/type'
+    | '/_main/_chat/chatingRoom'
+    | '/_matchingTest/matchingTest/step1'
+    | '/_matchingTest/matchingTest/step2'
+    | '/_matchingTest/matchingTest/step3'
+    | '/_main/_home/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
-  ChatComponentsTestRoute: typeof ChatComponentsTestRoute
+  MatchingTestRoute: typeof MatchingTestRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_matchingTest': {
+      id: '/_matchingTest'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MatchingTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_main': {
       id: '/_main'
       path: ''
@@ -129,81 +251,194 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_main/': {
-      id: '/_main/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof MainIndexRouteImport
+    '/_matchingTest/matchingResult': {
+      id: '/_matchingTest/matchingResult'
+      path: '/matchingResult'
+      fullPath: '/matchingResult'
+      preLoaderRoute: typeof MatchingTestMatchingResultRouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_main/_home': {
+      id: '/_main/_home'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainHomeRouteImport
       parentRoute: typeof MainRoute
     }
-    '/_main/mypage': {
-      id: '/_main/mypage'
-      path: '/mypage'
-      fullPath: '/mypage'
-      preLoaderRoute: typeof MainMypageRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/matching': {
-      id: '/_main/matching'
-      path: '/matching'
-      fullPath: '/matching'
-      preLoaderRoute: typeof MainMatchingRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/chat': {
-      id: '/_main/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof MainChatRouteImport
+    '/_main/_chat': {
+      id: '/_main/_chat'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainChatRouteRouteImport
       parentRoute: typeof MainRoute
     }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
+      preLoaderRoute: typeof AuthLoginRouteRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_chat/components/test': {
-      id: '/_chat/components/test'
-      path: '/components/test'
-      fullPath: '/components/test'
-      preLoaderRoute: typeof ChatComponentsTestRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/_home/': {
+      id: '/_main/_home/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof MainHomeIndexRouteImport
+      parentRoute: typeof MainHomeRoute
+    }
+    '/_matchingTest/matchingTest/step3': {
+      id: '/_matchingTest/matchingTest/step3'
+      path: '/matchingTest/step3'
+      fullPath: '/matchingTest/step3'
+      preLoaderRoute: typeof MatchingTestMatchingTestStep3RouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_matchingTest/matchingTest/step2': {
+      id: '/_matchingTest/matchingTest/step2'
+      path: '/matchingTest/step2'
+      fullPath: '/matchingTest/step2'
+      preLoaderRoute: typeof MatchingTestMatchingTestStep2RouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_matchingTest/matchingTest/step1': {
+      id: '/_matchingTest/matchingTest/step1'
+      path: '/matchingTest/step1'
+      fullPath: '/matchingTest/step1'
+      preLoaderRoute: typeof MatchingTestMatchingTestStep1RouteImport
+      parentRoute: typeof MatchingTestRoute
+    }
+    '/_main/_chat/chatingRoom': {
+      id: '/_main/_chat/chatingRoom'
+      path: '/chatingRoom'
+      fullPath: '/chatingRoom'
+      preLoaderRoute: typeof MainChatChatingRoomRouteImport
+      parentRoute: typeof MainChatRouteRoute
+    }
+    '/_auth/signup/type': {
+      id: '/_auth/signup/type'
+      path: '/signup/type'
+      fullPath: '/signup/type'
+      preLoaderRoute: typeof AuthSignupTypeRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/terms': {
+      id: '/_auth/signup/terms'
+      path: '/signup/terms'
+      fullPath: '/signup/terms'
+      preLoaderRoute: typeof AuthSignupTermsRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/success': {
+      id: '/_auth/signup/success'
+      path: '/signup/success'
+      fullPath: '/signup/success'
+      preLoaderRoute: typeof AuthSignupSuccessRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/purpose': {
+      id: '/_auth/signup/purpose'
+      path: '/signup/purpose'
+      fullPath: '/signup/purpose'
+      preLoaderRoute: typeof AuthSignupPurposeRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/info-more': {
+      id: '/_auth/signup/info-more'
+      path: '/signup/info-more'
+      fullPath: '/signup/info-more'
+      preLoaderRoute: typeof AuthSignupInfoMoreRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/signup/info': {
+      id: '/_auth/signup/info'
+      path: '/signup/info'
+      fullPath: '/signup/info'
+      preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
+      parentRoute: typeof AuthRoute
     }
   }
 }
 
 interface AuthRouteChildren {
-  AuthLoginRoute: typeof AuthLoginRoute
+  AuthLoginRouteRoute: typeof AuthLoginRouteRoute
+  AuthSignupInfoRouteRoute: typeof AuthSignupInfoRouteRoute
+  AuthSignupInfoMoreRouteRoute: typeof AuthSignupInfoMoreRouteRoute
+  AuthSignupPurposeRouteRoute: typeof AuthSignupPurposeRouteRoute
+  AuthSignupSuccessRouteRoute: typeof AuthSignupSuccessRouteRoute
+  AuthSignupTermsRouteRoute: typeof AuthSignupTermsRouteRoute
+  AuthSignupTypeRouteRoute: typeof AuthSignupTypeRouteRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthLoginRoute: AuthLoginRoute,
+  AuthLoginRouteRoute: AuthLoginRouteRoute,
+  AuthSignupInfoRouteRoute: AuthSignupInfoRouteRoute,
+  AuthSignupInfoMoreRouteRoute: AuthSignupInfoMoreRouteRoute,
+  AuthSignupPurposeRouteRoute: AuthSignupPurposeRouteRoute,
+  AuthSignupSuccessRouteRoute: AuthSignupSuccessRouteRoute,
+  AuthSignupTermsRouteRoute: AuthSignupTermsRouteRoute,
+  AuthSignupTypeRouteRoute: AuthSignupTypeRouteRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface MainChatRouteRouteChildren {
+  MainChatChatingRoomRoute: typeof MainChatChatingRoomRoute
+}
+
+const MainChatRouteRouteChildren: MainChatRouteRouteChildren = {
+  MainChatChatingRoomRoute: MainChatChatingRoomRoute,
+}
+
+const MainChatRouteRouteWithChildren = MainChatRouteRoute._addFileChildren(
+  MainChatRouteRouteChildren,
+)
+
+interface MainHomeRouteChildren {
+  MainHomeIndexRoute: typeof MainHomeIndexRoute
+}
+
+const MainHomeRouteChildren: MainHomeRouteChildren = {
+  MainHomeIndexRoute: MainHomeIndexRoute,
+}
+
+const MainHomeRouteWithChildren = MainHomeRoute._addFileChildren(
+  MainHomeRouteChildren,
+)
+
 interface MainRouteChildren {
-  MainChatRoute: typeof MainChatRoute
-  MainMatchingRoute: typeof MainMatchingRoute
-  MainMypageRoute: typeof MainMypageRoute
-  MainIndexRoute: typeof MainIndexRoute
+  MainChatRouteRoute: typeof MainChatRouteRouteWithChildren
+  MainHomeRoute: typeof MainHomeRouteWithChildren
 }
 
 const MainRouteChildren: MainRouteChildren = {
-  MainChatRoute: MainChatRoute,
-  MainMatchingRoute: MainMatchingRoute,
-  MainMypageRoute: MainMypageRoute,
-  MainIndexRoute: MainIndexRoute,
+  MainChatRouteRoute: MainChatRouteRouteWithChildren,
+  MainHomeRoute: MainHomeRouteWithChildren,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
 
+interface MatchingTestRouteChildren {
+  MatchingTestMatchingResultRoute: typeof MatchingTestMatchingResultRoute
+  MatchingTestMatchingTestStep1Route: typeof MatchingTestMatchingTestStep1Route
+  MatchingTestMatchingTestStep2Route: typeof MatchingTestMatchingTestStep2Route
+  MatchingTestMatchingTestStep3Route: typeof MatchingTestMatchingTestStep3Route
+}
+
+const MatchingTestRouteChildren: MatchingTestRouteChildren = {
+  MatchingTestMatchingResultRoute: MatchingTestMatchingResultRoute,
+  MatchingTestMatchingTestStep1Route: MatchingTestMatchingTestStep1Route,
+  MatchingTestMatchingTestStep2Route: MatchingTestMatchingTestStep2Route,
+  MatchingTestMatchingTestStep3Route: MatchingTestMatchingTestStep3Route,
+}
+
+const MatchingTestRouteWithChildren = MatchingTestRoute._addFileChildren(
+  MatchingTestRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   MainRoute: MainRouteWithChildren,
-  ChatComponentsTestRoute: ChatComponentsTestRoute,
+  MatchingTestRoute: MatchingTestRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
