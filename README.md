@@ -2,15 +2,15 @@
 
 ## 기술 스택
 
-- **패키지 매니저**: pnpm
-- **프레임워크**: Vite 7 + React 19
-- **라우팅**: TanStack Router (File-based Routing)
-- **언어**: TypeScript 5
-- **스타일링**: Tailwind CSS v4
-- **폰트**: Pretendard Variable
-- **상태관리**: Zustand
-- **데이터 페칭**: TanStack Query (React Query) v5
-- **PWA**: vite-plugin-pwa
+- **패키지 매니저**: pnpm - 효율적인 캐싱과 디스크 용량 절약을 위해 선택
+- **프레임워크**: Vite 7 + React 19 - 최신 성능 최적화와 Concurrent 기능 활용을 위해 선택
+- **라우팅**: TanStack Router (File-based Routing) - 완벽한 타입 안전성과 데이터 로딩 통합 관리를 위해 선택
+- **언어**: TypeScript 5 - 강력한 타입 추론과 개발 안정성 확보를 위해 선택
+- **스타일링**: Tailwind CSS v4 - 런타임 오버헤드 없는 제로 런타임 스타일링을 위해 선택
+- **폰트**: Pretendard Variable - 가독성 높은 한국어 웹폰트 최적화를 위해 선택
+- **상태관리**: Zustand - 보일러플레이트 없는 간결한 전역 상태 관리를 위해 선택
+- **데이터 페칭**: TanStack Query (React Query) v5 - 서버 상태 동기화 및 강력한 캐싱 기능을 위해 선택
+- **PWA**: vite-plugin-pwa - 모바일 네이티브 앱과 유사한 사용자 경험 제공을 위해 선택
 
 ## 프로젝트 구조
 
@@ -24,17 +24,19 @@ src/
 ├── routes/                 # TanStack Router 파일 기반 라우팅
 │   ├── __root.tsx          # 최상위 루트 레이아웃 (MobileContainer)
 │   ├── _auth.tsx           # 인증 레이아웃 (탭바 없음)
-│   │   └── login.tsx       # /login
+│   │   └── login/          # /login
+│   │       ├── route.tsx
+│   │       └── login-content.tsx
 │   ├── _main.tsx           # 메인 레이아웃 (BottomTab 포함)
-│   │   ├── index.tsx       # / (홈)
-│   │   ├── matching.tsx    # /matching
-│   │   ├── chat.tsx        # /chat
-│   │   └── mypage.tsx      # /mypage
+│   │   ├── components/     # _main 전용 컴포넌트 (BottomTab 등)
+│   │   └── _home/          # / (홈)
+│   │       ├── index.tsx       # 라우트 정의
+│   │       ├── home-content.tsx
+│   │       └── components/
 └── components/
     └── layout/             # 레이아웃 컴포넌트
         ├── MobileContainer.tsx  # 데스크톱 중앙 정렬 래퍼
-        ├── Header.tsx           # 공통 상단바
-        └── BottomTab.tsx        # 하단 네비게이션
+        └── Header.tsx           # 공통 상단바
 ```
 
 ## 디자인 시스템
@@ -355,21 +357,12 @@ git commit -m "feat: 매칭 알고리즘 구현
 - 사용자 선호도 기반 매칭 점수 계산
 - 거리 기반 필터링 추가
 - 매칭 결과 정렬 기능 구현
-
-Resolves: #123"
 ```
 
-### 브랜치 전략
-
-```bash
 main              # 프로덕션 배포 브랜치
-├── develop       # 개발 통합 브랜치
-    ├── feat/login-page          # 기능 개발
-    ├── fix/chat-loading-error   # 버그 수정
-    └── design/home-layout       # 디자인 작업
-```
-
-**브랜치 네이밍:**
+├── feat/login-page          # 기능 개발
+├── fix/chat-loading-error   # 버그 수정
+└── design/home-layout       # 디자인 작업
 
 - `feat/기능명` - 새 기능
 - `fix/버그명` - 버그 수정
