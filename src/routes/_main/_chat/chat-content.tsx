@@ -1,6 +1,6 @@
 import Header from "../../../components/layout/Header";
 import { useState, useMemo, useContext, useEffect } from "react";
-import { LayoutContext } from "../../_main";
+import { LayoutContext } from "../layout-context";
 import { type SortOption, SORT_LABEL } from "./types/SortOption";
 import { rooms } from "./data/mockData";
 import ChatListHeader from "./components/ChatListHeader";
@@ -28,11 +28,11 @@ function ChatPage() {
   // 받은제안/보낸제안 필터
   const filteredRooms = useMemo(() => {
     return rooms.filter((room) => room.type === activeTab);
-  }, [rooms, activeTab]);
+  }, [activeTab]);
 
   // 정렬 적용
   const sortedRooms = useMemo(() => {
-    
+
     // 받은/보낸 필터링
     let filtered = filteredRooms;
 
@@ -40,7 +40,7 @@ function ChatPage() {
     if (sort !== "latest") {
       filtered = filteredRooms.filter((room) => room.status === sort);
     }
-    
+
     const copy = [...filtered];
     copy.sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -63,7 +63,7 @@ function ChatPage() {
     <div className="min-h-screen bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
       <Header title="채팅" />
       <main className="p-4 pb-16">
-        <ChatListHeader 
+        <ChatListHeader
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           sortLabel={SORT_LABEL[sort]}
