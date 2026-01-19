@@ -1,6 +1,6 @@
 import BrandLogo from "../../../../assets/brand-logo.png";
-import ArrowRight from "../../../../assets/arrow-right.svg";
-import SearchIcon from "../../../../assets/search.svg";
+import ArrowRight from "../../../../assets/icon/arrow-right.svg";
+import SearchIcon from "../../../../assets/icon/search.svg";
 import Card from "../../../../components/common/Card";
 
 interface CampaignCardProps {

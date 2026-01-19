@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
-import LoginLogo from "../../../assets/login-logo.svg";
+import LoginLogo from "../../../assets/logo/login-logo.svg";
 import Button from "../../../components/common/Button";
 import { SocialLoginSection } from "./components/SocialLoginSection";
 import { InputField } from "../components/InputField";

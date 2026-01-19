@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Route } from "./route";
 import MatchResultHeader from "../../../../components/common/RealmatchHeader";
 import MainIcon from "../../../../assets/MainIcon.svg";
-import WhiteLogo from "../../../../assets/whitelogo.svg";
+import WhiteLogo from "../../../../assets/logo/whitelogo.svg";
 
 export default function MatchingResultContent() {
     const navigate = useNavigate();

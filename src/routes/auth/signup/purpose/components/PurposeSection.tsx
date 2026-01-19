@@ -3,9 +3,9 @@ import { PurposeCard } from "./PurposeCard";
 import { GiveStarIcon } from "../../components/icons/GiveStarIcon";
 import { WonIcon } from "../../components/icons/WonIcon";
 import { TrendIcon } from "../../components/icons/TrendIcon";
-import FollowUpIcon from "../../../../../assets/follow-up.svg";
-import BrandingUpIcon from "../../../../../assets/branding-up.svg";
-import NewBrandIcon from "../../../../../assets/new-brand.svg";
+import FollowUpIcon from "../../../../../assets/icon/follow-up.svg";
+import BrandingUpIcon from "../../../../../assets/icon/branding-up.svg";
+import NewBrandIcon from "../../../../../assets/icon/new-brand.svg";
 
 interface PurposeItem {
   id: string;

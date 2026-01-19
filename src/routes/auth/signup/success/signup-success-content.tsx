@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import Button from "../../../../components/common/Button";
 import { CheckCircleIcon } from "../components/icons/CheckCircleIcon";
-import MiniLogo from "../../../../assets/mini-logo.svg";
+import MiniLogo from "../../../../assets/logo/mini-logo.svg";
 
 function SignUpSuccessContent() {
   const navigate = useNavigate();

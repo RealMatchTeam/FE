@@ -1,37 +1,52 @@
 import BrandLogo from "../../../../../components/common/BrandLogo";
 
-
-interface BrandCardProps {
-    name: string;
+interface CampaignCardProps {
+    brandName: string;
+    title: string;
+    reward: number;
     matchRate: number;
-    tags: string[];
+    applicants: number;
     isLiked?: boolean;
     logoUrl?: string;
     onLike?: () => void;
 }
 
-export default function BrandCard({
-    name,
+export default function CampaignCard({
+    brandName,
+    title,
+    reward,
     matchRate,
-    tags,
+    applicants,
     isLiked = false,
     logoUrl,
     onLike
-}: BrandCardProps) {
+}: CampaignCardProps) {
+    // 금액 포맷팅
+    const formatReward = (amount: number) => {
+        return amount.toLocaleString('ko-KR');
+    };
+
     return (
         <div className="flex w-full p-2.5 bg-white border border-bluegray-2 rounded-2xl shadow-sm">
-            {/* 왼쪽: 이미지 */}
+            {/* 왼쪽: 이미지 + 배지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
-                <BrandLogo src={logoUrl} alt={name} />
+                <BrandLogo src={logoUrl} alt={brandName} />
+                {/* 원고료 & D-Day 배지 */}
+                <div className="flex items-center justify-center gap-1 w-full">
+                    <span className="px-1.5 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
+                        D-DAY
+                    </span>
+                    <span className="px-1.5 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                </div>
             </div>
 
             {/* 오른쪽: 콘텐츠 */}
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-1 h-full">
                     <div className="flex flex-col gap-1 w-full">
-                        {/* 헤더: 이름 & 좋아요 & 매칭률 */}
+                        {/* 헤더: 브랜드명 & 매칭률 & 좋아요 */}
                         <div className="flex justify-between items-start">
-                            <h3 className="text-title1 text-text-black truncate">{name}</h3>
+                            <h3 className="text-title1 text-text-black truncate">{brandName}</h3>
                             <div className="flex items-center gap-2">
                                 <span className="text-core-1"><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></span>
                                 <button onClick={onLike} className="flex-shrink-0 cursor-pointer">
@@ -47,13 +62,10 @@ export default function BrandCard({
                                 </button>
                             </div>
                         </div>
-
-                        {/* 태그 */}
-                        <div className="flex flex-wrap gap-1 mt-1">
-                            {tags.map((tag, i) => (
-                                <span key={i} className="text-callout1 text-text-gray3">#{tag}</span>
-                            ))}
-                        </div>
+                        {/* 캠페인 제목 */}
+                        <p className="text-title3 text-black truncate">{title}</p>
+                        {/* 원고료 */}
+                        <span className="text-callout1 text-core-1">원고료: {formatReward(reward)}원</span>
                     </div>
                 </div>
             </div>

@@ -1,14 +1,14 @@
 import Button from "../../../../../components/common/Button";
 import SearchBar from "../../../../../components/common/SearchBar";
-import type { BrandCategory } from "../../../../../data/brand";
+import type { CampaignCategory } from "../../../../../data/campaign";
 import { cn } from "../../../../../lib/utils";
 
-interface BrandFilterBarProps {
-    category: BrandCategory;
-    onCategoryChange: (category: BrandCategory) => void;
+interface CampaignFilterBarProps {
+    category: CampaignCategory;
+    onCategoryChange: (category: CampaignCategory) => void;
 }
 
-export default function BrandFilterBar({ category, onCategoryChange }: BrandFilterBarProps) {
+export default function CampaignFilterBar({ category, onCategoryChange }: CampaignFilterBarProps) {
     return (
         <div className="px-4 py-4 bg-core-2 sticky top-0 z-10 shrink-0 space-y-4">
             <div className="flex w-full gap-2">
@@ -37,7 +37,7 @@ export default function BrandFilterBar({ category, onCategoryChange }: BrandFilt
                     </Button>
                 </div>
                 <div className="flex-[7] min-w-0 justify-center">
-                    <SearchBar placeholder="브랜드 검색" className="w-full" />
+                    <SearchBar placeholder="캠페인 검색" className="w-full" />
                 </div>
             </div>
         </div>

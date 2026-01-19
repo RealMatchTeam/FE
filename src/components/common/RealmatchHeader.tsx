@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import RealMatchLogo from "../../assets/RealMatchLogo_ex.svg"
+import RealMatchLogo from "../../assets/logo/RealMatchLogo_ex.svg"
 
 type RealMatchHeaderProps = {
   /** 뒤로가기 버튼 노출 여부 */
