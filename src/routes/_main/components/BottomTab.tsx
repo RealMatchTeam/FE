@@ -112,11 +112,10 @@ export default function BottomTab() {
                 {tab.icon(isActive)}
               </div>
               <span
-                className={`text-callout3 ${
-                  isActive
-                    ? "text-core-1 font-semibold"
-                    : "text-text-gray3"
-                }`}
+                className={`text-callout3 ${isActive
+                  ? "text-core-1 font-semibold"
+                  : "text-text-gray3"
+                  }`}
               >
                 {tab.label}
               </span>

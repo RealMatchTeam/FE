@@ -1,4 +1,4 @@
-import StartMatchingTestButton from "./StartRMButton";
+import StartMatchingTestButton from "./components/StartRMButton";
 import RMLOGO from "../../../assets/RealMatchLogo_ex.svg";
 import MainIcon from "../../../assets/MainIcon.svg";
 
@@ -46,8 +46,8 @@ export default function HomeContent() {
             </p>
           </div>
         </div>
-          {/* 버튼 (기존 유지) */}
-          <div className="sticky  bottom-0 w-full bg-white/70 px-[24px] pt-[24px] pb-[40px] backdrop-blur">
+        {/* 버튼 (기존 유지) */}
+        <div className="sticky  bottom-0 w-full bg-white/70 px-[24px] pt-[24px] pb-[40px] backdrop-blur">
           <StartMatchingTestButton />
         </div>
       </main>
