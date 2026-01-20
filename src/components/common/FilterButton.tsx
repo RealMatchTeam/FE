@@ -3,16 +3,21 @@ interface FilterButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
     isActive?: boolean;
 }
 
+// 글자수 초과시 ""..." 처리
+const truncateLabel = (text: string, maxLength = 10) => {
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+};
+
 export default function FilterButton({ label, isActive, className = "", ...props }: FilterButtonProps) {
     return (
         <button
             className={`flex items-center gap-1 px-3 py-1.5 rounded-full border text-title3 transition-colors cursor-pointer ${isActive
-                ? 'border-core-1 text-core-1 bg-blue-50'
+                ? 'border-core-3 text-core-1 bg-core-70 shadow-[0_1px_3px_0_#D4D4D9]'
                 : 'border-gray-200 text-text-gray2 bg-white'
                 } ${className}`}
             {...props}
         >
-            {label}
+            {truncateLabel(label)}
             <svg
                 width="10"
                 height="6"

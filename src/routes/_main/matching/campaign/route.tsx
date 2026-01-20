@@ -6,8 +6,13 @@ type CampaignSearchParams = {
     type?: CampaignCategory
 }
 
+function CampaignRouteComponent() {
+    const search = Route.useSearch()
+    return <CampaignContent key={search.type} />
+}
+
 export const Route = createFileRoute('/_main/matching/campaign')({
-    component: CampaignContent,
+    component: CampaignRouteComponent,
     validateSearch: (search: Record<string, unknown>): CampaignSearchParams => {
         const type = search.type as string | undefined
         if (type === 'BEAUTY' || type === 'FASHION') {

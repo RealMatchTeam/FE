@@ -6,8 +6,13 @@ type BrandSearchParams = {
     type?: BrandCategory
 }
 
+function BrandRouteComponent() {
+    const search = Route.useSearch()
+    return <BrandContent key={search.type} />
+}
+
 export const Route = createFileRoute('/_main/matching/brand')({
-    component: BrandContent,
+    component: BrandRouteComponent,
     validateSearch: (search: Record<string, unknown>): BrandSearchParams => {
         const type = search.type as string | undefined
         if (type === 'BEAUTY' || type === 'FASHION') {

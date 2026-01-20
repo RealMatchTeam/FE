@@ -5,12 +5,17 @@ import CampaignCard from "./components/CampaignCard";
 import { CAMPAIGN_DATA, type CampaignCategory } from "../../../../data/campaign";
 import CampaignFilterBar from "./components/CampaignFilterBar";
 import { Route } from "./route";
+import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+import MatchingFilter from "../components/MatchingFilter";
 
 
 export default function CampaignContent() {
     const { type: category = "BEAUTY" } = Route.useSearch();
     const navigate = useNavigate();
     const [campaigns, setCampaigns] = useState(CAMPAIGN_DATA);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [sortOption, setSortOption] = useState("정렬 필터");
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const handleCategoryChange = (newCategory: CampaignCategory) => {
         navigate({
@@ -30,6 +35,24 @@ export default function CampaignContent() {
         ));
     };
 
+    const handleFilterApply = (sort: string, tags: string[]) => {
+        setSortOption(sort);
+        setSelectedTags(tags);
+        // TODO: 정렬 및 태그 필터 적용 로직
+    };
+
+    // 필터 버튼 라벨 생성
+    const getSortButtonLabel = () => {
+        return sortOption;
+    };
+
+    const getFilterButtonLabel = () => {
+        if (selectedTags.length > 0) {
+            return selectedTags.slice(0, 2).join(", ") + (selectedTags.length > 2 ? "..." : "");
+        }
+        return "콘텐츠 필터";
+    };
+
     return (
         <div className="flex flex-col h-full bg-core-2">
             {/* 뷰티/패션 필터 & 검색창 */}
@@ -41,8 +64,16 @@ export default function CampaignContent() {
                 <div className="mb-4">
                     <h2 className="text-title1 mb-3">캠페인 리스트</h2>
                     <div className="flex gap-2">
-                        <FilterButton label="정렬 필터" />
-                        <FilterButton label={category === "BEAUTY" ? "뷰티 필터" : "패션 필터"} />
+                        <FilterButton
+                            label={getSortButtonLabel()}
+                            isActive={sortOption !== "정렬 필터"}
+                            onClick={() => setIsFilterOpen(true)}
+                        />
+                        <FilterButton
+                            label={getFilterButtonLabel()}
+                            isActive={selectedTags.length > 0}
+                            onClick={() => setIsFilterOpen(true)}
+                        />
                     </div>
                 </div>
 
@@ -63,6 +94,17 @@ export default function CampaignContent() {
                     ))}
                 </div>
             </div>
+
+            {/* 필터 바텀시트 */}
+            <FilterBottomSheet isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
+                <MatchingFilter
+                    filterType="CONTENT"
+                    selectedSort={sortOption}
+                    selectedTags={selectedTags}
+                    onApply={handleFilterApply}
+                    onClose={() => setIsFilterOpen(false)}
+                />
+            </FilterBottomSheet>
         </div>
     );
 }

@@ -60,7 +60,10 @@ export default function BottomTab() {
     <nav className="w-full shrink-0 mx-auto max-w-[430px] bg-white border-t border-text-gray5 safe-area-bottom">
       <div className="flex items-center justify-center h-[66px] px-0 py-4 gap-[20px] shrink-0 self-stretch">
         {tabs.map((tab) => {
-          const isActive = currentPath === tab.path;
+          let isActive = currentPath === tab.path;
+          if (tab.path === "/matching/brand" && currentPath.startsWith("/matching")) {
+            isActive = true;
+          }
           return (
             <Link
               key={tab.path}
