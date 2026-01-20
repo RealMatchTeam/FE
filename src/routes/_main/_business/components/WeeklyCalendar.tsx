@@ -18,7 +18,9 @@ export default function WeeklyCalendar() {
           <div
             key={date}
             className={`flex items-center justify-center w-8 h-8 mx-auto rounded-full ${
-              date === 11 ? "bg-core-1 text-white" : "text-text-gray2"
+              date === 11
+                ? "bg-core-1 text-white"
+                : "text-text-gray3"
             }`}
           >
             {date}
@@ -28,10 +30,13 @@ export default function WeeklyCalendar() {
 
       {/* 일정 */}
       <div className="flex flex-col gap-2">
-        <div className="w-3/4 py-1 text-center text-callout2 text-white rounded-full bg-grad-calendar-1">
+        {/* 비플레인 */}
+        <div className="w-3/4 py-1 text-center text-callout2 text-white rounded-full bg-grad-1">
           비플레인
         </div>
-        <div className="w-2/3 py-1 text-center text-callout2 text-white rounded-full bg-grad-calendar-2">
+
+        {/* 라운드랩 */}
+        <div className="w-2/3 py-1 text-center text-callout2 text-white rounded-full bg-grad-2">
           라운드랩
         </div>
       </div>
