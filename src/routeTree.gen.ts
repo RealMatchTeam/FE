@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as BusinessCampaignRouteImport } from './routes/_business/campaign'
 import { Route as BusinessCalendarRouteImport } from './routes/_business/calendar'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 
@@ -20,6 +21,11 @@ const MainRoute = MainRouteImport.update({
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessCampaignRoute = BusinessCampaignRouteImport.update({
+  id: '/_business/campaign',
+  path: '/campaign',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessCalendarRoute = BusinessCalendarRouteImport.update({
@@ -36,10 +42,12 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/calendar': typeof BusinessCalendarRoute
+  '/campaign': typeof BusinessCampaignRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/calendar': typeof BusinessCalendarRoute
+  '/campaign': typeof BusinessCampaignRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -47,19 +55,27 @@ export interface FileRoutesById {
   '/_main': typeof MainRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_business/calendar': typeof BusinessCalendarRoute
+  '/_business/campaign': typeof BusinessCampaignRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/calendar'
+  fullPaths: '/login' | '/calendar' | '/campaign'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/calendar'
-  id: '__root__' | '/_auth' | '/_main' | '/_auth/login' | '/_business/calendar'
+  to: '/login' | '/calendar' | '/campaign'
+  id:
+    | '__root__'
+    | '/_auth'
+    | '/_main'
+    | '/_auth/login'
+    | '/_business/calendar'
+    | '/_business/campaign'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   MainRoute: typeof MainRoute
   BusinessCalendarRoute: typeof BusinessCalendarRoute
+  BusinessCampaignRoute: typeof BusinessCampaignRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +92,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_business/campaign': {
+      id: '/_business/campaign'
+      path: '/campaign'
+      fullPath: '/campaign'
+      preLoaderRoute: typeof BusinessCampaignRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_business/calendar': {
@@ -109,6 +132,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   MainRoute: MainRoute,
   BusinessCalendarRoute: BusinessCalendarRoute,
+  BusinessCampaignRoute: BusinessCampaignRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
