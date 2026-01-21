@@ -10,10 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteImport } from './routes/_main'
+import { Route as RoomRouteRouteImport } from './routes/room/route'
+import { Route as RoomChatIdRouteImport } from './routes/room/$chatId'
 import { Route as AuthLoginRouteRouteImport } from './routes/auth/login/route'
 import { Route as MainChatRouteRouteImport } from './routes/_main/chat/route'
 import { Route as MainHomeIndexRouteImport } from './routes/_main/_home/index'
-import { Route as MainChatChattingRoomRouteImport } from './routes/_main/chat/chatting-room'
 import { Route as AuthSignupTypeRouteRouteImport } from './routes/auth/signup/type/route'
 import { Route as AuthSignupTermsRouteRouteImport } from './routes/auth/signup/terms/route'
 import { Route as AuthSignupSuccessRouteRouteImport } from './routes/auth/signup/success/route'
@@ -22,6 +23,8 @@ import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/auth/signu
 import { Route as AuthSignupInfoRouteRouteImport } from './routes/auth/signup/info/route'
 import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
 import { Route as MainBusinessCalendarRouteRouteImport } from './routes/_main/_business/calendar/route'
+import { Route as RoomComponentsBubblesSystemEventMessageRouteImport } from './routes/room/components/Bubbles/SystemEventMessage'
+import { Route as RoomComponentsBubblesProposalMessageRouteImport } from './routes/room/components/Bubbles/ProposalMessage'
 import { Route as MainMatchingTestMatchingTestStep3RouteRouteImport } from './routes/_main/matching-test/matching-test/step3/route'
 import { Route as MainMatchingTestMatchingTestStep2RouteRouteImport } from './routes/_main/matching-test/matching-test/step2/route'
 import { Route as MainMatchingTestMatchingTestStep1RouteRouteImport } from './routes/_main/matching-test/matching-test/step1/route'
@@ -29,6 +32,16 @@ import { Route as MainMatchingTestMatchingTestStep1RouteRouteImport } from './ro
 const MainRoute = MainRouteImport.update({
   id: '/_main',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RoomRouteRoute = RoomRouteRouteImport.update({
+  id: '/room',
+  path: '/room',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoomChatIdRoute = RoomChatIdRouteImport.update({
+  id: '/$chatId',
+  path: '/$chatId',
+  getParentRoute: () => RoomRouteRoute,
 } as any)
 const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
   id: '/auth/login',
@@ -44,11 +57,6 @@ const MainHomeIndexRoute = MainHomeIndexRouteImport.update({
   id: '/_home/',
   path: '/',
   getParentRoute: () => MainRoute,
-} as any)
-const MainChatChattingRoomRoute = MainChatChattingRoomRouteImport.update({
-  id: '/chatting-room',
-  path: '/chatting-room',
-  getParentRoute: () => MainChatRouteRoute,
 } as any)
 const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
   id: '/auth/signup/type',
@@ -92,6 +100,18 @@ const MainBusinessCalendarRouteRoute =
     path: '/calendar',
     getParentRoute: () => MainRoute,
   } as any)
+const RoomComponentsBubblesSystemEventMessageRoute =
+  RoomComponentsBubblesSystemEventMessageRouteImport.update({
+    id: '/components/Bubbles/SystemEventMessage',
+    path: '/components/Bubbles/SystemEventMessage',
+    getParentRoute: () => RoomRouteRoute,
+  } as any)
+const RoomComponentsBubblesProposalMessageRoute =
+  RoomComponentsBubblesProposalMessageRouteImport.update({
+    id: '/components/Bubbles/ProposalMessage',
+    path: '/components/Bubbles/ProposalMessage',
+    getParentRoute: () => RoomRouteRoute,
+  } as any)
 const MainMatchingTestMatchingTestStep3RouteRoute =
   MainMatchingTestMatchingTestStep3RouteRouteImport.update({
     id: '/matching-test/matching-test/step3',
@@ -112,8 +132,10 @@ const MainMatchingTestMatchingTestStep1RouteRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/chat': typeof MainChatRouteRouteWithChildren
+  '/room': typeof RoomRouteRouteWithChildren
+  '/chat': typeof MainChatRouteRoute
   '/auth/login': typeof AuthLoginRouteRoute
+  '/room/$chatId': typeof RoomChatIdRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
@@ -122,15 +144,18 @@ export interface FileRoutesByFullPath {
   '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
   '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
   '/auth/signup/type': typeof AuthSignupTypeRouteRoute
-  '/chat/chatting-room': typeof MainChatChattingRoomRoute
   '/': typeof MainHomeIndexRoute
   '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/room/components/Bubbles/ProposalMessage': typeof RoomComponentsBubblesProposalMessageRoute
+  '/room/components/Bubbles/SystemEventMessage': typeof RoomComponentsBubblesSystemEventMessageRoute
 }
 export interface FileRoutesByTo {
-  '/chat': typeof MainChatRouteRouteWithChildren
+  '/room': typeof RoomRouteRouteWithChildren
+  '/chat': typeof MainChatRouteRoute
   '/auth/login': typeof AuthLoginRouteRoute
+  '/room/$chatId': typeof RoomChatIdRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
@@ -139,17 +164,20 @@ export interface FileRoutesByTo {
   '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
   '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
   '/auth/signup/type': typeof AuthSignupTypeRouteRoute
-  '/chat/chatting-room': typeof MainChatChattingRoomRoute
   '/': typeof MainHomeIndexRoute
   '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/room/components/Bubbles/ProposalMessage': typeof RoomComponentsBubblesProposalMessageRoute
+  '/room/components/Bubbles/SystemEventMessage': typeof RoomComponentsBubblesSystemEventMessageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/room': typeof RoomRouteRouteWithChildren
   '/_main': typeof MainRouteWithChildren
-  '/_main/chat': typeof MainChatRouteRouteWithChildren
+  '/_main/chat': typeof MainChatRouteRoute
   '/auth/login': typeof AuthLoginRouteRoute
+  '/room/$chatId': typeof RoomChatIdRoute
   '/_main/_business/calendar': typeof MainBusinessCalendarRouteRoute
   '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
@@ -158,17 +186,20 @@ export interface FileRoutesById {
   '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
   '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
   '/auth/signup/type': typeof AuthSignupTypeRouteRoute
-  '/_main/chat/chatting-room': typeof MainChatChattingRoomRoute
   '/_main/_home/': typeof MainHomeIndexRoute
   '/_main/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/_main/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/_main/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/room/components/Bubbles/ProposalMessage': typeof RoomComponentsBubblesProposalMessageRoute
+  '/room/components/Bubbles/SystemEventMessage': typeof RoomComponentsBubblesSystemEventMessageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/room'
     | '/chat'
     | '/auth/login'
+    | '/room/$chatId'
     | '/calendar'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
@@ -177,15 +208,18 @@ export interface FileRouteTypes {
     | '/auth/signup/success'
     | '/auth/signup/terms'
     | '/auth/signup/type'
-    | '/chat/chatting-room'
     | '/'
     | '/matching-test/matching-test/step1'
     | '/matching-test/matching-test/step2'
     | '/matching-test/matching-test/step3'
+    | '/room/components/Bubbles/ProposalMessage'
+    | '/room/components/Bubbles/SystemEventMessage'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/room'
     | '/chat'
     | '/auth/login'
+    | '/room/$chatId'
     | '/calendar'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
@@ -194,16 +228,19 @@ export interface FileRouteTypes {
     | '/auth/signup/success'
     | '/auth/signup/terms'
     | '/auth/signup/type'
-    | '/chat/chatting-room'
     | '/'
     | '/matching-test/matching-test/step1'
     | '/matching-test/matching-test/step2'
     | '/matching-test/matching-test/step3'
+    | '/room/components/Bubbles/ProposalMessage'
+    | '/room/components/Bubbles/SystemEventMessage'
   id:
     | '__root__'
+    | '/room'
     | '/_main'
     | '/_main/chat'
     | '/auth/login'
+    | '/room/$chatId'
     | '/_main/_business/calendar'
     | '/_main/matching-test/matching-result'
     | '/auth/signup/info'
@@ -212,14 +249,16 @@ export interface FileRouteTypes {
     | '/auth/signup/success'
     | '/auth/signup/terms'
     | '/auth/signup/type'
-    | '/_main/chat/chatting-room'
     | '/_main/_home/'
     | '/_main/matching-test/matching-test/step1'
     | '/_main/matching-test/matching-test/step2'
     | '/_main/matching-test/matching-test/step3'
+    | '/room/components/Bubbles/ProposalMessage'
+    | '/room/components/Bubbles/SystemEventMessage'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  RoomRouteRoute: typeof RoomRouteRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
   AuthLoginRouteRoute: typeof AuthLoginRouteRoute
   AuthSignupInfoRouteRoute: typeof AuthSignupInfoRouteRoute
@@ -238,6 +277,20 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof MainRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/room': {
+      id: '/room'
+      path: '/room'
+      fullPath: '/room'
+      preLoaderRoute: typeof RoomRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/room/$chatId': {
+      id: '/room/$chatId'
+      path: '/$chatId'
+      fullPath: '/room/$chatId'
+      preLoaderRoute: typeof RoomChatIdRouteImport
+      parentRoute: typeof RoomRouteRoute
     }
     '/auth/login': {
       id: '/auth/login'
@@ -259,13 +312,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof MainHomeIndexRouteImport
       parentRoute: typeof MainRoute
-    }
-    '/_main/chat/chatting-room': {
-      id: '/_main/chat/chatting-room'
-      path: '/chatting-room'
-      fullPath: '/chat/chatting-room'
-      preLoaderRoute: typeof MainChatChattingRoomRouteImport
-      parentRoute: typeof MainChatRouteRoute
     }
     '/auth/signup/type': {
       id: '/auth/signup/type'
@@ -323,6 +369,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainBusinessCalendarRouteRouteImport
       parentRoute: typeof MainRoute
     }
+    '/room/components/Bubbles/SystemEventMessage': {
+      id: '/room/components/Bubbles/SystemEventMessage'
+      path: '/components/Bubbles/SystemEventMessage'
+      fullPath: '/room/components/Bubbles/SystemEventMessage'
+      preLoaderRoute: typeof RoomComponentsBubblesSystemEventMessageRouteImport
+      parentRoute: typeof RoomRouteRoute
+    }
+    '/room/components/Bubbles/ProposalMessage': {
+      id: '/room/components/Bubbles/ProposalMessage'
+      path: '/components/Bubbles/ProposalMessage'
+      fullPath: '/room/components/Bubbles/ProposalMessage'
+      preLoaderRoute: typeof RoomComponentsBubblesProposalMessageRouteImport
+      parentRoute: typeof RoomRouteRoute
+    }
     '/_main/matching-test/matching-test/step3': {
       id: '/_main/matching-test/matching-test/step3'
       path: '/matching-test/matching-test/step3'
@@ -347,20 +407,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface MainChatRouteRouteChildren {
-  MainChatChattingRoomRoute: typeof MainChatChattingRoomRoute
+interface RoomRouteRouteChildren {
+  RoomChatIdRoute: typeof RoomChatIdRoute
+  RoomComponentsBubblesProposalMessageRoute: typeof RoomComponentsBubblesProposalMessageRoute
+  RoomComponentsBubblesSystemEventMessageRoute: typeof RoomComponentsBubblesSystemEventMessageRoute
 }
 
-const MainChatRouteRouteChildren: MainChatRouteRouteChildren = {
-  MainChatChattingRoomRoute: MainChatChattingRoomRoute,
+const RoomRouteRouteChildren: RoomRouteRouteChildren = {
+  RoomChatIdRoute: RoomChatIdRoute,
+  RoomComponentsBubblesProposalMessageRoute:
+    RoomComponentsBubblesProposalMessageRoute,
+  RoomComponentsBubblesSystemEventMessageRoute:
+    RoomComponentsBubblesSystemEventMessageRoute,
 }
 
-const MainChatRouteRouteWithChildren = MainChatRouteRoute._addFileChildren(
-  MainChatRouteRouteChildren,
+const RoomRouteRouteWithChildren = RoomRouteRoute._addFileChildren(
+  RoomRouteRouteChildren,
 )
 
 interface MainRouteChildren {
-  MainChatRouteRoute: typeof MainChatRouteRouteWithChildren
+  MainChatRouteRoute: typeof MainChatRouteRoute
   MainBusinessCalendarRouteRoute: typeof MainBusinessCalendarRouteRoute
   MainMatchingTestMatchingResultRouteRoute: typeof MainMatchingTestMatchingResultRouteRoute
   MainHomeIndexRoute: typeof MainHomeIndexRoute
@@ -370,7 +436,7 @@ interface MainRouteChildren {
 }
 
 const MainRouteChildren: MainRouteChildren = {
-  MainChatRouteRoute: MainChatRouteRouteWithChildren,
+  MainChatRouteRoute: MainChatRouteRoute,
   MainBusinessCalendarRouteRoute: MainBusinessCalendarRouteRoute,
   MainMatchingTestMatchingResultRouteRoute:
     MainMatchingTestMatchingResultRouteRoute,
@@ -386,6 +452,7 @@ const MainRouteChildren: MainRouteChildren = {
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  RoomRouteRoute: RoomRouteRouteWithChildren,
   MainRoute: MainRouteWithChildren,
   AuthLoginRouteRoute: AuthLoginRouteRoute,
   AuthSignupInfoRouteRoute: AuthSignupInfoRouteRoute,
