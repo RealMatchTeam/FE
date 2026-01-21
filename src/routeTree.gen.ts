@@ -22,6 +22,7 @@ import { Route as AuthSignupPurposeRouteRouteImport } from './routes/auth/signup
 import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/auth/signup/info-more/route'
 import { Route as AuthSignupInfoRouteRouteImport } from './routes/auth/signup/info/route'
 import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
+import { Route as MainBusinessCampaignRouteRouteImport } from './routes/_main/_business/campaign/route'
 import { Route as MainBusinessCalendarRouteRouteImport } from './routes/_main/_business/calendar/route'
 import { Route as RoomComponentsBubblesSystemEventMessageRouteImport } from './routes/room/components/Bubbles/SystemEventMessage'
 import { Route as RoomComponentsBubblesProposalMessageRouteImport } from './routes/room/components/Bubbles/ProposalMessage'
@@ -94,6 +95,12 @@ const MainMatchingTestMatchingResultRouteRoute =
     path: '/matching-test/matching-result',
     getParentRoute: () => MainRoute,
   } as any)
+const MainBusinessCampaignRouteRoute =
+  MainBusinessCampaignRouteRouteImport.update({
+    id: '/_business/campaign',
+    path: '/campaign',
+    getParentRoute: () => MainRoute,
+  } as any)
 const MainBusinessCalendarRouteRoute =
   MainBusinessCalendarRouteRouteImport.update({
     id: '/_business/calendar',
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRouteRoute
   '/room/$chatId': typeof RoomChatIdRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
+  '/campaign': typeof MainBusinessCampaignRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -157,6 +165,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRouteRoute
   '/room/$chatId': typeof RoomChatIdRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
+  '/campaign': typeof MainBusinessCampaignRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -179,6 +188,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRouteRoute
   '/room/$chatId': typeof RoomChatIdRoute
   '/_main/_business/calendar': typeof MainBusinessCalendarRouteRoute
+  '/_main/_business/campaign': typeof MainBusinessCampaignRouteRoute
   '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/room/$chatId'
     | '/calendar'
+    | '/campaign'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/room/$chatId'
     | '/calendar'
+    | '/campaign'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -242,6 +254,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/room/$chatId'
     | '/_main/_business/calendar'
+    | '/_main/_business/campaign'
     | '/_main/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainMatchingTestMatchingResultRouteRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/_business/campaign': {
+      id: '/_main/_business/campaign'
+      path: '/campaign'
+      fullPath: '/campaign'
+      preLoaderRoute: typeof MainBusinessCampaignRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/_business/calendar': {
       id: '/_main/_business/calendar'
       path: '/calendar'
@@ -428,6 +448,7 @@ const RoomRouteRouteWithChildren = RoomRouteRoute._addFileChildren(
 interface MainRouteChildren {
   MainChatRouteRoute: typeof MainChatRouteRoute
   MainBusinessCalendarRouteRoute: typeof MainBusinessCalendarRouteRoute
+  MainBusinessCampaignRouteRoute: typeof MainBusinessCampaignRouteRoute
   MainMatchingTestMatchingResultRouteRoute: typeof MainMatchingTestMatchingResultRouteRoute
   MainHomeIndexRoute: typeof MainHomeIndexRoute
   MainMatchingTestMatchingTestStep1RouteRoute: typeof MainMatchingTestMatchingTestStep1RouteRoute
@@ -438,6 +459,7 @@ interface MainRouteChildren {
 const MainRouteChildren: MainRouteChildren = {
   MainChatRouteRoute: MainChatRouteRoute,
   MainBusinessCalendarRouteRoute: MainBusinessCalendarRouteRoute,
+  MainBusinessCampaignRouteRoute: MainBusinessCampaignRouteRoute,
   MainMatchingTestMatchingResultRouteRoute:
     MainMatchingTestMatchingResultRouteRoute,
   MainHomeIndexRoute: MainHomeIndexRoute,
