@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ChattingRoom from "./chatting-room";
 
-export const Route = createFileRoute("/room/$chatId")({
+export const Route = createFileRoute("/rooms/$chatId")({
   component: ChatRoomRoute,
 });
 

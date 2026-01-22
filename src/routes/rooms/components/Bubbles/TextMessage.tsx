@@ -1,10 +1,10 @@
-import { type TextMessageProps } from "./TextMessageTypes";
+import { type ChatMessage } from "./TextMessageTypes";
 
-export default function TextMessage ({ 
-  message,
-  avatarSrc,
-  avatarSize = 38, 
-}: TextMessageProps) {
+type Props = {
+  message: ChatMessage;
+};
+
+export default function TextMessage ({ message }: Props) {
   if (message.type !== "TEXT") return null;
 
   const isMe = message.side === "me";
@@ -12,9 +12,11 @@ export default function TextMessage ({
 
   const timeText = message.time ?? "";
 
+  const avatarSrc = message.avatarSrc; //임시
+
   if (isMe) {
     return (
-      <div className="flex justify-end">
+      <div className="flex w-full justify-end">
         <div className="inline-flex items-end gap-[8px]">
           {timeText ? (
             <div className="text-[10px] leading-[12px] text-[#9B9BA1] text-right whitespace-pre-line">
@@ -22,9 +24,11 @@ export default function TextMessage ({
             </div>
           ) : null
           }
-          <div className="w-fit max-w-[70%] px-[10px] py-[10px] rounded-[10px] bg-[#B7B7F380] text-black text-[12px] leading-[16px] style-black break-words whitespace-pre-line"> 
+
+          {<div className="w-fit max-w-[240px] px-[10px] py-[10px] rounded-[10px] bg-[#B7B7F380] text-black text-[12px] leading-[16px] style-black break-words whitespace-pre-line"> 
             {message.content}
           </div>
+          } 
         </div>
       </div>
     );
@@ -38,7 +42,7 @@ export default function TextMessage ({
           {/* avatar */}
           <div
             className="shrink-0 rounded-[10px] bg-white overflow-hidden"
-            style={{ width: avatarSize, height: avatarSize }}
+            style={{ width: message.avatarSize, height: message.avatarSize }}
           >
             {avatarSrc ? (
               <img
@@ -54,10 +58,10 @@ export default function TextMessage ({
             )}
           </div>
 
-          {/* bubble + time */}
+          { /*bubble + time*/ }
           <div className="flex justify-start">
             <div className="flex items-end gap-[8px] max-w-[calc(100%-48px)]">
-              <div className="w-fit max-w-[60%] rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-[12px] leading-[16px] text-Medium text-black break-words whitespace-pre-line">
+              <div className="w-fit max-w-[240px] rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-[12px] leading-[16px] text-Medium text-black break-words whitespace-pre-line">
                 {message.content}
               </div>
 
@@ -68,7 +72,6 @@ export default function TextMessage ({
               ) : null}
             </div>
           </div>
-
         </div>
       </div>
     );

@@ -15,21 +15,66 @@ export default function ChattingRoom( {chatId} : Props ) {
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
-      id: "m1",
-      side: "other",
-      type: "TEXT",
-      content: " 안녕하세요 캠페인 문의 드립니다 안녕하세요 캠페인 문의 드립니다 안녕하세요 캠페인 문의 드립니다",
-      time: "25.01.01\n09:40",
+      id: "p1",
+      side: "other", // me -> 인플루언서 other -> 브랜드 test
+      type: "PROPOSAL",
+      campaignName: "글로우 쿠션 신제품 론칭 리뷰",
+      campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
+      time: "26.01.22\n00:10",
+      status: "sent",
+      avatarSize: 38,
+    },
+    {
+      id: "p1",
+      side: "me", // me -> 인플루언서 other -> 브랜드 test
+      type: "PROPOSAL",
+      campaignName: "글로우 쿠션 신제품 론칭 리뷰",
+      campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
+      time: "26.01.22\n00:10",
       status: "sent",
     },
     {
-      id: "m2",
-      side: "me",
-      type: "TEXT",
-      content: "안녕하세요!",
-      time: "25.01.01\n09:41",
+      id: "p1",
+      side: "other", 
+      type: "MATCHED_CAMPAIGN",
+      campaignName: "글로우 쿠션 신제품 론칭 리뷰",
+      campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
+      time: "26.01.22\n00:10",
       status: "sent",
+      price: 500000,
+      orderId: "ORD1234567890",
     },
+    {
+      id: "m1",
+      side: "other",
+      type: "TEXT",
+      content: "안녕하세요 캠페인 문의 드립니다.\n협업 가능하신지 확인 부탁드립니다.",
+      time: "26.01.21\n09:40",
+      avatarSize: 38,
+    },
+    {
+      id: "m4",
+      side: "system",
+      type: "SYSTEM_MATCHED",
+    },
+    {
+      id: "img1",
+      side: "other",
+      type: "IMAGE",
+      fileName: "IM_1234",
+      ext: "png",
+      time: "26.01.22\n10:11",
+      avatarSize: 38,
+      avartarSrc: "/brand.png",
+    },
+    {
+      id: "file1",
+      side: "me",
+      type: "FILE",
+      fileName: "계약서_v2",
+      ext: "pdf",
+      time: "26.01.22\n10:12",
+    }
   ]);
 
   const kb = useKeyboardOffset();
@@ -106,6 +151,8 @@ export default function ChattingRoom( {chatId} : Props ) {
         time: `${dateText}\n${timeText}`,
         type: "TEXT",
         status: "sent", // 수정필요
+        campaignName: "",
+        campaignContent: "",
       },
     ]);
     setText(""); // 입력창 비우기
@@ -127,8 +174,8 @@ export default function ChattingRoom( {chatId} : Props ) {
         ref={listRef}
         className="h-[calc(100vh-60px-49px)] overflow-y-auto px-4 py-5"
       >
-        <div className="mx-auto max-w-md">
-          <div className="space-y-2">
+        <div className="w-full">
+          <div className="w-full space-y-2">
             {messages.map((m) => (
               <MessageRenderer
                 key={m.id}

@@ -34,7 +34,7 @@ export function ChatListItem({ room }: { room: ChatRoom }) {
       className=" w-full max-w-[420px] rounded-[10px] bg-white px-4 py-[14px] flex items-start gap-[14px] text-left"
       onClick={() =>
         navigate({
-          to: "/room/$chatId",
+          to: "/rooms/$chatId",
           params: { chatId: String(room.id) },
         })
       }
