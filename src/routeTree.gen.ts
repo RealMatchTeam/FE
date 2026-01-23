@@ -21,6 +21,7 @@ import { Route as AuthSignupPurposeRouteRouteImport } from './routes/auth/signup
 import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/auth/signup/info-more/route'
 import { Route as AuthSignupInfoRouteRouteImport } from './routes/auth/signup/info/route'
 import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
+import { Route as MainBusinessRejectionRouteRouteImport } from './routes/_main/_business/rejection/route'
 import { Route as MainBusinessProposalRouteRouteImport } from './routes/_main/_business/proposal/route'
 import { Route as MainBusinessCampaignRouteRouteImport } from './routes/_main/_business/campaign/route'
 import { Route as MainBusinessCalendarRouteRouteImport } from './routes/_main/_business/calendar/route'
@@ -88,6 +89,12 @@ const MainMatchingTestMatchingResultRouteRoute =
     path: '/matching-test/matching-result',
     getParentRoute: () => MainRoute,
   } as any)
+const MainBusinessRejectionRouteRoute =
+  MainBusinessRejectionRouteRouteImport.update({
+    id: '/_business/rejection',
+    path: '/rejection',
+    getParentRoute: () => MainRoute,
+  } as any)
 const MainBusinessProposalRouteRoute =
   MainBusinessProposalRouteRouteImport.update({
     id: '/_business/proposal',
@@ -131,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof MainBusinessCalendarRouteRoute
   '/campaign': typeof MainBusinessCampaignRouteRoute
   '/proposal': typeof MainBusinessProposalRouteRoute
+  '/rejection': typeof MainBusinessRejectionRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -150,6 +158,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof MainBusinessCalendarRouteRoute
   '/campaign': typeof MainBusinessCampaignRouteRoute
   '/proposal': typeof MainBusinessProposalRouteRoute
+  '/rejection': typeof MainBusinessRejectionRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -171,6 +180,7 @@ export interface FileRoutesById {
   '/_main/_business/calendar': typeof MainBusinessCalendarRouteRoute
   '/_main/_business/campaign': typeof MainBusinessCampaignRouteRoute
   '/_main/_business/proposal': typeof MainBusinessProposalRouteRoute
+  '/_main/_business/rejection': typeof MainBusinessRejectionRouteRoute
   '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/campaign'
     | '/proposal'
+    | '/rejection'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/campaign'
     | '/proposal'
+    | '/rejection'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -231,6 +243,7 @@ export interface FileRouteTypes {
     | '/_main/_business/calendar'
     | '/_main/_business/campaign'
     | '/_main/_business/proposal'
+    | '/_main/_business/rejection'
     | '/_main/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -342,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainMatchingTestMatchingResultRouteRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/_business/rejection': {
+      id: '/_main/_business/rejection'
+      path: '/rejection'
+      fullPath: '/rejection'
+      preLoaderRoute: typeof MainBusinessRejectionRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/_business/proposal': {
       id: '/_main/_business/proposal'
       path: '/proposal'
@@ -404,6 +424,7 @@ interface MainRouteChildren {
   MainBusinessCalendarRouteRoute: typeof MainBusinessCalendarRouteRoute
   MainBusinessCampaignRouteRoute: typeof MainBusinessCampaignRouteRoute
   MainBusinessProposalRouteRoute: typeof MainBusinessProposalRouteRoute
+  MainBusinessRejectionRouteRoute: typeof MainBusinessRejectionRouteRoute
   MainMatchingTestMatchingResultRouteRoute: typeof MainMatchingTestMatchingResultRouteRoute
   MainHomeIndexRoute: typeof MainHomeIndexRoute
   MainMatchingTestMatchingTestStep1RouteRoute: typeof MainMatchingTestMatchingTestStep1RouteRoute
@@ -416,6 +437,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainBusinessCalendarRouteRoute: MainBusinessCalendarRouteRoute,
   MainBusinessCampaignRouteRoute: MainBusinessCampaignRouteRoute,
   MainBusinessProposalRouteRoute: MainBusinessProposalRouteRoute,
+  MainBusinessRejectionRouteRoute: MainBusinessRejectionRouteRoute,
   MainMatchingTestMatchingResultRouteRoute:
     MainMatchingTestMatchingResultRouteRoute,
   MainHomeIndexRoute: MainHomeIndexRoute,
