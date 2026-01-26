@@ -11,6 +11,7 @@ interface TermsSectionProps {
   onPrivacyCollectionChange: () => void;
   onPrivacy3rdPartyChange: () => void;
   onEventMarketingChange: () => void;
+  onDetailClick: (key: string) => void;
 }
 
 export function TermsSection({
@@ -24,6 +25,7 @@ export function TermsSection({
   onPrivacyCollectionChange,
   onPrivacy3rdPartyChange,
   onEventMarketingChange,
+  onDetailClick,
 }: TermsSectionProps) {
   return (
     <div className="space-y-5 px-12">
@@ -40,6 +42,7 @@ export function TermsSection({
         label="서비스 이용약관 동의"
         required
         hasArrow
+        onDetailClick={() => onDetailClick("serviceTerms")}
       />
 
       <TermsItem
@@ -48,6 +51,7 @@ export function TermsSection({
         label="개인정보 수집/이용동의"
         required
         hasArrow
+        onDetailClick={() => onDetailClick("privacyCollection")}
       />
 
       <TermsItem
@@ -56,6 +60,7 @@ export function TermsSection({
         label="개인정보 제3자 제공 동의"
         required
         hasArrow
+        onDetailClick={() => onDetailClick("privacy3rdParty")}
       />
 
       <TermsItem
@@ -63,6 +68,7 @@ export function TermsSection({
         onChange={onEventMarketingChange}
         label="이벤트 혜택 및 광고성 정보 수신 동의"
         hasArrow
+        onDetailClick={() => onDetailClick("eventMarketing")}
       />
     </div>
   );

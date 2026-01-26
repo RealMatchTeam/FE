@@ -34,7 +34,7 @@ export function AgeSection<T extends FieldValues>({ setValue }: AgeSectionProps<
         className="flex w-full h-[46px] px-4 items-center pl-4 rounded-xl border border-core-2 bg-bg-w-80"
       >
         {displayText ? (
-          <span className="text-callout1 text-text-gray1">{displayText}</span>
+          <span className="flex w-full justify-center text-callout1 text-core-1">{displayText}</span>
         ) : (
           <span className="flex w-full text-button text-core-1 justify-center">선택하기</span>
         )}

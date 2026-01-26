@@ -6,10 +6,9 @@ import { PurposeSection } from "./components/PurposeSection";
 
 function SignUpPurposeContent() {
   const navigate = useNavigate();
-  const { type } = useSearch({ from: "/auth/signup/purpose" });
-  const isEmail = type === "email";
-  const totalSteps = isEmail ? 4 : 3;
-  const currentStep = isEmail ? 4 : 3;
+  const { provider } = useSearch({ from: "/auth/signup/purpose" });
+  const totalSteps = 3;
+  const currentStep = 3;
 
   const [selectedPurposes, setSelectedPurposes] = useState<string[]>([]);
 
@@ -24,7 +23,7 @@ function SignUpPurposeContent() {
   const handleNext = () => {
     if (selectedPurposes.length > 0) {
       // 회원가입 완료 페이지로 이동
-      navigate({ to: "/auth/signup/success" });
+      navigate({ to: "/auth/signup/success", search: { provider } });
     }
   };
 
@@ -39,7 +38,7 @@ function SignUpPurposeContent() {
         <h2 className="text-title text-text-black text-center mb-2">
           어떤 목적으로 사용하시나요?
         </h2>
-        <p className="text-callout1 text-text-gray3 text-center mb-8">
+        <p className="text-callout1 text-text-gray3 text-center mb-20">
           <span className="text-core-1">모두</span> 선택해주세요
         </p>
 

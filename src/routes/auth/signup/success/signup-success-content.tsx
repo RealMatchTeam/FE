@@ -1,10 +1,11 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import Button from "../../../../components/common/Button";
 import { CheckCircleIcon } from "../components/icons/CheckCircleIcon";
 import MiniLogo from "../../../../assets/logo/mini-logo.svg";
 
 function SignUpSuccessContent() {
   const navigate = useNavigate();
+  const { provider } = useSearch({ from: "/auth/signup/success" });
 
   const handleStart = () => {
     // TODO: 홈 라우트 구현 후 "/" 로 변경

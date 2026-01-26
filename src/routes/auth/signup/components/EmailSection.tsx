@@ -30,7 +30,7 @@ export function EmailSection<T extends FieldValues>({
           placeholder="이메일을 입력해주세요"
           {...register("email" as Path<T>)}
           disabled
-          className="bg-text-gray5! cursor-not-allowed"
+          className="bg-white cursor-not-allowed"
         />
       </div>
     );

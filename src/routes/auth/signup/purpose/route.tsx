@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import SignUpPurposeContent from "./signup-purpose-content";
 
 type SignUpPurposeSearch = {
-  type?: "email" | "social";
+  provider: "kakao" | "naver" | "google";
 };
 
 export const Route = createFileRoute("/auth/signup/purpose")({
   component: SignUpPurposeContent,
   validateSearch: (search: Record<string, unknown>): SignUpPurposeSearch => {
     return {
-      type: search.type === "social" ? "social" : "email",
+      provider: (search.provider as "kakao" | "naver" | "google") || "kakao",
     };
   },
 });

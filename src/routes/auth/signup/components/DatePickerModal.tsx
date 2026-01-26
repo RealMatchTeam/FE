@@ -16,16 +16,16 @@ export function DatePickerModal({
   initialValue,
 }: DatePickerModalProps) {
   const currentYear = new Date().getFullYear();
-  
-  const years = useMemo(() => 
+
+  const years = useMemo(() =>
     Array.from({ length: 100 }, (_, i) => String(currentYear - i)),
     [currentYear]
   );
-  const months = useMemo(() => 
+  const months = useMemo(() =>
     Array.from({ length: 12 }, (_, i) => String(i + 1)),
     []
   );
-  const days = useMemo(() => 
+  const days = useMemo(() =>
     Array.from({ length: 31 }, (_, i) => String(i + 1)),
     []
   );

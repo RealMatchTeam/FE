@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { cn } from "../../../../lib/utils";
+import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+import Button from "../../../../components/common/Button";
 import { CheckIcon } from "../../components/CheckIcon";
 
 interface ContentCategorySectionProps {
@@ -14,19 +17,6 @@ export function ContentCategorySection({
 }: ContentCategorySectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleToggle = (category: string) => {
-    onToggleCategory(category);
-    
-    // 모든 카테고리가 선택되면 자동으로 드롭다운 닫기
-    const willBeSelected = selectedCategories.includes(category)
-      ? selectedCategories.filter((c) => c !== category)
-      : [...selectedCategories, category];
-    
-    if (willBeSelected.length === CONTENT_CATEGORIES.length) {
-      setIsOpen(false);
-    }
-  };
-
   return (
     <div className="space-y-1">
       <h3 className="text-title1 text-text-black">콘텐츠 분야</h3>
@@ -37,7 +27,7 @@ export function ContentCategorySection({
         <div className="relative">
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setIsOpen(true)}
             className="flex w-full min-h-[46px] px-4 py-3 items-center justify-center rounded-xl border border-core-2 bg-bg-w-80"
           >
             {selectedCategories.length > 0 ? (
@@ -52,30 +42,63 @@ export function ContentCategorySection({
               <span className="text-button text-core-1">선택하기</span>
             )}
           </button>
-          {isOpen && (
-            <>
-              {/* 외부 클릭 감지용 오버레이 */}
-              <div
-                className="fixed inset-0 z-0"
-                onClick={() => setIsOpen(false)}
-              />
-              <div className="absolute z-10 w-full mt-1 bg-white border border-core-2 rounded-xl overflow-hidden shadow-lg">
-                {CONTENT_CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => handleToggle(category)}
-                    className="w-full px-4 py-3 flex items-center justify-center gap-2 text-title4 text-core-1 hover:bg-core-70 transition-colors"
-                  >
-                    <CheckIcon checked={selectedCategories.includes(category)} />
-                    <span>{category}</span>
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
         </div>
       </div>
+
+      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[32%]">
+        <div className="flex flex-col h-full px-5 pb-6">
+          {/* 헤더 */}
+          <div className="flex justify-between items-center py-5.5">
+            <span className="text-title2 text-text-black px-1.5 py-1">콘텐츠 분야 선택</span>
+            <button onClick={() => setIsOpen(false)} className="p-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M0.75 10.75L5.75 5.75L10.75 10.75M10.75 0.75L5.74905 5.75L0.75 0.75" stroke="#5B5D6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          {/* 옵션 리스트 */}
+          <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
+            {CONTENT_CATEGORIES.map((category) => {
+              const isSelected = selectedCategories.includes(category);
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => onToggleCategory(category)}
+                  style={{
+                    backgroundColor: isSelected ? "#B7B7F380" : "var(--color-bg-w-80)",
+                    color: isSelected ? "var(--color-core-1)" : "var(--color-text-gray1)",
+                  }}
+                  className={cn(
+                    "w-full py-4 px-5 rounded-[12px] flex items-center justify-center gap-2 transition-all relative text-title3"
+                  )}
+                >
+                  {/* 체크박스 */}
+                  <div className="absolute left-5 flex items-center">
+                    <CheckIcon checked={isSelected} />
+                  </div>
+
+                  <span>{category}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 하단 완료 버튼 */}
+          <div className="pt-4">
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={() => setIsOpen(false)}
+            >
+              선택 완료
+            </Button>
+          </div>
+        </div>
+      </FilterBottomSheet>
     </div>
   );
 }

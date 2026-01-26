@@ -1,31 +1,54 @@
+import { useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
 
 interface FilterBottomSheetProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
+    className?: string;
 }
 
-export default function FilterBottomSheet({ isOpen, onClose, children }: FilterBottomSheetProps) {
-    if (!isOpen) return null;
+export default function FilterBottomSheet({ isOpen, onClose, children, className }: FilterBottomSheetProps) {
+    const [isVisible, setIsVisible] = useState(isOpen);
+    const [animateClass, setAnimateClass] = useState("");
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsVisible(true);
+            setAnimateClass("animate-slide-up");
+        } else if (isVisible) {
+            setAnimateClass("animate-slide-down");
+        }
+    }, [isOpen]);
+
+    const handleAnimationEnd = () => {
+        if (!isOpen) {
+            setIsVisible(false);
+        }
+    };
+
+    if (!isVisible) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
             {/* 배경 오버레이 */}
             <div
-                className="absolute inset-0 bg-black/50 transition-opacity"
+                className={cn(
+                    "absolute inset-0 bg-black transition-opacity duration-300",
+                    isOpen ? "bg-black/50" : "bg-black/0"
+                )}
                 onClick={onClose}
             />
 
             {/* 바텀시트 */}
-            <div className={cn(
-                "relative w-full max-w-[430px] bg-white rounded-t-2xl",
-                "animate-slide-up h-[60%] flex flex-col"
-            )}>
-                {/* 핸들 바 */}
-                <div className="flex justify-center pt-3 pb-2">
-                    <div className="w-10 h-1 bg-gray-300 rounded-full" />
-                </div>
+            <div
+                onAnimationEnd={handleAnimationEnd}
+                className={cn(
+                    "relative w-full max-w-[375px] bg-white rounded-t-2xl",
+                    "flex flex-col",
+                    animateClass,
+                    className || "h-[60%]"
+                )}>
 
                 {/* 콘텐츠 */}
                 <div className="flex-1 overflow-y-auto">

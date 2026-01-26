@@ -12,9 +12,8 @@ export function CheckIcon({ checked }: CheckIconProps) {
     );
   }
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect width="16" height="16" rx="3" fill="#D4D4D9" />
-      <path d="M4 8L6.5 10.5L12 5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="0.5" y="0.5" width="15" height="15" rx="2.5" stroke="#404252" />
     </svg>
   );
 }

@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import SignUpTermsContent from "./signup-terms-content";
 
 type SignUpTermsSearch = {
-  type?: "email" | "social";
+  provider: "kakao" | "naver" | "google";
 };
 
 export const Route = createFileRoute("/auth/signup/terms")({
   component: SignUpTermsContent,
   validateSearch: (search: Record<string, unknown>): SignUpTermsSearch => {
     return {
-      type: search.type === "social" ? "social" : "email",
+      provider: (search.provider as "kakao" | "naver" | "google") || "kakao", // 기본값은 안전장치로
     };
   },
 });

@@ -297,4 +297,19 @@ html {
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
   }
+
+  /* 슬라이드 다운 애니메이션 */
+  @keyframes slide-down {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(100%);
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out forwards;
+  }
 }
