@@ -12,7 +12,7 @@ export function TermsDetailModal({ isOpen, onClose, title, content }: TermsDetai
     const [isVisible, setIsVisible] = useState(isOpen);
 
     useEffect(() => {
-        let timer: NodeJS.Timeout;
+        let timer: ReturnType<typeof setTimeout>;
         if (isOpen) {
             setIsVisible(true);
         } else {
