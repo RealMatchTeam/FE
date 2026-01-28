@@ -17,7 +17,7 @@ export default function CalendarContent() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("전체");
 
-  const hasData = matchingSubTab === "sent";
+  const hasData = true;
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
@@ -86,7 +86,7 @@ export default function CalendarContent() {
             <MatchingTabSection subTab={matchingSubTab} setSubTab={setMatchingSubTab} />
 
             {hasData ? (
-              <div className="flex flex-col gap-4 px-4 py-6 flex-1">
+              <div className="flex flex-col gap-4 px-4 flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <h2 className="text-title1 font-bold text-text-black">매칭 현황</h2>
                   <button
@@ -98,11 +98,23 @@ export default function CalendarContent() {
                   </button>
                 </div>
                 <div className="flex flex-col gap-4">
-                  <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
-                  <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                  <MatchingCard brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                  <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                  {matchingSubTab === "sent" ? (
+                    <>
+                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
+                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
+                      <MatchingCard brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
+                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                    </>
+                  ) : (
+                    <>
+                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
+                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
+                      <MatchingCard brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
+                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                    </>
+                  )}
                 </div>
+
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center">
