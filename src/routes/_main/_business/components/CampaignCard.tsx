@@ -19,13 +19,13 @@ export default function CampaignCard({
   logo,
   showButton = true,
 }: CampaignCardProps) {
-  const BUTTON_WIDTH = '280px';
+  const BUTTON_WIDTH = "280px";
 
   return (
-    <div className="flex p-4 bg-white rounded-2xl shadow-sm">
+    <div className="flex p-4 bg-[var(--color-bg-w)] rounded-2xl shadow-sm">
       <div className="flex w-full gap-3">
         {/* 1. 로고 영역 */}
-        <div className="w-[72px] h-[72px] flex items-center justify-center border border-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+        <div className="w-[72px] h-[72px] flex items-center justify-center border border-[var(--color-bluegray-2)] rounded-lg overflow-hidden flex-shrink-0">
           <img
             src={logo || BrandLogo}
             alt={`${brand} 로고`}
@@ -41,15 +41,21 @@ export default function CampaignCard({
           {/* 브랜드 + 제목/날짜 */}
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-1">
-              <span className="text-[17px] font-bold text-text-black leading-tight">{brand}</span>
-              <img src={ArrowRight} alt="이동" className="w-4 h-4 object-contain" />
+              <span className="text-[17px] font-bold text-[var(--color-text-black)] leading-tight">
+                {brand}
+              </span>
+              <img
+                src={ArrowRight}
+                alt="이동"
+                className="w-4 h-4 object-contain"
+              />
             </div>
 
             <div className="flex justify-between items-start w-full">
-              <p className="text-[13px] text-text-gray2 truncate flex-1 leading-tight">
+              <p className="text-[13px] text-[var(--color-text-gray2)] truncate flex-1 leading-tight">
                 {title}
               </p>
-              <div className="flex flex-col items-end text-[10px] text-text-gray3 leading-tight ml-2 flex-shrink-0">
+              <div className="flex flex-col items-end text-[10px] text-[var(--color-text-gray3)] leading-tight ml-2 flex-shrink-0">
                 <span>{startDate}.25</span>
                 <span>{endDate}.25</span>
               </div>
@@ -59,8 +65,8 @@ export default function CampaignCard({
           {/* 캠페인 보기 버튼 */}
           {showButton && (
             <button
-              className="relative flex items-center justify-center bg-[#EBEEFB] rounded-[6px] transition-colors hover:bg-[#DEE2F5]"
-              style={{ width: BUTTON_WIDTH, height: '50px' }}
+              className="relative flex items-center justify-center bg-[var(--color-bluegray-2)] rounded-[6px] transition-colors hover:bg-[var(--color-core-2)]"
+              style={{ width: BUTTON_WIDTH, height: "50px" }}
             >
               {/* 돋보기 아이콘만 왼쪽 정렬 */}
               <img
@@ -69,8 +75,8 @@ export default function CampaignCard({
                 className="absolute left-[12px] w-3.5 h-3.5 object-contain"
               />
 
-              {/* 글자는 버튼의 정중앙에 위치 */}
-              <span className="text-[13px] font-medium text-text-black">
+              {/* 글자는 버튼의 정중앙 */}
+              <span className="text-[13px] font-medium text-[var(--color-text-black)]">
                 캠페인 보기
               </span>
             </button>
