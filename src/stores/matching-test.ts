@@ -50,6 +50,9 @@ const EMPTY_STEP3_CHIPS: Step3ChipsState = {
   editingRange: [],
 };
 
+// ✅ 결과 변환용 (홈/추천에서 공통으로 쓸 카테고리)
+export type MatchCategory = "beauty" | "fashion";
+
 // store
 type MatchingTestStore = {
   // step1
@@ -83,6 +86,9 @@ type MatchingTestStore = {
 
   step3Chips: Step3ChipsState;
   toggleStep3Chip: (key: Step3ChipKey, label: string, max: number) => void;
+
+  // ✅ 추가: 최종 결과 payload 생성(홈 추천/API에 그대로 넘길 수 있게)
+  buildResult: (category: MatchCategory) => { category: MatchCategory; tags: string[] };
 
   resetAll: () => void;
 };
@@ -133,6 +139,8 @@ export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
   // step3
   snsUrl: "",
   setSnsUrl: (v) => set({ snsUrl: v }),
+
+  // ⚠️ 기존 코드 유지: 필요하면 "https://www.instagram.com/" 형태로 고쳐야 정확함
   isValidInstagramUrl: () => get().snsUrl.startsWith("www.instagram/"),
 
   step3Selected: EMPTY_STEP3_SELECTED,
@@ -170,6 +178,26 @@ export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
     if (cur.length >= max) return;
 
     set({ step3Chips: { ...prevAll, [key]: [...cur, label] } });
+  },
+
+  // ✅ 임시 입력값 -> 결과 요약(tags)
+  buildResult: (category) => {
+    const s1 = get().selected;
+    const s2 = get().step2Selected;
+    const s3sel = get().step3Selected;
+    const s3chip = get().step3Chips;
+
+    const flatten = (obj: Record<string, string[]>) => Object.values(obj).flat();
+
+    const tags =
+      category === "beauty"
+        ? [...flatten(s1), ...flatten(s3sel), ...flatten(s3chip)]
+        : [...flatten(s2), ...flatten(s3sel), ...flatten(s3chip)];
+
+    // 중복 제거
+    const uniq = Array.from(new Set(tags));
+
+    return { category, tags: uniq };
   },
 
   resetAll: () =>
