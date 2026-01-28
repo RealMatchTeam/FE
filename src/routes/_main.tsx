@@ -20,18 +20,21 @@ export const Route = createFileRoute("/_main")({
 
 function MainLayout() {
   const [hideBottomTab, setHideBottomTab] = useState(false);
+  const [hideHeader, setHideHeader] = useState(false);
 
   return (
-    <LayoutContext.Provider value={{ hideBottomTab, setHideBottomTab }}>
+    <LayoutContext.Provider value={{ hideBottomTab, setHideBottomTab, hideHeader, setHideHeader }}>
       <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-        <header className="w-full bg-white shrink-0 py-4.5">
-          <div className="grid h-full w-full grid-cols-3 items-center">
-            <div className="flex items-center"></div>
-            <div className="flex items-center justify-center">
-              <img alt="Real Match" draggable="false" src={Logo} />
+        {!hideHeader && (
+          <header className="w-full bg-white shrink-0 py-4.5">
+            <div className="grid h-full w-full grid-cols-3 items-center">
+              <div className="flex items-center"></div>
+              <div className="flex items-center justify-center">
+                <img alt="Real Match" draggable="false" src={Logo} />
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         <main className="flex-1 w-full bg-[#FAFAFA] overflow-y-auto">
           <Outlet />

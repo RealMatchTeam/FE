@@ -7,6 +7,7 @@ import BrandFilterBar from "./components/BrandFilterBar";
 import { Route } from "./route";
 import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
+import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
 
 
 export default function BrandContent() {
@@ -16,6 +17,9 @@ export default function BrandContent() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    // 바텀탭 숨기기 (바텀시트 열렸을 때)
+    useHideBottomTab(isFilterOpen);
 
     const handleCategoryChange = (newCategory: BrandCategory) => {
         navigate({
