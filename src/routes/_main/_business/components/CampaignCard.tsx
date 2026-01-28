@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router"; 
 import BrandLogo from "../../../../assets/brand-logo.png";
 import ArrowRight from "../../../../assets/arrow-right.svg";
 import SearchIcon from "../../../../assets/search.svg";
@@ -20,6 +21,13 @@ export default function CampaignCard({
   showButton = true,
 }: CampaignCardProps) {
   const BUTTON_WIDTH = "280px";
+  
+  // 2. navigate 함수 선언
+  const navigate = useNavigate();
+
+  const handleGoToCampaign = () => {
+    navigate({ to: "/campaign" });
+  };
 
   return (
     <div className="flex p-4 bg-[var(--color-bg-w)] rounded-2xl shadow-sm">
@@ -62,20 +70,18 @@ export default function CampaignCard({
             </div>
           </div>
 
-          {/* 캠페인 보기 버튼 */}
+          {/* 캠페인 보기 버튼 - onClick 이벤트 연결 */}
           {showButton && (
             <button
+              onClick={handleGoToCampaign} // 3. 클릭 시 이동 핸들러 연결
               className="relative flex items-center justify-center bg-[var(--color-bluegray-2)] rounded-[6px] transition-colors hover:bg-[var(--color-core-2)]"
               style={{ width: BUTTON_WIDTH, height: "50px" }}
             >
-              {/* 돋보기 아이콘만 왼쪽 정렬 */}
               <img
                 src={SearchIcon}
                 alt="돋보기"
                 className="absolute left-[12px] w-3.5 h-3.5 object-contain"
               />
-
-              {/* 글자는 버튼의 정중앙 */}
               <span className="text-[13px] font-medium text-[var(--color-text-black)]">
                 캠페인 보기
               </span>
