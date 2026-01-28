@@ -44,14 +44,14 @@ export default function FilterBottomSheet({ isOpen, onClose, children, className
             <div
                 onAnimationEnd={handleAnimationEnd}
                 className={cn(
-                    "relative w-full max-w-[375px] bg-white rounded-t-2xl",
+                    "relative w-full max-w-[375px] bg-white rounded-t-3xl",
                     "flex flex-col",
                     animateClass,
                     className || "h-[60%]"
                 )}>
 
                 {/* 콘텐츠 */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto scrollbar-hide">
                     {children}
                 </div>
             </div>

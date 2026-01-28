@@ -17,6 +17,15 @@ import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
 import MiniLogo from "../../../../assets/logo/mini-logo.svg";
 import { existingCampaigns } from "../../../../data/existing-campaigns";
 import ProfileSelector from "../components/ProfileSelector";
+import SelectBottomSheet from "./components/SelectBottomSheet";
+import {
+  formatOptions,
+  categoryOptions,
+  toneOptions,
+  involvementOptions,
+  usageScopeOptions,
+  sponsorProductOptions,
+} from "./campaignOptions";
 import {
   campaignFormSchema,
   defaultCampaignFormValues,
@@ -31,8 +40,18 @@ export default function CreateCampaignContent() {
   const [isSheetOpen, setIsSheetOpen] = useState(type === "existing");
   const [selectedCampaignIds, setSelectedCampaignIds] = useState<number[]>([1]);
 
+  // 각 필드별 바텀시트 상태
+  const [isFormatSheetOpen, setIsFormatSheetOpen] = useState(false);
+  const [isCategorySheetOpen, setIsCategorySheetOpen] = useState(false);
+  const [isToneSheetOpen, setIsToneSheetOpen] = useState(false);
+  const [isInvolvementSheetOpen, setIsInvolvementSheetOpen] = useState(false);
+  const [isUsageScopeSheetOpen, setIsUsageScopeSheetOpen] = useState(false);
+  const [isSponsorProductSheetOpen, setIsSponsorProductSheetOpen] = useState(false);
+
   // 바텀탭 숨기기 (바텀시트 열렸을 때)
-  useHideBottomTab(isSheetOpen);
+  const anySheetOpen = isSheetOpen || isFormatSheetOpen || isCategorySheetOpen || 
+    isToneSheetOpen || isInvolvementSheetOpen || isUsageScopeSheetOpen || isSponsorProductSheetOpen;
+  useHideBottomTab(anySheetOpen);
 
   // react-hook-form + zod
   const {
@@ -111,7 +130,7 @@ export default function CreateCampaignContent() {
               onChange={(v) => setValue("campaignName", v)}
             />
             {errors.campaignName && (
-              <p className="text-callout1 text-error mt-1">
+              <p className="text-callout1 text-error mt-1 ml-1">
                 {errors.campaignName.message}
               </p>
             )}
@@ -132,7 +151,7 @@ export default function CreateCampaignContent() {
               onChange={(v) => setValue("description", v)}
             />
             {errors.description && (
-              <p className="text-callout1 text-error mt-1">
+              <p className="text-callout1 text-error mt-1 ml-1">
                 {errors.description.message}
               </p>
             )}
@@ -142,7 +161,7 @@ export default function CreateCampaignContent() {
             <SelectField
               placeholder="형식 선택"
               value={formValues.format}
-              onClick={() => setValue("format", "릴스")}
+              onClick={() => setIsFormatSheetOpen(true)}
             />
 
             {/* 종류 / 톤 */}
@@ -152,7 +171,7 @@ export default function CreateCampaignContent() {
                 <SelectField
                   placeholder="종류 선택"
                   value={formValues.category}
-                  onClick={() => setValue("category", "뷰티")}
+                  onClick={() => setIsCategorySheetOpen(true)}
                 />
               </div>
               <div>
@@ -160,7 +179,7 @@ export default function CreateCampaignContent() {
                 <SelectField
                   placeholder="톤 선택"
                   value={formValues.tone}
-                  onClick={() => setValue("tone", "밝은")}
+                  onClick={() => setIsToneSheetOpen(true)}
                 />
               </div>
             </div>
@@ -172,7 +191,7 @@ export default function CreateCampaignContent() {
                 <SelectField
                   placeholder="관여도 선택"
                   value={formValues.involvement}
-                  onClick={() => setValue("involvement", "높음")}
+                  onClick={() => setIsInvolvementSheetOpen(true)}
                 />
               </div>
               <div>
@@ -180,25 +199,25 @@ export default function CreateCampaignContent() {
                 <SelectField
                   placeholder="활용 범위 선택"
                   value={formValues.usageScope}
-                  onClick={() => setValue("usageScope", "SNS")}
+                  onClick={() => setIsUsageScopeSheetOpen(true)}
                 />
               </div>
             </div>
           </div>
 
           {/* 협찬품 / 원고료 */}
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <div>
+          <div className="grid grid-cols-2 gap-3 w-full h-auto">
+            <div className="h-auto">
               <label className="text-title3 text-text-black mb-2 block">
                 협찬품<span className="text-error">*</span>
               </label>
               <SelectField
                 placeholder="협찬품 선택"
                 value={formValues.sponsorProduct}
-                onClick={() => setValue("sponsorProduct", "화장품 세트")}
+                onClick={() => setIsSponsorProductSheetOpen(true)}
               />
             </div>
-            <div>
+            <div className="h-auto">
               <label className="text-title3 text-text-black mb-2 block">
                 원고료<span className="text-error">*</span>
               </label>
@@ -210,7 +229,7 @@ export default function CreateCampaignContent() {
           </div>
 
           {/* 제작 기간 */}
-          <div className="w-full">
+          <div className="w-full h-auto">
             <label className="text-title3 text-text-black mb-2 block">
               제작 기간<span className="text-error">*</span>
             </label>
@@ -218,13 +237,13 @@ export default function CreateCampaignContent() {
               <DateField
                 placeholder="시작 날짜"
                 value={formValues.startDate}
-                onClick={() => setValue("startDate", "2024-01-01")}
+                onClick={() => {}}
               />
               <span className="text-text-gray3">~</span>
               <DateField
                 placeholder="끝 날짜"
                 value={formValues.endDate}
-                onClick={() => setValue("endDate", "2024-01-31")}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -244,6 +263,7 @@ export default function CreateCampaignContent() {
         </Button>
       </div>
 
+      {/* 바텀시트 */}
       {/* 기존 캠페인 선택 바텀시트 */}
       {type === "existing" && (
         <FilterBottomSheet
@@ -252,17 +272,20 @@ export default function CreateCampaignContent() {
           className="h-[50%]"
         >
           {/* 헤더 */}
-          <div className="flex items-center gap-2 px-5 pt-6 pb-4">
-            <img src={ExistSuggestIcon} alt="" className="w-6 h-6" />
-            <h3 className="text-title2 text-text-black">기존 캠페인 제안</h3>
+          <div className="px-5 pt-6 pb-4">
+            <div className="flex items-center gap-2">
+              <img src={ExistSuggestIcon} alt="" className="w-6 h-6" />
+              <h3 className="text-title2 text-text-black">기존 캠페인 제안</h3>
+            </div>
           </div>
+          <div className="w-[90%] mx-auto border-b border-core-2" />
 
           {/* 캠페인 목록 */}
-          <div className="px-5 pb-4">
+          <div className="px-5 pt-2.5 pb-20 flex flex-col gap-2.5">
             {existingCampaigns.map((campaign) => (
               <label
                 key={campaign.id}
-                className="flex items-center gap-3 py-3 cursor-pointer"
+                className="flex items-center gap-2.5 cursor-pointer"
               >
                 <div onClick={() => handleToggleCampaign(campaign.id)}>
                   <CheckIcon checked={selectedCampaignIds.includes(campaign.id)} />
@@ -275,19 +298,84 @@ export default function CreateCampaignContent() {
           </div>
 
           {/* 선택 완료 버튼 */}
-          <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-white">
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-white">
             <Button
               variant="primary"
               size="lg"
-              fullWidth
               onClick={handleSheetSubmit}
-              className="text-title7"
+              className="text-title7 w-[327px] h-[44px] flex items-center justify-center gap-[10px]"
             >
               선택 완료
             </Button>
           </div>
         </FilterBottomSheet>
       )}
+
+      {/* 형식 선택 바텀시트 */}
+      <SelectBottomSheet
+        isOpen={isFormatSheetOpen}
+        onClose={() => setIsFormatSheetOpen(false)}
+        title="형식"
+        options={formatOptions}
+        selectedValues={formValues.format ? [formValues.format] : []}
+        onSubmit={(values) => setValue("format", values[0] || "")}
+        multiSelect={false}
+      />
+
+      {/* 종류 선택 바텀시트 */}
+      <SelectBottomSheet
+        isOpen={isCategorySheetOpen}
+        onClose={() => setIsCategorySheetOpen(false)}
+        title="종류"
+        options={categoryOptions}
+        selectedValues={formValues.category ? [formValues.category] : []}
+        onSubmit={(values) => setValue("category", values[0] || "")}
+        multiSelect={false}
+      />
+
+      {/* 톤 선택 바텀시트 */}
+      <SelectBottomSheet
+        isOpen={isToneSheetOpen}
+        onClose={() => setIsToneSheetOpen(false)}
+        title="톤"
+        options={toneOptions}
+        selectedValues={formValues.tone ? [formValues.tone] : []}
+        onSubmit={(values) => setValue("tone", values[0] || "")}
+        multiSelect={false}
+      />
+
+      {/* 관여도 선택 바텀시트 */}
+      <SelectBottomSheet
+        isOpen={isInvolvementSheetOpen}
+        onClose={() => setIsInvolvementSheetOpen(false)}
+        title="관여도"
+        options={involvementOptions}
+        selectedValues={formValues.involvement ? [formValues.involvement] : []}
+        onSubmit={(values) => setValue("involvement", values[0] || "")}
+        multiSelect={false}
+      />
+
+      {/* 활용 범위 선택 바텀시트 */}
+      <SelectBottomSheet
+        isOpen={isUsageScopeSheetOpen}
+        onClose={() => setIsUsageScopeSheetOpen(false)}
+        title="활용 범위"
+        options={usageScopeOptions}
+        selectedValues={formValues.usageScope ? [formValues.usageScope] : []}
+        onSubmit={(values) => setValue("usageScope", values[0] || "")}
+        multiSelect={false}
+      />
+
+      {/* 협찬품 선택 바텀시트 */}
+      <SelectBottomSheet
+        isOpen={isSponsorProductSheetOpen}
+        onClose={() => setIsSponsorProductSheetOpen(false)}
+        title="협찬품 선택"
+        options={sponsorProductOptions}
+        selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
+        onSubmit={(values) => setValue("sponsorProduct", values[0] || "")}
+        multiSelect={false}
+      />
     </div>
   );
 }

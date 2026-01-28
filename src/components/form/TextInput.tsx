@@ -12,7 +12,7 @@ export default function TextInput({
   onChange,
 }: TextInputProps) {
   return (
-    <div className="flex items-center w-full py-[10px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80">
+    <div className="flex items-center w-full h-[34px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80">
       <input
         type="text"
         placeholder={placeholder}
