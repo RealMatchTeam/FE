@@ -16,3 +16,4 @@ export function formatKoreanDateTime(updatedAt: string) {
     timeText: `${hh}:${min}`,
   };
 }
+
