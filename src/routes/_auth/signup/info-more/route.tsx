@@ -5,7 +5,7 @@ type SignUpInfoMoreSearch = {
   type?: "email" | "social";
 };
 
-export const Route = createFileRoute("/auth/signup/info-more")({
+export const Route = createFileRoute("/_auth/signup/info-more")({
   component: SignUpInfoMoreContent,
   validateSearch: (search: Record<string, unknown>): SignUpInfoMoreSearch => {
     return {

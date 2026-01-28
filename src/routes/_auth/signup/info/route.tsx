@@ -5,7 +5,7 @@ type SignUpInfoSearch = {
   provider: "kakao" | "naver" | "google";
 };
 
-export const Route = createFileRoute("/auth/signup/info")({
+export const Route = createFileRoute("/_auth/signup/info")({
   component: SignUpInfoContent,
   validateSearch: (search: Record<string, unknown>): SignUpInfoSearch => {
     return {
