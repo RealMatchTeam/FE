@@ -12,13 +12,13 @@ export default function AttachmentMessage({ message }: Props) {
   const isLeft = message.side === "other" || message.side === "system";
   const timeText = message.time ?? "";
 
-  //  message에서 꺼내 쓰기 (임시)
-  const avatarSrc = (message as any).avatarSrc; 
-  const avatarSize = (message as any).avatarSize ?? 38;
+  //  message에서 꺼내 쓰기
+  const avatarSrc = message.avatarSrc; 
+  const avatarSize = message.avatarSize ?? 38;
 
   // 파일 정보
-  const fileName = (message as any).fileName ?? "IM_1234";
-  const ext = (message as any).ext ?? "png";
+  const fileName = message.fileName ?? "IM_1234";
+  const ext = message.ext ?? "png";
 
   const handleOpen = () => {
     // TODO: 파일/이미지 열기

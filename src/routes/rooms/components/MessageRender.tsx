@@ -10,13 +10,13 @@ export default function MessageRenderer({ message }: TextMessageProps) {
 
   switch (message.type) {
     case "TEXT":
-      return (<TextMessage message={message as any} />);
+      return (<TextMessage message={message} />);
 
     case "PROPOSAL":
-      return <ProposalMessage message={message as any} />;
+      return <ProposalMessage message={message} />;
 
     case "MATCHED_CAMPAIGN":
-      return <MatchingMessage message={message as any} />;
+      return <MatchingMessage message={message} />;
 
     case "SYSTEM_MATCHED":
       return (<SystemEventMessage text={CHAT_NOTICE_TEXT.MATCHED} />);

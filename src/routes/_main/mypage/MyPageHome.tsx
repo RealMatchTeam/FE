@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ConfirmModal from "./_components/ConfirmModal";
 
 type Props = {
@@ -36,15 +36,10 @@ export default function MyPageHome({
   onLogout,
   onWithdraw,
 }: Props) {
-  const [openGate, setOpenGate] = useState(false);
+  // hasMatchingTest가 false면 gate 모달을 바로 열기 위해 초기값으로 설정
+  const [openGate, setOpenGate] = useState(!hasMatchingTest);
   const [openLogout, setOpenLogout] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
-
-  useEffect(() => {
-    if (!hasMatchingTest) {
-      setOpenGate(true);
-    }
-  }, [hasMatchingTest]);
 
   //const actionsDisabled = useMemo(() => !hasMatchingTest, [hasMatchingTest]); 매칭검사 안했을 시
 
