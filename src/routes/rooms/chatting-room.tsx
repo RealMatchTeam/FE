@@ -83,6 +83,11 @@ export default function ChattingRoom( {chatId} : Props ) {
   const sheetHeight = kb > 0 ? kb : 240;
   const { dateText, timeText } = formatKoreanDateTime(new Date().toISOString());
 
+  useEffect(() => {
+    // TODO: chatId로 메시지 불러오기
+    console.log("fetch messages for chatId:", chatId);
+  }, [chatId]);
+
   const partnerName = "민주"; // TODO: API/route loader에서 받아오기
   const hashtags = "#청정자극 #저자극 #심플한 감성"; // TODO: 프로필/카드에서 받아오기
   const matchStatus: "MATCHED" | "REJECTED" | "REVIEWING" = "REVIEWING"; // TODO: 서버에서 받아오기
