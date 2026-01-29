@@ -43,7 +43,7 @@ function SignUpPurposeContent() {
 
       if (!signupData) {
         alert("회원가입 정보가 누락되었습니다. 처음부터 다시 진행해주세요.");
-        navigate({ to: "/signup/terms", search: { provider } });
+        navigate({ to: "/signup/terms", search: { provider: provider || "kakao" } });
         return;
       }
 
@@ -53,7 +53,11 @@ function SignUpPurposeContent() {
       if (response.isSuccess) {
         // 회원가입 성공
         reset();
-        navigate({ to: "/signup/success", search: { provider } });
+        if (provider) {
+          navigate({ to: "/signup/success", search: { provider } });
+        } else {
+          navigate({ to: "/signup/success" });
+        }
       } else {
         // 회원가입 실패
         alert(response.message || "회원가입에 실패했습니다.");
