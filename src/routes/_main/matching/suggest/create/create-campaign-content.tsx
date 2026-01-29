@@ -2,19 +2,19 @@ import { useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "../../../../components/common/Button";
-import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+import Button from "../../../../../components/common/Button";
+import FilterBottomSheet from "../../../../../components/common/FilterBottomSheet";
 import {
   TextInput,
   TextArea,
   SelectField,
   DateField,
   FeeInput,
-} from "../../../../components/form";
-import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
-import { CheckIcon } from "../../../_auth/components/CheckIcon";
-import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
-import { existingCampaigns } from "../../../../data/existing-campaigns";
+} from "../../../../../components/form";
+import { useHideBottomTab } from "../../../../../hooks/useHideBottomTab";
+import { CheckIcon } from "../../../../_auth/components/CheckIcon";
+import ExistSuggestIcon from "../../../../../assets/icon/exist-suggest.svg";
+import { existingCampaigns } from "../../../../../data/existing-campaigns";
 import ProfileSelector from "../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
@@ -34,7 +34,7 @@ import {
 
 export default function CreateCampaignContent() {
   const navigate = useNavigate();
-  const { type } = useSearch({ from: "/_main/matching-suggest/create" });
+  const { type } = useSearch({ from: "/_main/matching/suggest/create" });
 
   // 바텀시트 상태 (기존 캠페인일 때만 열림)
   const [isSheetOpen, setIsSheetOpen] = useState(type === "existing");
@@ -82,7 +82,7 @@ export default function CreateCampaignContent() {
 
   const handleSheetClose = () => {
     setIsSheetOpen(false);
-    navigate({ to: "/matching-suggest" });
+    navigate({ to: "/matching/suggest" });
   };
 
   const onSubmit = (data: CampaignFormData) => {

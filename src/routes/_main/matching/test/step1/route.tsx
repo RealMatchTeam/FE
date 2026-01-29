@@ -19,7 +19,7 @@ const SECTIONS: Array<{
   { key: "makeupStyle", title: "메이크업 스타일", items: ["내추럴", "화려한", "글로우", "매트"] },
 ] as const;
 
-export const Route = createFileRoute("/_main/matching-test/matching-test/step1")({
+export const Route = createFileRoute("/_main/matching/test/step1")({
   component: MatchingTestStep1Page,
 });
 
@@ -49,7 +49,7 @@ function MatchingTestStep1Page() {
       onToggle={(section, label) => toggleStore(section, label, MAX_PER_SECTION)}
       canGoNext={canGoNext}
       onBack={() => navigate({ to: "/" })}
-      onNext={() => navigate({ to: "/matching-test/matching-test/step2" })}
+      onNext={() => navigate({ to: "/matching/test/step2" })}
     />
   );
 }

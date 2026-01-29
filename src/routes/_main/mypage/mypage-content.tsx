@@ -17,7 +17,7 @@ export default function MyPageContent() {
         email: me?.email ?? "yeahsel0608@cau.ac.kr",
         avatarUrl: me?.avatarUrl ?? "/images/default-avatar.png",
       }}
-      onGoMatchingTest={() => navigate({ to: "/matching-test/matching-test/step1" })}
+      onGoMatchingTest={() => navigate({ to: "/matching/test/step1" })}
       onOpenProfileCard={() => navigate({ to: "/mypage/profileCard" })}
       onOpenLikes={() => navigate({ to: "/mypage/likes" })}
       onOpenEditProfile={() => navigate({ to: "/mypage/edit" })}

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import type { Step2SectionKey, Step2SelectedState } from "../../../../../stores/matching-test";
 
-import SelectChip from "../../components/SelectChip";
-import FormField from "../../components/FormField";
-import BottomSheet from "../../components/BottomSheet";
-import InputSheet from "../../components/InputSheet";
-import SelectSheet from "../../components/SelectSheet";
-import MatchingTestTopBar from "../../components/MatchingTestHeader";
+import SelectChip from "../components/SelectChip";
+import FormField from "../components/FormField";
+import BottomSheet from "../components/BottomSheet";
+import InputSheet from "../components/InputSheet";
+import SelectSheet from "../components/SelectSheet";
+import MatchingTestTopBar from "../components/MatchingTestHeader";
 import Button from "../../../../../components/common/Button";
 
 type Props = {

@@ -1,9 +1,9 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useContext, useEffect } from "react";
-import { LayoutContext } from "../layout-context";
+import { LayoutContext } from "../../layout-context";
 import SuggestHeader from "./components/SuggestHeader";
 
-export const Route = createFileRoute("/_main/matching-suggest")({
+export const Route = createFileRoute("/_main/matching/suggest")({
   component: MatchingSuggestLayout,
 });
 

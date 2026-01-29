@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import MatchingTestStep2Content from "./step2-content";
 import { useMatchingTestStore, type Step2SectionKey } from "../../../../../stores/matching-test";
 
-export const Route = createFileRoute("/_main/matching-test/matching-test/step2")({
+export const Route = createFileRoute("/_main/matching/test/step2")({
   component: MatchingTestStep2Page,
 });
 
@@ -55,8 +55,8 @@ function MatchingTestStep2Page() {
       onTopSizeChange={setTopSize}
       onBottomSizeChange={setBottomSizeIn}
       canGoNext={canGoNext}
-      onBack={() => navigate({ to: "/matching-test/matching-test/step1" })}
-      onNext={() => navigate({ to: "/matching-test/matching-test/step3" })}
+      onBack={() => navigate({ to: "/matching/test/step1" })}
+      onNext={() => navigate({ to: "/matching/test/step3" })}
     />
   );
 }

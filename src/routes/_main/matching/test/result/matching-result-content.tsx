@@ -1,7 +1,7 @@
 import { Route } from "./route";
-import MatchResultHeader from "../../../../components/common/RealmatchHeader";
-import MainIcon from "../../../../assets/MainIcon.svg";
-import Button from "../../../../components/common/Button";
+import MatchResultHeader from "../../../../../components/common/RealmatchHeader";
+import MainIcon from "../../../../../assets/MainIcon.svg"
+import Button from "../../../../../components/common/Button";
 
 export default function MatchingResultContent() {
     const search = Route.useSearch();

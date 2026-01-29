@@ -19,7 +19,7 @@ export default function RealMatchHeader({
 
     // 가능하면 라우터 상위로, 실패하면 브라우저 히스토리
     try {
-      navigate({ to: "/matching-test/matching-test/step3" });
+      navigate({ to: "/matching/test/step3" });
     } catch {
       window.history.back();
     }

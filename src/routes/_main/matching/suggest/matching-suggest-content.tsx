@@ -1,17 +1,17 @@
 import { useNavigate } from "@tanstack/react-router";
-import Button from "../../../components/common/Button";
-import NewSuggestIcon from "../../../assets/icon/new-suggest.svg";
-import ExistSuggestIcon from "../../../assets/icon/exist-suggest.svg";
+import Button from "../../../../components/common/Button";
+import NewSuggestIcon from "../../../../assets/icon/new-suggest.svg";
+import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
 
 export default function MatchingSuggestContent() {
   const navigate = useNavigate();
 
   const handleNewCampaign = () => {
-    navigate({ to: "/matching-suggest/create", search: { type: "new" } });
+    navigate({ to: "/matching/suggest/create", search: { type: "new" } });
   };
 
   const handleExistingCampaign = () => {
-    navigate({ to: "/matching-suggest/create", search: { type: "existing" } });
+    navigate({ to: "/matching/suggest/create", search: { type: "existing" } });
   };
 
   return (
