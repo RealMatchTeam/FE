@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import MatchingTestStep3Content from "./step3-content";
 import { useMatchingTestStore, type Step3ChipKey, type Step3SelectKey } from "../../../../../stores/matching-test";
 
-export const Route = createFileRoute("/_main/matching-test/matching-test/step3")({
+export const Route = createFileRoute("/_main/matching/test/step3")({
   component: MatchingTestStep3Page,
 });
 
@@ -61,7 +61,8 @@ function MatchingTestStep3Page() {
       step3Chips={step3Chips}
       onToggleChip={onToggleChip}
       canGoNext={canGoNext}
-      onBack={() => navigate({ to: "/matching-test/matching-test/step2" })}
+      onBack={() => navigate({ to: "/matching/test/step2" })}
+      onNext={() => navigate({ to: "/matching/test/result" })}
     />
   );
 }

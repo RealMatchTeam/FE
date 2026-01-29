@@ -9,7 +9,7 @@ type Step4Search = {
     recommendedBrand?: string;
 };
 
-export const Route = createFileRoute("/_main/matching-test/matching-result")({
+export const Route = createFileRoute("/_main/matching/test/result")({
     component: MatchingResultContent,
     validateSearch: (search: Record<string, unknown>): Step4Search => ({
         userName: typeof search.userName === "string" ? search.userName : undefined,

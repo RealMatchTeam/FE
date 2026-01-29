@@ -3,6 +3,7 @@ import SignUpPurposeContent from "./signup-purpose-content";
 
 type SignUpPurposeSearch = {
   provider?: "kakao" | "naver" | "google";
+  type?: "email" | "social";
 };
 
 export const Route = createFileRoute("/_auth/signup/purpose")({
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/_auth/signup/purpose")({
   validateSearch: (search: Record<string, unknown>): SignUpPurposeSearch => {
     return {
       provider: search.provider as "kakao" | "naver" | "google" | undefined,
+      type: search.type as "email" | "social" | undefined,
     };
   },
 });

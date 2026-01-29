@@ -6,7 +6,7 @@ import { PurposeSection } from "./components/PurposeSection";
 
 function SignUpPurposeContent() {
   const navigate = useNavigate();
-  const { provider, } = useSearch({ from: "/_auth/signup/purpose" });
+  const { provider } = useSearch({ from: "/_auth/signup/purpose" });
   const totalSteps = 3;
   const currentStep = 3;
 

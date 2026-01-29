@@ -26,9 +26,9 @@ import { Route as MainMypageLikesRouteImport } from './routes/_main/mypage/likes
 import { Route as MainMypageInquiryRouteImport } from './routes/_main/mypage/inquiry'
 import { Route as MainMypageEditRouteImport } from './routes/_main/mypage/edit'
 import { Route as MainHomePreRouteImport } from './routes/_main/_home/pre'
+import { Route as MainMatchingSuggestRouteRouteImport } from './routes/_main/matching/suggest/route'
 import { Route as MainMatchingCampaignRouteRouteImport } from './routes/_main/matching/campaign/route'
 import { Route as MainMatchingBrandRouteRouteImport } from './routes/_main/matching/brand/route'
-import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
 import { Route as MainBusinessRejectionRouteRouteImport } from './routes/_main/_business/rejection/route'
 import { Route as MainBusinessProposalRouteRouteImport } from './routes/_main/_business/proposal/route'
 import { Route as MainBusinessCampaignRouteRouteImport } from './routes/_main/_business/campaign/route'
@@ -39,9 +39,12 @@ import { Route as AuthSignupSuccessRouteRouteImport } from './routes/_auth/signu
 import { Route as AuthSignupPurposeRouteRouteImport } from './routes/_auth/signup/purpose/route'
 import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/_auth/signup/info-more/route'
 import { Route as AuthSignupInfoRouteRouteImport } from './routes/_auth/signup/info/route'
-import { Route as MainMatchingTestMatchingTestStep3RouteRouteImport } from './routes/_main/matching-test/matching-test/step3/route'
-import { Route as MainMatchingTestMatchingTestStep2RouteRouteImport } from './routes/_main/matching-test/matching-test/step2/route'
-import { Route as MainMatchingTestMatchingTestStep1RouteRouteImport } from './routes/_main/matching-test/matching-test/step1/route'
+import { Route as MainMatchingSuggestIndexRouteImport } from './routes/_main/matching/suggest/index'
+import { Route as MainMatchingTestStep3RouteRouteImport } from './routes/_main/matching/test/step3/route'
+import { Route as MainMatchingTestStep2RouteRouteImport } from './routes/_main/matching/test/step2/route'
+import { Route as MainMatchingTestStep1RouteRouteImport } from './routes/_main/matching/test/step1/route'
+import { Route as MainMatchingTestResultRouteRouteImport } from './routes/_main/matching/test/result/route'
+import { Route as MainMatchingSuggestCreateRouteRouteImport } from './routes/_main/matching/suggest/create/route'
 
 const MainRoute = MainRouteImport.update({
   id: '/_main',
@@ -127,6 +130,12 @@ const MainHomePreRoute = MainHomePreRouteImport.update({
   path: '/pre',
   getParentRoute: () => MainRoute,
 } as any)
+const MainMatchingSuggestRouteRoute =
+  MainMatchingSuggestRouteRouteImport.update({
+    id: '/suggest',
+    path: '/suggest',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
 const MainMatchingCampaignRouteRoute =
   MainMatchingCampaignRouteRouteImport.update({
     id: '/campaign',
@@ -138,12 +147,6 @@ const MainMatchingBrandRouteRoute = MainMatchingBrandRouteRouteImport.update({
   path: '/brand',
   getParentRoute: () => MainMatchingRouteRoute,
 } as any)
-const MainMatchingTestMatchingResultRouteRoute =
-  MainMatchingTestMatchingResultRouteRouteImport.update({
-    id: '/matching-test/matching-result',
-    path: '/matching-test/matching-result',
-    getParentRoute: () => MainRoute,
-  } as any)
 const MainBusinessRejectionRouteRoute =
   MainBusinessRejectionRouteRouteImport.update({
     id: '/_business/rejection',
@@ -198,23 +201,41 @@ const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
   path: '/signup/info',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MainMatchingTestMatchingTestStep3RouteRoute =
-  MainMatchingTestMatchingTestStep3RouteRouteImport.update({
-    id: '/matching-test/matching-test/step3',
-    path: '/matching-test/matching-test/step3',
-    getParentRoute: () => MainRoute,
+const MainMatchingSuggestIndexRoute =
+  MainMatchingSuggestIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => MainMatchingSuggestRouteRoute,
   } as any)
-const MainMatchingTestMatchingTestStep2RouteRoute =
-  MainMatchingTestMatchingTestStep2RouteRouteImport.update({
-    id: '/matching-test/matching-test/step2',
-    path: '/matching-test/matching-test/step2',
-    getParentRoute: () => MainRoute,
+const MainMatchingTestStep3RouteRoute =
+  MainMatchingTestStep3RouteRouteImport.update({
+    id: '/test/step3',
+    path: '/test/step3',
+    getParentRoute: () => MainMatchingRouteRoute,
   } as any)
-const MainMatchingTestMatchingTestStep1RouteRoute =
-  MainMatchingTestMatchingTestStep1RouteRouteImport.update({
-    id: '/matching-test/matching-test/step1',
-    path: '/matching-test/matching-test/step1',
-    getParentRoute: () => MainRoute,
+const MainMatchingTestStep2RouteRoute =
+  MainMatchingTestStep2RouteRouteImport.update({
+    id: '/test/step2',
+    path: '/test/step2',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingTestStep1RouteRoute =
+  MainMatchingTestStep1RouteRouteImport.update({
+    id: '/test/step1',
+    path: '/test/step1',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingTestResultRouteRoute =
+  MainMatchingTestResultRouteRouteImport.update({
+    id: '/test/result',
+    path: '/test/result',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingSuggestCreateRouteRoute =
+  MainMatchingSuggestCreateRouteRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => MainMatchingSuggestRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -235,9 +256,9 @@ export interface FileRoutesByFullPath {
   '/campaign': typeof MainBusinessCampaignRouteRoute
   '/proposal': typeof MainBusinessProposalRouteRoute
   '/rejection': typeof MainBusinessRejectionRouteRoute
-  '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/matching/brand': typeof MainMatchingBrandRouteRoute
   '/matching/campaign': typeof MainMatchingCampaignRouteRoute
+  '/matching/suggest': typeof MainMatchingSuggestRouteRouteWithChildren
   '/pre': typeof MainHomePreRoute
   '/mypage/edit': typeof MainMypageEditRoute
   '/mypage/inquiry': typeof MainMypageInquiryRoute
@@ -247,9 +268,12 @@ export interface FileRoutesByFullPath {
   '/mypage/profileCard': typeof MainMypageProfileCardRoute
   '/mypage/terms': typeof MainMypageTermsRoute
   '/mypage/withdraw': typeof MainMypageWithdrawRoute
-  '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
-  '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
-  '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
+  '/matching/test/result': typeof MainMatchingTestResultRouteRoute
+  '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
+  '/matching/test/step2': typeof MainMatchingTestStep2RouteRoute
+  '/matching/test/step3': typeof MainMatchingTestStep3RouteRoute
+  '/matching/suggest/': typeof MainMatchingSuggestIndexRoute
 }
 export interface FileRoutesByTo {
   '/rooms': typeof RoomsRouteRouteWithChildren
@@ -268,7 +292,6 @@ export interface FileRoutesByTo {
   '/campaign': typeof MainBusinessCampaignRouteRoute
   '/proposal': typeof MainBusinessProposalRouteRoute
   '/rejection': typeof MainBusinessRejectionRouteRoute
-  '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/matching/brand': typeof MainMatchingBrandRouteRoute
   '/matching/campaign': typeof MainMatchingCampaignRouteRoute
   '/pre': typeof MainHomePreRoute
@@ -281,9 +304,12 @@ export interface FileRoutesByTo {
   '/mypage/terms': typeof MainMypageTermsRoute
   '/mypage/withdraw': typeof MainMypageWithdrawRoute
   '/': typeof MainHomeIndexRoute
-  '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
-  '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
-  '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
+  '/matching/test/result': typeof MainMatchingTestResultRouteRoute
+  '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
+  '/matching/test/step2': typeof MainMatchingTestStep2RouteRoute
+  '/matching/test/step3': typeof MainMatchingTestStep3RouteRoute
+  '/matching/suggest': typeof MainMatchingSuggestIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -304,9 +330,9 @@ export interface FileRoutesById {
   '/_main/_business/campaign': typeof MainBusinessCampaignRouteRoute
   '/_main/_business/proposal': typeof MainBusinessProposalRouteRoute
   '/_main/_business/rejection': typeof MainBusinessRejectionRouteRoute
-  '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/_main/matching/brand': typeof MainMatchingBrandRouteRoute
   '/_main/matching/campaign': typeof MainMatchingCampaignRouteRoute
+  '/_main/matching/suggest': typeof MainMatchingSuggestRouteRouteWithChildren
   '/_main/_home/pre': typeof MainHomePreRoute
   '/_main/mypage/edit': typeof MainMypageEditRoute
   '/_main/mypage/inquiry': typeof MainMypageInquiryRoute
@@ -317,9 +343,12 @@ export interface FileRoutesById {
   '/_main/mypage/terms': typeof MainMypageTermsRoute
   '/_main/mypage/withdraw': typeof MainMypageWithdrawRoute
   '/_main/_home/': typeof MainHomeIndexRoute
-  '/_main/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
-  '/_main/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
-  '/_main/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/_main/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
+  '/_main/matching/test/result': typeof MainMatchingTestResultRouteRoute
+  '/_main/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
+  '/_main/matching/test/step2': typeof MainMatchingTestStep2RouteRoute
+  '/_main/matching/test/step3': typeof MainMatchingTestStep3RouteRoute
+  '/_main/matching/suggest/': typeof MainMatchingSuggestIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -341,9 +370,9 @@ export interface FileRouteTypes {
     | '/campaign'
     | '/proposal'
     | '/rejection'
-    | '/matching-test/matching-result'
     | '/matching/brand'
     | '/matching/campaign'
+    | '/matching/suggest'
     | '/pre'
     | '/mypage/edit'
     | '/mypage/inquiry'
@@ -353,9 +382,12 @@ export interface FileRouteTypes {
     | '/mypage/profileCard'
     | '/mypage/terms'
     | '/mypage/withdraw'
-    | '/matching-test/matching-test/step1'
-    | '/matching-test/matching-test/step2'
-    | '/matching-test/matching-test/step3'
+    | '/matching/suggest/create'
+    | '/matching/test/result'
+    | '/matching/test/step1'
+    | '/matching/test/step2'
+    | '/matching/test/step3'
+    | '/matching/suggest/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/rooms'
@@ -374,7 +406,6 @@ export interface FileRouteTypes {
     | '/campaign'
     | '/proposal'
     | '/rejection'
-    | '/matching-test/matching-result'
     | '/matching/brand'
     | '/matching/campaign'
     | '/pre'
@@ -387,9 +418,12 @@ export interface FileRouteTypes {
     | '/mypage/terms'
     | '/mypage/withdraw'
     | '/'
-    | '/matching-test/matching-test/step1'
-    | '/matching-test/matching-test/step2'
-    | '/matching-test/matching-test/step3'
+    | '/matching/suggest/create'
+    | '/matching/test/result'
+    | '/matching/test/step1'
+    | '/matching/test/step2'
+    | '/matching/test/step3'
+    | '/matching/suggest'
   id:
     | '__root__'
     | '/rooms'
@@ -409,9 +443,9 @@ export interface FileRouteTypes {
     | '/_main/_business/campaign'
     | '/_main/_business/proposal'
     | '/_main/_business/rejection'
-    | '/_main/matching-test/matching-result'
     | '/_main/matching/brand'
     | '/_main/matching/campaign'
+    | '/_main/matching/suggest'
     | '/_main/_home/pre'
     | '/_main/mypage/edit'
     | '/_main/mypage/inquiry'
@@ -422,9 +456,12 @@ export interface FileRouteTypes {
     | '/_main/mypage/terms'
     | '/_main/mypage/withdraw'
     | '/_main/_home/'
-    | '/_main/matching-test/matching-test/step1'
-    | '/_main/matching-test/matching-test/step2'
-    | '/_main/matching-test/matching-test/step3'
+    | '/_main/matching/suggest/create'
+    | '/_main/matching/test/result'
+    | '/_main/matching/test/step1'
+    | '/_main/matching/test/step2'
+    | '/_main/matching/test/step3'
+    | '/_main/matching/suggest/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -560,6 +597,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainHomePreRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/matching/suggest': {
+      id: '/_main/matching/suggest'
+      path: '/suggest'
+      fullPath: '/matching/suggest'
+      preLoaderRoute: typeof MainMatchingSuggestRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
     '/_main/matching/campaign': {
       id: '/_main/matching/campaign'
       path: '/campaign'
@@ -573,13 +617,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/matching/brand'
       preLoaderRoute: typeof MainMatchingBrandRouteRouteImport
       parentRoute: typeof MainMatchingRouteRoute
-    }
-    '/_main/matching-test/matching-result': {
-      id: '/_main/matching-test/matching-result'
-      path: '/matching-test/matching-result'
-      fullPath: '/matching-test/matching-result'
-      preLoaderRoute: typeof MainMatchingTestMatchingResultRouteRouteImport
-      parentRoute: typeof MainRoute
     }
     '/_main/_business/rejection': {
       id: '/_main/_business/rejection'
@@ -651,26 +688,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_main/matching-test/matching-test/step3': {
-      id: '/_main/matching-test/matching-test/step3'
-      path: '/matching-test/matching-test/step3'
-      fullPath: '/matching-test/matching-test/step3'
-      preLoaderRoute: typeof MainMatchingTestMatchingTestStep3RouteRouteImport
-      parentRoute: typeof MainRoute
+    '/_main/matching/suggest/': {
+      id: '/_main/matching/suggest/'
+      path: '/'
+      fullPath: '/matching/suggest/'
+      preLoaderRoute: typeof MainMatchingSuggestIndexRouteImport
+      parentRoute: typeof MainMatchingSuggestRouteRoute
     }
-    '/_main/matching-test/matching-test/step2': {
-      id: '/_main/matching-test/matching-test/step2'
-      path: '/matching-test/matching-test/step2'
-      fullPath: '/matching-test/matching-test/step2'
-      preLoaderRoute: typeof MainMatchingTestMatchingTestStep2RouteRouteImport
-      parentRoute: typeof MainRoute
+    '/_main/matching/test/step3': {
+      id: '/_main/matching/test/step3'
+      path: '/test/step3'
+      fullPath: '/matching/test/step3'
+      preLoaderRoute: typeof MainMatchingTestStep3RouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
     }
-    '/_main/matching-test/matching-test/step1': {
-      id: '/_main/matching-test/matching-test/step1'
-      path: '/matching-test/matching-test/step1'
-      fullPath: '/matching-test/matching-test/step1'
-      preLoaderRoute: typeof MainMatchingTestMatchingTestStep1RouteRouteImport
-      parentRoute: typeof MainRoute
+    '/_main/matching/test/step2': {
+      id: '/_main/matching/test/step2'
+      path: '/test/step2'
+      fullPath: '/matching/test/step2'
+      preLoaderRoute: typeof MainMatchingTestStep2RouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/test/step1': {
+      id: '/_main/matching/test/step1'
+      path: '/test/step1'
+      fullPath: '/matching/test/step1'
+      preLoaderRoute: typeof MainMatchingTestStep1RouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/test/result': {
+      id: '/_main/matching/test/result'
+      path: '/test/result'
+      fullPath: '/matching/test/result'
+      preLoaderRoute: typeof MainMatchingTestResultRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/suggest/create': {
+      id: '/_main/matching/suggest/create'
+      path: '/create'
+      fullPath: '/matching/suggest/create'
+      preLoaderRoute: typeof MainMatchingSuggestCreateRouteRouteImport
+      parentRoute: typeof MainMatchingSuggestRouteRoute
     }
   }
 }
@@ -687,14 +745,40 @@ const RoomsRouteRouteWithChildren = RoomsRouteRoute._addFileChildren(
   RoomsRouteRouteChildren,
 )
 
+interface MainMatchingSuggestRouteRouteChildren {
+  MainMatchingSuggestCreateRouteRoute: typeof MainMatchingSuggestCreateRouteRoute
+  MainMatchingSuggestIndexRoute: typeof MainMatchingSuggestIndexRoute
+}
+
+const MainMatchingSuggestRouteRouteChildren: MainMatchingSuggestRouteRouteChildren =
+  {
+    MainMatchingSuggestCreateRouteRoute: MainMatchingSuggestCreateRouteRoute,
+    MainMatchingSuggestIndexRoute: MainMatchingSuggestIndexRoute,
+  }
+
+const MainMatchingSuggestRouteRouteWithChildren =
+  MainMatchingSuggestRouteRoute._addFileChildren(
+    MainMatchingSuggestRouteRouteChildren,
+  )
+
 interface MainMatchingRouteRouteChildren {
   MainMatchingBrandRouteRoute: typeof MainMatchingBrandRouteRoute
   MainMatchingCampaignRouteRoute: typeof MainMatchingCampaignRouteRoute
+  MainMatchingSuggestRouteRoute: typeof MainMatchingSuggestRouteRouteWithChildren
+  MainMatchingTestResultRouteRoute: typeof MainMatchingTestResultRouteRoute
+  MainMatchingTestStep1RouteRoute: typeof MainMatchingTestStep1RouteRoute
+  MainMatchingTestStep2RouteRoute: typeof MainMatchingTestStep2RouteRoute
+  MainMatchingTestStep3RouteRoute: typeof MainMatchingTestStep3RouteRoute
 }
 
 const MainMatchingRouteRouteChildren: MainMatchingRouteRouteChildren = {
   MainMatchingBrandRouteRoute: MainMatchingBrandRouteRoute,
   MainMatchingCampaignRouteRoute: MainMatchingCampaignRouteRoute,
+  MainMatchingSuggestRouteRoute: MainMatchingSuggestRouteRouteWithChildren,
+  MainMatchingTestResultRouteRoute: MainMatchingTestResultRouteRoute,
+  MainMatchingTestStep1RouteRoute: MainMatchingTestStep1RouteRoute,
+  MainMatchingTestStep2RouteRoute: MainMatchingTestStep2RouteRoute,
+  MainMatchingTestStep3RouteRoute: MainMatchingTestStep3RouteRoute,
 }
 
 const MainMatchingRouteRouteWithChildren =
@@ -734,12 +818,8 @@ interface MainRouteChildren {
   MainBusinessCampaignRouteRoute: typeof MainBusinessCampaignRouteRoute
   MainBusinessProposalRouteRoute: typeof MainBusinessProposalRouteRoute
   MainBusinessRejectionRouteRoute: typeof MainBusinessRejectionRouteRoute
-  MainMatchingTestMatchingResultRouteRoute: typeof MainMatchingTestMatchingResultRouteRoute
   MainHomePreRoute: typeof MainHomePreRoute
   MainHomeIndexRoute: typeof MainHomeIndexRoute
-  MainMatchingTestMatchingTestStep1RouteRoute: typeof MainMatchingTestMatchingTestStep1RouteRoute
-  MainMatchingTestMatchingTestStep2RouteRoute: typeof MainMatchingTestMatchingTestStep2RouteRoute
-  MainMatchingTestMatchingTestStep3RouteRoute: typeof MainMatchingTestMatchingTestStep3RouteRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
@@ -750,16 +830,8 @@ const MainRouteChildren: MainRouteChildren = {
   MainBusinessCampaignRouteRoute: MainBusinessCampaignRouteRoute,
   MainBusinessProposalRouteRoute: MainBusinessProposalRouteRoute,
   MainBusinessRejectionRouteRoute: MainBusinessRejectionRouteRoute,
-  MainMatchingTestMatchingResultRouteRoute:
-    MainMatchingTestMatchingResultRouteRoute,
   MainHomePreRoute: MainHomePreRoute,
   MainHomeIndexRoute: MainHomeIndexRoute,
-  MainMatchingTestMatchingTestStep1RouteRoute:
-    MainMatchingTestMatchingTestStep1RouteRoute,
-  MainMatchingTestMatchingTestStep2RouteRoute:
-    MainMatchingTestMatchingTestStep2RouteRoute,
-  MainMatchingTestMatchingTestStep3RouteRoute:
-    MainMatchingTestMatchingTestStep3RouteRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)

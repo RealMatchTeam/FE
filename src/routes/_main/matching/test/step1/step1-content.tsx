@@ -1,5 +1,6 @@
-import SelectChip from "../../components/SelectChip";
-import MatchingTestTopBar from "../../components/MatchingTestHeader";
+import SelectChip from "../components/SelectChip";
+import MatchingTestTopBar from "../components/MatchingTestHeader";
+import Button from "../../../../../components/common/Button";
 
 type SectionKey = "style" | "function" | "skinType" | "skinTone" | "makeupStyle";
 
@@ -90,19 +91,15 @@ export default function MatchingTestContent({
 
       {/* ✅ 하단 고정 */}
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
           onClick={onNext}
           disabled={!canGoNext}
-          className={[
-            "w-full h-[52px] rounded-[12px]",
-            "text-title1",
-            canGoNext ? "bg-core-1 text-white" : "bg-core-2 text-text-gray3",
-            "active:opacity-90",
-          ].join(" ")}
         >
           다음
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -6,11 +6,15 @@ import { SocialLoginSection } from "./components/SocialLoginSection";
 function LoginContent() {
   const navigate = useNavigate();
   const [lastProvider] = useState<"kakao" | "naver" | "google" | null>(() => {
-    return localStorage.getItem("lastLoginProvider") as "kakao" | "naver" | "google" | null;
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("lastLoginProvider") as "kakao" | "naver" | "google" | null;
+    }
+    return null;
   });
 
   const openSocialSignUp = (provider: "kakao" | "naver" | "google") => {
     localStorage.setItem("lastLoginProvider", provider);
+    // 소셜 로그인/회원가입 시 provider 정보 전달
     navigate({ to: "/signup/terms", search: { provider } });
   };
 
