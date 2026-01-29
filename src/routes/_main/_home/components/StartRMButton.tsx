@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import WhiteLogo from "../../../../assets/whitelogo.svg"
+import WhiteLogo from "../../../../assets/logo/whitelogo.svg";
 
 export default function StartMatchingTestButton() {
   return (

@@ -27,7 +27,7 @@ export default function MyPageContent() {
       onOpenPrivacy={() => navigate({ to: "/mypage/privacy" })} // policy/privacy
       onLogout={() => {
         useAuthStore.getState().logout?.();
-        navigate({ to: "/auth/login" });
+        navigate({ to: "/login" });
       }}
       onWithdraw={() => navigate({ to: "/mypage/withdraw" })}
     />

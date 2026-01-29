@@ -12,9 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as RoomsRouteRouteImport } from './routes/rooms/route'
 import { Route as RoomsChatIdRouteImport } from './routes/rooms/$chatId'
-import { Route as AuthLoginRouteRouteImport } from './routes/auth/login/route'
 import { Route as MainMypageRouteRouteImport } from './routes/_main/mypage/route'
+import { Route as MainMatchingRouteRouteImport } from './routes/_main/matching/route'
 import { Route as MainChatRouteRouteImport } from './routes/_main/chat/route'
+import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
 import { Route as MainHomeIndexRouteImport } from './routes/_main/_home/index'
 import { Route as MainMypageWithdrawRouteImport } from './routes/_main/mypage/withdraw'
 import { Route as MainMypageTermsRouteImport } from './routes/_main/mypage/terms'
@@ -25,17 +26,19 @@ import { Route as MainMypageLikesRouteImport } from './routes/_main/mypage/likes
 import { Route as MainMypageInquiryRouteImport } from './routes/_main/mypage/inquiry'
 import { Route as MainMypageEditRouteImport } from './routes/_main/mypage/edit'
 import { Route as MainHomePreRouteImport } from './routes/_main/_home/pre'
-import { Route as AuthSignupTypeRouteRouteImport } from './routes/auth/signup/type/route'
-import { Route as AuthSignupTermsRouteRouteImport } from './routes/auth/signup/terms/route'
-import { Route as AuthSignupSuccessRouteRouteImport } from './routes/auth/signup/success/route'
-import { Route as AuthSignupPurposeRouteRouteImport } from './routes/auth/signup/purpose/route'
-import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/auth/signup/info-more/route'
-import { Route as AuthSignupInfoRouteRouteImport } from './routes/auth/signup/info/route'
+import { Route as MainMatchingCampaignRouteRouteImport } from './routes/_main/matching/campaign/route'
+import { Route as MainMatchingBrandRouteRouteImport } from './routes/_main/matching/brand/route'
 import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
 import { Route as MainBusinessRejectionRouteRouteImport } from './routes/_main/_business/rejection/route'
 import { Route as MainBusinessProposalRouteRouteImport } from './routes/_main/_business/proposal/route'
 import { Route as MainBusinessCampaignRouteRouteImport } from './routes/_main/_business/campaign/route'
 import { Route as MainBusinessCalendarRouteRouteImport } from './routes/_main/_business/calendar/route'
+import { Route as AuthSignupTypeRouteRouteImport } from './routes/_auth/signup/type/route'
+import { Route as AuthSignupTermsRouteRouteImport } from './routes/_auth/signup/terms/route'
+import { Route as AuthSignupSuccessRouteRouteImport } from './routes/_auth/signup/success/route'
+import { Route as AuthSignupPurposeRouteRouteImport } from './routes/_auth/signup/purpose/route'
+import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/_auth/signup/info-more/route'
+import { Route as AuthSignupInfoRouteRouteImport } from './routes/_auth/signup/info/route'
 import { Route as MainMatchingTestMatchingTestStep3RouteRouteImport } from './routes/_main/matching-test/matching-test/step3/route'
 import { Route as MainMatchingTestMatchingTestStep2RouteRouteImport } from './routes/_main/matching-test/matching-test/step2/route'
 import { Route as MainMatchingTestMatchingTestStep1RouteRouteImport } from './routes/_main/matching-test/matching-test/step1/route'
@@ -54,20 +57,25 @@ const RoomsChatIdRoute = RoomsChatIdRouteImport.update({
   path: '/$chatId',
   getParentRoute: () => RoomsRouteRoute,
 } as any)
-const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MainMypageRouteRoute = MainMypageRouteRouteImport.update({
   id: '/mypage',
   path: '/mypage',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainMatchingRouteRoute = MainMatchingRouteRouteImport.update({
+  id: '/matching',
+  path: '/matching',
   getParentRoute: () => MainRoute,
 } as any)
 const MainChatRouteRoute = MainChatRouteRouteImport.update({
   id: '/chat',
   path: '/chat',
   getParentRoute: () => MainRoute,
+} as any)
+const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
+  id: '/_auth/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MainHomeIndexRoute = MainHomeIndexRouteImport.update({
   id: '/_home/',
@@ -119,35 +127,16 @@ const MainHomePreRoute = MainHomePreRouteImport.update({
   path: '/pre',
   getParentRoute: () => MainRoute,
 } as any)
-const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
-  id: '/auth/signup/type',
-  path: '/auth/signup/type',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupTermsRouteRoute = AuthSignupTermsRouteRouteImport.update({
-  id: '/auth/signup/terms',
-  path: '/auth/signup/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupSuccessRouteRoute = AuthSignupSuccessRouteRouteImport.update({
-  id: '/auth/signup/success',
-  path: '/auth/signup/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupPurposeRouteRoute = AuthSignupPurposeRouteRouteImport.update({
-  id: '/auth/signup/purpose',
-  path: '/auth/signup/purpose',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupInfoMoreRouteRoute = AuthSignupInfoMoreRouteRouteImport.update({
-  id: '/auth/signup/info-more',
-  path: '/auth/signup/info-more',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
-  id: '/auth/signup/info',
-  path: '/auth/signup/info',
-  getParentRoute: () => rootRouteImport,
+const MainMatchingCampaignRouteRoute =
+  MainMatchingCampaignRouteRouteImport.update({
+    id: '/campaign',
+    path: '/campaign',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingBrandRouteRoute = MainMatchingBrandRouteRouteImport.update({
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => MainMatchingRouteRoute,
 } as any)
 const MainMatchingTestMatchingResultRouteRoute =
   MainMatchingTestMatchingResultRouteRouteImport.update({
@@ -179,6 +168,36 @@ const MainBusinessCalendarRouteRoute =
     path: '/calendar',
     getParentRoute: () => MainRoute,
   } as any)
+const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
+  id: '/_auth/signup/type',
+  path: '/signup/type',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupTermsRouteRoute = AuthSignupTermsRouteRouteImport.update({
+  id: '/_auth/signup/terms',
+  path: '/signup/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupSuccessRouteRoute = AuthSignupSuccessRouteRouteImport.update({
+  id: '/_auth/signup/success',
+  path: '/signup/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupPurposeRouteRoute = AuthSignupPurposeRouteRouteImport.update({
+  id: '/_auth/signup/purpose',
+  path: '/signup/purpose',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupInfoMoreRouteRoute = AuthSignupInfoMoreRouteRouteImport.update({
+  id: '/_auth/signup/info-more',
+  path: '/signup/info-more',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
+  id: '/_auth/signup/info',
+  path: '/signup/info',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainMatchingTestMatchingTestStep3RouteRoute =
   MainMatchingTestMatchingTestStep3RouteRouteImport.update({
     id: '/matching-test/matching-test/step3',
@@ -200,21 +219,25 @@ const MainMatchingTestMatchingTestStep1RouteRoute =
 
 export interface FileRoutesByFullPath {
   '/rooms': typeof RoomsRouteRouteWithChildren
+  '/': typeof MainHomeIndexRoute
+  '/login': typeof AuthLoginRouteRoute
   '/chat': typeof MainChatRouteRoute
+  '/matching': typeof MainMatchingRouteRouteWithChildren
   '/mypage': typeof MainMypageRouteRouteWithChildren
-  '/auth/login': typeof AuthLoginRouteRoute
   '/rooms/$chatId': typeof RoomsChatIdRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/signup/type': typeof AuthSignupTypeRouteRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
   '/campaign': typeof MainBusinessCampaignRouteRoute
   '/proposal': typeof MainBusinessProposalRouteRoute
   '/rejection': typeof MainBusinessRejectionRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
-  '/auth/signup/info': typeof AuthSignupInfoRouteRoute
-  '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
-  '/auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
-  '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
-  '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
-  '/auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/matching/brand': typeof MainMatchingBrandRouteRoute
+  '/matching/campaign': typeof MainMatchingCampaignRouteRoute
   '/pre': typeof MainHomePreRoute
   '/mypage/edit': typeof MainMypageEditRoute
   '/mypage/inquiry': typeof MainMypageInquiryRoute
@@ -224,28 +247,30 @@ export interface FileRoutesByFullPath {
   '/mypage/profileCard': typeof MainMypageProfileCardRoute
   '/mypage/terms': typeof MainMypageTermsRoute
   '/mypage/withdraw': typeof MainMypageWithdrawRoute
-  '/': typeof MainHomeIndexRoute
   '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
 }
 export interface FileRoutesByTo {
   '/rooms': typeof RoomsRouteRouteWithChildren
+  '/login': typeof AuthLoginRouteRoute
   '/chat': typeof MainChatRouteRoute
+  '/matching': typeof MainMatchingRouteRouteWithChildren
   '/mypage': typeof MainMypageRouteRouteWithChildren
-  '/auth/login': typeof AuthLoginRouteRoute
   '/rooms/$chatId': typeof RoomsChatIdRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/signup/type': typeof AuthSignupTypeRouteRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
   '/campaign': typeof MainBusinessCampaignRouteRoute
   '/proposal': typeof MainBusinessProposalRouteRoute
   '/rejection': typeof MainBusinessRejectionRouteRoute
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
-  '/auth/signup/info': typeof AuthSignupInfoRouteRoute
-  '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
-  '/auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
-  '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
-  '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
-  '/auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/matching/brand': typeof MainMatchingBrandRouteRoute
+  '/matching/campaign': typeof MainMatchingCampaignRouteRoute
   '/pre': typeof MainHomePreRoute
   '/mypage/edit': typeof MainMypageEditRoute
   '/mypage/inquiry': typeof MainMypageInquiryRoute
@@ -264,21 +289,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/rooms': typeof RoomsRouteRouteWithChildren
   '/_main': typeof MainRouteWithChildren
+  '/_auth/login': typeof AuthLoginRouteRoute
   '/_main/chat': typeof MainChatRouteRoute
+  '/_main/matching': typeof MainMatchingRouteRouteWithChildren
   '/_main/mypage': typeof MainMypageRouteRouteWithChildren
-  '/auth/login': typeof AuthLoginRouteRoute
   '/rooms/$chatId': typeof RoomsChatIdRoute
+  '/_auth/signup/info': typeof AuthSignupInfoRouteRoute
+  '/_auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/_auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/_auth/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/_auth/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/_auth/signup/type': typeof AuthSignupTypeRouteRoute
   '/_main/_business/calendar': typeof MainBusinessCalendarRouteRoute
   '/_main/_business/campaign': typeof MainBusinessCampaignRouteRoute
   '/_main/_business/proposal': typeof MainBusinessProposalRouteRoute
   '/_main/_business/rejection': typeof MainBusinessRejectionRouteRoute
   '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
-  '/auth/signup/info': typeof AuthSignupInfoRouteRoute
-  '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
-  '/auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
-  '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
-  '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
-  '/auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/_main/matching/brand': typeof MainMatchingBrandRouteRoute
+  '/_main/matching/campaign': typeof MainMatchingCampaignRouteRoute
   '/_main/_home/pre': typeof MainHomePreRoute
   '/_main/mypage/edit': typeof MainMypageEditRoute
   '/_main/mypage/inquiry': typeof MainMypageInquiryRoute
@@ -297,21 +325,25 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/rooms'
+    | '/'
+    | '/login'
     | '/chat'
+    | '/matching'
     | '/mypage'
-    | '/auth/login'
     | '/rooms/$chatId'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
     | '/calendar'
     | '/campaign'
     | '/proposal'
     | '/rejection'
     | '/matching-test/matching-result'
-    | '/auth/signup/info'
-    | '/auth/signup/info-more'
-    | '/auth/signup/purpose'
-    | '/auth/signup/success'
-    | '/auth/signup/terms'
-    | '/auth/signup/type'
+    | '/matching/brand'
+    | '/matching/campaign'
     | '/pre'
     | '/mypage/edit'
     | '/mypage/inquiry'
@@ -321,28 +353,30 @@ export interface FileRouteTypes {
     | '/mypage/profileCard'
     | '/mypage/terms'
     | '/mypage/withdraw'
-    | '/'
     | '/matching-test/matching-test/step1'
     | '/matching-test/matching-test/step2'
     | '/matching-test/matching-test/step3'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/rooms'
+    | '/login'
     | '/chat'
+    | '/matching'
     | '/mypage'
-    | '/auth/login'
     | '/rooms/$chatId'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
     | '/calendar'
     | '/campaign'
     | '/proposal'
     | '/rejection'
     | '/matching-test/matching-result'
-    | '/auth/signup/info'
-    | '/auth/signup/info-more'
-    | '/auth/signup/purpose'
-    | '/auth/signup/success'
-    | '/auth/signup/terms'
-    | '/auth/signup/type'
+    | '/matching/brand'
+    | '/matching/campaign'
     | '/pre'
     | '/mypage/edit'
     | '/mypage/inquiry'
@@ -360,21 +394,24 @@ export interface FileRouteTypes {
     | '__root__'
     | '/rooms'
     | '/_main'
+    | '/_auth/login'
     | '/_main/chat'
+    | '/_main/matching'
     | '/_main/mypage'
-    | '/auth/login'
     | '/rooms/$chatId'
+    | '/_auth/signup/info'
+    | '/_auth/signup/info-more'
+    | '/_auth/signup/purpose'
+    | '/_auth/signup/success'
+    | '/_auth/signup/terms'
+    | '/_auth/signup/type'
     | '/_main/_business/calendar'
     | '/_main/_business/campaign'
     | '/_main/_business/proposal'
     | '/_main/_business/rejection'
     | '/_main/matching-test/matching-result'
-    | '/auth/signup/info'
-    | '/auth/signup/info-more'
-    | '/auth/signup/purpose'
-    | '/auth/signup/success'
-    | '/auth/signup/terms'
-    | '/auth/signup/type'
+    | '/_main/matching/brand'
+    | '/_main/matching/campaign'
     | '/_main/_home/pre'
     | '/_main/mypage/edit'
     | '/_main/mypage/inquiry'
@@ -407,7 +444,7 @@ declare module '@tanstack/react-router' {
     '/_main': {
       id: '/_main'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof MainRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -425,18 +462,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoomsChatIdRouteImport
       parentRoute: typeof RoomsRouteRoute
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_main/mypage': {
       id: '/_main/mypage'
       path: '/mypage'
       fullPath: '/mypage'
       preLoaderRoute: typeof MainMypageRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/matching': {
+      id: '/_main/matching'
+      path: '/matching'
+      fullPath: '/matching'
+      preLoaderRoute: typeof MainMatchingRouteRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/chat': {
@@ -445,6 +482,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/chat'
       preLoaderRoute: typeof MainChatRouteRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_main/_home/': {
       id: '/_main/_home/'
@@ -516,47 +560,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainHomePreRouteImport
       parentRoute: typeof MainRoute
     }
-    '/auth/signup/type': {
-      id: '/auth/signup/type'
-      path: '/auth/signup/type'
-      fullPath: '/auth/signup/type'
-      preLoaderRoute: typeof AuthSignupTypeRouteRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/matching/campaign': {
+      id: '/_main/matching/campaign'
+      path: '/campaign'
+      fullPath: '/matching/campaign'
+      preLoaderRoute: typeof MainMatchingCampaignRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
     }
-    '/auth/signup/terms': {
-      id: '/auth/signup/terms'
-      path: '/auth/signup/terms'
-      fullPath: '/auth/signup/terms'
-      preLoaderRoute: typeof AuthSignupTermsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup/success': {
-      id: '/auth/signup/success'
-      path: '/auth/signup/success'
-      fullPath: '/auth/signup/success'
-      preLoaderRoute: typeof AuthSignupSuccessRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup/purpose': {
-      id: '/auth/signup/purpose'
-      path: '/auth/signup/purpose'
-      fullPath: '/auth/signup/purpose'
-      preLoaderRoute: typeof AuthSignupPurposeRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup/info-more': {
-      id: '/auth/signup/info-more'
-      path: '/auth/signup/info-more'
-      fullPath: '/auth/signup/info-more'
-      preLoaderRoute: typeof AuthSignupInfoMoreRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup/info': {
-      id: '/auth/signup/info'
-      path: '/auth/signup/info'
-      fullPath: '/auth/signup/info'
-      preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/matching/brand': {
+      id: '/_main/matching/brand'
+      path: '/brand'
+      fullPath: '/matching/brand'
+      preLoaderRoute: typeof MainMatchingBrandRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
     }
     '/_main/matching-test/matching-result': {
       id: '/_main/matching-test/matching-result'
@@ -592,6 +608,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/calendar'
       preLoaderRoute: typeof MainBusinessCalendarRouteRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/_auth/signup/type': {
+      id: '/_auth/signup/type'
+      path: '/signup/type'
+      fullPath: '/signup/type'
+      preLoaderRoute: typeof AuthSignupTypeRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/terms': {
+      id: '/_auth/signup/terms'
+      path: '/signup/terms'
+      fullPath: '/signup/terms'
+      preLoaderRoute: typeof AuthSignupTermsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/success': {
+      id: '/_auth/signup/success'
+      path: '/signup/success'
+      fullPath: '/signup/success'
+      preLoaderRoute: typeof AuthSignupSuccessRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/purpose': {
+      id: '/_auth/signup/purpose'
+      path: '/signup/purpose'
+      fullPath: '/signup/purpose'
+      preLoaderRoute: typeof AuthSignupPurposeRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/info-more': {
+      id: '/_auth/signup/info-more'
+      path: '/signup/info-more'
+      fullPath: '/signup/info-more'
+      preLoaderRoute: typeof AuthSignupInfoMoreRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/info': {
+      id: '/_auth/signup/info'
+      path: '/signup/info'
+      fullPath: '/signup/info'
+      preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_main/matching-test/matching-test/step3': {
       id: '/_main/matching-test/matching-test/step3'
@@ -629,6 +687,19 @@ const RoomsRouteRouteWithChildren = RoomsRouteRoute._addFileChildren(
   RoomsRouteRouteChildren,
 )
 
+interface MainMatchingRouteRouteChildren {
+  MainMatchingBrandRouteRoute: typeof MainMatchingBrandRouteRoute
+  MainMatchingCampaignRouteRoute: typeof MainMatchingCampaignRouteRoute
+}
+
+const MainMatchingRouteRouteChildren: MainMatchingRouteRouteChildren = {
+  MainMatchingBrandRouteRoute: MainMatchingBrandRouteRoute,
+  MainMatchingCampaignRouteRoute: MainMatchingCampaignRouteRoute,
+}
+
+const MainMatchingRouteRouteWithChildren =
+  MainMatchingRouteRoute._addFileChildren(MainMatchingRouteRouteChildren)
+
 interface MainMypageRouteRouteChildren {
   MainMypageEditRoute: typeof MainMypageEditRoute
   MainMypageInquiryRoute: typeof MainMypageInquiryRoute
@@ -657,6 +728,7 @@ const MainMypageRouteRouteWithChildren = MainMypageRouteRoute._addFileChildren(
 
 interface MainRouteChildren {
   MainChatRouteRoute: typeof MainChatRouteRoute
+  MainMatchingRouteRoute: typeof MainMatchingRouteRouteWithChildren
   MainMypageRouteRoute: typeof MainMypageRouteRouteWithChildren
   MainBusinessCalendarRouteRoute: typeof MainBusinessCalendarRouteRoute
   MainBusinessCampaignRouteRoute: typeof MainBusinessCampaignRouteRoute
@@ -672,6 +744,7 @@ interface MainRouteChildren {
 
 const MainRouteChildren: MainRouteChildren = {
   MainChatRouteRoute: MainChatRouteRoute,
+  MainMatchingRouteRoute: MainMatchingRouteRouteWithChildren,
   MainMypageRouteRoute: MainMypageRouteRouteWithChildren,
   MainBusinessCalendarRouteRoute: MainBusinessCalendarRouteRoute,
   MainBusinessCampaignRouteRoute: MainBusinessCampaignRouteRoute,
