@@ -32,7 +32,7 @@ const initialTermsState: TermsState = {
 
 function SignUpTermsContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/auth/signup/terms" });
+  const { provider } = useSearch({ from: "/_auth/signup/terms" });
   const totalSteps = 3;
 
   // 관련 상태를 하나의 객체로 그룹화
@@ -86,7 +86,7 @@ function SignUpTermsContent() {
   const handleNext = () => {
     if (requiredChecked) {
       // 다음 단계로 provider 정보 전달
-      navigate({ to: "/auth/signup/info", search: { provider } });
+      navigate({ to: "/signup/info", search: { provider } });
     }
   };
 

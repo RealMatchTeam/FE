@@ -6,7 +6,7 @@ import { PurposeSection } from "./components/PurposeSection";
 
 function SignUpPurposeContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/auth/signup/purpose" });
+  const { provider, } = useSearch({ from: "/_auth/signup/purpose" });
   const totalSteps = 3;
   const currentStep = 3;
 
@@ -23,7 +23,7 @@ function SignUpPurposeContent() {
   const handleNext = () => {
     if (selectedPurposes.length > 0) {
       // 회원가입 완료 페이지로 이동
-      navigate({ to: "/auth/signup/success", search: { provider } });
+      navigate({ to: "/signup/success", search: { provider } });
     }
   };
 

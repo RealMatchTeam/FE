@@ -16,8 +16,7 @@ function LoginContent() {
 
   const openSocialSignUp = (provider: "kakao" | "naver" | "google") => {
     localStorage.setItem("lastLoginProvider", provider);
-    // 소셜 로그인/회원가입 시 provider 정보 전달 (Type 페이지 생략하고 Terms로 바로 이동)
-    navigate({ to: "/auth/signup/terms", search: { provider } });
+    navigate({ to: "/signup/terms", search: { provider } });
   };
 
   return (

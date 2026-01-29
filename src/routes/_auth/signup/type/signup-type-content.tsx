@@ -3,12 +3,12 @@ import Button from "../../../../components/common/Button";
 
 function SignUpTypeContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/auth/signup/type" });
+  const { provider } = useSearch({ from: "/_auth/signup/type" });
 
   const handleSocialSignUp = () => {
     if (provider) {
       navigate({
-        to: "/auth/signup/terms",
+        to: "/signup/terms",
         search: { provider },
       });
     }

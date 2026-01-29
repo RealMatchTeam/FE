@@ -20,7 +20,7 @@ interface SocialFormData {
 
 function SignUpInfoContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/auth/signup/info" });
+  const { provider } = useSearch({ from: "/_auth/signup/info" });
   const totalSteps = 3;
 
   // 에러/성공 상태
@@ -55,7 +55,7 @@ function SignUpInfoContent() {
 
   const handleNext = () => {
     // 소셜 회원가입: 3/3 목적 선택 페이지로 이동
-    navigate({ to: "/auth/signup/purpose", search: { provider } });
+    navigate({ to: "/signup/purpose", search: { provider } });
   };
 
   return (

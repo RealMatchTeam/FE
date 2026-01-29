@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm, useWatch } from "react-hook-form";
 import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
@@ -15,9 +15,7 @@ interface InfoMoreFormData {
 
 function SignUpInfoMoreContent() {
   const navigate = useNavigate();
-  const { type } = useSearch({ from: "/auth/signup/info-more" });
-  const isEmail = type === "email";
-  const totalSteps = isEmail ? 4 : 3;
+  const totalSteps = 4;
 
   const form = useForm<InfoMoreFormData>();
   const genderValue = useWatch({ control: form.control, name: "gender" });
@@ -32,8 +30,8 @@ function SignUpInfoMoreContent() {
   };
 
   const handleNext = () => {
-    // 목적 선택 페이지로 이동
-    navigate({ to: "/auth/signup/purpose", search: { type } });
+    // 목적 선택 페이지로 이동 (소셜 회원가입이 아니므로 provider는 전달하지 않음)
+    navigate({ to: "/signup/purpose" });
   };
 
   return (
