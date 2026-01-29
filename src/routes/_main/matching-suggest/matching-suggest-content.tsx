@@ -15,7 +15,7 @@ export default function MatchingSuggestContent() {
   };
 
   return (
-    <div className="flex flex-col flex-1 justify-center px-5 pb-20 gap-[69px]">
+    <div className="flex flex-col flex-1 justify-center items-center px-5 py-20 gap-17">
       <Button
         variant="primary"
         size="lg"

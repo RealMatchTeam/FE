@@ -1,12 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-
-import type {
-  Step3ChipKey,
-  Step3ChipsState,
-  Step3SelectKey,
-  Step3SelectedState,
-} from "../../../../../stores/matching-test";
+import type { Step3ChipKey, Step3ChipsState, Step3SelectKey, Step3SelectedState } from "../../../../../stores/matching-test";
 
 import MatchingTestTopBar from "../../components/MatchingTestHeader";
 import SelectChip from "../../components/SelectChip";
@@ -15,6 +8,7 @@ import BottomSheet from "../../components/BottomSheet";
 import InputSheet from "../../components/InputSheet";
 import SelectSheet from "../../components/SelectSheet";
 import CheckDropdown from "../../components/CheckDropdown";
+import Button from "../../../../../components/common/Button";
 
 type Props = {
   snsUrl: string;
@@ -29,6 +23,7 @@ type Props = {
 
   canGoNext: boolean;
   onBack: () => void;
+  onNext: () => void;
 };
 
 type Sheet = null | "snsUrl" | "gender" | "ageGroup" | "videoLength" | "views";
@@ -54,9 +49,8 @@ export default function MatchingTestStep3Content({
   onToggleChip,
   canGoNext,
   onBack,
+  onNext,
 }: Props) {
-  const navigate = useNavigate();
-
   const [sheet, setSheet] = useState<Sheet>(null);
   const open = (s: Sheet) => setSheet(s);
   const close = () => setSheet(null);
@@ -72,22 +66,17 @@ export default function MatchingTestStep3Content({
     }),
     [step3Chips]
   );
-
   const genderValue = step3Selected.gender.join("\n");
   const ageValue = step3Selected.ageGroup.join("\n");
   const lenValue = step3Selected.videoLength[0] ?? "";
   const viewsValue = step3Selected.views[0] ?? "";
 
-  // ✅ step3 완료 → matching-result로 이동
-  const goToResult = () => {
-    if (!canGoNext) return;
-    navigate({ to: "/matching-test/matching-result" });
-  };
-
   return (
     <div className="min-h-dvh bg-white">
+      {/* ✅ step1과 동일한 상단 컴포넌트만 사용 */}
       <MatchingTestTopBar step={3} totalSteps={3} onBack={onBack} />
 
+      {/* ✅ step1 기준: px-6 */}
       <div className="px-6 pb-6">
         <h1 className="text-title1 text-text-black">
           <span className="text-core-1">콘텐츠 특성</span>을 모두 선택해주세요
@@ -210,18 +199,17 @@ export default function MatchingTestStep3Content({
         </Section>
       </div>
 
+      {/* ✅ step1 기준: px-6 */}
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onClick={onNext}
           disabled={!canGoNext}
-          onClick={goToResult}
-          className={[
-            "w-full rounded-2xl py-4 text-title1",
-            canGoNext ? "bg-core-1 text-white active:opacity-90" : "bg-bluegray-2 text-text-gray3",
-          ].join(" ")}
         >
           다음
-        </button>
+        </Button>
       </div>
 
       {sheet === "snsUrl" ? (
@@ -238,6 +226,8 @@ export default function MatchingTestStep3Content({
         </BottomSheet>
       ) : null}
 
+
+
       {sheet === "gender" ? (
         <BottomSheet title="성별" onClose={close}>
           <CheckDropdown
@@ -249,6 +239,7 @@ export default function MatchingTestStep3Content({
         </BottomSheet>
       ) : null}
 
+
       {sheet === "ageGroup" ? (
         <BottomSheet title="나이대" onClose={close}>
           <CheckDropdown
@@ -259,6 +250,7 @@ export default function MatchingTestStep3Content({
           />
         </BottomSheet>
       ) : null}
+
 
       {sheet === "videoLength" ? (
         <BottomSheet title="영상 길이" onClose={close}>

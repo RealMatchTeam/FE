@@ -1,15 +1,7 @@
-import { useNavigate } from "@tanstack/react-router";
-import Button from "../../../../components/common/Button";
 import { CheckCircleIcon } from "../components/icons/CheckCircleIcon";
-import MiniLogo from "../../../../assets/logo/mini-logo.svg";
+import Button from "../../../../components/common/Button";
 
 function SignUpSuccessContent() {
-  const navigate = useNavigate();
-
-  const handleStart = () => {
-    // TODO: 홈 라우트 구현 후 "/" 로 변경
-    navigate({ to: "/login" });
-  };
 
   return (
     <div className="flex flex-col h-screen bg-grad-auth">
@@ -29,15 +21,7 @@ function SignUpSuccessContent() {
 
       {/* 고정 하단 버튼 */}
       <div className="px-6 pb-6 pt-4">
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          fullWidth
-          onClick={handleStart}
-          className="gap-1.5"
-        >
-          <img src={MiniLogo} alt="미니 로고" className="w-5 h-5" />
+        <Button variant="primary" size="lg" fullWidth withLogo to="/">
           RealMatch 시작하기
         </Button>
       </div>

@@ -7,6 +7,7 @@ import BottomSheet from "../../components/BottomSheet";
 import InputSheet from "../../components/InputSheet";
 import SelectSheet from "../../components/SelectSheet";
 import MatchingTestTopBar from "../../components/MatchingTestHeader";
+import Button from "../../../../../components/common/Button";
 
 type Props = {
   maxText: string;
@@ -191,17 +192,15 @@ export default function MatchingTestStep2Content({
 
         {/* CTA */}
         <div className="sticky bottom-0 bg-white px-5 pb-6 pt-3">
-          <button
-            type="button"
-            disabled={!canGoNext}
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
             onClick={onNext}
-            className={[
-              "w-full rounded-2xl py-4 text-title1",
-              canGoNext ? "bg-core-1 text-white active:opacity-90" : "bg-bluegray-2 text-text-gray3",
-            ].join(" ")}
+            disabled={!canGoNext}
           >
             다음
-          </button>
+          </Button>
         </div>
       </div>
 

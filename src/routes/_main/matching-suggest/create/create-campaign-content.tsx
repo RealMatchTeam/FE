@@ -14,10 +14,10 @@ import {
 import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
 import { CheckIcon } from "../../../_auth/components/CheckIcon";
 import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
-import MiniLogo from "../../../../assets/logo/mini-logo.svg";
 import { existingCampaigns } from "../../../../data/existing-campaigns";
 import ProfileSelector from "../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
+import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
 import {
   formatOptions,
   categoryOptions,
@@ -47,10 +47,13 @@ export default function CreateCampaignContent() {
   const [isInvolvementSheetOpen, setIsInvolvementSheetOpen] = useState(false);
   const [isUsageScopeSheetOpen, setIsUsageScopeSheetOpen] = useState(false);
   const [isSponsorProductSheetOpen, setIsSponsorProductSheetOpen] = useState(false);
+  const [isStartDateSheetOpen, setIsStartDateSheetOpen] = useState(false);
+  const [isEndDateSheetOpen, setIsEndDateSheetOpen] = useState(false);
 
   // 바텀탭 숨기기 (바텀시트 열렸을 때)
   const anySheetOpen = isSheetOpen || isFormatSheetOpen || isCategorySheetOpen || 
-    isToneSheetOpen || isInvolvementSheetOpen || isUsageScopeSheetOpen || isSponsorProductSheetOpen;
+    isToneSheetOpen || isInvolvementSheetOpen || isUsageScopeSheetOpen || isSponsorProductSheetOpen ||
+    isStartDateSheetOpen || isEndDateSheetOpen;
   useHideBottomTab(anySheetOpen);
 
   // react-hook-form + zod
@@ -237,13 +240,13 @@ export default function CreateCampaignContent() {
               <DateField
                 placeholder="시작 날짜"
                 value={formValues.startDate}
-                onClick={() => {}}
+                onClick={() => setIsStartDateSheetOpen(true)}
               />
               <span className="text-text-gray3">~</span>
               <DateField
                 placeholder="끝 날짜"
                 value={formValues.endDate}
-                onClick={() => {}}
+                onClick={() => setIsEndDateSheetOpen(true)}
               />
             </div>
           </div>
@@ -252,13 +255,7 @@ export default function CreateCampaignContent() {
 
       {/* 하단 버튼 */}
       <div className="sticky bottom-0 left-0 right-0 p-5 bg-white">
-        <Button
-          variant="primary"
-          size="action"
-          fullWidth
-          onClick={handleSubmit(onSubmit)}
-        >
-          <img src={MiniLogo} alt="" className="w-6 h-4" />
+        <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit)} className="shadow-none">
           캠페인 제안하기
         </Button>
       </div>
@@ -375,6 +372,22 @@ export default function CreateCampaignContent() {
         selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
         onSubmit={(values) => setValue("sponsorProduct", values[0] || "")}
         multiSelect={false}
+      />
+
+      {/* 시작 날짜 선택 바텀시트 */}
+      <DatePickerBottomSheet
+        isOpen={isStartDateSheetOpen}
+        onClose={() => setIsStartDateSheetOpen(false)}
+        initialValue={formValues.startDate}
+        onSelect={(date) => setValue("startDate", date)}
+      />
+
+      {/* 끝 날짜 선택 바텀시트 */}
+      <DatePickerBottomSheet
+        isOpen={isEndDateSheetOpen}
+        onClose={() => setIsEndDateSheetOpen(false)}
+        initialValue={formValues.endDate}
+        onSelect={(date) => setValue("endDate", date)}
       />
     </div>
   );
