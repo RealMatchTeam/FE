@@ -86,13 +86,6 @@ export default function MatchingResultContent() {
                         className="h-auto w-[26px] select-none"
                         draggable={false}
                     />
-                    <path
-                        d="M13.8 10.2a4 4 0 0 1 0 5.6l-2 2a4 4 0 1 1-5.6-5.6l.9-.9"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
                     RealMatch 시작하기
                 </button>
             </div>

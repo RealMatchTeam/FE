@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+:root {
+  --color-core-1: #6666e5;
+  --color-core-2: #e6e6f3;
+  --color-core-3: #b7b7f3;
+
+  --color-bluegray-1: #f3f4f8;
+  --color-bluegray-2: #ebeefb;
+
+  --color-text-black: #171718;
+  --color-text-gray3: #9b9ba1;
+}
+
 /* globals.css */
 html {
   scrollbar-gutter: stable;
