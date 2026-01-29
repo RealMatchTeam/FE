@@ -3,6 +3,8 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { PurposeSection } from "./components/PurposeSection";
+import { useSignupStore } from "../../../../stores/signupStore";
+import { signup } from "../../api/auth";
 
 function SignUpPurposeContent() {
   const navigate = useNavigate();
@@ -11,6 +13,9 @@ function SignUpPurposeContent() {
   const currentStep = 3;
 
   const [selectedPurposes, setSelectedPurposes] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { setPurposes, getSignupData, reset } = useSignupStore();
 
   const togglePurpose = (purpose: string) => {
     setSelectedPurposes((prev) =>
@@ -20,10 +25,44 @@ function SignUpPurposeContent() {
     );
   };
 
-  const handleNext = () => {
-    if (selectedPurposes.length > 0) {
-      // 회원가입 완료 페이지로 이동
-      navigate({ to: "/signup/success", search: { provider } });
+  const handleNext = async () => {
+    if (selectedPurposes.length === 0) {
+      alert("목적을 하나 이상 선택해주세요.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // 선택한 목적을 store에 저장
+      const purposeIds = selectedPurposes.map((p) => parseInt(p, 10));
+      setPurposes(purposeIds);
+
+      // 회원가입 데이터 가져오기
+      const signupData = getSignupData();
+
+      if (!signupData) {
+        alert("회원가입 정보가 누락되었습니다. 처음부터 다시 진행해주세요.");
+        navigate({ to: "/signup/terms", search: { provider } });
+        return;
+      }
+
+      // 회원가입 API 호출
+      const response = await signup(signupData);
+
+      if (response.isSuccess) {
+        // 회원가입 성공
+        reset();
+        navigate({ to: "/signup/success", search: { provider } });
+      } else {
+        // 회원가입 실패
+        alert(response.message || "회원가입에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("회원가입 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -57,8 +96,9 @@ function SignUpPurposeContent() {
           size="lg"
           fullWidth
           onClick={handleNext}
+          disabled={isSubmitting || selectedPurposes.length === 0}
         >
-          다음
+          {isSubmitting ? "가입 중..." : "완료"}
         </Button>
       </div>
     </div>

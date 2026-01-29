@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import LoginLogo from "../../../assets/logo/login-logo.svg";
 import { SocialLoginSection } from "./components/SocialLoginSection";
+import { getKakaoAuthUrl, getNaverAuthUrl, getGoogleAuthUrl } from "../../../utils/social-auth";
 
 function LoginContent() {
   const navigate = useNavigate();
@@ -14,6 +15,31 @@ function LoginContent() {
 
   const openSocialSignUp = (provider: "kakao" | "naver" | "google") => {
     localStorage.setItem("lastLoginProvider", provider);
+
+    if (provider === "kakao") {
+      const authUrl = getKakaoAuthUrl();
+      if (authUrl !== "#") {
+        window.location.href = authUrl;
+        return;
+      }
+    }
+
+    if (provider === "naver") {
+      const authUrl = getNaverAuthUrl();
+      if (authUrl !== "#") {
+        window.location.href = authUrl;
+        return;
+      }
+    }
+
+    if (provider === "google") {
+      const authUrl = getGoogleAuthUrl();
+      if (authUrl !== "#") {
+        window.location.href = authUrl;
+        return;
+      }
+    }
+
     // 소셜 로그인/회원가입 시 provider 정보 전달
     navigate({ to: "/signup/terms", search: { provider } });
   };

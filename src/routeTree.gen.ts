@@ -45,6 +45,9 @@ import { Route as MainMatchingTestStep2RouteRouteImport } from './routes/_main/m
 import { Route as MainMatchingTestStep1RouteRouteImport } from './routes/_main/matching/test/step1/route'
 import { Route as MainMatchingTestResultRouteRouteImport } from './routes/_main/matching/test/result/route'
 import { Route as MainMatchingSuggestCreateRouteRouteImport } from './routes/_main/matching/suggest/create/route'
+import { Route as AuthAuthCallbackNaverRouteRouteImport } from './routes/_auth/auth/callback/naver/route'
+import { Route as AuthAuthCallbackKakaoRouteRouteImport } from './routes/_auth/auth/callback/kakao/route'
+import { Route as AuthAuthCallbackGoogleRouteRouteImport } from './routes/_auth/auth/callback/google/route'
 
 const MainRoute = MainRouteImport.update({
   id: '/_main',
@@ -237,6 +240,24 @@ const MainMatchingSuggestCreateRouteRoute =
     path: '/create',
     getParentRoute: () => MainMatchingSuggestRouteRoute,
   } as any)
+const AuthAuthCallbackNaverRouteRoute =
+  AuthAuthCallbackNaverRouteRouteImport.update({
+    id: '/_auth/auth/callback/naver',
+    path: '/auth/callback/naver',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthAuthCallbackKakaoRouteRoute =
+  AuthAuthCallbackKakaoRouteRouteImport.update({
+    id: '/_auth/auth/callback/kakao',
+    path: '/auth/callback/kakao',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthAuthCallbackGoogleRouteRoute =
+  AuthAuthCallbackGoogleRouteRouteImport.update({
+    id: '/_auth/auth/callback/google',
+    path: '/auth/callback/google',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/rooms': typeof RoomsRouteRouteWithChildren
@@ -268,6 +289,9 @@ export interface FileRoutesByFullPath {
   '/mypage/profileCard': typeof MainMypageProfileCardRoute
   '/mypage/terms': typeof MainMypageTermsRoute
   '/mypage/withdraw': typeof MainMypageWithdrawRoute
+  '/auth/callback/google': typeof AuthAuthCallbackGoogleRouteRoute
+  '/auth/callback/kakao': typeof AuthAuthCallbackKakaoRouteRoute
+  '/auth/callback/naver': typeof AuthAuthCallbackNaverRouteRoute
   '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
   '/matching/test/result': typeof MainMatchingTestResultRouteRoute
   '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
@@ -304,6 +328,9 @@ export interface FileRoutesByTo {
   '/mypage/terms': typeof MainMypageTermsRoute
   '/mypage/withdraw': typeof MainMypageWithdrawRoute
   '/': typeof MainHomeIndexRoute
+  '/auth/callback/google': typeof AuthAuthCallbackGoogleRouteRoute
+  '/auth/callback/kakao': typeof AuthAuthCallbackKakaoRouteRoute
+  '/auth/callback/naver': typeof AuthAuthCallbackNaverRouteRoute
   '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
   '/matching/test/result': typeof MainMatchingTestResultRouteRoute
   '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
@@ -343,6 +370,9 @@ export interface FileRoutesById {
   '/_main/mypage/terms': typeof MainMypageTermsRoute
   '/_main/mypage/withdraw': typeof MainMypageWithdrawRoute
   '/_main/_home/': typeof MainHomeIndexRoute
+  '/_auth/auth/callback/google': typeof AuthAuthCallbackGoogleRouteRoute
+  '/_auth/auth/callback/kakao': typeof AuthAuthCallbackKakaoRouteRoute
+  '/_auth/auth/callback/naver': typeof AuthAuthCallbackNaverRouteRoute
   '/_main/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
   '/_main/matching/test/result': typeof MainMatchingTestResultRouteRoute
   '/_main/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
@@ -382,6 +412,9 @@ export interface FileRouteTypes {
     | '/mypage/profileCard'
     | '/mypage/terms'
     | '/mypage/withdraw'
+    | '/auth/callback/google'
+    | '/auth/callback/kakao'
+    | '/auth/callback/naver'
     | '/matching/suggest/create'
     | '/matching/test/result'
     | '/matching/test/step1'
@@ -418,6 +451,9 @@ export interface FileRouteTypes {
     | '/mypage/terms'
     | '/mypage/withdraw'
     | '/'
+    | '/auth/callback/google'
+    | '/auth/callback/kakao'
+    | '/auth/callback/naver'
     | '/matching/suggest/create'
     | '/matching/test/result'
     | '/matching/test/step1'
@@ -456,6 +492,9 @@ export interface FileRouteTypes {
     | '/_main/mypage/terms'
     | '/_main/mypage/withdraw'
     | '/_main/_home/'
+    | '/_auth/auth/callback/google'
+    | '/_auth/auth/callback/kakao'
+    | '/_auth/auth/callback/naver'
     | '/_main/matching/suggest/create'
     | '/_main/matching/test/result'
     | '/_main/matching/test/step1'
@@ -474,6 +513,9 @@ export interface RootRouteChildren {
   AuthSignupSuccessRouteRoute: typeof AuthSignupSuccessRouteRoute
   AuthSignupTermsRouteRoute: typeof AuthSignupTermsRouteRoute
   AuthSignupTypeRouteRoute: typeof AuthSignupTypeRouteRoute
+  AuthAuthCallbackGoogleRouteRoute: typeof AuthAuthCallbackGoogleRouteRoute
+  AuthAuthCallbackKakaoRouteRoute: typeof AuthAuthCallbackKakaoRouteRoute
+  AuthAuthCallbackNaverRouteRoute: typeof AuthAuthCallbackNaverRouteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -730,6 +772,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainMatchingSuggestCreateRouteRouteImport
       parentRoute: typeof MainMatchingSuggestRouteRoute
     }
+    '/_auth/auth/callback/naver': {
+      id: '/_auth/auth/callback/naver'
+      path: '/auth/callback/naver'
+      fullPath: '/auth/callback/naver'
+      preLoaderRoute: typeof AuthAuthCallbackNaverRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/auth/callback/kakao': {
+      id: '/_auth/auth/callback/kakao'
+      path: '/auth/callback/kakao'
+      fullPath: '/auth/callback/kakao'
+      preLoaderRoute: typeof AuthAuthCallbackKakaoRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/auth/callback/google': {
+      id: '/_auth/auth/callback/google'
+      path: '/auth/callback/google'
+      fullPath: '/auth/callback/google'
+      preLoaderRoute: typeof AuthAuthCallbackGoogleRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -846,6 +909,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupSuccessRouteRoute: AuthSignupSuccessRouteRoute,
   AuthSignupTermsRouteRoute: AuthSignupTermsRouteRoute,
   AuthSignupTypeRouteRoute: AuthSignupTypeRouteRoute,
+  AuthAuthCallbackGoogleRouteRoute: AuthAuthCallbackGoogleRouteRoute,
+  AuthAuthCallbackKakaoRouteRoute: AuthAuthCallbackKakaoRouteRoute,
+  AuthAuthCallbackNaverRouteRoute: AuthAuthCallbackNaverRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

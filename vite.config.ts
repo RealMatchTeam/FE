@@ -7,9 +7,15 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   server: {
     port: 5173,
+    hmr: {
+      overlay: false,
+    },
   },
+  logLevel: 'warn',
   plugins: [
-    TanStackRouterVite(),
+    TanStackRouterVite({
+      routeFileIgnorePattern: ".*(/(components|utils|hooks|types)/.*|-content\\.tsx$)",
+    }),
     react(),
     VitePWA({
       registerType: "autoUpdate",
