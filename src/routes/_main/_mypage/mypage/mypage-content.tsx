@@ -18,7 +18,7 @@ export default function MyPageContent() {
           email: me?.email ?? "yeahsel0608@cau.ac.kr",
           avatarUrl: me?.avatarUrl ?? "/images/default-avatar.png",
         }}
-        onGoMatchingTest={() => navigate({ to: "/matching-test/matching-test/step1" })}
+        onGoMatchingTest={() => navigate({ to: "/matching/test/step1" })}
         onOpenProfileCard={() => navigate({ to: "/profileCard" })}
         onOpenLikes={() => navigate({ to: "/likes" })}
         onOpenEditProfile={() => navigate({ to: "/edit" })}
@@ -28,7 +28,7 @@ export default function MyPageContent() {
         onOpenPrivacy={() => navigate({ to: "/privacy" })} // policy/privacy
         onLogout={() => {
           useAuthStore.getState().logout?.();
-          navigate({ to: "/auth/login" });
+          navigate({ to: "/login" });
         }}
         onWithdraw={() => {}}
       />
