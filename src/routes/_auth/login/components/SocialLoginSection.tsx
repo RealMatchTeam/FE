@@ -5,16 +5,16 @@ interface SocialLoginSectionProps {
   lastProvider?: "kakao" | "naver" | "google" | null;
 }
 
-export function SocialLoginSection({ onKakaoClick, onNaverClick, onGoogleClick, lastProvider }: SocialLoginSectionProps) {
-  const Tooltip = () => (
-    <div className="absolute top-[60px] left-1/2 -translate-x-1/2 w-max animate-slide-up z-10">
-      <div className="relative bg-white px-2 py-1 rounded-[8px] shadow-md border border-gray-100">
-        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-gray-100 rotate-45" />
-        <span className="text-callout1 text-text-black relative z-10">가장 최근 로그인했어요</span>
-      </div>
+const Tooltip = () => (
+  <div className="absolute top-[60px] left-1/2 -translate-x-1/2 w-max animate-slide-up z-10">
+    <div className="relative bg-white px-2 py-1 rounded-[8px] shadow-md border border-gray-100">
+      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-gray-100 rotate-45" />
+      <span className="text-callout1 text-text-black relative z-10">가장 최근 로그인했어요</span>
     </div>
-  );
+  </div>
+);
 
+export function SocialLoginSection({ onKakaoClick, onNaverClick, onGoogleClick, lastProvider }: SocialLoginSectionProps) {
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <span className="text-text-gray3 text-title3">SNS 계정으로 간편 로그인 하기</span>

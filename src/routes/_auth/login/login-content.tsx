@@ -1,18 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import LoginLogo from "../../../assets/logo/login-logo.svg";
 import { SocialLoginSection } from "./components/SocialLoginSection";
 
 function LoginContent() {
   const navigate = useNavigate();
-  const [lastProvider, setLastProvider] = useState<"kakao" | "naver" | "google" | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("lastLoginProvider") as "kakao" | "naver" | "google" | null;
-    if (saved) {
-      setLastProvider(saved);
-    }
-  }, []);
+  const [lastProvider] = useState<"kakao" | "naver" | "google" | null>(() => {
+    return localStorage.getItem("lastLoginProvider") as "kakao" | "naver" | "google" | null;
+  });
 
   const openSocialSignUp = (provider: "kakao" | "naver" | "google") => {
     localStorage.setItem("lastLoginProvider", provider);

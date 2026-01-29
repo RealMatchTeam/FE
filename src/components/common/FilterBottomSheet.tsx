@@ -9,25 +9,25 @@ interface FilterBottomSheetProps {
 }
 
 export default function FilterBottomSheet({ isOpen, onClose, children, className }: FilterBottomSheetProps) {
-    const [isVisible, setIsVisible] = useState(isOpen);
-    const [animateClass, setAnimateClass] = useState("");
+    const [shouldRender, setShouldRender] = useState(isOpen);
 
     useEffect(() => {
         if (isOpen) {
-            setIsVisible(true);
-            setAnimateClass("animate-slide-up");
-        } else if (isVisible) {
-            setAnimateClass("animate-slide-down");
+            // Use setTimeout to avoid direct setState in effect
+            const timer = setTimeout(() => setShouldRender(true), 0);
+            return () => clearTimeout(timer);
         }
     }, [isOpen]);
 
     const handleAnimationEnd = () => {
         if (!isOpen) {
-            setIsVisible(false);
+            setShouldRender(false);
         }
     };
 
-    if (!isVisible) return null;
+    if (!shouldRender && !isOpen) return null;
+
+    const animateClass = isOpen ? "animate-slide-up" : "animate-slide-down";
 
     return (
         <div className="fixed inset-0 z-50 flex items-end justify-center">

@@ -9,19 +9,19 @@ interface TermsDetailModalProps {
 }
 
 export function TermsDetailModal({ isOpen, onClose, title, content }: TermsDetailModalProps) {
-    const [isVisible, setIsVisible] = useState(isOpen);
+    const [shouldRender, setShouldRender] = useState(isOpen);
 
     useEffect(() => {
-        let timer: ReturnType<typeof setTimeout>;
         if (isOpen) {
-            setIsVisible(true);
+            const timer = setTimeout(() => setShouldRender(true), 0);
+            return () => clearTimeout(timer);
         } else {
-            timer = setTimeout(() => setIsVisible(false), 300);
+            const timer = setTimeout(() => setShouldRender(false), 300);
+            return () => clearTimeout(timer);
         }
-        return () => clearTimeout(timer);
     }, [isOpen]);
 
-    if (!isVisible) return null;
+    if (!shouldRender) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
