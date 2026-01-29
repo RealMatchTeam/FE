@@ -133,6 +133,7 @@ const MainMatchingTestMatchingTestStep1RouteRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof MainHomeIndexRoute
   '/chat': typeof MainChatRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRouteRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
@@ -147,7 +148,6 @@ export interface FileRoutesByFullPath {
   '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
   '/auth/signup/type': typeof AuthSignupTypeRouteRoute
   '/chat/chatting-room': typeof MainChatChattingRoomRoute
-  '/': typeof MainHomeIndexRoute
   '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
@@ -197,6 +197,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/chat'
     | '/auth/login'
     | '/calendar'
@@ -211,7 +212,6 @@ export interface FileRouteTypes {
     | '/auth/signup/terms'
     | '/auth/signup/type'
     | '/chat/chatting-room'
-    | '/'
     | '/matching-test/matching-test/step1'
     | '/matching-test/matching-test/step2'
     | '/matching-test/matching-test/step3'
@@ -274,7 +274,7 @@ declare module '@tanstack/react-router' {
     '/_main': {
       id: '/_main'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof MainRouteImport
       parentRoute: typeof rootRouteImport
     }
