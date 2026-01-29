@@ -7,7 +7,7 @@ import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import editIcon from "../../../../assets/icon-edit.svg";
 import dropdownIcon from "../../../../assets/arrow-down.svg";
 import dropupIcon from "../../../../assets/arrow-up.svg";
-import arrowRightIcon from "../../../../assets/arrow-right.svg";
+import arrowRightIcon from "../../../../assets/icon/arrow-right.svg";
 import calendarIcon from "../../../../assets/icon-calender.svg";
 
 export default function CampaignContent() {
