@@ -31,4 +31,3 @@ dist-ssr
 # TanStack Router auto-generated
 .tanstack/
 .tanstack/tmp
-src/routeTree.gen.ts

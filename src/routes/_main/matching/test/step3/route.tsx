@@ -62,6 +62,7 @@ function MatchingTestStep3Page() {
       onToggleChip={onToggleChip}
       canGoNext={canGoNext}
       onBack={() => navigate({ to: "/matching/test/step2" })}
+      onNext={() => navigate({ to: "/matching/test/result" })}
     />
   );
 }
