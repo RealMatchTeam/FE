@@ -1,7 +1,7 @@
 interface SelectFieldProps {
   label: string;
   valueText?: string;
-  onOpen: () => void; // ✅ "선택하기" 클릭 시 실행
+  onOpen: () => void;
 }
 
 export default function SelectField({

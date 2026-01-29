@@ -1,6 +1,6 @@
 import brandLogo from "../../../../assets/brand-logo.png";
 import chatIcon from "../../../../assets/chat-icon.svg";
-import arrowRightIcon from "../../../../assets/arrow-right.svg";
+import arrowRightIcon from "../../../../assets/icon/arrow-right.svg";
 
 interface CampaignBrandCardProps {
   showChatSection?: boolean; // 채팅 섹션 표시 여부

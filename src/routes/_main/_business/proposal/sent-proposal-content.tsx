@@ -6,7 +6,7 @@ import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
 import dropdownIcon from "../../../../assets/arrow-down.svg";
 import dropupIcon from "../../../../assets/arrow-up.svg";
-import arrowRightIcon from "../../../../assets/arrow-right.svg";
+import arrowRightIcon from "../../../../assets/icon/arrow-right.svg";
 import arrowPurpleIcon from "../../../../assets/arrow-purple.svg";
 import profileIcon from "../../../../assets/icon-profile.svg";
 

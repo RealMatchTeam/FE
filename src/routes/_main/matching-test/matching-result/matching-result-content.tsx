@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Route } from "./route";
 import MatchResultHeader from "../../../../components/common/RealmatchHeader";
 import MainIcon from "../../../../assets/MainIcon.svg";
-import WhiteLogo from "../../../../assets/whitelogo.svg";
+import WhiteLogo from "../../../../assets/logo/whitelogo.svg";
 
 export default function MatchingResultContent() {
     const navigate = useNavigate();
@@ -85,13 +85,6 @@ export default function MatchingResultContent() {
                         alt="흰색 로고"
                         className="h-auto w-[26px] select-none"
                         draggable={false}
-                    />
-                    <path
-                        d="M13.8 10.2a4 4 0 0 1 0 5.6l-2 2a4 4 0 1 1-5.6-5.6l.9-.9"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
                     />
                     RealMatch 시작하기
                 </button>
