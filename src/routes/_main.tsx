@@ -1,10 +1,20 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import BottomTab from "./_main/components/BottomTab";
 import { useState } from "react";
 import { LayoutContext } from "./_main/layout-context";
 import Logo from "../assets/logo/RealMatchLogo_ex.svg";
+import { useAuthStore } from "../stores/auth-store";
 
 export const Route = createFileRoute("/_main")({
+  beforeLoad: () => {
+    // 처음 진입 시 로그인 페이지로
+    const { me } = useAuthStore.getState();
+    if (!me) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
   component: MainLayout,
 });
 
