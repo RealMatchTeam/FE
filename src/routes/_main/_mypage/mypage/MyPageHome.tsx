@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ConfirmModal from "./_components/ConfirmModal";
+import ConfirmModal from "../components/ConfirmModal";
 
 type Props = {
   // 서버/스토어에서 내려오는 값이라고 가정
@@ -36,7 +36,6 @@ export default function MyPageHome({
   onLogout,
   onWithdraw,
 }: Props) {
-  // hasMatchingTest가 false면 gate 모달을 바로 열기 위해 초기값으로 설정
   const [openGate, setOpenGate] = useState(!hasMatchingTest);
   const [openLogout, setOpenLogout] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
@@ -80,7 +79,7 @@ export default function MyPageHome({
         </div>
 
         {/* top buttons */}
-        <div className="flex max-w-[398px] gap-[10px]">
+        <div className="flex w-full max-w-[398px] gap-[10px]">
           <button
             type="button"
             onClick={onOpenProfileCard}
@@ -108,15 +107,17 @@ export default function MyPageHome({
         </div>
       </div>
 
+      <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
+ 
       {/* list */}
       <div >
-        <MenuButton title="내 정보" label="회원정보 변경" onClick={onOpenEditProfile} py={11} gap={6} />
+        <MenuButton title="내 정보" label="회원정보 변경" onClick={onOpenEditProfile} py={11} />
         <Divider />
 
-        <MenuButton label="알림 설정" onClick={onOpenNotifications} py={16} gap={6} />
+        <MenuButton label="알림 설정" onClick={onOpenNotifications} py={16}/>
         <Divider />
 
-        <MenuButton title="고객센터" label="문의하기" onClick={onOpenInquiry} py={11} gap={6} />
+        <MenuButton title="고객센터" label="문의하기" onClick={onOpenInquiry} py={11} />
         <Divider />
 
         <div className="px-5 pt-[11px] pb-[5px]">
@@ -140,10 +141,10 @@ export default function MyPageHome({
         </div>
         <Divider />
 
-        <MenuButton title="" label="로그아웃" onClick={() => setOpenLogout(true)} py={16} gap={6} />
+        <MenuButton title="" label="로그아웃" onClick={() => setOpenLogout(true)} py={16} />
         <Divider />
 
-        <MenuButton label="회원탈퇴" onClick={() => setOpenWithdraw(true)} muted={true} py={16} gap={6} />        
+        <MenuButton label="회원탈퇴" onClick={() => setOpenWithdraw(true)} muted={true} py={16} />        
       </div>
 
       {/* gate modal */}
@@ -162,7 +163,7 @@ export default function MyPageHome({
           onClose={() => setOpenLogout(false)}
           onPrimary={() => {
             setOpenLogout(false);
-            onLogout(); // ✅ MyPageContent에서 로그인 페이지 이동 처리
+            onLogout(); // MyPageContent에서 로그인 페이지 이동 처리
           }}
         />
       ) : null}
@@ -176,7 +177,7 @@ export default function MyPageHome({
           onClose={() => setOpenWithdraw(false)}
           onPrimary={() => {
             setOpenWithdraw(false);
-            onWithdraw(); // ✅ 탈퇴 페이지 이동 or API 호출로 연결
+            onWithdraw(); // 탈퇴 페이지 이동 or API 호출로 연결
           }}
         />
       ) : null}
@@ -186,43 +187,51 @@ export default function MyPageHome({
 }
 
 function MenuButton({
-  title, label, onClick, muted, py, gap = 6,
-}: {title?: string; label: string; onClick: () => void; muted?: boolean; py?: number; gap?: number; }) {
+  title, label, onClick, muted, py,
+}: {
+  title?: string;
+  label: string;
+  onClick: () => void;
+  muted?: boolean;
+  py?: number;
+}) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={[
-        "w-full text-left rounded-none",
-        "transition-colors active:bg-[#E6E6EB]", // 눌림 회색
-        muted ? "text-[#B7B7BF]" : "text-[#111]",
-      ].join(" ")}
-      style={{
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingTop: py,
-        paddingBottom: py,
-      }}
-    >
-      <div className="flex flex-col" style={{ gap }}>
-        {title && (
-          <div
-            className={[
-              "text-[10px] leading-[12px] style-Regular text-[#5B5D6B]",
-              muted ? "opacity-70" : "",
-            ].join(" ")}
-          >
-            {title}
-          </div>
-        )}
-
-        <div className="text-[14px] leading-[20px] style-Medium">
-          {label}
+    <div className="w-full">
+      {title && (
+        <div
+          className={[
+            "px-5 pt-[11px] pb-[5px]",
+            "text-[10px] leading-[12px] text-[#5B5D6B]",
+            muted ? "opacity-70" : "",
+          ].join(" ")}
+        >
+          {title}
         </div>
+      )}
+
+      {/* label */}
+      <div className="px-5">
+        <button
+          type="button"
+          onClick={onClick}
+          className={[
+            "w-full text-left rounded-none",
+            "transition-colors active:bg-[#E6E6EB]",
+            muted ? "text-[#B7B7BF]" : "text-[#111]",
+            "text-[14px] leading-[20px] style-Medium",
+          ].join(" ")}
+          style={{
+            paddingTop: py,
+            paddingBottom: py,
+          }}
+        >
+          {label}
+        </button>
       </div>
-    </button>
+    </div>
   );
 }
+
 
 function Divider() {
   return <div className="mx-5 h-px bg-[#F0F0F4]" />;
@@ -241,22 +250,24 @@ function GateModal({
       <div className="absolute inset-0 bg-black/45" />
 
       {/* modal */}
-      <div className="absolute left-1/2 top-1/2 w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute left-4 top-4 text-[#9B9BA1]"
-          aria-label="닫기"
-        >
-          ✕
-        </button>
+      <div className="absolute left-1/2 top-1/2 w-[320px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl">
+        <div className="relative w-[270px] h-[24px]">
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute left-0 top-0 text-[#9B9BA1]"
+            aria-label="닫기"
+          >
+            ✕
+          </button>
+        </div>  
 
-        <div className="flex flex-col items-center pt-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#5B5CEB]">
+        <div className="flex flex-col items-center pt-8">
+          <div className="flex h-[64px] w-[64px] items-center justify-center rounded-full bg-[#5B5CEB]">
             <span className="text-[28px] font-bold text-white">!</span>
           </div>
 
-          <div className="mt-5 text-center text-[18px] font-semibold text-[#111] leading-6">
+          <div className="mt-8 text-center text-[18px] font-semibold text-[#111] leading-6">
             매칭 검사를
             <br />
             먼저 진행해주세요
@@ -265,7 +276,7 @@ function GateModal({
           <button
             type="button"
             onClick={onGoTest}
-            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#5B5CEB] text-[15px] font-semibold text-white"
+            className="mt-8 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#5B5CEB] text-[15px] font-semibold text-white"
           >
             <span className="inline-flex h-5 w-5 items-center justify-center">
               <svg width="26" height="16" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">

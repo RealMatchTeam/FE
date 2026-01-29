@@ -39,7 +39,7 @@ export default function ConfirmModal({
           ) : null}
         </div>
 
-        {/* buttons – 맨 아래 고정 */}
+        {/* buttons */}
         <div className="mt-auto px-5 pb-4">
           <div className="flex gap-3">
             <button
