@@ -6,8 +6,8 @@ import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
 import dropdownIcon from "../../../../assets/arrow-down.svg";
 import dropupIcon from "../../../../assets/arrow-up.svg";
-import arrowRightIcon from "../../../../assets/arrow-right.svg";
-import profileIcon from "../../../../assets/mini-logo.svg"; 
+import arrowRightIcon from "../../../../assets/icon/arrow-right.svg";
+import profileIcon from "../../../../assets/logo/mini-logo.svg"; 
 
 export default function ReceivedProposalContent() {
     const [isContentOpen, setIsContentOpen] = useState(false);

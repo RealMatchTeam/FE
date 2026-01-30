@@ -14,7 +14,7 @@
 
 /* globals.css */
 html {
-scrollbar-gutter: stable;
+  scrollbar-gutter: stable;
 }
 
 @font-face {
@@ -24,7 +24,10 @@ scrollbar-gutter: stable;
   font-style: normal;
   font-display: swap;
 }
-html { scrollbar-gutter: stable; }
+
+html {
+  scrollbar-gutter: stable;
+}
 
 @theme {
   /* Core 컬러 */
@@ -85,6 +88,7 @@ html { scrollbar-gutter: stable; }
 }
 
 @layer components {
+
   /* Typography 클래스 */
   .text-title {
     font-size: 20px;
@@ -217,14 +221,28 @@ html { scrollbar-gutter: stable; }
   input[type="password"]::-webkit-input-placeholder {
     letter-spacing: normal;
   }
+
+  .text-date-separator {
+    font-family: var(--font-family-pretendard);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 160%;
+    letter-spacing: -0.02em;
+    /* -2% */
+    vertical-align: middle;
+  }
+
+
 }
 
 @layer utilities {
+
   /* 슬라이드 업 애니메이션 */
   @keyframes slide-up {
     from {
       transform: translateY(100%);
     }
+
     to {
       transform: translateY(0);
     }
@@ -236,12 +254,15 @@ html { scrollbar-gutter: stable; }
 
   /* 스크롤바 숨기기 */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE, Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE, Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera */
+    display: none;
+    /* Chrome, Safari, Opera */
   }
 
   /* Safe Area 대응 (iOS 노치) */
@@ -284,5 +305,35 @@ html { scrollbar-gutter: stable; }
 
   .bg-grad-2 {
     background: linear-gradient(90deg, #AFBEF9 0%, #496EFF 44.23%, #AFBEF9 100%);
+  }
+
+  /* 바텀시트 슬라이드 업 애니메이션 */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  /* 슬라이드 다운 애니메이션 */
+  @keyframes slide-down {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(100%);
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out forwards;
   }
 }

@@ -1,5 +1,5 @@
-import ArrowLeftIcon from "../../../../assets/arrow-left.svg";
-import ArrowRightIcon from "../../../../assets/arrow-right.svg";
+import ArrowLeftIcon from "../../../../assets/icon/arrow-left.svg";
+import ArrowRightIcon from "../../../../assets/icon/arrow-right.svg";
 
 const WEEK_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 

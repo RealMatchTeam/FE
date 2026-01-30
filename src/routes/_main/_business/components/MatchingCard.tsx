@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import chatIcon from "../../../../assets/chat-icon2.svg";
-import searchIcon from "../../../../assets/search.svg";
+import searchIcon from "../../../../assets/icon/search.svg";
 
 interface MatchingCardProps {
   brand: string;
