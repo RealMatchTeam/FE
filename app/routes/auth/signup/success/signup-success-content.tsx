@@ -1,5 +1,5 @@
 import { CheckCircleIcon } from "../components/icons/CheckCircleIcon";
-import Button from "../../../components/common/Button";
+import Button from "../../../../components/common/Button";
 
 function SignUpSuccessContent() {
 

@@ -11,10 +11,10 @@ import {
   DateField,
   FeeInput,
 } from "../../../../components/form";
-import { useHideBottomTab } from "../../../../../hooks/useHideBottomTab";
-import { CheckIcon } from "../../../../auth/components/CheckIcon";
-import ExistSuggestIcon from "../../../assets/icon/exist-suggest.svg";
-import { existingCampaigns } from "../../../../../data/existing-campaigns";
+import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
+import { CheckIcon } from "../../../auth/components/CheckIcon";
+import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
+import { existingCampaigns } from "../../../../data/existing-campaigns";
 import ProfileSelector from "../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";

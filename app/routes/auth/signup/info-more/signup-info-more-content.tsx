@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate, useSearch } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
-import Button from "../../../components/common/Button";
+import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { AgeSection } from "../components/AgeSection";
 import { GenderSection } from "../components/GenderSection";
@@ -15,7 +15,8 @@ interface InfoMoreFormData {
 
 function SignUpInfoMoreContent() {
   const navigate = useNavigate();
-  const { type } = useSearch({ from: "/_auth/signup/info-more" });
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
   const isEmail = type === "email";
   const totalSteps = isEmail ? 4 : 3;
 
@@ -32,8 +33,7 @@ function SignUpInfoMoreContent() {
   };
 
   const handleNext = () => {
-    // 목적 선택 페이지로 이동
-    navigate({ to: "/signup/purpose", search: { type } });
+    navigate(`/auth/signup/purpose?type=${type}`);
   };
 
   return (

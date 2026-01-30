@@ -1,6 +1,6 @@
 import { Route } from "./route";
 import MatchResultHeader from "../../../../components/common/RealmatchHeader";
-import MainIcon from "../../../assets/MainIcon.svg"
+import MainIcon from "../../../../assets/MainIcon.svg"
 import Button from "../../../../components/common/Button";
 
 export default function MatchingResultContent() {

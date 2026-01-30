@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cn } from "../../../../lib/utils";
-import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
-import Button from "../../../components/common/Button";
+import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+import Button from "../../../../components/common/Button";
 import { CheckIcon } from "../../components/CheckIcon";
 
 interface ContentCategorySectionProps {
@@ -45,7 +45,7 @@ export function ContentCategorySection({
         </div>
       </div>
 
-      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[32%]">
+      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[35%]">
         <div className="flex flex-col h-full px-5 pb-6">
           {/* 헤더 */}
           <div className="flex justify-between items-center py-5.5">
@@ -58,7 +58,7 @@ export function ContentCategorySection({
           </div>
 
           {/* 옵션 리스트 */}
-          <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
+          <div className="flex flex-col pt-2 gap-3 flex-1 overflow-y-auto">
             {CONTENT_CATEGORIES.map((category) => {
               const isSelected = selectedCategories.includes(category);
               return (

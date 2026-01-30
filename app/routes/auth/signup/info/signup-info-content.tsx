@@ -1,41 +1,51 @@
 import { useState } from "react";
-import { useNavigate, useSearch } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
-import Button from "../../../components/common/Button";
+import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { NameSection } from "../components/NameSection";
 import { EmailSection } from "../components/EmailSection";
 import { AgeSection } from "../components/AgeSection";
 import { GenderSection } from "../components/GenderSection";
 import { ContentCategorySection } from "../components/ContentCategorySection";
+import { useAuthStore } from "../../../../stores/auth-store";
+import { useSignupStore } from "../../../../stores/signupStore";
 
 interface SocialFormData {
   name: string;
   nickname: string;
   email: string;
-  age: string;
+  birthDate: string;
   gender: string;
   contentCategories: string[];
 }
 
 function SignUpInfoContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/_auth/signup/info" });
+  const [searchParams] = useSearchParams();
+  const provider = searchParams.get("provider");
   const totalSteps = 3;
+  const me = useAuthStore((state) => state.me);
+  const { setBasicInfo, setAdditionalInfo } = useSignupStore();
 
   // 에러/성공 상태
   const [socialNicknameError, setSocialNicknameError] = useState<string | null>(null);
   const [socialNicknameSuccess, setSocialNicknameSuccess] = useState<string | null>(null);
 
   // Social form
-  const socialForm = useForm<SocialFormData>();
+  const socialForm = useForm<SocialFormData>({
+    defaultValues: {
+      email: me?.email || "",
+    }
+  });
   const socialNicknameValue = useWatch({ control: socialForm.control, name: "nickname" });
   const socialGenderValue = useWatch({ control: socialForm.control, name: "gender" });
+  const socialBirthDateValue = useWatch({ control: socialForm.control, name: "birthDate" });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const handleNicknameCheck = () => {
     // TODO: 닉네임 중복 확인 API 호출
-    const isDuplicate = false; // API 결과로 대체
+    const isDuplicate = false;
     if (isDuplicate) {
       setSocialNicknameError("이미 존재하는 아이디입니다");
       setSocialNicknameSuccess(null);
@@ -54,8 +64,41 @@ function SignUpInfoContent() {
   };
 
   const handleNext = () => {
-    // 소셜 회원가입: 3/3 목적 선택 페이지로 이동
-    navigate({ to: "/signup/purpose", search: { provider } });
+    // 필수 입력값 검증
+    if (!socialNicknameValue || !socialBirthDateValue || !socialGenderValue) {
+      alert("모든 필수 정보를 입력해주세요.");
+      return;
+    }
+
+    if (selectedCategories.length === 0) {
+      alert("콘텐츠 분야를 하나 이상 선택해주세요.");
+      return;
+    }
+
+    // 성별 한글 -> 영문 변환
+    const genderMap: Record<string, "MALE" | "FEMALE" | "NONE"> = {
+      "남성": "MALE",
+      "여성": "FEMALE",
+    };
+    const genderValue = genderMap[socialGenderValue] || "NONE";
+
+    // 기본 정보 저장
+    setBasicInfo(
+      socialNicknameValue,
+      socialBirthDateValue,
+      genderValue
+    );
+
+    // 콘텐츠 카테고리 ID 변환
+    const categoryIds = selectedCategories.map(category => {
+      if (category === "패션") return 1;
+      if (category === "뷰티") return 2;
+      return 0;
+    });
+
+    setAdditionalInfo(0, categoryIds);
+
+    navigate(`/auth/signup/purpose?provider=${provider}`);
   };
 
   return (
@@ -83,7 +126,7 @@ function SignUpInfoContent() {
           <EmailSection<SocialFormData>
             register={socialForm.register}
             errors={socialForm.formState.errors}
-            emailValue=""
+            emailValue={me?.email || ""}
             verificationCodeError={null}
             onEmailVerify={() => { }}
             readOnly

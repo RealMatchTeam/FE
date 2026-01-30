@@ -33,7 +33,7 @@ const tabs: TabItem[] = [
     iconSelected: MatchingListIconSelected,
   },
   {
-    path: "/calendar",
+    path: "/business/calendar",
     label: "비즈니스",
     icon: BusinessIcon,
     iconSelected: BusinessIconSelected,
@@ -62,6 +62,9 @@ export default function BottomTab() {
         {tabs.map((tab) => {
           let isActive = currentPath === tab.path;
           if (tab.path === "/matching/brand" && currentPath.startsWith("/matching")) {
+            isActive = true;
+          }
+          if (tab.path === "/business/calendar" && currentPath.startsWith("/business")) {
             isActive = true;
           }
           return (

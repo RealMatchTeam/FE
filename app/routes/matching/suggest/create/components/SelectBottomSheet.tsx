@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FilterBottomSheet from "../../../../../components/common/FilterBottomSheet";
 import Button from "../../../../../components/common/Button";
-import { CheckIcon } from "../../../../../auth/components/CheckIcon";
+import { CheckIcon } from "../../../../auth/components/CheckIcon";
 
 interface SelectOption {
   value: string;

@@ -1,5 +1,5 @@
 import { type ChatRoom } from "../types/ChatRoom";
-import { formatKoreanDateTime } from "../../../../utils/dateTime";
+import { formatKoreanDateTime } from "../../../utils/dateTime";
 import { useNavigate } from "react-router";
 
 export function ChatList({ rooms }: { rooms: ChatRoom[] }) {
@@ -32,12 +32,7 @@ export function ChatListItem({ room }: { room: ChatRoom }) {
     <button
       type="button"
       className=" w-full max-w-[420px] rounded-[10px] bg-white px-4 py-[14px] flex items-start gap-[14px] text-left"
-      onClick={() =>
-        navigate({
-          to: "/rooms/$chatId",
-          params: { chatId: String(room.id) },
-        })
-      }
+      onClick={() => navigate(`/rooms/${room.id}`)}
     >
       {/* 왼쪽 로고 */}
       <div className="w-[43px] h-[43px] rounded-[10px] bg-white border border-[#E6E6F3] flex items-center justify-center overflow-hidden shrink-0">

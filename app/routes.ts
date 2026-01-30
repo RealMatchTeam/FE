@@ -55,4 +55,7 @@ export default [
 
     route("mypage", "routes/mypage/route.tsx"),
   ]),
+
+  // 404 Catch-all
+  route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

@@ -1,4 +1,4 @@
-import { useRouter } from "react-router";
+import { useNavigate } from "react-router";
 
 interface FlowNavigationProps {
   currentStep: number;
@@ -7,13 +7,13 @@ interface FlowNavigationProps {
 }
 
 export function FlowNavigation({ currentStep, totalSteps, onBack }: FlowNavigationProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else {
-      router.history.back();
+      navigate(-1);
     }
   };
 

@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import FilterBottomSheet from "../../../../../components/common/FilterBottomSheet";
 import Button from "../../../../../components/common/Button";
-import ArrowLeftIcon from "../../../../assets/icon/arrow-left.svg";
-import ArrowRightIcon from "../../../../assets/icon/arrow-right.svg";
+import ArrowLeftIcon from "../../../../../assets/icon/arrow-left.svg";
+import ArrowRightIcon from "../../../../../assets/icon/arrow-right.svg";
 
 const WEEK_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 

@@ -1,7 +1,4 @@
 interface SocialLoginSectionProps {
-  onKakaoClick: () => void;
-  onNaverClick: () => void;
-  onGoogleClick: () => void;
   lastProvider?: "kakao" | "naver" | "google" | null;
 }
 
@@ -14,7 +11,24 @@ const Tooltip = () => (
   </div>
 );
 
-export function SocialLoginSection({ onKakaoClick, onNaverClick, onGoogleClick, lastProvider }: SocialLoginSectionProps) {
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export function SocialLoginSection({ lastProvider }: SocialLoginSectionProps) {
+  const handleKakaoLogin = () => {
+    const redirectUri = `${window.location.origin}/auth/callback/kakao`;
+    window.location.href = `${BASE_URL}/oauth2/authorization/kakao?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  };
+
+  const handleNaverLogin = () => {
+    const redirectUri = `${window.location.origin}/auth/callback/naver`;
+    window.location.href = `${BASE_URL}/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  };
+
+  const handleGoogleLogin = () => {
+    const redirectUri = `${window.location.origin}/auth/callback/google`;
+    window.location.href = `${BASE_URL}/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  };
+
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <span className="text-text-gray3 text-title3">SNS 계정으로 간편 로그인 하기</span>
@@ -24,7 +38,7 @@ export function SocialLoginSection({ onKakaoClick, onNaverClick, onGoogleClick, 
         <div className="relative flex flex-col items-center">
           <button
             type="button"
-            onClick={onKakaoClick}
+            onClick={handleKakaoLogin}
             className="w-[52px] h-[52px] rounded-full bg-[#FEE500] flex items-center justify-center transition-transform hover:scale-105"
             aria-label="카카오 로그인"
           >
@@ -44,7 +58,7 @@ export function SocialLoginSection({ onKakaoClick, onNaverClick, onGoogleClick, 
         <div className="relative flex flex-col items-center">
           <button
             type="button"
-            onClick={onNaverClick}
+            onClick={handleNaverLogin}
             className="w-[52px] h-[52px] rounded-full bg-[#03C75A] flex items-center justify-center transition-transform hover:scale-105"
             aria-label="네이버 로그인"
           >
@@ -62,7 +76,7 @@ export function SocialLoginSection({ onKakaoClick, onNaverClick, onGoogleClick, 
         <div className="relative flex flex-col items-center">
           <button
             type="button"
-            onClick={onGoogleClick}
+            onClick={handleGoogleLogin}
             className="w-[52px] h-[52px] rounded-full bg-white border border-gray-100 flex items-center justify-center shadow-sm transition-transform hover:scale-105"
             aria-label="구글 로그인"
           >

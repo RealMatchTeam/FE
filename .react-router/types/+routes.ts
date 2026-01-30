@@ -112,12 +112,17 @@ type Pages = {
   "/mypage": {
     params: {};
   };
+  "/*": {
+    params: {
+      "*": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth" | "/auth/login" | "/auth/callback" | "/auth/callback/google" | "/auth/callback/kakao" | "/auth/callback/naver" | "/auth/signup" | "/auth/signup/terms" | "/auth/signup/type" | "/auth/signup/info" | "/auth/signup/info-more" | "/auth/signup/purpose" | "/auth/signup/success" | "/matching" | "/matching/brand" | "/matching/campaign" | "/matching/suggest" | "/matching/suggest/create" | "/matching/test" | "/matching/test/step1" | "/matching/test/step2" | "/matching/test/step3" | "/matching/test/result" | "/business" | "/business/calendar" | "/business/campaign" | "/business/proposal" | "/business/rejection" | "/chat" | "/rooms" | "/rooms/:chatId" | "/mypage";
+    page: "/" | "/auth" | "/auth/login" | "/auth/callback" | "/auth/callback/google" | "/auth/callback/kakao" | "/auth/callback/naver" | "/auth/signup" | "/auth/signup/terms" | "/auth/signup/type" | "/auth/signup/info" | "/auth/signup/info-more" | "/auth/signup/purpose" | "/auth/signup/success" | "/matching" | "/matching/brand" | "/matching/campaign" | "/matching/suggest" | "/matching/suggest/create" | "/matching/test" | "/matching/test/step1" | "/matching/test/step2" | "/matching/test/step3" | "/matching/test/result" | "/business" | "/business/calendar" | "/business/campaign" | "/business/proposal" | "/business/rejection" | "/chat" | "/rooms" | "/rooms/:chatId" | "/mypage" | "/*";
   };
   "routes/auth/route.tsx": {
     id: "routes/auth/route";
@@ -259,6 +264,10 @@ type RouteFiles = {
     id: "routes/mypage/route";
     page: "/mypage";
   };
+  "routes/not-found.tsx": {
+    id: "routes/not-found";
+    page: "/*";
+  };
 };
 
 type RouteModules = {
@@ -298,4 +307,5 @@ type RouteModules = {
   "routes/rooms/route": typeof import("./app/routes/rooms/route.tsx");
   "routes/rooms/$chatId": typeof import("./app/routes/rooms/$chatId.tsx");
   "routes/mypage/route": typeof import("./app/routes/mypage/route.tsx");
+  "routes/not-found": typeof import("./app/routes/not-found.tsx");
 };

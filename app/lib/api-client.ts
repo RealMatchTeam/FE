@@ -64,7 +64,7 @@ apiClient.interceptors.response.use(
           if (!refreshToken) {
             // Refresh Token이 없으면 로그아웃 처리
             tokenStorage.clearTokens();
-            window.location.href = "/login";
+            window.location.href = "/auth/login";
             return Promise.reject(error);
           }
 
@@ -100,7 +100,7 @@ apiClient.interceptors.response.use(
           // Refresh Token도 만료된 경우 로그아웃 처리
           isRefreshing = false;
           tokenStorage.clearTokens();
-          window.location.href = "/login";
+          window.location.href = "/auth/login";
           return Promise.reject(refreshError);
         }
       } else {

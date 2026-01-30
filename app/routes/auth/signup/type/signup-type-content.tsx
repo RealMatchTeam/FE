@@ -1,16 +1,14 @@
-import { useNavigate, useSearch } from "react-router";
-import Button from "../../../components/common/Button";
+import { useNavigate, useSearchParams } from "react-router";
+import Button from "../../../../components/common/Button";
 
 function SignUpTypeContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/_auth/signup/type" });
+  const [searchParams] = useSearchParams();
+  const provider = searchParams.get("provider");
 
   const handleSocialSignUp = () => {
     if (provider) {
-      navigate({
-        to: "/signup/terms",
-        search: { provider },
-      });
+      navigate(`/auth/signup/terms?provider=${provider}`);
     }
   };
 

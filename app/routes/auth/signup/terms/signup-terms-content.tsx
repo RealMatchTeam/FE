@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useNavigate, useSearch } from "react-router";
-import Button from "../../../components/common/Button";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router";
+import Button from "../../../../components/common/Button";
 import { CheckIcon } from "../../components/CheckIcon";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { TermsSection } from "./components/TermsSection";
 import { SubTermsSection } from "./components/SubTermsSection";
 import { TermsDetailModal } from "./components/TermsDetailModal";
 import { TERMS_CONTENTS } from "../../../../data/termsData";
+import { useSignupStore } from "../../../../stores/signupStore";
 
 // 약관 동의 상태 타입 정의
 interface TermsState {
@@ -32,8 +33,18 @@ const initialTermsState: TermsState = {
 
 function SignUpTermsContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/_auth/signup/terms" });
+  const [searchParams] = useSearchParams();
+  const provider = searchParams.get("provider");
   const totalSteps = 3;
+  const { setTerms: setSignupTerms, setRole } = useSignupStore();
+
+  // provider 검증 - kakao, naver, google만 허용
+  useEffect(() => {
+    if (!provider || !["kakao", "naver", "google"].includes(provider)) {
+      console.error("Invalid or missing provider:", provider);
+      navigate("/auth/login");
+    }
+  }, [provider, navigate]);
 
   // 관련 상태를 하나의 객체로 그룹화
   const [terms, setTerms] = useState<TermsState>(initialTermsState);
@@ -85,8 +96,23 @@ function SignUpTermsContent() {
 
   const handleNext = () => {
     if (requiredChecked) {
+      // 약관 동의 정보를 signupStore에 저장
+      const termsArray = [
+        { type: "AGE" as const, agreed: terms.age14 },
+        { type: "SERVICE_TERMS" as const, agreed: terms.serviceTerms },
+        { type: "PRIVACY_COLLECTION" as const, agreed: terms.privacyCollection },
+        { type: "PRIVACY_THIRD_PARTY" as const, agreed: terms.privacy3rdParty },
+        { type: "MARKETING_PRIVACY_COLLECTION" as const, agreed: terms.eventMarketing },
+        { type: "MARKETING_NOTIFICATION" as const, agreed: terms.emailPush },
+      ];
+
+      setSignupTerms(termsArray);
+
+      // 소셜 로그인 사용자는 CREATOR로 설정 (추후 type 선택 페이지 추가 시 변경 가능)
+      setRole("CREATOR");
+
       // 다음 단계로 provider 정보 전달
-      navigate({ to: "/signup/info", search: { provider } });
+      navigate(`/auth/signup/info?provider=${provider}`);
     }
   };
 

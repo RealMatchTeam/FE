@@ -1,5 +1,5 @@
 import type { FieldErrors, FieldValues, Path, UseFormRegister } from "react-hook-form";
-import Button from "../../../components/common/Button";
+import Button from "../../../../components/common/Button";
 import { InputField } from "../../components/InputField";
 
 interface EmailSectionProps<T extends FieldValues> {

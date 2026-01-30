@@ -10,10 +10,6 @@ export default function MainLayout() {
   const [hideBottomTab, setHideBottomTab] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
 
-  if (!me) {
-    return <Navigate to="/auth/login" replace />;
-  }
-
   return (
     <LayoutContext.Provider value={{ hideBottomTab, setHideBottomTab, hideHeader, setHideHeader }}>
       <div className="flex flex-col w-full h-screen bg-white overflow-hidden">

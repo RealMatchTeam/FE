@@ -1,33 +1,67 @@
-import { useState, useMemo, useDeferredValue } from "react";
-import { useNavigate } from "react-router";
+import { useState, useMemo, useDeferredValue, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import FilterButton from "../../../components/common/FilterButton";
 import CampaignCard from "./components/CampaignCard";
-import { CAMPAIGN_DATA, type CampaignCategory } from "../../../../data/campaign";
+import { type CampaignCategory } from "../../../data/campaign";
 import CampaignFilterBar from "./components/CampaignFilterBar";
-import { Route } from "./route";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
-import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
+import { apiClient } from "../../../lib/api-client";
+import { tokenStorage } from "../../../lib/token";
+import MainIcon from "../../../assets/MainIcon.svg";
+import MiniLogo from "../../../assets/logo/mini-logo.svg";
+import Button from "../../../components/common/Button";
 
 
 export default function CampaignContent() {
-    const { type: category = "BEAUTY" } = Route.useSearch();
+    const [searchParams] = useSearchParams();
+    const category = (searchParams.get("type") || "BEAUTY") as CampaignCategory;
     const navigate = useNavigate();
-    const [campaigns, setCampaigns] = useState(CAMPAIGN_DATA);
+    const [campaigns, setCampaigns] = useState<any[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [searchKeyword, setSearchKeyword] = useState("");
     const deferredKeyword = useDeferredValue(searchKeyword);
+    const [hasMatchingResult, setHasMatchingResult] = useState<boolean | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // API 호출해서 매칭 결과 가져오기
+    useEffect(() => {
+        const fetchMatchingCampaigns = async () => {
+            try {
+                const userId = tokenStorage.getUserId();
+                if (!userId) {
+                    setHasMatchingResult(false);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const response = await apiClient.get(`/api/v1/matches/campaigns/${userId}`);
+
+                if (response.data.result && response.data.result.brands && response.data.result.brands.length > 0) {
+                    setCampaigns(response.data.result.brands);
+                    setHasMatchingResult(true);
+                } else {
+                    setHasMatchingResult(false);
+                }
+            } catch (error) {
+                console.error("Failed to fetch matching campaigns:", error);
+                setHasMatchingResult(false);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchMatchingCampaigns();
+    }, []);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
 
     const handleCategoryChange = (newCategory: CampaignCategory) => {
-        navigate({
-            to: "/matching/campaign",
-            search: { type: newCategory },
-        });
+        navigate(`/matching/campaign?type=${newCategory}`);
     };
 
     // 카테고리 + 검색어 필터링 
@@ -65,6 +99,40 @@ export default function CampaignContent() {
         return "콘텐츠 필터";
     };
 
+    // 로딩 중
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-full bg-core-2">
+                <div className="text-lg text-text-gray3">로딩 중...</div>
+            </div>
+        );
+    }
+
+    // 매칭 결과가 없을 때
+    if (hasMatchingResult === false) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-[#E8E8F8] to-white px-6">
+                <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
+                <p className="text-title1 text-text-black text-center mb-2">
+                    매칭된 기업이 없어요
+                </p>
+                <p className="text-body2 text-text-gray3 text-center mb-8">
+                    매칭 검사를 먼저 진행해주세요
+                </p>
+                <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={() => navigate("/matching/test/step1")}
+                    className="w-full max-w-[300px] flex items-center justify-center gap-2"
+                >
+                    <img src={MiniLogo} alt="logo" className="w-5 h-5" />
+                    매칭 검사하기
+                </Button>
+            </div>
+        );
+    }
+
+    // 매칭 결과가 있을 때
     return (
         <div className="flex flex-col h-full bg-core-2">
             {/* 뷰티/패션 필터 & 검색창 */}
@@ -100,13 +168,13 @@ export default function CampaignContent() {
                         <CampaignCard
                             key={campaign.id}
                             brandName={campaign.brandName}
-                            title={campaign.title}
-                            reward={campaign.reward}
-                            matchRate={campaign.matchRate}
+                            title={campaign.name || campaign.title}
+                            reward={campaign.manuscriptFee || campaign.reward}
+                            matchRate={campaign.matchingRatio || campaign.matchRate}
                             applicants={campaign.applicants}
                             isLiked={campaign.isLiked}
                             onLike={() => toggleLike(campaign.id)}
-                            logoUrl={`/dummy-logo-${campaign.id}.png`}
+                            logoUrl={campaign.logoUrl || `/dummy-logo-${campaign.id}.png`}
                         />
                     ))}
                 </div>

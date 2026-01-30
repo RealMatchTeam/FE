@@ -1,7 +1,7 @@
 import Button from "../../../../components/common/Button";
 import SearchBar from "../../../../components/common/SearchBar";
-import type { BrandCategory } from "../../../../../data/brand";
-import { cn } from "../../../../../lib/utils";
+import type { BrandCategory } from "../../../../data/brand";
+import { cn } from "../../../../lib/utils";
 
 interface BrandFilterBarProps {
     category: BrandCategory;

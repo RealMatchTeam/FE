@@ -18,7 +18,7 @@ export default function HomeAfterMatchPage() {
   }, [category]);
 
   return (
-    // ✅ 전체 화면 배경 흰색 고정
+    // 전체 화면 배경 흰색 고정
     <div className="min-h-screen bg-white">
       {/* Hero 영역 */}
       <HeroCarousel items={data.hero} />

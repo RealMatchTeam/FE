@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FieldValues, Path, PathValue, UseFormSetValue } from "react-hook-form";
-import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
-import Button from "../../../components/common/Button";
+import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+import Button from "../../../../components/common/Button";
 import { cn } from "../../../../lib/utils";
 
 interface GenderSectionProps<T extends FieldValues> {
@@ -31,7 +31,7 @@ export function GenderSection<T extends FieldValues>({ genderValue, setValue }: 
       </div>
 
       {/* 바텀시트 */}
-      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[32%]">
+      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[35%]">
         <div className="flex flex-col h-full px-5 pb-6">
           {/* 헤더 */}
           <div className="relative flex items-center py-5.5">

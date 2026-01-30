@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { cn } from "../../../../lib/utils";
+import { cn } from "../../../lib/utils";
 import FilterChip from "../../../components/common/FilterChip";
 import Button from "../../../components/common/Button";
 import {
@@ -11,7 +11,7 @@ import {
     type BeautyFilterKey,
     type FashionFilterKey,
     type ContentFilterKey,
-} from "../../../../data/filter";
+} from "../../../data/filter";
 
 type FilterType = "BEAUTY" | "FASHION" | "CONTENT";
 type MainTab = "정렬 필터" | "뷰티 필터" | "패션 필터" | "콘텐츠 필터";

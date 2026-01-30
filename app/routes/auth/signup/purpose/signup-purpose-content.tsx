@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate, useSearch } from "react-router";
-import Button from "../../../components/common/Button";
+import { useNavigate, useSearchParams } from "react-router";
+import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { PurposeSection } from "./components/PurposeSection";
 import { useSignupStore } from "../../../../stores/signupStore";
@@ -8,7 +8,8 @@ import { signup } from "../../api/auth";
 
 function SignUpPurposeContent() {
   const navigate = useNavigate();
-  const { provider } = useSearch({ from: "/_auth/signup/purpose" });
+  const [searchParams] = useSearchParams();
+  const provider = searchParams.get("provider");
   const totalSteps = 3;
   const currentStep = 3;
 
@@ -34,8 +35,26 @@ function SignUpPurposeContent() {
     try {
       setIsSubmitting(true);
 
-      // 선택한 목적을 store에 저장
-      const purposeIds = selectedPurposes.map((p) => parseInt(p, 10));
+      // 목적 한글 → ID 매핑
+      const purposeMap: Record<string, number> = {
+        "제품 협찬": 1,
+        "수익 창출": 2,
+        "팔로워 증대": 3,
+        "브랜딩 강화": 4,
+        "신규 브랜드 발굴": 5,
+        "트렌드 탐색": 6,
+      };
+
+      // 선택한 목적을 ID로 변환
+      const purposeIds = selectedPurposes
+        .map((p) => purposeMap[p])
+        .filter((id) => id !== undefined);
+
+      if (purposeIds.length === 0) {
+        alert("유효한 목적을 선택해주세요.");
+        return;
+      }
+
       setPurposes(purposeIds);
 
       // 회원가입 데이터 가져오기
@@ -43,7 +62,7 @@ function SignUpPurposeContent() {
 
       if (!signupData) {
         alert("회원가입 정보가 누락되었습니다. 처음부터 다시 진행해주세요.");
-        navigate({ to: "/signup/terms", search: { provider: provider || "kakao" } });
+        navigate(`/auth/signup/terms?provider=${provider || "kakao"}`);
         return;
       }
 
@@ -54,9 +73,9 @@ function SignUpPurposeContent() {
         // 회원가입 성공
         reset();
         if (provider) {
-          navigate({ to: "/signup/success", search: { provider } });
+          navigate(`/auth/signup/success?provider=${provider}`);
         } else {
-          navigate({ to: "/signup/success" });
+          navigate("/auth/signup/success");
         }
       } else {
         // 회원가입 실패

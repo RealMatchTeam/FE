@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router";
-import MiniLogo from "../assets/logo/mini-logo.svg";
+import MiniLogo from "../../assets/logo/mini-logo.svg";
 
 type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "action";
 type ButtonSize = "sm" | "md" | "lg" | "action";

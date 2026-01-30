@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import MyPageHome from "./MyPageHome";
-import { useAuthStore } from "../../../stores/auth-store";
+import { useAuthStore } from "../../stores/auth-store";
 
 export default function MyPageContent() {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function MyPageContent() {
       onOpenPrivacy={() => navigate({ to: "/mypage/privacy" })} // policy/privacy
       onLogout={() => {
         useAuthStore.getState().logout?.();
-        navigate({ to: "/login" });
+        navigate({ to: "/auth/login" });
       }}
       onWithdraw={() => navigate({ to: "/mypage/withdraw" })}
     />

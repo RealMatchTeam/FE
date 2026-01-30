@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { type SortOption, SORT_LABEL } from "./types/SortOption";
-import { rooms } from "../../../data/chat-room";
+import { rooms } from "../../data/chat-room";
 import ChatListHeader from "./components/ChatListHeader";
 import SortFilterSheet from "./components/SortingSheet";
 import ChatList from "./components/ChatList";
 import { EmptyChatState } from "./components/EmptyState";
-import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
+import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 
 function ChatPage() {
   const [activeTab, setActiveTab] = useState<"sent" | "received">("sent"); // 보낸 제안 / 받은 제안 탭
