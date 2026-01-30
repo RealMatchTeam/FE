@@ -12,9 +12,27 @@ export default defineConfig({
     },
   },
   logLevel: 'warn',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-router': ['@tanstack/react-router'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-form': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'vendor-utils': ['axios', 'zustand', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 500,
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'esnext',
+  },
   plugins: [
     TanStackRouterVite({
       routeFileIgnorePattern: ".*(/(components|utils|hooks|types)/.*|-content\\.tsx$)",
+      disableLogging: true,
     }),
     react(),
     VitePWA({

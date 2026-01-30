@@ -6,9 +6,11 @@ import { cn } from "../../../../../lib/utils";
 interface CampaignFilterBarProps {
     category: CampaignCategory;
     onCategoryChange: (category: CampaignCategory) => void;
+    searchKeyword: string;
+    onSearchChange: (keyword: string) => void;
 }
 
-export default function CampaignFilterBar({ category, onCategoryChange }: CampaignFilterBarProps) {
+export default function CampaignFilterBar({ category, onCategoryChange, searchKeyword, onSearchChange }: CampaignFilterBarProps) {
     return (
         <div className="px-4 py-4 bg-core-2 sticky top-0 z-10 shrink-0 space-y-4">
             <div className="flex w-full gap-2">
@@ -37,7 +39,7 @@ export default function CampaignFilterBar({ category, onCategoryChange }: Campai
                     </Button>
                 </div>
                 <div className="flex-[7] min-w-0 justify-center">
-                    <SearchBar placeholder="캠페인 검색" className="w-full" />
+                    <SearchBar placeholder="캠페인 검색" className="w-full" value={searchKeyword} onChange={onSearchChange} />
                 </div>
             </div>
         </div>

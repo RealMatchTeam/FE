@@ -1,10 +1,11 @@
-
-interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface SearchBarProps {
     placeholder?: string;
     className?: string;
+    value: string;
+    onChange: (value: string) => void;
 }
 
-export default function SearchBar({ placeholder = "검색", className = "", ...props }: SearchBarProps) {
+export default function SearchBar({ placeholder = "검색", className = "", value, onChange }: SearchBarProps) {
     return (
         <div className={`relative flex items-center w-full ${className}`}>
             <div className="absolute left-3 flex items-center justify-center w-5 h-5 text-text-gray4">
@@ -15,15 +16,22 @@ export default function SearchBar({ placeholder = "검색", className = "", ...p
             <input
                 type="text"
                 placeholder={placeholder}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
                 className="w-full h-10 pl-10 pr-10 text-center text-body2 bg-white border border-gray-200 rounded-[8px] placeholder-text-gray3 focus:outline-none focus:border-core-1 transition-colors"
-                {...props}
             />
-            <div className="absolute right-3 flex items-center justify-center w-5 h-5 bg-text-gray4 rounded-full text-white cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </div>
+            {value && (
+                <button
+                    type="button"
+                    onClick={() => onChange("")}
+                    className="absolute right-3 flex items-center justify-center w-5 h-5 bg-text-gray4 rounded-full text-white cursor-pointer"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            )}
         </div>
     );
 }

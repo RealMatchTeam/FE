@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import FilterButton from "../../../../components/common/FilterButton";
 import CampaignCard from "./components/CampaignCard";
@@ -17,8 +17,10 @@ export default function CampaignContent() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const deferredKeyword = useDeferredValue(searchKeyword);
 
-    // 바텀탭 숨기기 (바텀시트 열렸을 때)
+    // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
 
     const handleCategoryChange = (newCategory: CampaignCategory) => {
@@ -28,10 +30,16 @@ export default function CampaignContent() {
         });
     };
 
-    // 카테고리별 필터링
+    // 카테고리 + 검색어 필터링 
     const filteredCampaigns = useMemo(() => {
-        return campaigns.filter(campaign => campaign.category === category);
-    }, [campaigns, category]);
+        return campaigns.filter(campaign => {
+            const matchesCategory = campaign.category === category;
+            const matchesSearch = deferredKeyword === "" ||
+                campaign.title.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
+                campaign.brandName.toLowerCase().includes(deferredKeyword.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+    }, [campaigns, category, deferredKeyword]);
 
     const toggleLike = (id: number) => {
         setCampaigns(prev => prev.map(campaign =>
@@ -60,7 +68,12 @@ export default function CampaignContent() {
     return (
         <div className="flex flex-col h-full bg-core-2">
             {/* 뷰티/패션 필터 & 검색창 */}
-            <CampaignFilterBar category={category} onCategoryChange={handleCategoryChange} />
+            <CampaignFilterBar
+                category={category}
+                onCategoryChange={handleCategoryChange}
+                searchKeyword={searchKeyword}
+                onSearchChange={setSearchKeyword}
+            />
 
             {/* 메인 컨텐츠 */}
             <div className="flex-1 px-4 py-6 overflow-y-auto">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import FilterButton from "../../../../components/common/FilterButton";
 import BrandCard from "./components/BrandCard";
@@ -17,8 +17,10 @@ export default function BrandContent() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const deferredKeyword = useDeferredValue(searchKeyword);
 
-    // 바텀탭 숨기기 (바텀시트 열렸을 때)
+    // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
 
     const handleCategoryChange = (newCategory: BrandCategory) => {
@@ -28,10 +30,16 @@ export default function BrandContent() {
         });
     };
 
-    // 카테고리별 필터링
+    // 카테고리 + 검색어 필터링
     const filteredBrands = useMemo(() => {
-        return brands.filter(brand => brand.category === category);
-    }, [brands, category]);
+        return brands.filter(brand => {
+            const matchesCategory = brand.category === category;
+            const matchesSearch = deferredKeyword === "" ||
+                brand.name.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
+                brand.tags.some(tag => tag.toLowerCase().includes(deferredKeyword.toLowerCase()));
+            return matchesCategory && matchesSearch;
+        });
+    }, [brands, category, deferredKeyword]);
 
     const toggleLike = (id: number) => {
         setBrands(prev => prev.map(brand =>
@@ -59,7 +67,12 @@ export default function BrandContent() {
     return (
         <div className="flex flex-col h-full bg-core-2">
             {/* 뷰티/패션 필터 & 검색창 */}
-            <BrandFilterBar category={category} onCategoryChange={handleCategoryChange} />
+            <BrandFilterBar
+                category={category}
+                onCategoryChange={handleCategoryChange}
+                searchKeyword={searchKeyword}
+                onSearchChange={setSearchKeyword}
+            />
 
             {/* 메인 컨텐츠 */}
             <div className="flex-1 px-4 py-6 overflow-y-auto">

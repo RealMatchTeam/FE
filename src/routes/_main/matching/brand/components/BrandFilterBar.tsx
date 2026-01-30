@@ -6,9 +6,11 @@ import { cn } from "../../../../../lib/utils";
 interface BrandFilterBarProps {
     category: BrandCategory;
     onCategoryChange: (category: BrandCategory) => void;
+    searchKeyword: string;
+    onSearchChange: (keyword: string) => void;
 }
 
-export default function BrandFilterBar({ category, onCategoryChange }: BrandFilterBarProps) {
+export default function BrandFilterBar({ category, onCategoryChange, searchKeyword, onSearchChange }: BrandFilterBarProps) {
     return (
         <div className="px-4 py-4 bg-core-2 sticky top-0 z-10 shrink-0 space-y-4">
             <div className="flex w-full gap-2">
@@ -37,7 +39,7 @@ export default function BrandFilterBar({ category, onCategoryChange }: BrandFilt
                     </Button>
                 </div>
                 <div className="flex-[7] min-w-0 justify-center">
-                    <SearchBar placeholder="브랜드 검색" className="w-full" />
+                    <SearchBar placeholder="브랜드 검색" className="w-full" value={searchKeyword} onChange={onSearchChange} />
                 </div>
             </div>
         </div>
