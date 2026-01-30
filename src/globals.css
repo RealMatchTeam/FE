@@ -221,6 +221,18 @@ html {
   input[type="password"]::-webkit-input-placeholder {
     letter-spacing: normal;
   }
+
+  .text-date-separator {
+    font-family: var(--font-family-pretendard);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 160%;
+    letter-spacing: -0.02em;
+    /* -2% */
+    vertical-align: middle;
+  }
+
+
 }
 
 @layer utilities {

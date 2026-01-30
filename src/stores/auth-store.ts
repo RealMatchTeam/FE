@@ -25,7 +25,11 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  me: null,
+  me: {
+    id: "user123",
+    name: "홍길동",
+    email: "test@example.com",
+  },
 
   setMe: (user) => {
     set({ me: user });

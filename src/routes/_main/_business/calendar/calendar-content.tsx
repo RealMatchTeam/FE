@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import FilterBottomSheet from "../components/FilterBottomSheet";
 import WeeklyCalendar from "../components/WeeklyCalendar";
 import MonthlyCalendar from "../components/MonthlyCalendar";
@@ -25,8 +24,9 @@ export default function CalendarContent() {
       <div className="flex w-full bg-bg-w border-b border-text-gray5">
         <button
           onClick={() => setMainTab("collaboration")}
-          className={`flex-1 py-4 text-[16px] font-bold relative transition-colors ${mainTab === "collaboration" ? "text-core-1" : "text-text-gray3"
-            }`}
+          className={`flex-1 py-4 text-[16px] font-bold relative transition-colors ${
+            mainTab === "collaboration" ? "text-core-1" : "text-text-gray3"
+          }`}
         >
           협업 현황
           {mainTab === "collaboration" && (
@@ -35,8 +35,9 @@ export default function CalendarContent() {
         </button>
         <button
           onClick={() => setMainTab("matching")}
-          className={`flex-1 py-4 text-[16px] font-bold relative transition-colors ${mainTab === "matching" ? "text-core-1" : "text-text-gray3"
-            }`}
+          className={`flex-1 py-4 text-[16px] font-bold relative transition-colors ${
+            mainTab === "matching" ? "text-core-1" : "text-text-gray3"
+          }`}
         >
           매칭 현황
           {mainTab === "matching" && (
@@ -87,40 +88,39 @@ export default function CalendarContent() {
 
             {hasData ? (
               <div className="flex flex-col gap-4 px-4 flex-1">
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-1 mt-4">
                   <h2 className="text-title1 font-bold text-text-black">매칭 현황</h2>
                   <button
                     onClick={() => setIsFilterOpen(true)}
-                    className="flex items-center gap-1 px-3 py-1 border border-text-gray4 rounded-full bg-white active:bg-bluegray-2 transition-colors"
+                    className="flex items-center gap-1 px-3 py-1 border border-text-gray4 rounded-full bg-white transition-colors"
                   >
                     <span className="text-callout1 text-text-gray2">{activeFilter}</span>
                     <img src={dropdownIcon} alt="open filter" />
                   </button>
                 </div>
+                
                 <div className="flex flex-col gap-4">
+                  {/* matchingSubTab을 type 프롭스로 그대로 전달 */}
                   {matchingSubTab === "sent" ? (
                     <>
-                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" type={matchingSubTab} />
+                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" type={matchingSubTab} />
+                      <MatchingCard brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" type={matchingSubTab} />
+                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" type={matchingSubTab} />
                     </>
                   ) : (
                     <>
-                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" type={matchingSubTab} />
+                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" type={matchingSubTab} />
+                      <MatchingCard brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" type={matchingSubTab} />
+                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" type={matchingSubTab} />
                     </>
                   )}
                 </div>
-
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center">
-                <EmptyState
-                  message={`${(matchingSubTab as string) === "sent" ? "보낸" : "받은"} 제안이 없어요`}
-                />
+                <EmptyState message={`${matchingSubTab === "sent" ? "보낸" : "받은"} 제안이 없어요`} />
               </div>
             )}
 

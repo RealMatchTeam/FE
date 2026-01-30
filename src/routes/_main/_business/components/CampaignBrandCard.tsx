@@ -1,15 +1,17 @@
+import { Link } from "@tanstack/react-router";
 import brandLogo from "../../../../assets/brand-logo.png";
 import chatIcon from "../../../../assets/chat-icon.svg";
-import arrowRightIcon from "../../../../assets/icon/arrow-right.svg";
 
 interface CampaignBrandCardProps {
   showChatSection?: boolean; // 채팅 섹션 표시 여부
   statusText?: string;      // '보낸 제안' 또는 '검토 중'
+  roomId?: string; // 채팅방 ID를 프롭스로 전달받는다고 가정
 }
 
 export default function CampaignBrandCard({ 
   showChatSection = true, 
-  statusText = "보낸 제안" 
+  statusText = "보낸 제안",
+  roomId = "123" // 예시 ID 
 }: CampaignBrandCardProps) {
   return (
     <section className="bg-bg-w p-5 flex flex-col gap-4 -mx-4 -mt-6">
@@ -28,7 +30,6 @@ export default function CampaignBrandCard({
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-1">
               <h2 className="text-title1 text-text-black">비플레인</h2>
-              <img src={arrowRightIcon} alt="arrow"/>
             </div>
             <p className="text-callout1 text-text-gray3 mt-3">
               #저자극 #천연재료 #민감성피부
@@ -57,10 +58,14 @@ export default function CampaignBrandCard({
             </h1>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-bluegray-2 rounded-lg text-core-1 text-caption1 active:opacity-70 transition-opacity">
+          <Link 
+            to="/rooms/$chatId" 
+            params={{ chatId: roomId }}
+            className="flex items-center gap-2 px-4 py-2 bg-bluegray-2 rounded-lg text-text-black text-title3 active:opacity-70 transition-opacity"
+          >
             <img src={chatIcon} alt="chat" className="w-[16px] h-[16px]" />
             채팅하기
-          </button>
+          </Link>
         </div>
       )}
     </section>

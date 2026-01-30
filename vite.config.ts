@@ -7,6 +7,14 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   server: {
     port: 5173,
+    proxy: {
+      // 브라우저에서 /api로 시작하는 요청을 만나면 아래 target 주소로 전달
+      '/api': {
+        target: 'https://api.realmatch.co.kr',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   plugins: [
     TanStackRouterVite(),
