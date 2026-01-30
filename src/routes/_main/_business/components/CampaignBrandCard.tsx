@@ -13,6 +13,7 @@ export default function CampaignBrandCard({
   statusText = "보낸 제안",
   roomId = "123" // 예시 ID 
 }: CampaignBrandCardProps) {
+  const isReviewing = statusText === "검토 중";
   return (
     <section className="bg-bg-w p-5 flex flex-col gap-4 -mx-4 -mt-6">
       {/* 상단 브랜드 정보 */}
@@ -42,7 +43,9 @@ export default function CampaignBrandCard({
             <span className="text-title5 text-core-1">매칭률</span>
             <span className="text-title6 text-core-1">99%</span>
           </div>
-          <span className="text-callout1 text-core-1 mt-3">{statusText}</span>
+          <span className={`text-callout1 mt-3 ${isReviewing ? "text-status-review" : "text-core-1"}`}>
+        {statusText}
+      </span>
         </div>
       </div>
 
