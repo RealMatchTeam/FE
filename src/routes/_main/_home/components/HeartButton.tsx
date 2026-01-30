@@ -16,7 +16,8 @@ export default function HeartButton({
 }: Props) {
   const [pressed, setPressed] = useState(defaultPressed);
 
-  const toggle = () => {
+  const toggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // ✅ 핵심: 카드 클릭으로 전파 방지
     setPressed((prev) => {
       const next = !prev;
       onChange?.(next);
@@ -34,7 +35,7 @@ export default function HeartButton({
         className,
       ].join(" ")}
     >
-      {/* ✅ 하트 아이콘 크기 고정(항상 유지) */}
+      {/* 하트 아이콘 크기 고정 */}
       <img src={pressed ? heartOn : heartOff} alt="" className="h-5 w-5" />
     </button>
   );

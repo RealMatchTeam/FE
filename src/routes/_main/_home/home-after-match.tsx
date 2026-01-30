@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import type { CategoryKey, HomeAfterMatchCategoryData } from "./types";
 import { HOME_AFTER_MATCH_MOCK } from "./home.mock";
 import HeroCarousel from "./components/HeroCarousel";
@@ -8,7 +9,12 @@ import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
 import CreatorProfileCard from "./components/CreatorProfileCard";
 
+// ✅ index.tsx를 직접 import (barrel 금지)
+import { Route as BrandIndexRoute } from "./brand/index";
+import { Route as CampaignIndexRoute } from "./campaign/index";
+
 export default function HomeAfterMatchPage() {
+  const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("beauty");
 
   const data: HomeAfterMatchCategoryData = useMemo(() => {
@@ -18,19 +24,13 @@ export default function HomeAfterMatchPage() {
   }, [category]);
 
   return (
-    // ✅ 전체 화면 배경 흰색 고정
     <div className="min-h-screen bg-white">
-      {/* Hero 영역 */}
       <HeroCarousel items={data.hero} />
 
-      {/* 본문 */}
       <div className="bg-white px-5">
-        {/* 카테고리 탭 */}
         <CategoryTabs value={category} onChange={setCategory} />
 
-        {/* ===============================
-            매칭률 높은 브랜드
-           =============================== */}
+        {/* 매칭률 높은 브랜드 */}
         <section className="mt-6">
           <SectionHeader
             title="매칭률 높은 브랜드"
@@ -40,14 +40,25 @@ export default function HomeAfterMatchPage() {
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
             {data.topBrands.map((brand) => (
-              <BrandCard key={brand.id} item={brand} />
+              <BrandCard
+                key={brand.id}
+                item={brand}
+                onClick={() => {
+                  console.log("CLICK BRAND", brand.id, brand.domain);
+                  navigate({
+                    to: BrandIndexRoute.to,
+                    search: () => ({
+                      brandId: brand.id,
+                      domain: brand.domain,
+                    }),
+                  });
+                }}
+              />
             ))}
           </div>
         </section>
 
-        {/* ===============================
-            매칭률 높은 캠페인
-           =============================== */}
+        {/* 매칭률 높은 캠페인 */}
         <section className="mt-7">
           <SectionHeader
             title="매칭률 높은 캠페인"
@@ -57,21 +68,28 @@ export default function HomeAfterMatchPage() {
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
             {data.topCampaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} item={campaign} variant="top" />
+              <CampaignCard
+                key={campaign.id}
+                item={campaign}
+                variant="top"
+                onClick={() => {
+                  navigate({
+                    to: CampaignIndexRoute.to,
+                    search: () => ({
+                      campaignId: campaign.id,
+                    }),
+                  });
+                }}
+              />
             ))}
           </div>
         </section>
 
-        {/* ===============================
-            크리에이터 프로필
-           =============================== */}
         <section className="mt-7">
           <CreatorProfileCard model={data.creatorProfile} />
         </section>
 
-        {/* ===============================
-            인기 캠페인
-           =============================== */}
+        {/* 인기 캠페인 */}
         <section className="mt-8 pb-24">
           <SectionHeader
             title="인기 캠페인"
@@ -85,6 +103,14 @@ export default function HomeAfterMatchPage() {
                 key={campaign.id}
                 item={campaign}
                 variant="popular"
+                onClick={() => {
+                  navigate({
+                    to: CampaignIndexRoute.to,
+                    search: () => ({
+                      campaignId: campaign.id,
+                    }),
+                  });
+                }}
               />
             ))}
           </div>

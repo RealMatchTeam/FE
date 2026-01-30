@@ -22,7 +22,11 @@ import { Route as AuthSignupPurposeRouteRouteImport } from './routes/auth/signup
 import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/auth/signup/info-more/route'
 import { Route as AuthSignupInfoRouteRouteImport } from './routes/auth/signup/info/route'
 import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
+import { Route as MainHomeCampaignRouteRouteImport } from './routes/_main/_home/campaign/route'
+import { Route as MainHomeBrandRouteRouteImport } from './routes/_main/_home/brand/route'
 import { Route as MainBusinessCalendarRouteRouteImport } from './routes/_main/_business/calendar/route'
+import { Route as MainHomeCampaignIndexRouteImport } from './routes/_main/_home/campaign/index'
+import { Route as MainHomeBrandIndexRouteImport } from './routes/_main/_home/brand/index'
 import { Route as MainMatchingTestMatchingTestStep3RouteRouteImport } from './routes/_main/matching-test/matching-test/step3/route'
 import { Route as MainMatchingTestMatchingTestStep2RouteRouteImport } from './routes/_main/matching-test/matching-test/step2/route'
 import { Route as MainMatchingTestMatchingTestStep1RouteRouteImport } from './routes/_main/matching-test/matching-test/step1/route'
@@ -92,12 +96,32 @@ const MainMatchingTestMatchingResultRouteRoute =
     path: '/matching-test/matching-result',
     getParentRoute: () => MainRoute,
   } as any)
+const MainHomeCampaignRouteRoute = MainHomeCampaignRouteRouteImport.update({
+  id: '/_home/campaign',
+  path: '/campaign',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainHomeBrandRouteRoute = MainHomeBrandRouteRouteImport.update({
+  id: '/_home/brand',
+  path: '/brand',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainBusinessCalendarRouteRoute =
   MainBusinessCalendarRouteRouteImport.update({
     id: '/_business/calendar',
     path: '/calendar',
     getParentRoute: () => MainRoute,
   } as any)
+const MainHomeCampaignIndexRoute = MainHomeCampaignIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainHomeCampaignRouteRoute,
+} as any)
+const MainHomeBrandIndexRoute = MainHomeBrandIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainHomeBrandRouteRoute,
+} as any)
 const MainMatchingTestMatchingTestStep3RouteRoute =
   MainMatchingTestMatchingTestStep3RouteRouteImport.update({
     id: '/matching-test/matching-test/step3',
@@ -121,6 +145,8 @@ export interface FileRoutesByFullPath {
   '/chat': typeof MainChatRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRouteRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
+  '/brand': typeof MainHomeBrandRouteRouteWithChildren
+  '/campaign': typeof MainHomeCampaignRouteRouteWithChildren
   '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -134,6 +160,8 @@ export interface FileRoutesByFullPath {
   '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/brand/': typeof MainHomeBrandIndexRoute
+  '/campaign/': typeof MainHomeCampaignIndexRoute
 }
 export interface FileRoutesByTo {
   '/chat': typeof MainChatRouteRouteWithChildren
@@ -152,6 +180,8 @@ export interface FileRoutesByTo {
   '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/brand': typeof MainHomeBrandIndexRoute
+  '/campaign': typeof MainHomeCampaignIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,6 +189,8 @@ export interface FileRoutesById {
   '/_main/chat': typeof MainChatRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRouteRoute
   '/_main/_business/calendar': typeof MainBusinessCalendarRouteRoute
+  '/_main/_home/brand': typeof MainHomeBrandRouteRouteWithChildren
+  '/_main/_home/campaign': typeof MainHomeCampaignRouteRouteWithChildren
   '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
   '/auth/signup/info': typeof AuthSignupInfoRouteRoute
   '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
@@ -172,6 +204,8 @@ export interface FileRoutesById {
   '/_main/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
   '/_main/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
   '/_main/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
+  '/_main/_home/brand/': typeof MainHomeBrandIndexRoute
+  '/_main/_home/campaign/': typeof MainHomeCampaignIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,6 +213,8 @@ export interface FileRouteTypes {
     | '/chat'
     | '/auth/login'
     | '/calendar'
+    | '/brand'
+    | '/campaign'
     | '/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -192,6 +228,8 @@ export interface FileRouteTypes {
     | '/matching-test/matching-test/step1'
     | '/matching-test/matching-test/step2'
     | '/matching-test/matching-test/step3'
+    | '/brand/'
+    | '/campaign/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/chat'
@@ -210,12 +248,16 @@ export interface FileRouteTypes {
     | '/matching-test/matching-test/step1'
     | '/matching-test/matching-test/step2'
     | '/matching-test/matching-test/step3'
+    | '/brand'
+    | '/campaign'
   id:
     | '__root__'
     | '/_main'
     | '/_main/chat'
     | '/auth/login'
     | '/_main/_business/calendar'
+    | '/_main/_home/brand'
+    | '/_main/_home/campaign'
     | '/_main/matching-test/matching-result'
     | '/auth/signup/info'
     | '/auth/signup/info-more'
@@ -229,6 +271,8 @@ export interface FileRouteTypes {
     | '/_main/matching-test/matching-test/step1'
     | '/_main/matching-test/matching-test/step2'
     | '/_main/matching-test/matching-test/step3'
+    | '/_main/_home/brand/'
+    | '/_main/_home/campaign/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -335,12 +379,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainMatchingTestMatchingResultRouteRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/_home/campaign': {
+      id: '/_main/_home/campaign'
+      path: '/campaign'
+      fullPath: '/campaign'
+      preLoaderRoute: typeof MainHomeCampaignRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_home/brand': {
+      id: '/_main/_home/brand'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof MainHomeBrandRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/_business/calendar': {
       id: '/_main/_business/calendar'
       path: '/calendar'
       fullPath: '/calendar'
       preLoaderRoute: typeof MainBusinessCalendarRouteRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/_main/_home/campaign/': {
+      id: '/_main/_home/campaign/'
+      path: '/'
+      fullPath: '/campaign/'
+      preLoaderRoute: typeof MainHomeCampaignIndexRouteImport
+      parentRoute: typeof MainHomeCampaignRouteRoute
+    }
+    '/_main/_home/brand/': {
+      id: '/_main/_home/brand/'
+      path: '/'
+      fullPath: '/brand/'
+      preLoaderRoute: typeof MainHomeBrandIndexRouteImport
+      parentRoute: typeof MainHomeBrandRouteRoute
     }
     '/_main/matching-test/matching-test/step3': {
       id: '/_main/matching-test/matching-test/step3'
@@ -378,9 +450,35 @@ const MainChatRouteRouteWithChildren = MainChatRouteRoute._addFileChildren(
   MainChatRouteRouteChildren,
 )
 
+interface MainHomeBrandRouteRouteChildren {
+  MainHomeBrandIndexRoute: typeof MainHomeBrandIndexRoute
+}
+
+const MainHomeBrandRouteRouteChildren: MainHomeBrandRouteRouteChildren = {
+  MainHomeBrandIndexRoute: MainHomeBrandIndexRoute,
+}
+
+const MainHomeBrandRouteRouteWithChildren =
+  MainHomeBrandRouteRoute._addFileChildren(MainHomeBrandRouteRouteChildren)
+
+interface MainHomeCampaignRouteRouteChildren {
+  MainHomeCampaignIndexRoute: typeof MainHomeCampaignIndexRoute
+}
+
+const MainHomeCampaignRouteRouteChildren: MainHomeCampaignRouteRouteChildren = {
+  MainHomeCampaignIndexRoute: MainHomeCampaignIndexRoute,
+}
+
+const MainHomeCampaignRouteRouteWithChildren =
+  MainHomeCampaignRouteRoute._addFileChildren(
+    MainHomeCampaignRouteRouteChildren,
+  )
+
 interface MainRouteChildren {
   MainChatRouteRoute: typeof MainChatRouteRouteWithChildren
   MainBusinessCalendarRouteRoute: typeof MainBusinessCalendarRouteRoute
+  MainHomeBrandRouteRoute: typeof MainHomeBrandRouteRouteWithChildren
+  MainHomeCampaignRouteRoute: typeof MainHomeCampaignRouteRouteWithChildren
   MainMatchingTestMatchingResultRouteRoute: typeof MainMatchingTestMatchingResultRouteRoute
   MainHomePreRoute: typeof MainHomePreRoute
   MainHomeIndexRoute: typeof MainHomeIndexRoute
@@ -392,6 +490,8 @@ interface MainRouteChildren {
 const MainRouteChildren: MainRouteChildren = {
   MainChatRouteRoute: MainChatRouteRouteWithChildren,
   MainBusinessCalendarRouteRoute: MainBusinessCalendarRouteRoute,
+  MainHomeBrandRouteRoute: MainHomeBrandRouteRouteWithChildren,
+  MainHomeCampaignRouteRoute: MainHomeCampaignRouteRouteWithChildren,
   MainMatchingTestMatchingResultRouteRoute:
     MainMatchingTestMatchingResultRouteRoute,
   MainHomePreRoute: MainHomePreRoute,
