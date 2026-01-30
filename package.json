@@ -10,14 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@iconify/react": "^6.0.2",
     "@tanstack/react-query": "^5.90.16",
     "@tanstack/react-router": "^1.145.7",
+    "axios": "^1.13.4",
+    "clsx": "^2.1.1",
     "iconify": "^1.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.0",
     "react-mobile-picker": "^1.2.0",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^3.23.8",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

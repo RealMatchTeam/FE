@@ -1,5 +1,5 @@
-import ArrowLeftIcon from "../../../../assets/arrow-left.svg";
-import ArrowRightIcon from "../../../../assets/arrow-right.svg";
+import ArrowLeftIcon from "../../../../assets/icon/arrow-left.svg";
+import ArrowRightIcon from "../../../../assets/icon/arrow-right.svg";
 
 const WEEK_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -15,7 +15,9 @@ export default function MonthlyCalendar() {
         <button type="button" className="p-1 active:opacity-60">
           <img src={ArrowLeftIcon} alt="이전 달" className="w-5 h-5" />
         </button>
-        <span className="mx-2 text-[17px] font-bold text-text-black">2025년 07월</span>
+        <span className="mx-2 text-[17px] font-bold text-text-black">
+          2025년 07월
+        </span>
         <button type="button" className="p-1 active:opacity-60">
           <img src={ArrowRightIcon} alt="다음 달" className="w-5 h-5" />
         </button>
@@ -29,14 +31,19 @@ export default function MonthlyCalendar() {
           ))}
         </div>
 
-        {/* 1. 날짜 그리드: 숫자만 표시하는 층 */}
+        {/* 날짜 그리드 */}
         <div className="grid grid-cols-7 text-center border-t border-gray-50">
           {allSlots.map((day, index) => (
             <div key={index} className="h-28 relative pt-2">
               <div className="h-8 flex items-center justify-center">
                 {day && (
-                  <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-[15px] ${day === 11 ? "bg-[#6C72FF] text-white" : "text-text-black"
-                    }`}>
+                  <span
+                    className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-[15px]
+                      ${day === 11
+                        ? "bg-[var(--color-core-1)] text-white"
+                        : "text-text-black"
+                      }`}
+                  >
                     {day}
                   </span>
                 )}
@@ -45,19 +52,17 @@ export default function MonthlyCalendar() {
           ))}
         </div>
 
-
+        {/* 일정 바 */}
         <div className="absolute top-[85px] left-0 w-full pointer-events-none">
-
           {/* 비플레인 */}
           <div
-            className="absolute flex items-center justify-center text-[11px] text-white shadow-sm"
+            className="absolute flex items-center justify-center text-[11px] text-white shadow-sm bg-grad-1"
             style={{
-              left: '28.57%',
-              width: '57.14%',
-              height: '20px',
-              borderRadius: '20px',
-              background: 'linear-gradient(90deg, #CBCBF5 0%, #6666E5 50.96%, #CBCBF5 100%)',
-              top: '0px'
+              left: "28.57%",
+              width: "57.14%",
+              height: "20px",
+              borderRadius: "20px",
+              top: "0px",
             }}
           >
             비플레인
@@ -65,19 +70,19 @@ export default function MonthlyCalendar() {
 
           {/* 라운드랩 */}
           <div
-            className="absolute flex items-center justify-center text-[11px] text-white shadow-sm"
+            className="absolute flex items-center justify-center text-[11px] text-white shadow-sm bg-grad-2"
             style={{
-              left: '57.14%',
-              width: '42.85%',
-              height: '20px',
-              borderRadius: '20px',
-              background: 'linear-gradient(90deg, #AFBEF9 0%, #496EFF 44.23%, #AFBEF9 100%)',
-              top: '25px'
+              left: "57.14%",
+              width: "42.85%",
+              height: "20px",
+              borderRadius: "20px",
+              top: "25px",
             }}
           >
             라운드랩
           </div>
         </div>
+
       </div>
     </div>
   );

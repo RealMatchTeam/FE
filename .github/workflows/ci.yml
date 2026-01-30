@@ -2,15 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [develop, main, feat/login-ui]
+    branches: ['**']  # 모든 브랜치에서 실행
+  pull_request:
+    branches: [main]  # main으로의 PR에서 실행
 
 jobs:
-  lint-and-build:
+  lint:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [20.x]
 
     steps:
       - name: Checkout code
@@ -24,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20.x'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -32,6 +30,30 @@ jobs:
 
       - name: Run ESLint
         run: pnpm run lint
+
+  build:
+    runs-on: ubuntu-latest
+    # main 브랜치에서만 빌드 실행
+    if: github.ref == 'refs/heads/main'
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build project
         run: pnpm run build

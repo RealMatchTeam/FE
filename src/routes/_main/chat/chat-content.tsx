@@ -1,29 +1,20 @@
-
-import { useState, useMemo, useContext, useEffect } from "react";
-import { LayoutContext } from "../layout-context";
+import { useState, useMemo } from "react";
 import { type SortOption, SORT_LABEL } from "./types/SortOption";
 import { rooms } from "../../../data/chat-room";
 import ChatListHeader from "./components/ChatListHeader";
 import SortFilterSheet from "./components/SortingSheet";
 import ChatList from "./components/ChatList";
 import { EmptyChatState } from "./components/EmptyState";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 
 function ChatPage() {
   const [activeTab, setActiveTab] = useState<"sent" | "received">("sent"); // 보낸 제안 / 받은 제안 탭
   const [isSortOpen, setIsSortOpen] = useState(false);    // 정렬 바텀시트
   const [sort, setSort] = useState<SortOption>("latest"); // 현재 선택된 정렬 옵션
   const [pendingSort, setPendingSort] = useState<SortOption>(sort); // 바텀시트에서 고른 값
-  const layout = useContext(LayoutContext); // 레이아웃
 
-  useEffect(() => {
-    if (!layout) return;
-
-    layout.setHideBottomTab(isSortOpen);
-
-    return () => {
-      layout.setHideBottomTab(false);
-    };
-  }, [isSortOpen, layout]);
+  // 바텀탭 숨기기 (바텀시트 열렸을 때)
+  useHideBottomTab(isSortOpen);
 
   // 받은제안/보낸제안 필터
   const filteredRooms = useMemo(() => {

@@ -10,272 +10,570 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteImport } from './routes/_main'
-import { Route as AuthLoginRouteRouteImport } from './routes/auth/login/route'
+import { Route as RoomsRouteRouteImport } from './routes/rooms/route'
+import { Route as RoomsChatIdRouteImport } from './routes/rooms/$chatId'
+import { Route as MainMatchingRouteRouteImport } from './routes/_main/matching/route'
 import { Route as MainChatRouteRouteImport } from './routes/_main/chat/route'
+import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
 import { Route as MainHomeIndexRouteImport } from './routes/_main/_home/index'
-import { Route as MainChatChattingRoomRouteImport } from './routes/_main/chat/chatting-room'
 import { Route as MainHomePreRouteImport } from './routes/_main/_home/pre'
-import { Route as AuthSignupTypeRouteRouteImport } from './routes/auth/signup/type/route'
-import { Route as AuthSignupTermsRouteRouteImport } from './routes/auth/signup/terms/route'
-import { Route as AuthSignupSuccessRouteRouteImport } from './routes/auth/signup/success/route'
-import { Route as AuthSignupPurposeRouteRouteImport } from './routes/auth/signup/purpose/route'
-import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/auth/signup/info-more/route'
-import { Route as AuthSignupInfoRouteRouteImport } from './routes/auth/signup/info/route'
-import { Route as MainMatchingTestMatchingResultRouteRouteImport } from './routes/_main/matching-test/matching-result/route'
-import { Route as MainHomeCampaignRouteRouteImport } from './routes/_main/_home/campaign/route'
-import { Route as MainHomeBrandRouteRouteImport } from './routes/_main/_home/brand/route'
+import { Route as MainMatchingSuggestRouteRouteImport } from './routes/_main/matching/suggest/route'
+import { Route as MainMatchingCampaignRouteRouteImport } from './routes/_main/matching/campaign/route'
+import { Route as MainMatchingBrandRouteRouteImport } from './routes/_main/matching/brand/route'
+import { Route as MainMypageTermsRouteRouteImport } from './routes/_main/_mypage/terms/route'
+import { Route as MainMypageProfileCardRouteRouteImport } from './routes/_main/_mypage/profileCard/route'
+import { Route as MainMypagePrivacyRouteRouteImport } from './routes/_main/_mypage/privacy/route'
+import { Route as MainMypageNotificationsRouteRouteImport } from './routes/_main/_mypage/notifications/route'
+import { Route as MainMypageMypageRouteRouteImport } from './routes/_main/_mypage/mypage/route'
+import { Route as MainMypageLikesRouteRouteImport } from './routes/_main/_mypage/likes/route'
+import { Route as MainMypageEditRouteRouteImport } from './routes/_main/_mypage/edit/route'
+import { Route as MainBusinessRejectionRouteRouteImport } from './routes/_main/_business/rejection/route'
+import { Route as MainBusinessProposalRouteRouteImport } from './routes/_main/_business/proposal/route'
+import { Route as MainBusinessCampaignRouteRouteImport } from './routes/_main/_business/campaign/route'
 import { Route as MainBusinessCalendarRouteRouteImport } from './routes/_main/_business/calendar/route'
-import { Route as MainHomeCampaignIndexRouteImport } from './routes/_main/_home/campaign/index'
-import { Route as MainHomeBrandIndexRouteImport } from './routes/_main/_home/brand/index'
-import { Route as MainMatchingTestMatchingTestStep3RouteRouteImport } from './routes/_main/matching-test/matching-test/step3/route'
-import { Route as MainMatchingTestMatchingTestStep2RouteRouteImport } from './routes/_main/matching-test/matching-test/step2/route'
-import { Route as MainMatchingTestMatchingTestStep1RouteRouteImport } from './routes/_main/matching-test/matching-test/step1/route'
+import { Route as AuthSignupTypeRouteRouteImport } from './routes/_auth/signup/type/route'
+import { Route as AuthSignupTermsRouteRouteImport } from './routes/_auth/signup/terms/route'
+import { Route as AuthSignupSuccessRouteRouteImport } from './routes/_auth/signup/success/route'
+import { Route as AuthSignupPurposeRouteRouteImport } from './routes/_auth/signup/purpose/route'
+import { Route as AuthSignupInfoMoreRouteRouteImport } from './routes/_auth/signup/info-more/route'
+import { Route as AuthSignupInfoRouteRouteImport } from './routes/_auth/signup/info/route'
+import { Route as MainMatchingSuggestIndexRouteImport } from './routes/_main/matching/suggest/index'
+import { Route as MainMypageTermsTermsContentRouteImport } from './routes/_main/_mypage/terms/terms-content'
+import { Route as MainMypagePrivacyPrivacyContentRouteImport } from './routes/_main/_mypage/privacy/privacy-content'
+import { Route as MainMypageNotificationsNotificationsContentRouteImport } from './routes/_main/_mypage/notifications/notifications-content'
+import { Route as MainMypageLikesLikesContentRouteImport } from './routes/_main/_mypage/likes/likes-content'
+import { Route as MainMypageEditEditContentRouteImport } from './routes/_main/_mypage/edit/edit-content'
+import { Route as MainMatchingTestStep3RouteRouteImport } from './routes/_main/matching/test/step3/route'
+import { Route as MainMatchingTestStep2RouteRouteImport } from './routes/_main/matching/test/step2/route'
+import { Route as MainMatchingTestStep1RouteRouteImport } from './routes/_main/matching/test/step1/route'
+import { Route as MainMatchingTestResultRouteRouteImport } from './routes/_main/matching/test/result/route'
+import { Route as MainMatchingSuggestCreateRouteRouteImport } from './routes/_main/matching/suggest/create/route'
+import { Route as MainMypageComponentsProfileCardTsxSnsCardRouteImport } from './routes/_main/_mypage/components/profileCard.tsx/SnsCard'
+import { Route as MainMypageComponentsProfileCardTsxProfileSummaryRouteImport } from './routes/_main/_mypage/components/profileCard.tsx/ProfileSummary'
+import { Route as MainMypageComponentsProfileCardTsxMyTraitsRouteImport } from './routes/_main/_mypage/components/profileCard.tsx/MyTraits'
+import { Route as MainMypageComponentsProfileCardTsxMyCampaignsRouteImport } from './routes/_main/_mypage/components/profileCard.tsx/MyCampaigns'
+import { Route as MainMypageComponentsProfileCardTsxMatchingResultRouteImport } from './routes/_main/_mypage/components/profileCard.tsx/MatchingResult'
 
 const MainRoute = MainRouteImport.update({
   id: '/_main',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
+const RoomsRouteRoute = RoomsRouteRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RoomsChatIdRoute = RoomsChatIdRouteImport.update({
+  id: '/$chatId',
+  path: '/$chatId',
+  getParentRoute: () => RoomsRouteRoute,
+} as any)
+const MainMatchingRouteRoute = MainMatchingRouteRouteImport.update({
+  id: '/matching',
+  path: '/matching',
+  getParentRoute: () => MainRoute,
 } as any)
 const MainChatRouteRoute = MainChatRouteRouteImport.update({
   id: '/chat',
   path: '/chat',
   getParentRoute: () => MainRoute,
 } as any)
+const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
+  id: '/_auth/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainHomeIndexRoute = MainHomeIndexRouteImport.update({
   id: '/_home/',
   path: '/',
   getParentRoute: () => MainRoute,
-} as any)
-const MainChatChattingRoomRoute = MainChatChattingRoomRouteImport.update({
-  id: '/chatting-room',
-  path: '/chatting-room',
-  getParentRoute: () => MainChatRouteRoute,
 } as any)
 const MainHomePreRoute = MainHomePreRouteImport.update({
   id: '/_home/pre',
   path: '/pre',
   getParentRoute: () => MainRoute,
 } as any)
-const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
-  id: '/auth/signup/type',
-  path: '/auth/signup/type',
-  getParentRoute: () => rootRouteImport,
+const MainMatchingSuggestRouteRoute =
+  MainMatchingSuggestRouteRouteImport.update({
+    id: '/suggest',
+    path: '/suggest',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingCampaignRouteRoute =
+  MainMatchingCampaignRouteRouteImport.update({
+    id: '/campaign',
+    path: '/campaign',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingBrandRouteRoute = MainMatchingBrandRouteRouteImport.update({
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => MainMatchingRouteRoute,
 } as any)
-const AuthSignupTermsRouteRoute = AuthSignupTermsRouteRouteImport.update({
-  id: '/auth/signup/terms',
-  path: '/auth/signup/terms',
-  getParentRoute: () => rootRouteImport,
+const MainMypageTermsRouteRoute = MainMypageTermsRouteRouteImport.update({
+  id: '/_mypage/terms',
+  path: '/terms',
+  getParentRoute: () => MainRoute,
 } as any)
-const AuthSignupSuccessRouteRoute = AuthSignupSuccessRouteRouteImport.update({
-  id: '/auth/signup/success',
-  path: '/auth/signup/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupPurposeRouteRoute = AuthSignupPurposeRouteRouteImport.update({
-  id: '/auth/signup/purpose',
-  path: '/auth/signup/purpose',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupInfoMoreRouteRoute = AuthSignupInfoMoreRouteRouteImport.update({
-  id: '/auth/signup/info-more',
-  path: '/auth/signup/info-more',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
-  id: '/auth/signup/info',
-  path: '/auth/signup/info',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MainMatchingTestMatchingResultRouteRoute =
-  MainMatchingTestMatchingResultRouteRouteImport.update({
-    id: '/matching-test/matching-result',
-    path: '/matching-test/matching-result',
+const MainMypageProfileCardRouteRoute =
+  MainMypageProfileCardRouteRouteImport.update({
+    id: '/_mypage/profileCard',
+    path: '/profileCard',
     getParentRoute: () => MainRoute,
   } as any)
-const MainHomeCampaignRouteRoute = MainHomeCampaignRouteRouteImport.update({
-  id: '/_home/campaign',
-  path: '/campaign',
+const MainMypagePrivacyRouteRoute = MainMypagePrivacyRouteRouteImport.update({
+  id: '/_mypage/privacy',
+  path: '/privacy',
   getParentRoute: () => MainRoute,
 } as any)
-const MainHomeBrandRouteRoute = MainHomeBrandRouteRouteImport.update({
-  id: '/_home/brand',
-  path: '/brand',
+const MainMypageNotificationsRouteRoute =
+  MainMypageNotificationsRouteRouteImport.update({
+    id: '/_mypage/notifications',
+    path: '/notifications',
+    getParentRoute: () => MainRoute,
+  } as any)
+const MainMypageMypageRouteRoute = MainMypageMypageRouteRouteImport.update({
+  id: '/_mypage/mypage',
+  path: '/mypage',
   getParentRoute: () => MainRoute,
 } as any)
+const MainMypageLikesRouteRoute = MainMypageLikesRouteRouteImport.update({
+  id: '/_mypage/likes',
+  path: '/likes',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainMypageEditRouteRoute = MainMypageEditRouteRouteImport.update({
+  id: '/_mypage/edit',
+  path: '/edit',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainBusinessRejectionRouteRoute =
+  MainBusinessRejectionRouteRouteImport.update({
+    id: '/_business/rejection',
+    path: '/rejection',
+    getParentRoute: () => MainRoute,
+  } as any)
+const MainBusinessProposalRouteRoute =
+  MainBusinessProposalRouteRouteImport.update({
+    id: '/_business/proposal',
+    path: '/proposal',
+    getParentRoute: () => MainRoute,
+  } as any)
+const MainBusinessCampaignRouteRoute =
+  MainBusinessCampaignRouteRouteImport.update({
+    id: '/_business/campaign',
+    path: '/campaign',
+    getParentRoute: () => MainRoute,
+  } as any)
 const MainBusinessCalendarRouteRoute =
   MainBusinessCalendarRouteRouteImport.update({
     id: '/_business/calendar',
     path: '/calendar',
     getParentRoute: () => MainRoute,
   } as any)
-const MainHomeCampaignIndexRoute = MainHomeCampaignIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MainHomeCampaignRouteRoute,
+const AuthSignupTypeRouteRoute = AuthSignupTypeRouteRouteImport.update({
+  id: '/_auth/signup/type',
+  path: '/signup/type',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const MainHomeBrandIndexRoute = MainHomeBrandIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MainHomeBrandRouteRoute,
+const AuthSignupTermsRouteRoute = AuthSignupTermsRouteRouteImport.update({
+  id: '/_auth/signup/terms',
+  path: '/signup/terms',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const MainMatchingTestMatchingTestStep3RouteRoute =
-  MainMatchingTestMatchingTestStep3RouteRouteImport.update({
-    id: '/matching-test/matching-test/step3',
-    path: '/matching-test/matching-test/step3',
+const AuthSignupSuccessRouteRoute = AuthSignupSuccessRouteRouteImport.update({
+  id: '/_auth/signup/success',
+  path: '/signup/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupPurposeRouteRoute = AuthSignupPurposeRouteRouteImport.update({
+  id: '/_auth/signup/purpose',
+  path: '/signup/purpose',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupInfoMoreRouteRoute = AuthSignupInfoMoreRouteRouteImport.update({
+  id: '/_auth/signup/info-more',
+  path: '/signup/info-more',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupInfoRouteRoute = AuthSignupInfoRouteRouteImport.update({
+  id: '/_auth/signup/info',
+  path: '/signup/info',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainMatchingSuggestIndexRoute =
+  MainMatchingSuggestIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => MainMatchingSuggestRouteRoute,
+  } as any)
+const MainMypageTermsTermsContentRoute =
+  MainMypageTermsTermsContentRouteImport.update({
+    id: '/terms-content',
+    path: '/terms-content',
+    getParentRoute: () => MainMypageTermsRouteRoute,
+  } as any)
+const MainMypagePrivacyPrivacyContentRoute =
+  MainMypagePrivacyPrivacyContentRouteImport.update({
+    id: '/privacy-content',
+    path: '/privacy-content',
+    getParentRoute: () => MainMypagePrivacyRouteRoute,
+  } as any)
+const MainMypageNotificationsNotificationsContentRoute =
+  MainMypageNotificationsNotificationsContentRouteImport.update({
+    id: '/notifications-content',
+    path: '/notifications-content',
+    getParentRoute: () => MainMypageNotificationsRouteRoute,
+  } as any)
+const MainMypageLikesLikesContentRoute =
+  MainMypageLikesLikesContentRouteImport.update({
+    id: '/likes-content',
+    path: '/likes-content',
+    getParentRoute: () => MainMypageLikesRouteRoute,
+  } as any)
+const MainMypageEditEditContentRoute =
+  MainMypageEditEditContentRouteImport.update({
+    id: '/edit-content',
+    path: '/edit-content',
+    getParentRoute: () => MainMypageEditRouteRoute,
+  } as any)
+const MainMatchingTestStep3RouteRoute =
+  MainMatchingTestStep3RouteRouteImport.update({
+    id: '/test/step3',
+    path: '/test/step3',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingTestStep2RouteRoute =
+  MainMatchingTestStep2RouteRouteImport.update({
+    id: '/test/step2',
+    path: '/test/step2',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingTestStep1RouteRoute =
+  MainMatchingTestStep1RouteRouteImport.update({
+    id: '/test/step1',
+    path: '/test/step1',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingTestResultRouteRoute =
+  MainMatchingTestResultRouteRouteImport.update({
+    id: '/test/result',
+    path: '/test/result',
+    getParentRoute: () => MainMatchingRouteRoute,
+  } as any)
+const MainMatchingSuggestCreateRouteRoute =
+  MainMatchingSuggestCreateRouteRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => MainMatchingSuggestRouteRoute,
+  } as any)
+const MainMypageComponentsProfileCardTsxSnsCardRoute =
+  MainMypageComponentsProfileCardTsxSnsCardRouteImport.update({
+    id: '/_mypage/components/profileCard/tsx/SnsCard',
+    path: '/components/profileCard/tsx/SnsCard',
     getParentRoute: () => MainRoute,
   } as any)
-const MainMatchingTestMatchingTestStep2RouteRoute =
-  MainMatchingTestMatchingTestStep2RouteRouteImport.update({
-    id: '/matching-test/matching-test/step2',
-    path: '/matching-test/matching-test/step2',
+const MainMypageComponentsProfileCardTsxProfileSummaryRoute =
+  MainMypageComponentsProfileCardTsxProfileSummaryRouteImport.update({
+    id: '/_mypage/components/profileCard/tsx/ProfileSummary',
+    path: '/components/profileCard/tsx/ProfileSummary',
     getParentRoute: () => MainRoute,
   } as any)
-const MainMatchingTestMatchingTestStep1RouteRoute =
-  MainMatchingTestMatchingTestStep1RouteRouteImport.update({
-    id: '/matching-test/matching-test/step1',
-    path: '/matching-test/matching-test/step1',
+const MainMypageComponentsProfileCardTsxMyTraitsRoute =
+  MainMypageComponentsProfileCardTsxMyTraitsRouteImport.update({
+    id: '/_mypage/components/profileCard/tsx/MyTraits',
+    path: '/components/profileCard/tsx/MyTraits',
+    getParentRoute: () => MainRoute,
+  } as any)
+const MainMypageComponentsProfileCardTsxMyCampaignsRoute =
+  MainMypageComponentsProfileCardTsxMyCampaignsRouteImport.update({
+    id: '/_mypage/components/profileCard/tsx/MyCampaigns',
+    path: '/components/profileCard/tsx/MyCampaigns',
+    getParentRoute: () => MainRoute,
+  } as any)
+const MainMypageComponentsProfileCardTsxMatchingResultRoute =
+  MainMypageComponentsProfileCardTsxMatchingResultRouteImport.update({
+    id: '/_mypage/components/profileCard/tsx/MatchingResult',
+    path: '/components/profileCard/tsx/MatchingResult',
     getParentRoute: () => MainRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/chat': typeof MainChatRouteRouteWithChildren
-  '/auth/login': typeof AuthLoginRouteRoute
+  '/rooms': typeof RoomsRouteRouteWithChildren
+  '/login': typeof AuthLoginRouteRoute
+  '/chat': typeof MainChatRouteRoute
+  '/matching': typeof MainMatchingRouteRouteWithChildren
+  '/rooms/$chatId': typeof RoomsChatIdRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/signup/type': typeof AuthSignupTypeRouteRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
-  '/brand': typeof MainHomeBrandRouteRouteWithChildren
-  '/campaign': typeof MainHomeCampaignRouteRouteWithChildren
-  '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
-  '/auth/signup/info': typeof AuthSignupInfoRouteRoute
-  '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
-  '/auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
-  '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
-  '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
-  '/auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/campaign': typeof MainBusinessCampaignRouteRoute
+  '/proposal': typeof MainBusinessProposalRouteRoute
+  '/rejection': typeof MainBusinessRejectionRouteRoute
+  '/edit': typeof MainMypageEditRouteRouteWithChildren
+  '/likes': typeof MainMypageLikesRouteRouteWithChildren
+  '/mypage': typeof MainMypageMypageRouteRoute
+  '/notifications': typeof MainMypageNotificationsRouteRouteWithChildren
+  '/privacy': typeof MainMypagePrivacyRouteRouteWithChildren
+  '/profileCard': typeof MainMypageProfileCardRouteRoute
+  '/terms': typeof MainMypageTermsRouteRouteWithChildren
+  '/matching/brand': typeof MainMatchingBrandRouteRoute
+  '/matching/campaign': typeof MainMatchingCampaignRouteRoute
+  '/matching/suggest': typeof MainMatchingSuggestRouteRouteWithChildren
   '/pre': typeof MainHomePreRoute
-  '/chat/chatting-room': typeof MainChatChattingRoomRoute
   '/': typeof MainHomeIndexRoute
-  '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
-  '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
-  '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
-  '/brand/': typeof MainHomeBrandIndexRoute
-  '/campaign/': typeof MainHomeCampaignIndexRoute
+  '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
+  '/matching/test/result': typeof MainMatchingTestResultRouteRoute
+  '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
+  '/matching/test/step2': typeof MainMatchingTestStep2RouteRoute
+  '/matching/test/step3': typeof MainMatchingTestStep3RouteRoute
+  '/edit/edit-content': typeof MainMypageEditEditContentRoute
+  '/likes/likes-content': typeof MainMypageLikesLikesContentRoute
+  '/notifications/notifications-content': typeof MainMypageNotificationsNotificationsContentRoute
+  '/privacy/privacy-content': typeof MainMypagePrivacyPrivacyContentRoute
+  '/terms/terms-content': typeof MainMypageTermsTermsContentRoute
+  '/matching/suggest/': typeof MainMatchingSuggestIndexRoute
+  '/components/profileCard/tsx/MatchingResult': typeof MainMypageComponentsProfileCardTsxMatchingResultRoute
+  '/components/profileCard/tsx/MyCampaigns': typeof MainMypageComponentsProfileCardTsxMyCampaignsRoute
+  '/components/profileCard/tsx/MyTraits': typeof MainMypageComponentsProfileCardTsxMyTraitsRoute
+  '/components/profileCard/tsx/ProfileSummary': typeof MainMypageComponentsProfileCardTsxProfileSummaryRoute
+  '/components/profileCard/tsx/SnsCard': typeof MainMypageComponentsProfileCardTsxSnsCardRoute
 }
 export interface FileRoutesByTo {
-  '/chat': typeof MainChatRouteRouteWithChildren
-  '/auth/login': typeof AuthLoginRouteRoute
+  '/rooms': typeof RoomsRouteRouteWithChildren
+  '/login': typeof AuthLoginRouteRoute
+  '/chat': typeof MainChatRouteRoute
+  '/matching': typeof MainMatchingRouteRouteWithChildren
+  '/rooms/$chatId': typeof RoomsChatIdRoute
+  '/signup/info': typeof AuthSignupInfoRouteRoute
+  '/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/signup/type': typeof AuthSignupTypeRouteRoute
   '/calendar': typeof MainBusinessCalendarRouteRoute
-  '/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
-  '/auth/signup/info': typeof AuthSignupInfoRouteRoute
-  '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
-  '/auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
-  '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
-  '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
-  '/auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/campaign': typeof MainBusinessCampaignRouteRoute
+  '/proposal': typeof MainBusinessProposalRouteRoute
+  '/rejection': typeof MainBusinessRejectionRouteRoute
+  '/edit': typeof MainMypageEditRouteRouteWithChildren
+  '/likes': typeof MainMypageLikesRouteRouteWithChildren
+  '/mypage': typeof MainMypageMypageRouteRoute
+  '/notifications': typeof MainMypageNotificationsRouteRouteWithChildren
+  '/privacy': typeof MainMypagePrivacyRouteRouteWithChildren
+  '/profileCard': typeof MainMypageProfileCardRouteRoute
+  '/terms': typeof MainMypageTermsRouteRouteWithChildren
+  '/matching/brand': typeof MainMatchingBrandRouteRoute
+  '/matching/campaign': typeof MainMatchingCampaignRouteRoute
   '/pre': typeof MainHomePreRoute
-  '/chat/chatting-room': typeof MainChatChattingRoomRoute
   '/': typeof MainHomeIndexRoute
-  '/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
-  '/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
-  '/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
-  '/brand': typeof MainHomeBrandIndexRoute
-  '/campaign': typeof MainHomeCampaignIndexRoute
+  '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
+  '/matching/test/result': typeof MainMatchingTestResultRouteRoute
+  '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
+  '/matching/test/step2': typeof MainMatchingTestStep2RouteRoute
+  '/matching/test/step3': typeof MainMatchingTestStep3RouteRoute
+  '/edit/edit-content': typeof MainMypageEditEditContentRoute
+  '/likes/likes-content': typeof MainMypageLikesLikesContentRoute
+  '/notifications/notifications-content': typeof MainMypageNotificationsNotificationsContentRoute
+  '/privacy/privacy-content': typeof MainMypagePrivacyPrivacyContentRoute
+  '/terms/terms-content': typeof MainMypageTermsTermsContentRoute
+  '/matching/suggest': typeof MainMatchingSuggestIndexRoute
+  '/components/profileCard/tsx/MatchingResult': typeof MainMypageComponentsProfileCardTsxMatchingResultRoute
+  '/components/profileCard/tsx/MyCampaigns': typeof MainMypageComponentsProfileCardTsxMyCampaignsRoute
+  '/components/profileCard/tsx/MyTraits': typeof MainMypageComponentsProfileCardTsxMyTraitsRoute
+  '/components/profileCard/tsx/ProfileSummary': typeof MainMypageComponentsProfileCardTsxProfileSummaryRoute
+  '/components/profileCard/tsx/SnsCard': typeof MainMypageComponentsProfileCardTsxSnsCardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/rooms': typeof RoomsRouteRouteWithChildren
   '/_main': typeof MainRouteWithChildren
-  '/_main/chat': typeof MainChatRouteRouteWithChildren
-  '/auth/login': typeof AuthLoginRouteRoute
+  '/_auth/login': typeof AuthLoginRouteRoute
+  '/_main/chat': typeof MainChatRouteRoute
+  '/_main/matching': typeof MainMatchingRouteRouteWithChildren
+  '/rooms/$chatId': typeof RoomsChatIdRoute
+  '/_auth/signup/info': typeof AuthSignupInfoRouteRoute
+  '/_auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
+  '/_auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
+  '/_auth/signup/success': typeof AuthSignupSuccessRouteRoute
+  '/_auth/signup/terms': typeof AuthSignupTermsRouteRoute
+  '/_auth/signup/type': typeof AuthSignupTypeRouteRoute
   '/_main/_business/calendar': typeof MainBusinessCalendarRouteRoute
-  '/_main/_home/brand': typeof MainHomeBrandRouteRouteWithChildren
-  '/_main/_home/campaign': typeof MainHomeCampaignRouteRouteWithChildren
-  '/_main/matching-test/matching-result': typeof MainMatchingTestMatchingResultRouteRoute
-  '/auth/signup/info': typeof AuthSignupInfoRouteRoute
-  '/auth/signup/info-more': typeof AuthSignupInfoMoreRouteRoute
-  '/auth/signup/purpose': typeof AuthSignupPurposeRouteRoute
-  '/auth/signup/success': typeof AuthSignupSuccessRouteRoute
-  '/auth/signup/terms': typeof AuthSignupTermsRouteRoute
-  '/auth/signup/type': typeof AuthSignupTypeRouteRoute
+  '/_main/_business/campaign': typeof MainBusinessCampaignRouteRoute
+  '/_main/_business/proposal': typeof MainBusinessProposalRouteRoute
+  '/_main/_business/rejection': typeof MainBusinessRejectionRouteRoute
+  '/_main/_mypage/edit': typeof MainMypageEditRouteRouteWithChildren
+  '/_main/_mypage/likes': typeof MainMypageLikesRouteRouteWithChildren
+  '/_main/_mypage/mypage': typeof MainMypageMypageRouteRoute
+  '/_main/_mypage/notifications': typeof MainMypageNotificationsRouteRouteWithChildren
+  '/_main/_mypage/privacy': typeof MainMypagePrivacyRouteRouteWithChildren
+  '/_main/_mypage/profileCard': typeof MainMypageProfileCardRouteRoute
+  '/_main/_mypage/terms': typeof MainMypageTermsRouteRouteWithChildren
+  '/_main/matching/brand': typeof MainMatchingBrandRouteRoute
+  '/_main/matching/campaign': typeof MainMatchingCampaignRouteRoute
+  '/_main/matching/suggest': typeof MainMatchingSuggestRouteRouteWithChildren
   '/_main/_home/pre': typeof MainHomePreRoute
-  '/_main/chat/chatting-room': typeof MainChatChattingRoomRoute
   '/_main/_home/': typeof MainHomeIndexRoute
-  '/_main/matching-test/matching-test/step1': typeof MainMatchingTestMatchingTestStep1RouteRoute
-  '/_main/matching-test/matching-test/step2': typeof MainMatchingTestMatchingTestStep2RouteRoute
-  '/_main/matching-test/matching-test/step3': typeof MainMatchingTestMatchingTestStep3RouteRoute
-  '/_main/_home/brand/': typeof MainHomeBrandIndexRoute
-  '/_main/_home/campaign/': typeof MainHomeCampaignIndexRoute
+  '/_main/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
+  '/_main/matching/test/result': typeof MainMatchingTestResultRouteRoute
+  '/_main/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
+  '/_main/matching/test/step2': typeof MainMatchingTestStep2RouteRoute
+  '/_main/matching/test/step3': typeof MainMatchingTestStep3RouteRoute
+  '/_main/_mypage/edit/edit-content': typeof MainMypageEditEditContentRoute
+  '/_main/_mypage/likes/likes-content': typeof MainMypageLikesLikesContentRoute
+  '/_main/_mypage/notifications/notifications-content': typeof MainMypageNotificationsNotificationsContentRoute
+  '/_main/_mypage/privacy/privacy-content': typeof MainMypagePrivacyPrivacyContentRoute
+  '/_main/_mypage/terms/terms-content': typeof MainMypageTermsTermsContentRoute
+  '/_main/matching/suggest/': typeof MainMatchingSuggestIndexRoute
+  '/_main/_mypage/components/profileCard/tsx/MatchingResult': typeof MainMypageComponentsProfileCardTsxMatchingResultRoute
+  '/_main/_mypage/components/profileCard/tsx/MyCampaigns': typeof MainMypageComponentsProfileCardTsxMyCampaignsRoute
+  '/_main/_mypage/components/profileCard/tsx/MyTraits': typeof MainMypageComponentsProfileCardTsxMyTraitsRoute
+  '/_main/_mypage/components/profileCard/tsx/ProfileSummary': typeof MainMypageComponentsProfileCardTsxProfileSummaryRoute
+  '/_main/_mypage/components/profileCard/tsx/SnsCard': typeof MainMypageComponentsProfileCardTsxSnsCardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/rooms'
+    | '/login'
     | '/chat'
-    | '/auth/login'
+    | '/matching'
+    | '/rooms/$chatId'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
     | '/calendar'
-    | '/brand'
     | '/campaign'
-    | '/matching-test/matching-result'
-    | '/auth/signup/info'
-    | '/auth/signup/info-more'
-    | '/auth/signup/purpose'
-    | '/auth/signup/success'
-    | '/auth/signup/terms'
-    | '/auth/signup/type'
+    | '/proposal'
+    | '/rejection'
+    | '/edit'
+    | '/likes'
+    | '/mypage'
+    | '/notifications'
+    | '/privacy'
+    | '/profileCard'
+    | '/terms'
+    | '/matching/brand'
+    | '/matching/campaign'
+    | '/matching/suggest'
     | '/pre'
-    | '/chat/chatting-room'
     | '/'
-    | '/matching-test/matching-test/step1'
-    | '/matching-test/matching-test/step2'
-    | '/matching-test/matching-test/step3'
-    | '/brand/'
-    | '/campaign/'
+    | '/matching/suggest/create'
+    | '/matching/test/result'
+    | '/matching/test/step1'
+    | '/matching/test/step2'
+    | '/matching/test/step3'
+    | '/edit/edit-content'
+    | '/likes/likes-content'
+    | '/notifications/notifications-content'
+    | '/privacy/privacy-content'
+    | '/terms/terms-content'
+    | '/matching/suggest/'
+    | '/components/profileCard/tsx/MatchingResult'
+    | '/components/profileCard/tsx/MyCampaigns'
+    | '/components/profileCard/tsx/MyTraits'
+    | '/components/profileCard/tsx/ProfileSummary'
+    | '/components/profileCard/tsx/SnsCard'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/rooms'
+    | '/login'
     | '/chat'
-    | '/auth/login'
+    | '/matching'
+    | '/rooms/$chatId'
+    | '/signup/info'
+    | '/signup/info-more'
+    | '/signup/purpose'
+    | '/signup/success'
+    | '/signup/terms'
+    | '/signup/type'
     | '/calendar'
-    | '/matching-test/matching-result'
-    | '/auth/signup/info'
-    | '/auth/signup/info-more'
-    | '/auth/signup/purpose'
-    | '/auth/signup/success'
-    | '/auth/signup/terms'
-    | '/auth/signup/type'
-    | '/pre'
-    | '/chat/chatting-room'
-    | '/'
-    | '/matching-test/matching-test/step1'
-    | '/matching-test/matching-test/step2'
-    | '/matching-test/matching-test/step3'
-    | '/brand'
     | '/campaign'
+    | '/proposal'
+    | '/rejection'
+    | '/edit'
+    | '/likes'
+    | '/mypage'
+    | '/notifications'
+    | '/privacy'
+    | '/profileCard'
+    | '/terms'
+    | '/matching/brand'
+    | '/matching/campaign'
+    | '/pre'
+    | '/'
+    | '/matching/suggest/create'
+    | '/matching/test/result'
+    | '/matching/test/step1'
+    | '/matching/test/step2'
+    | '/matching/test/step3'
+    | '/edit/edit-content'
+    | '/likes/likes-content'
+    | '/notifications/notifications-content'
+    | '/privacy/privacy-content'
+    | '/terms/terms-content'
+    | '/matching/suggest'
+    | '/components/profileCard/tsx/MatchingResult'
+    | '/components/profileCard/tsx/MyCampaigns'
+    | '/components/profileCard/tsx/MyTraits'
+    | '/components/profileCard/tsx/ProfileSummary'
+    | '/components/profileCard/tsx/SnsCard'
   id:
     | '__root__'
+    | '/rooms'
     | '/_main'
+    | '/_auth/login'
     | '/_main/chat'
-    | '/auth/login'
+    | '/_main/matching'
+    | '/rooms/$chatId'
+    | '/_auth/signup/info'
+    | '/_auth/signup/info-more'
+    | '/_auth/signup/purpose'
+    | '/_auth/signup/success'
+    | '/_auth/signup/terms'
+    | '/_auth/signup/type'
     | '/_main/_business/calendar'
-    | '/_main/_home/brand'
-    | '/_main/_home/campaign'
-    | '/_main/matching-test/matching-result'
-    | '/auth/signup/info'
-    | '/auth/signup/info-more'
-    | '/auth/signup/purpose'
-    | '/auth/signup/success'
-    | '/auth/signup/terms'
-    | '/auth/signup/type'
+    | '/_main/_business/campaign'
+    | '/_main/_business/proposal'
+    | '/_main/_business/rejection'
+    | '/_main/_mypage/edit'
+    | '/_main/_mypage/likes'
+    | '/_main/_mypage/mypage'
+    | '/_main/_mypage/notifications'
+    | '/_main/_mypage/privacy'
+    | '/_main/_mypage/profileCard'
+    | '/_main/_mypage/terms'
+    | '/_main/matching/brand'
+    | '/_main/matching/campaign'
+    | '/_main/matching/suggest'
     | '/_main/_home/pre'
-    | '/_main/chat/chatting-room'
     | '/_main/_home/'
-    | '/_main/matching-test/matching-test/step1'
-    | '/_main/matching-test/matching-test/step2'
-    | '/_main/matching-test/matching-test/step3'
-    | '/_main/_home/brand/'
-    | '/_main/_home/campaign/'
+    | '/_main/matching/suggest/create'
+    | '/_main/matching/test/result'
+    | '/_main/matching/test/step1'
+    | '/_main/matching/test/step2'
+    | '/_main/matching/test/step3'
+    | '/_main/_mypage/edit/edit-content'
+    | '/_main/_mypage/likes/likes-content'
+    | '/_main/_mypage/notifications/notifications-content'
+    | '/_main/_mypage/privacy/privacy-content'
+    | '/_main/_mypage/terms/terms-content'
+    | '/_main/matching/suggest/'
+    | '/_main/_mypage/components/profileCard/tsx/MatchingResult'
+    | '/_main/_mypage/components/profileCard/tsx/MyCampaigns'
+    | '/_main/_mypage/components/profileCard/tsx/MyTraits'
+    | '/_main/_mypage/components/profileCard/tsx/ProfileSummary'
+    | '/_main/_mypage/components/profileCard/tsx/SnsCard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  RoomsRouteRoute: typeof RoomsRouteRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
   AuthLoginRouteRoute: typeof AuthLoginRouteRoute
   AuthSignupInfoRouteRoute: typeof AuthSignupInfoRouteRoute
@@ -295,12 +593,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteRouteImport
+    '/rooms': {
+      id: '/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/rooms/$chatId': {
+      id: '/rooms/$chatId'
+      path: '/$chatId'
+      fullPath: '/rooms/$chatId'
+      preLoaderRoute: typeof RoomsChatIdRouteImport
+      parentRoute: typeof RoomsRouteRoute
+    }
+    '/_main/matching': {
+      id: '/_main/matching'
+      path: '/matching'
+      fullPath: '/matching'
+      preLoaderRoute: typeof MainMatchingRouteRouteImport
+      parentRoute: typeof MainRoute
     }
     '/_main/chat': {
       id: '/_main/chat'
@@ -309,19 +621,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainChatRouteRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_main/_home/': {
       id: '/_main/_home/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof MainHomeIndexRouteImport
       parentRoute: typeof MainRoute
-    }
-    '/_main/chat/chatting-room': {
-      id: '/_main/chat/chatting-room'
-      path: '/chatting-room'
-      fullPath: '/chat/chatting-room'
-      preLoaderRoute: typeof MainChatChattingRoomRouteImport
-      parentRoute: typeof MainChatRouteRoute
     }
     '/_main/_home/pre': {
       id: '/_main/_home/pre'
@@ -330,67 +642,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainHomePreRouteImport
       parentRoute: typeof MainRoute
     }
-    '/auth/signup/type': {
-      id: '/auth/signup/type'
-      path: '/auth/signup/type'
-      fullPath: '/auth/signup/type'
-      preLoaderRoute: typeof AuthSignupTypeRouteRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/matching/suggest': {
+      id: '/_main/matching/suggest'
+      path: '/suggest'
+      fullPath: '/matching/suggest'
+      preLoaderRoute: typeof MainMatchingSuggestRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
     }
-    '/auth/signup/terms': {
-      id: '/auth/signup/terms'
-      path: '/auth/signup/terms'
-      fullPath: '/auth/signup/terms'
-      preLoaderRoute: typeof AuthSignupTermsRouteRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/matching/campaign': {
+      id: '/_main/matching/campaign'
+      path: '/campaign'
+      fullPath: '/matching/campaign'
+      preLoaderRoute: typeof MainMatchingCampaignRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
     }
-    '/auth/signup/success': {
-      id: '/auth/signup/success'
-      path: '/auth/signup/success'
-      fullPath: '/auth/signup/success'
-      preLoaderRoute: typeof AuthSignupSuccessRouteRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/matching/brand': {
+      id: '/_main/matching/brand'
+      path: '/brand'
+      fullPath: '/matching/brand'
+      preLoaderRoute: typeof MainMatchingBrandRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
     }
-    '/auth/signup/purpose': {
-      id: '/auth/signup/purpose'
-      path: '/auth/signup/purpose'
-      fullPath: '/auth/signup/purpose'
-      preLoaderRoute: typeof AuthSignupPurposeRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup/info-more': {
-      id: '/auth/signup/info-more'
-      path: '/auth/signup/info-more'
-      fullPath: '/auth/signup/info-more'
-      preLoaderRoute: typeof AuthSignupInfoMoreRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup/info': {
-      id: '/auth/signup/info'
-      path: '/auth/signup/info'
-      fullPath: '/auth/signup/info'
-      preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_main/matching-test/matching-result': {
-      id: '/_main/matching-test/matching-result'
-      path: '/matching-test/matching-result'
-      fullPath: '/matching-test/matching-result'
-      preLoaderRoute: typeof MainMatchingTestMatchingResultRouteRouteImport
+    '/_main/_mypage/terms': {
+      id: '/_main/_mypage/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof MainMypageTermsRouteRouteImport
       parentRoute: typeof MainRoute
     }
-    '/_main/_home/campaign': {
-      id: '/_main/_home/campaign'
+    '/_main/_mypage/profileCard': {
+      id: '/_main/_mypage/profileCard'
+      path: '/profileCard'
+      fullPath: '/profileCard'
+      preLoaderRoute: typeof MainMypageProfileCardRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/privacy': {
+      id: '/_main/_mypage/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof MainMypagePrivacyRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/notifications': {
+      id: '/_main/_mypage/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof MainMypageNotificationsRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/mypage': {
+      id: '/_main/_mypage/mypage'
+      path: '/mypage'
+      fullPath: '/mypage'
+      preLoaderRoute: typeof MainMypageMypageRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/likes': {
+      id: '/_main/_mypage/likes'
+      path: '/likes'
+      fullPath: '/likes'
+      preLoaderRoute: typeof MainMypageLikesRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/edit': {
+      id: '/_main/_mypage/edit'
+      path: '/edit'
+      fullPath: '/edit'
+      preLoaderRoute: typeof MainMypageEditRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_business/rejection': {
+      id: '/_main/_business/rejection'
+      path: '/rejection'
+      fullPath: '/rejection'
+      preLoaderRoute: typeof MainBusinessRejectionRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_business/proposal': {
+      id: '/_main/_business/proposal'
+      path: '/proposal'
+      fullPath: '/proposal'
+      preLoaderRoute: typeof MainBusinessProposalRouteRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_business/campaign': {
+      id: '/_main/_business/campaign'
       path: '/campaign'
       fullPath: '/campaign'
-      preLoaderRoute: typeof MainHomeCampaignRouteRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/_home/brand': {
-      id: '/_main/_home/brand'
-      path: '/brand'
-      fullPath: '/brand'
-      preLoaderRoute: typeof MainHomeBrandRouteRouteImport
+      preLoaderRoute: typeof MainBusinessCampaignRouteRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/_business/calendar': {
@@ -400,113 +740,332 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainBusinessCalendarRouteRouteImport
       parentRoute: typeof MainRoute
     }
-    '/_main/_home/campaign/': {
-      id: '/_main/_home/campaign/'
-      path: '/'
-      fullPath: '/campaign/'
-      preLoaderRoute: typeof MainHomeCampaignIndexRouteImport
-      parentRoute: typeof MainHomeCampaignRouteRoute
+    '/_auth/signup/type': {
+      id: '/_auth/signup/type'
+      path: '/signup/type'
+      fullPath: '/signup/type'
+      preLoaderRoute: typeof AuthSignupTypeRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_main/_home/brand/': {
-      id: '/_main/_home/brand/'
-      path: '/'
-      fullPath: '/brand/'
-      preLoaderRoute: typeof MainHomeBrandIndexRouteImport
-      parentRoute: typeof MainHomeBrandRouteRoute
+    '/_auth/signup/terms': {
+      id: '/_auth/signup/terms'
+      path: '/signup/terms'
+      fullPath: '/signup/terms'
+      preLoaderRoute: typeof AuthSignupTermsRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_main/matching-test/matching-test/step3': {
-      id: '/_main/matching-test/matching-test/step3'
-      path: '/matching-test/matching-test/step3'
-      fullPath: '/matching-test/matching-test/step3'
-      preLoaderRoute: typeof MainMatchingTestMatchingTestStep3RouteRouteImport
+    '/_auth/signup/success': {
+      id: '/_auth/signup/success'
+      path: '/signup/success'
+      fullPath: '/signup/success'
+      preLoaderRoute: typeof AuthSignupSuccessRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/purpose': {
+      id: '/_auth/signup/purpose'
+      path: '/signup/purpose'
+      fullPath: '/signup/purpose'
+      preLoaderRoute: typeof AuthSignupPurposeRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/info-more': {
+      id: '/_auth/signup/info-more'
+      path: '/signup/info-more'
+      fullPath: '/signup/info-more'
+      preLoaderRoute: typeof AuthSignupInfoMoreRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup/info': {
+      id: '/_auth/signup/info'
+      path: '/signup/info'
+      fullPath: '/signup/info'
+      preLoaderRoute: typeof AuthSignupInfoRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_main/matching/suggest/': {
+      id: '/_main/matching/suggest/'
+      path: '/'
+      fullPath: '/matching/suggest/'
+      preLoaderRoute: typeof MainMatchingSuggestIndexRouteImport
+      parentRoute: typeof MainMatchingSuggestRouteRoute
+    }
+    '/_main/_mypage/terms/terms-content': {
+      id: '/_main/_mypage/terms/terms-content'
+      path: '/terms-content'
+      fullPath: '/terms/terms-content'
+      preLoaderRoute: typeof MainMypageTermsTermsContentRouteImport
+      parentRoute: typeof MainMypageTermsRouteRoute
+    }
+    '/_main/_mypage/privacy/privacy-content': {
+      id: '/_main/_mypage/privacy/privacy-content'
+      path: '/privacy-content'
+      fullPath: '/privacy/privacy-content'
+      preLoaderRoute: typeof MainMypagePrivacyPrivacyContentRouteImport
+      parentRoute: typeof MainMypagePrivacyRouteRoute
+    }
+    '/_main/_mypage/notifications/notifications-content': {
+      id: '/_main/_mypage/notifications/notifications-content'
+      path: '/notifications-content'
+      fullPath: '/notifications/notifications-content'
+      preLoaderRoute: typeof MainMypageNotificationsNotificationsContentRouteImport
+      parentRoute: typeof MainMypageNotificationsRouteRoute
+    }
+    '/_main/_mypage/likes/likes-content': {
+      id: '/_main/_mypage/likes/likes-content'
+      path: '/likes-content'
+      fullPath: '/likes/likes-content'
+      preLoaderRoute: typeof MainMypageLikesLikesContentRouteImport
+      parentRoute: typeof MainMypageLikesRouteRoute
+    }
+    '/_main/_mypage/edit/edit-content': {
+      id: '/_main/_mypage/edit/edit-content'
+      path: '/edit-content'
+      fullPath: '/edit/edit-content'
+      preLoaderRoute: typeof MainMypageEditEditContentRouteImport
+      parentRoute: typeof MainMypageEditRouteRoute
+    }
+    '/_main/matching/test/step3': {
+      id: '/_main/matching/test/step3'
+      path: '/test/step3'
+      fullPath: '/matching/test/step3'
+      preLoaderRoute: typeof MainMatchingTestStep3RouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/test/step2': {
+      id: '/_main/matching/test/step2'
+      path: '/test/step2'
+      fullPath: '/matching/test/step2'
+      preLoaderRoute: typeof MainMatchingTestStep2RouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/test/step1': {
+      id: '/_main/matching/test/step1'
+      path: '/test/step1'
+      fullPath: '/matching/test/step1'
+      preLoaderRoute: typeof MainMatchingTestStep1RouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/test/result': {
+      id: '/_main/matching/test/result'
+      path: '/test/result'
+      fullPath: '/matching/test/result'
+      preLoaderRoute: typeof MainMatchingTestResultRouteRouteImport
+      parentRoute: typeof MainMatchingRouteRoute
+    }
+    '/_main/matching/suggest/create': {
+      id: '/_main/matching/suggest/create'
+      path: '/create'
+      fullPath: '/matching/suggest/create'
+      preLoaderRoute: typeof MainMatchingSuggestCreateRouteRouteImport
+      parentRoute: typeof MainMatchingSuggestRouteRoute
+    }
+    '/_main/_mypage/components/profileCard/tsx/SnsCard': {
+      id: '/_main/_mypage/components/profileCard/tsx/SnsCard'
+      path: '/components/profileCard/tsx/SnsCard'
+      fullPath: '/components/profileCard/tsx/SnsCard'
+      preLoaderRoute: typeof MainMypageComponentsProfileCardTsxSnsCardRouteImport
       parentRoute: typeof MainRoute
     }
-    '/_main/matching-test/matching-test/step2': {
-      id: '/_main/matching-test/matching-test/step2'
-      path: '/matching-test/matching-test/step2'
-      fullPath: '/matching-test/matching-test/step2'
-      preLoaderRoute: typeof MainMatchingTestMatchingTestStep2RouteRouteImport
+    '/_main/_mypage/components/profileCard/tsx/ProfileSummary': {
+      id: '/_main/_mypage/components/profileCard/tsx/ProfileSummary'
+      path: '/components/profileCard/tsx/ProfileSummary'
+      fullPath: '/components/profileCard/tsx/ProfileSummary'
+      preLoaderRoute: typeof MainMypageComponentsProfileCardTsxProfileSummaryRouteImport
       parentRoute: typeof MainRoute
     }
-    '/_main/matching-test/matching-test/step1': {
-      id: '/_main/matching-test/matching-test/step1'
-      path: '/matching-test/matching-test/step1'
-      fullPath: '/matching-test/matching-test/step1'
-      preLoaderRoute: typeof MainMatchingTestMatchingTestStep1RouteRouteImport
+    '/_main/_mypage/components/profileCard/tsx/MyTraits': {
+      id: '/_main/_mypage/components/profileCard/tsx/MyTraits'
+      path: '/components/profileCard/tsx/MyTraits'
+      fullPath: '/components/profileCard/tsx/MyTraits'
+      preLoaderRoute: typeof MainMypageComponentsProfileCardTsxMyTraitsRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/components/profileCard/tsx/MyCampaigns': {
+      id: '/_main/_mypage/components/profileCard/tsx/MyCampaigns'
+      path: '/components/profileCard/tsx/MyCampaigns'
+      fullPath: '/components/profileCard/tsx/MyCampaigns'
+      preLoaderRoute: typeof MainMypageComponentsProfileCardTsxMyCampaignsRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_mypage/components/profileCard/tsx/MatchingResult': {
+      id: '/_main/_mypage/components/profileCard/tsx/MatchingResult'
+      path: '/components/profileCard/tsx/MatchingResult'
+      fullPath: '/components/profileCard/tsx/MatchingResult'
+      preLoaderRoute: typeof MainMypageComponentsProfileCardTsxMatchingResultRouteImport
       parentRoute: typeof MainRoute
     }
   }
 }
 
-interface MainChatRouteRouteChildren {
-  MainChatChattingRoomRoute: typeof MainChatChattingRoomRoute
+interface RoomsRouteRouteChildren {
+  RoomsChatIdRoute: typeof RoomsChatIdRoute
 }
 
-const MainChatRouteRouteChildren: MainChatRouteRouteChildren = {
-  MainChatChattingRoomRoute: MainChatChattingRoomRoute,
+const RoomsRouteRouteChildren: RoomsRouteRouteChildren = {
+  RoomsChatIdRoute: RoomsChatIdRoute,
 }
 
-const MainChatRouteRouteWithChildren = MainChatRouteRoute._addFileChildren(
-  MainChatRouteRouteChildren,
+const RoomsRouteRouteWithChildren = RoomsRouteRoute._addFileChildren(
+  RoomsRouteRouteChildren,
 )
 
-interface MainHomeBrandRouteRouteChildren {
-  MainHomeBrandIndexRoute: typeof MainHomeBrandIndexRoute
+interface MainMatchingSuggestRouteRouteChildren {
+  MainMatchingSuggestCreateRouteRoute: typeof MainMatchingSuggestCreateRouteRoute
+  MainMatchingSuggestIndexRoute: typeof MainMatchingSuggestIndexRoute
 }
 
-const MainHomeBrandRouteRouteChildren: MainHomeBrandRouteRouteChildren = {
-  MainHomeBrandIndexRoute: MainHomeBrandIndexRoute,
-}
+const MainMatchingSuggestRouteRouteChildren: MainMatchingSuggestRouteRouteChildren =
+  {
+    MainMatchingSuggestCreateRouteRoute: MainMatchingSuggestCreateRouteRoute,
+    MainMatchingSuggestIndexRoute: MainMatchingSuggestIndexRoute,
+  }
 
-const MainHomeBrandRouteRouteWithChildren =
-  MainHomeBrandRouteRoute._addFileChildren(MainHomeBrandRouteRouteChildren)
-
-interface MainHomeCampaignRouteRouteChildren {
-  MainHomeCampaignIndexRoute: typeof MainHomeCampaignIndexRoute
-}
-
-const MainHomeCampaignRouteRouteChildren: MainHomeCampaignRouteRouteChildren = {
-  MainHomeCampaignIndexRoute: MainHomeCampaignIndexRoute,
-}
-
-const MainHomeCampaignRouteRouteWithChildren =
-  MainHomeCampaignRouteRoute._addFileChildren(
-    MainHomeCampaignRouteRouteChildren,
+const MainMatchingSuggestRouteRouteWithChildren =
+  MainMatchingSuggestRouteRoute._addFileChildren(
+    MainMatchingSuggestRouteRouteChildren,
   )
 
+interface MainMatchingRouteRouteChildren {
+  MainMatchingBrandRouteRoute: typeof MainMatchingBrandRouteRoute
+  MainMatchingCampaignRouteRoute: typeof MainMatchingCampaignRouteRoute
+  MainMatchingSuggestRouteRoute: typeof MainMatchingSuggestRouteRouteWithChildren
+  MainMatchingTestResultRouteRoute: typeof MainMatchingTestResultRouteRoute
+  MainMatchingTestStep1RouteRoute: typeof MainMatchingTestStep1RouteRoute
+  MainMatchingTestStep2RouteRoute: typeof MainMatchingTestStep2RouteRoute
+  MainMatchingTestStep3RouteRoute: typeof MainMatchingTestStep3RouteRoute
+}
+
+const MainMatchingRouteRouteChildren: MainMatchingRouteRouteChildren = {
+  MainMatchingBrandRouteRoute: MainMatchingBrandRouteRoute,
+  MainMatchingCampaignRouteRoute: MainMatchingCampaignRouteRoute,
+  MainMatchingSuggestRouteRoute: MainMatchingSuggestRouteRouteWithChildren,
+  MainMatchingTestResultRouteRoute: MainMatchingTestResultRouteRoute,
+  MainMatchingTestStep1RouteRoute: MainMatchingTestStep1RouteRoute,
+  MainMatchingTestStep2RouteRoute: MainMatchingTestStep2RouteRoute,
+  MainMatchingTestStep3RouteRoute: MainMatchingTestStep3RouteRoute,
+}
+
+const MainMatchingRouteRouteWithChildren =
+  MainMatchingRouteRoute._addFileChildren(MainMatchingRouteRouteChildren)
+
+interface MainMypageEditRouteRouteChildren {
+  MainMypageEditEditContentRoute: typeof MainMypageEditEditContentRoute
+}
+
+const MainMypageEditRouteRouteChildren: MainMypageEditRouteRouteChildren = {
+  MainMypageEditEditContentRoute: MainMypageEditEditContentRoute,
+}
+
+const MainMypageEditRouteRouteWithChildren =
+  MainMypageEditRouteRoute._addFileChildren(MainMypageEditRouteRouteChildren)
+
+interface MainMypageLikesRouteRouteChildren {
+  MainMypageLikesLikesContentRoute: typeof MainMypageLikesLikesContentRoute
+}
+
+const MainMypageLikesRouteRouteChildren: MainMypageLikesRouteRouteChildren = {
+  MainMypageLikesLikesContentRoute: MainMypageLikesLikesContentRoute,
+}
+
+const MainMypageLikesRouteRouteWithChildren =
+  MainMypageLikesRouteRoute._addFileChildren(MainMypageLikesRouteRouteChildren)
+
+interface MainMypageNotificationsRouteRouteChildren {
+  MainMypageNotificationsNotificationsContentRoute: typeof MainMypageNotificationsNotificationsContentRoute
+}
+
+const MainMypageNotificationsRouteRouteChildren: MainMypageNotificationsRouteRouteChildren =
+  {
+    MainMypageNotificationsNotificationsContentRoute:
+      MainMypageNotificationsNotificationsContentRoute,
+  }
+
+const MainMypageNotificationsRouteRouteWithChildren =
+  MainMypageNotificationsRouteRoute._addFileChildren(
+    MainMypageNotificationsRouteRouteChildren,
+  )
+
+interface MainMypagePrivacyRouteRouteChildren {
+  MainMypagePrivacyPrivacyContentRoute: typeof MainMypagePrivacyPrivacyContentRoute
+}
+
+const MainMypagePrivacyRouteRouteChildren: MainMypagePrivacyRouteRouteChildren =
+  {
+    MainMypagePrivacyPrivacyContentRoute: MainMypagePrivacyPrivacyContentRoute,
+  }
+
+const MainMypagePrivacyRouteRouteWithChildren =
+  MainMypagePrivacyRouteRoute._addFileChildren(
+    MainMypagePrivacyRouteRouteChildren,
+  )
+
+interface MainMypageTermsRouteRouteChildren {
+  MainMypageTermsTermsContentRoute: typeof MainMypageTermsTermsContentRoute
+}
+
+const MainMypageTermsRouteRouteChildren: MainMypageTermsRouteRouteChildren = {
+  MainMypageTermsTermsContentRoute: MainMypageTermsTermsContentRoute,
+}
+
+const MainMypageTermsRouteRouteWithChildren =
+  MainMypageTermsRouteRoute._addFileChildren(MainMypageTermsRouteRouteChildren)
+
 interface MainRouteChildren {
-  MainChatRouteRoute: typeof MainChatRouteRouteWithChildren
+  MainChatRouteRoute: typeof MainChatRouteRoute
+  MainMatchingRouteRoute: typeof MainMatchingRouteRouteWithChildren
   MainBusinessCalendarRouteRoute: typeof MainBusinessCalendarRouteRoute
-  MainHomeBrandRouteRoute: typeof MainHomeBrandRouteRouteWithChildren
-  MainHomeCampaignRouteRoute: typeof MainHomeCampaignRouteRouteWithChildren
-  MainMatchingTestMatchingResultRouteRoute: typeof MainMatchingTestMatchingResultRouteRoute
+  MainBusinessCampaignRouteRoute: typeof MainBusinessCampaignRouteRoute
+  MainBusinessProposalRouteRoute: typeof MainBusinessProposalRouteRoute
+  MainBusinessRejectionRouteRoute: typeof MainBusinessRejectionRouteRoute
+  MainMypageEditRouteRoute: typeof MainMypageEditRouteRouteWithChildren
+  MainMypageLikesRouteRoute: typeof MainMypageLikesRouteRouteWithChildren
+  MainMypageMypageRouteRoute: typeof MainMypageMypageRouteRoute
+  MainMypageNotificationsRouteRoute: typeof MainMypageNotificationsRouteRouteWithChildren
+  MainMypagePrivacyRouteRoute: typeof MainMypagePrivacyRouteRouteWithChildren
+  MainMypageProfileCardRouteRoute: typeof MainMypageProfileCardRouteRoute
+  MainMypageTermsRouteRoute: typeof MainMypageTermsRouteRouteWithChildren
   MainHomePreRoute: typeof MainHomePreRoute
   MainHomeIndexRoute: typeof MainHomeIndexRoute
-  MainMatchingTestMatchingTestStep1RouteRoute: typeof MainMatchingTestMatchingTestStep1RouteRoute
-  MainMatchingTestMatchingTestStep2RouteRoute: typeof MainMatchingTestMatchingTestStep2RouteRoute
-  MainMatchingTestMatchingTestStep3RouteRoute: typeof MainMatchingTestMatchingTestStep3RouteRoute
+  MainMypageComponentsProfileCardTsxMatchingResultRoute: typeof MainMypageComponentsProfileCardTsxMatchingResultRoute
+  MainMypageComponentsProfileCardTsxMyCampaignsRoute: typeof MainMypageComponentsProfileCardTsxMyCampaignsRoute
+  MainMypageComponentsProfileCardTsxMyTraitsRoute: typeof MainMypageComponentsProfileCardTsxMyTraitsRoute
+  MainMypageComponentsProfileCardTsxProfileSummaryRoute: typeof MainMypageComponentsProfileCardTsxProfileSummaryRoute
+  MainMypageComponentsProfileCardTsxSnsCardRoute: typeof MainMypageComponentsProfileCardTsxSnsCardRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
-  MainChatRouteRoute: MainChatRouteRouteWithChildren,
+  MainChatRouteRoute: MainChatRouteRoute,
+  MainMatchingRouteRoute: MainMatchingRouteRouteWithChildren,
   MainBusinessCalendarRouteRoute: MainBusinessCalendarRouteRoute,
-  MainHomeBrandRouteRoute: MainHomeBrandRouteRouteWithChildren,
-  MainHomeCampaignRouteRoute: MainHomeCampaignRouteRouteWithChildren,
-  MainMatchingTestMatchingResultRouteRoute:
-    MainMatchingTestMatchingResultRouteRoute,
+  MainBusinessCampaignRouteRoute: MainBusinessCampaignRouteRoute,
+  MainBusinessProposalRouteRoute: MainBusinessProposalRouteRoute,
+  MainBusinessRejectionRouteRoute: MainBusinessRejectionRouteRoute,
+  MainMypageEditRouteRoute: MainMypageEditRouteRouteWithChildren,
+  MainMypageLikesRouteRoute: MainMypageLikesRouteRouteWithChildren,
+  MainMypageMypageRouteRoute: MainMypageMypageRouteRoute,
+  MainMypageNotificationsRouteRoute:
+    MainMypageNotificationsRouteRouteWithChildren,
+  MainMypagePrivacyRouteRoute: MainMypagePrivacyRouteRouteWithChildren,
+  MainMypageProfileCardRouteRoute: MainMypageProfileCardRouteRoute,
+  MainMypageTermsRouteRoute: MainMypageTermsRouteRouteWithChildren,
   MainHomePreRoute: MainHomePreRoute,
   MainHomeIndexRoute: MainHomeIndexRoute,
-  MainMatchingTestMatchingTestStep1RouteRoute:
-    MainMatchingTestMatchingTestStep1RouteRoute,
-  MainMatchingTestMatchingTestStep2RouteRoute:
-    MainMatchingTestMatchingTestStep2RouteRoute,
-  MainMatchingTestMatchingTestStep3RouteRoute:
-    MainMatchingTestMatchingTestStep3RouteRoute,
+  MainMypageComponentsProfileCardTsxMatchingResultRoute:
+    MainMypageComponentsProfileCardTsxMatchingResultRoute,
+  MainMypageComponentsProfileCardTsxMyCampaignsRoute:
+    MainMypageComponentsProfileCardTsxMyCampaignsRoute,
+  MainMypageComponentsProfileCardTsxMyTraitsRoute:
+    MainMypageComponentsProfileCardTsxMyTraitsRoute,
+  MainMypageComponentsProfileCardTsxProfileSummaryRoute:
+    MainMypageComponentsProfileCardTsxProfileSummaryRoute,
+  MainMypageComponentsProfileCardTsxSnsCardRoute:
+    MainMypageComponentsProfileCardTsxSnsCardRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  RoomsRouteRoute: RoomsRouteRouteWithChildren,
   MainRoute: MainRouteWithChildren,
   AuthLoginRouteRoute: AuthLoginRouteRoute,
   AuthSignupInfoRouteRoute: AuthSignupInfoRouteRoute,

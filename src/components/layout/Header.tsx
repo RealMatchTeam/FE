@@ -1,3 +1,6 @@
+import { useNavigate } from "@tanstack/react-router";
+import arrowLeftIcon from "../../assets/icon/arrow-left.svg";
+
 interface HeaderProps {
   title?: string;
   showBack?: boolean;
@@ -11,43 +14,46 @@ export default function Header({
   onBackClick,
   rightElement,
 }: HeaderProps) {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      // 기본 동작: 이전 페이지로 이동
+      navigate({ to: ".." }); 
+    }
+  };
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between w-full h-[107px] px-4 bg-white border-b border-text-gray5 safe-area-top">
-      {/* 왼쪽: 뒤로가기 버튼 */}
-      <div className="flex items-center">
+    <header className="sticky top-0 z-50 flex items-center justify-between w-full h-[60px] px-[16px] py-[10px] bg-white border-b border-[var(--color-text-gray5)]">
+      <div className="flex items-center w-8">
         {showBack && (
           <button
-            onClick={onBackClick}
-            className="flex items-center justify-center w-8 h-8 text-text-black hover:bg-bluegray-1 rounded-lg transition-colors"
+            onClick={handleBack} // 수정된 부분
+            className="flex items-center justify-start active:opacity-50 transition-opacity"
             aria-label="뒤로가기"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
-              />
-            </svg>
+            {/* assets의 화살표 아이콘 사용 + 왼쪽으로 회전 */}
+            <img 
+              src={arrowLeftIcon} 
+              alt="back" 
+              className="w-6 h-6 brightness-0"
+            />
           </button>
         )}
       </div>
 
       {/* 중앙: 타이틀 */}
       {title && (
-        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-title1 text-text-black">
+        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-title1 text-[var(--color-text-black)] whitespace-nowrap">
           {title}
         </h1>
       )}
 
-      {/* 오른쪽: 커스텀 엘리먼트 */}
-      <div className="flex items-center">{rightElement}</div>
+      {/* 오른쪽: 커스텀 엘리먼트 영역 */}
+      <div className="flex items-center justify-end w-8">
+        {rightElement}
+      </div>
     </header>
   );
 }
