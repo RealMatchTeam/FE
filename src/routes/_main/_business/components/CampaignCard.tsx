@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import BrandLogo from "../../../../assets/brand-logo.png";
 import ArrowRight from "../../../../assets/icon/arrow-right.svg";
 import SearchIcon from "../../../../assets/icon/search.svg";
@@ -20,7 +21,7 @@ export default function CampaignCard({
   logo,
   showButton = true,
 }: CampaignCardProps) {
-  const BUTTON_WIDTH = '280px';
+  const navigate = useNavigate();
 
   // 로고 컴포넌트
   const Logo = (
@@ -35,10 +36,7 @@ export default function CampaignCard({
 
   return (
     <Card image={Logo}>
-      <div
-        className="flex flex-col h-[72px] justify-between"
-        style={{ width: BUTTON_WIDTH }}
-      >
+      <div className="flex flex-col flex-1 gap-2 min-w-0">
         {/* 브랜드 + 제목/날짜 */}
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-1">
@@ -51,8 +49,8 @@ export default function CampaignCard({
               {title}
             </p>
             <div className="flex flex-col items-end text-[10px] text-text-gray3 leading-tight ml-2 flex-shrink-0">
-              <span>{startDate}.25</span>
-              <span>{endDate}.25</span>
+              <span>{startDate}</span>
+              <span>{endDate}</span>
             </div>
           </div>
         </div>
@@ -60,13 +58,20 @@ export default function CampaignCard({
         {/* 캠페인 보기 버튼 */}
         {showButton && (
           <button
-            className="relative flex items-center justify-center bg-[#EBEEFB] rounded-[6px] transition-colors hover:bg-[#DEE2F5]"
-            style={{ width: BUTTON_WIDTH, height: '50px' }}
+          onClick={() => navigate({ to: "/campaign" })}
+            className="
+              flex items-center justify-center 
+              w-full max-w-[221px] h-[30px] 
+              gap-2 px-4 py-[5px] 
+              bg-[#EBEEFB] rounded-[6px] 
+              transition-colors hover:bg-[#DEE2F5]
+              mt-1
+            "
           >
             <img
               src={SearchIcon}
               alt="돋보기"
-              className="absolute left-[12px] w-3.5 h-3.5 object-contain"
+              className="w-3.5 h-3.5 object-contain"
             />
             <span className="text-[13px] font-medium text-text-black">
               캠페인 보기

@@ -53,15 +53,15 @@ export default function MonthlyCalendar() {
         </div>
 
         {/* 일정 바 */}
-        <div className="absolute top-[85px] left-0 w-full pointer-events-none">
+        <div className="absolute top-[200px] left-0 w-full pointer-events-none">
           {/* 비플레인 */}
           <div
             className="absolute flex items-center justify-center text-[11px] text-white shadow-sm bg-grad-1"
             style={{
-              left: "28.57%",
+              left: "16.57%",
               width: "57.14%",
-              height: "20px",
-              borderRadius: "20px",
+              height: "22px",
+              borderRadius: "11px",
               top: "0px",
             }}
           >
@@ -72,11 +72,11 @@ export default function MonthlyCalendar() {
           <div
             className="absolute flex items-center justify-center text-[11px] text-white shadow-sm bg-grad-2"
             style={{
-              left: "57.14%",
-              width: "42.85%",
-              height: "20px",
-              borderRadius: "20px",
-              top: "25px",
+              left: "48.14%",
+              width: "48.85%",
+              height: "22px",
+              borderRadius: "11px",
+              top: "26px",
             }}
           >
             라운드랩
