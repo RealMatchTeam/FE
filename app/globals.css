@@ -1,0 +1,299 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import "tailwindcss";
+
+@theme {
+  /* Core 컬러 */
+  --color-core-1: #6666e5;
+  --color-core-2: #e6e6f3;
+  --color-core-3: #b7b7f3;
+  --color-core-50: #6666e580;
+  --color-core-70: #B7B7F3B2;
+  ;
+
+  /* State 컬러 */
+  --color-error: #F84343;
+  --color-success: #6666e5;
+
+  /* Text 컬러 */
+  --color-text-black: #171718;
+  --color-text-gray1: #494a50;
+  --color-text-gray2: #5b5d6b;
+  --color-text-gray3: #9b9ba1;
+  --color-text-gray4: #d4d4d9;
+  --color-text-gray5: #f3f3f3;
+
+  /* Bluegray */
+  --color-bluegray-1: #f3f4f8;
+  --color-bluegray-2: #ebeefb;
+
+  /* Background 컬러 */
+  --color-bg-w: #ffffff;
+  --color-bg-w-80: #ffffffcc;
+  --color-bg-w-60: #ffffff99;
+  --color-bg-black-20: #17171833;
+
+  /* 폰트 패밀리 */
+  --font-family-pretendard: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-family-pretendard);
+    color: var(--color-text-black);
+    background-color: var(--color-bluegray-1);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+
+  /* Typography 클래스 */
+  .text-title {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .text-title1 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .text-title2 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+  .text-title3 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+  .text-title4 {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 18px;
+  }
+
+  .text-title5 {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 14px;
+  }
+
+  .text-title6 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .text-title7 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+  }
+
+  .text-title8 {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  .text-headline1 {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 30px;
+  }
+
+  .text-caption1 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 14px;
+  }
+
+  .text-caption2 {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 16px;
+  }
+
+  .text-callout1 {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  .text-callout2 {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 12px;
+  }
+
+  .text-callout3 {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  .text-callout4 {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 12px;
+  }
+
+  .text-body1 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 18px;
+  }
+
+  .text-button {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 18px;
+  }
+
+  /* 에러/성공 메시지 스타일 */
+  .text-error {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 12px;
+    color: var(--color-error);
+  }
+
+  .text-success {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 12px;
+    color: var(--color-success);
+  }
+
+  /* 비밀번호 입력 필드 스타일 */
+  input[type="password"] {
+    letter-spacing: 0.1em;
+  }
+
+  input[type="password"]::-webkit-input-placeholder {
+    letter-spacing: normal;
+  }
+}
+
+@layer utilities {
+
+  /* 슬라이드 업 애니메이션 */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  /* 스크롤바 숨기기 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE, Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+
+  /* Safe Area 대응 (iOS 노치) */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* 그라디언트 배경 유틸리티 */
+  .bg-grad-calendar-1 {
+    background: linear-gradient(135deg, #b7b7f3 0%, #6666e5 100%);
+  }
+
+  .bg-grad-calendar-2 {
+    background: linear-gradient(135deg, #a7b8fc 0%, #6666e5 100%);
+  }
+
+  .bg-grad-creator {
+    background: linear-gradient(135deg, #6666e5 0%, #3b3b98 100%);
+  }
+
+  .bg-grad-auth {
+    background: linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%);
+  }
+
+  .bg-grad-1 {
+    background: linear-gradient(90deg, #CBCBF5 0%, #6666E5 50.96%, #CBCBF5 100%);
+  }
+
+  .bg-grad-2 {
+    background: linear-gradient(90deg, #AFBEF9 0%, #496EFF 44.23%, #AFBEF9 100%);
+  }
+
+  /* 바텀시트 슬라이드 업 애니메이션 */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  /* 슬라이드 다운 애니메이션 */
+  @keyframes slide-down {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(100%);
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out forwards;
+  }
+}

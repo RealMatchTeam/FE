@@ -1,0 +1,58 @@
+import { type RouteConfig, route, layout, index } from "@react-router/dev/routes";
+
+export default [
+  // Auth routes
+  route("auth", "routes/auth/route.tsx", [
+    route("login", "routes/auth/login/route.tsx"),
+    route("callback", "routes/auth/callback/route.tsx", [
+      route("google", "routes/auth/callback/google/route.tsx"),
+      route("kakao", "routes/auth/callback/kakao/route.tsx"),
+      route("naver", "routes/auth/callback/naver/route.tsx"),
+    ]),
+    route("signup", "routes/auth/signup/route.tsx", [
+      route("terms", "routes/auth/signup/terms/route.tsx"),
+      route("type", "routes/auth/signup/type/route.tsx"),
+      route("info", "routes/auth/signup/info/route.tsx"),
+      route("info-more", "routes/auth/signup/info-more/route.tsx"),
+      route("purpose", "routes/auth/signup/purpose/route.tsx"),
+      route("success", "routes/auth/signup/success/route.tsx"),
+    ]),
+  ]),
+
+  // Main layout routes
+  layout("routes/_main.tsx", [
+    index("routes/home/index.tsx"),
+
+    route("matching", "routes/matching/route.tsx", [
+      route("brand", "routes/matching/brand/route.tsx"),
+      route("campaign", "routes/matching/campaign/route.tsx"),
+    ]),
+
+    route("matching/suggest", "routes/matching/suggest/route.tsx", [
+      index("routes/matching/suggest/index.tsx"),
+      route("create", "routes/matching/suggest/create/route.tsx"),
+    ]),
+
+    route("matching/test", "routes/matching/test/route.tsx", [
+      route("step1", "routes/matching/test/step1/route.tsx"),
+      route("step2", "routes/matching/test/step2/route.tsx"),
+      route("step3", "routes/matching/test/step3/route.tsx"),
+      route("result", "routes/matching/test/result/route.tsx"),
+    ]),
+
+    route("business", "routes/business/route.tsx", [
+      route("calendar", "routes/business/calendar/route.tsx"),
+      route("campaign", "routes/business/campaign/route.tsx"),
+      route("proposal", "routes/business/proposal/route.tsx"),
+      route("rejection", "routes/business/rejection/route.tsx"),
+    ]),
+
+    route("chat", "routes/chat/route.tsx"),
+
+    route("rooms", "routes/rooms/route.tsx", [
+      route(":chatId", "routes/rooms/$chatId.tsx"),
+    ]),
+
+    route("mypage", "routes/mypage/route.tsx"),
+  ]),
+] satisfies RouteConfig;

@@ -1,6 +1,6 @@
+import { reactRouter } from "@react-router/dev/vite";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
@@ -11,30 +11,16 @@ export default defineConfig({
       overlay: false,
     },
   },
-  logLevel: 'warn',
+  logLevel: "info",
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['@tanstack/react-router'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-form': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          'vendor-utils': ['axios', 'zustand', 'clsx', 'tailwind-merge'],
-        },
-      },
-    },
     chunkSizeWarningLimit: 500,
     sourcemap: false,
-    minify: 'esbuild',
-    target: 'esnext',
+    minify: "esbuild",
+    target: "esnext",
   },
   plugins: [
-    TanStackRouterVite({
-      routeFileIgnorePattern: ".*(/(components|utils|hooks|types)/.*|-content\\.tsx$)",
-      disableLogging: true,
-    }),
-    react(),
+    tailwindcss(),
+    reactRouter(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
