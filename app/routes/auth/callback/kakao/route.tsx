@@ -40,11 +40,11 @@ export default function KakaoCallback() {
             name: decoded.name,
             email: decoded.email,
           });
-          navigate("/home");
+          navigate("/");
         }
       } catch (e) {
         console.error("Token decode failed", e);
-        navigate("/home");
+        navigate("/");
       }
       return;
     }
