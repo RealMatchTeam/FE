@@ -8,9 +8,10 @@ const PRIMARY = "#5B5DEB";
 type Props = {
   item: CampaignItem;
   variant: "top" | "popular";
+  onClick?: () => void;
 };
 
-export default function CampaignCard({ item, variant }: Props) {
+export default function CampaignCard({ item, variant, onClick }: Props) {
   const rightText =
     variant === "popular"
       ? `${item.progressText}명`
@@ -19,7 +20,11 @@ export default function CampaignCard({ item, variant }: Props) {
         : "";
 
   return (
-    <div className="w-[118px] shrink-0">
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-[118px] shrink-0 text-left"
+    >
       <div className="relative aspect-square rounded-2xl border border-black/5 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.06)]">
         <div className="absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between">
           <div className="flex max-w-[76px] items-center gap-1 overflow-hidden">
@@ -62,6 +67,6 @@ export default function CampaignCard({ item, variant }: Props) {
           </div>
         ) : null}
       </div>
-    </div>
+    </button>
   );
 }

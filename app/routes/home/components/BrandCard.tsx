@@ -5,11 +5,15 @@ import BadgePill from "./BadgePill";
 
 const PRIMARY = "#5B5DEB";
 
-type Props = { item: BrandItem };
+type Props = { item: BrandItem; onClick?: () => void };
 
-export default function BrandCard({ item }: Props) {
+export default function BrandCard({ item, onClick }: Props) {
   return (
-    <div className="w-[118px] shrink-0">
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-[118px] shrink-0 text-left"
+    >
       <div className="relative aspect-square rounded-2xl border border-black/5 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.06)]">
         {/* 상단: 좌 배지 / 우 하트 */}
         <div className="absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between">
@@ -54,6 +58,6 @@ export default function BrandCard({ item }: Props) {
           {item.subText ?? ""}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
