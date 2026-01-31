@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { type SortOption, SORT_LABEL } from "./components/SortingSheet";
+import { SORT_LABEL, type SortOption } from "./components/SortingSheetConstant";
 import { rooms } from "../../../data/chat-room";
 import ChatListHeader from "./components/ChatListHeader";
 import SortFilterSheet from "./components/SortingSheet";

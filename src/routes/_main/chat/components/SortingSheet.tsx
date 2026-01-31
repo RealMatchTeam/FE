@@ -1,10 +1,6 @@
-// 정렬, 필터 옵션 (최신순/협업 중)
-export type SortOption = "latest" | "collaborating";
+import { type SortOption } from "./SortingSheetConstant";
 
-export const SORT_LABEL: Record<SortOption, string> = {
-  latest: "최신순",
-  collaborating: "협업 중",
-};
+// 정렬, 필터 옵션 (최신순/협업 중)
 
 export function SortFilterSheet({
   open,
