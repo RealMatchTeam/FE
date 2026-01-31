@@ -1,0 +1,1 @@
+import{a as e}from"./chunk-JZWAC4HX-BXfHA1av.js";import{L as a}from"./layout-context-D06zrhwi.js";function u(o){const t=e.useContext(a);e.useLayoutEffect(()=>{if(t)return t.setHideBottomTab(o),()=>{t.setHideBottomTab(!1)}},[o,t])}export{u};

@@ -1,17 +1,17 @@
-import { Route } from "./route";
+import { useSearchParams } from "react-router";
 import MatchResultHeader from "../../../../components/common/RealmatchHeader";
 import MainIcon from "../../../../assets/MainIcon.svg"
 import Button from "../../../../components/common/Button";
 
 export default function MatchingResultContent() {
-    const search = Route.useSearch();
+    const [searchParams] = useSearchParams();
 
     const resultData = {
-        userName: search.userName ?? "OO",
-        beautyTraits: search.fitTraits ?? "00 핏 특성들",
-        styleTraits: search.styleTraits ?? "00 패션 특성들",
-        contentTraits: search.moodTraits ?? "00 콘텐츠 특성들",
-        recommendedBrand: search.recommendedBrand ?? "00한 브랜드와",
+        userName: searchParams.get("userName") ?? "OO",
+        beautyTraits: searchParams.get("fitTraits") ?? "00 핏 특성들",
+        styleTraits: searchParams.get("styleTraits") ?? "00 패션 특성들",
+        contentTraits: searchParams.get("moodTraits") ?? "00 콘텐츠 특성들",
+        recommendedBrand: searchParams.get("recommendedBrand") ?? "00한 브랜드와",
     };
 
     return (

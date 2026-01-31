@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearch } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../../components/common/Button";
@@ -34,7 +34,8 @@ import {
 
 export default function CreateCampaignContent() {
   const navigate = useNavigate();
-  const { type } = useSearch({ from: "/_main/matching/suggest/create" });
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
 
   // 바텀시트 상태 (기존 캠페인일 때만 열림)
   const [isSheetOpen, setIsSheetOpen] = useState(type === "existing");
@@ -82,7 +83,7 @@ export default function CreateCampaignContent() {
 
   const handleSheetClose = () => {
     setIsSheetOpen(false);
-    navigate({ to: "/matching/suggest" });
+    navigate("/matching/suggest");
   };
 
   const onSubmit = (data: CampaignFormData) => {
