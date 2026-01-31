@@ -5,7 +5,7 @@ import RealmatchHeader from "../../../components/common/RealmatchHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
-import { getProposalDetail, type ProposalDetail } from "../../../data/campaign";
+import { type ProposalDetail } from "../../../data/campaign";
 
 import editIcon from "../../../assets/icon-edit.svg";
 import dropdownIcon from "../../../assets/arrow-down.svg";
@@ -18,55 +18,53 @@ export default function CampaignContent() {
   const [isContentOpen, setIsContentOpen] = useState(false);
 
   const [data, setData] = useState<ProposalDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log("1. 현재 주소창에서 가져온 ID:", campaignId);
-    if (campaignId) {
-    setIsLoading(true);
+    if (!campaignId) return;
 
-    // --- 여기부터 가짜 데이터 ---
-    const mockData: ProposalDetail = {
-      proposalId: campaignId,
-      brandId: 1,
-      creatorId: 100,
-      title: "비플레인 클렌징 및 세럼 리뷰 콘텐츠", // 화면에 나올 제목
-      description: "비플레인의 가치가 제 채널과 잘 맞아서 제안드립니다.",
-      rewardAmount: 200000,
-      productId: 10,
-      startDate: "2025-01-20",
-      endDate: "2025-01-30",
-      status: "검토 중",
-      createdAt: "2025-01-15T10:00:00Z",
-      contentTags: {
-        formats: [{ id: "1", name: "인스타그램 릴스" }],
-        categories: [{ id: "2", name: "뷰티" }],
-        tones: [{ id: "3", name: "일상적인" }],
-        involvements: [{ id: "4", name: "가이드 제공" }],
-        usageRanges: [{ id: "5", name: "크리에이터 1차 활용" }],
+    // 비동기 데이터 로딩
+    const loadData = async () => {
+      // --- 여기부터 가짜 데이터 ---
+      const mockData: ProposalDetail = {
+        proposalId: campaignId,
+        brandId: 1,
+        creatorId: 100,
+        title: "비플레인 클렌징 및 세럼 리뷰 콘텐츠", // 화면에 나올 제목
+        description: "비플레인의 가치가 제 채널과 잘 맞아서 제안드립니다.",
+        rewardAmount: 200000,
+        productId: 10,
+        startDate: "2025-01-20",
+        endDate: "2025-01-30",
+        status: "검토 중",
+        createdAt: "2025-01-15T10:00:00Z",
+        contentTags: {
+          formats: [{ id: "1", name: "인스타그램 릴스" }],
+          categories: [{ id: "2", name: "뷰티" }],
+          tones: [{ id: "3", name: "일상적인" }],
+          involvements: [{ id: "4", name: "가이드 제공" }],
+          usageRanges: [{ id: "5", name: "크리에이터 1차 활용" }],
+        }
+      };
+
+      setData(mockData);
+
+      /*
+      try {
+        const res = await getProposalDetail(campaignId);
+        console.log("2. 서버에서 받은 진짜 데이터:", res);
+        setData(res);
+      } catch (err) {
+        console.error("3. API 호출 중 발생한 에러:", err);
       }
+      */
     };
 
-    setData(mockData);
-    setIsLoading(false);
-
-    /*if (campaignId) {
-      getProposalDetail(campaignId)
-        .then((res) => {
-          console.log("2. 서버에서 받은 진짜 데이터:", res);
-          setData(res);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error("3. API 호출 중 발생한 에러:", err);
-          setIsLoading(false);
-        });*/
-    }
+    loadData();
   }, [campaignId]);
 
-  // 3. 로딩 중일 때 보여줄 화면
-  if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
-  if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
+  // 데이터 로딩 전
+  if (!data) return <div className="p-10 text-center">로딩 중...</div>;
 
   // 태그들을 예쁘게 합쳐주는 함수 (예: ["릴스", "숏폼"] -> "릴스, 숏폼")
   const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
