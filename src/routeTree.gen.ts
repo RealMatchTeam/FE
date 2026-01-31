@@ -300,6 +300,7 @@ const MainMypageComponentsProfileCardTsxMatchingResultRoute =
 
 export interface FileRoutesByFullPath {
   '/rooms': typeof RoomsRouteRouteWithChildren
+  '/': typeof MainHomeIndexRoute
   '/login': typeof AuthLoginRouteRoute
   '/chat': typeof MainChatRouteRoute
   '/matching': typeof MainMatchingRouteRouteWithChildren
@@ -325,7 +326,6 @@ export interface FileRoutesByFullPath {
   '/matching/campaign': typeof MainMatchingCampaignRouteRoute
   '/matching/suggest': typeof MainMatchingSuggestRouteRouteWithChildren
   '/pre': typeof MainHomePreRoute
-  '/': typeof MainHomeIndexRoute
   '/matching/suggest/create': typeof MainMatchingSuggestCreateRouteRoute
   '/matching/test/result': typeof MainMatchingTestResultRouteRoute
   '/matching/test/step1': typeof MainMatchingTestStep1RouteRoute
@@ -438,6 +438,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/rooms'
+    | '/'
     | '/login'
     | '/chat'
     | '/matching'
@@ -463,7 +464,6 @@ export interface FileRouteTypes {
     | '/matching/campaign'
     | '/matching/suggest'
     | '/pre'
-    | '/'
     | '/matching/suggest/create'
     | '/matching/test/result'
     | '/matching/test/step1'
@@ -589,7 +589,7 @@ declare module '@tanstack/react-router' {
     '/_main': {
       id: '/_main'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof MainRouteImport
       parentRoute: typeof rootRouteImport
     }

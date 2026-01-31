@@ -107,7 +107,7 @@ export default function MyPageHome({
         </div>
       </div>
 
-      <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
+      <div className="w-full max-w-[375px] h-[10px] bg-[#F3F3FA]"></div>
  
       {/* list */}
       <div >

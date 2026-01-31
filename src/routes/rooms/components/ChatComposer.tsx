@@ -29,7 +29,7 @@ export default function ChatComposer({
 
   return (
     <div
-      className="fixed w-full max-w-[430px] bg-[#1A1A1A] left-1/2 -translate-x-1/2 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      className="fixed w-full max-w-[375px] bg-[#1A1A1A] left-1/2 -translate-x-1/2 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
       style={{
         bottom: "calc(var(--kb, 0px) + env(safe-area-inset-bottom, 0px))",
         transform: isSheetOpen ? `translateY(-${sheetOffset}px)` : "translateY(0px)",

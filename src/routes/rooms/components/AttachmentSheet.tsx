@@ -57,7 +57,7 @@ export default function AttachmentSheet({ open, actions, onClose, onAction, heig
       {/* sheet */}
       <div
         className={[
-          "fixed bottom-0 w-full max-w-[430px] px-[68px] py-[30px] bg-[#E6E6F3] transition-transform",
+          "fixed bottom-0 w-full max-w-[375px] px-[68px] py-[30px] bg-[#E6E6F3] transition-transform",
           open ? "translate-y-0" : "translate-y-full",
         ].join(" ")}
         style={{
@@ -76,7 +76,7 @@ export default function AttachmentSheet({ open, actions, onClose, onAction, heig
             >
               <Icon name={a.icon} />
             </button>
-            <div className="text-Medium text-[12px] text-[#5B5D6B]">{a.label}</div>
+            <div className="text-Medium text-[12px] leading-[16px] text-[#5B5D6B] whitespace-nowrap">{a.label}</div>
           </div>
         ))}
         </div>

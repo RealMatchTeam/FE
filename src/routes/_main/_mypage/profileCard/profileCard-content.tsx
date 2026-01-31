@@ -1,4 +1,5 @@
 import React from "react";
+import NavigationHeader from "../../../../components/common/NavigationHeader";
 
 type Campaign = {
   type: "보낸 제안" | "지원";
@@ -14,23 +15,20 @@ export default function ProfileCard() {
   ];
 
   return (
-    <div className="min-h-dvh w-full bg-[#2f3137] flex justify-center">
-      {/* phone frame (430px) */}
-      <div className="w-full max-w-[430px] bg-white overflow-hidden shadow-2xl">
-        {/* status bar mock */}
+    <div className="min-h-dvh w-full flex justify-center">
+      <div className="w-full max-w-[375px] bg-white overflow-hidden shadow-2xl">
         {/* header */}
-        <div className="px-[23px] pb-[10px]">
-          <div className="h-[44px] flex items-center justify-between">
-            <button type="button" className="w-10 h-10 -ml-2 grid place-items-center">
-              <span className="text-[22px] leading-none">‹</span>
-            </button>
-            <div className="text-[16px] font-semibold">내 프로필 카드</div>
-            <div className="w-10 h-10" />
-          </div>
+        <div className="absolute top-0 left-0 right-0 z-50">
+          <NavigationHeader
+            title={"내 프로필 카드"}
+            onBack={() => history.back()}
+          />
+        </div>
 
+        <div className="px-4 py-6">
           {/* profile summary */}
-          <div className="flex items-center gap-[12px] mt-[10px]">
-            <div className="relative w-[44px] h-[44px] rounded-full bg-gray-200 overflow-hidden">
+          <div className="flex items-center gap-4 mt-[10px]">
+            <div className="relative w-[50px] h-[50px] rounded-[20px] border border-[#E6E6F3] bg-gray-200 overflow-hidden">
               {/* 이미지 자리 */}
               <div className="absolute inset-0 bg-gradient-to-b from-gray-200 to-gray-300" />
               <div className="absolute -right-[2px] -bottom-[2px] w-[18px] h-[18px] rounded-full bg-white grid place-items-center shadow">
@@ -38,8 +36,8 @@ export default function ProfileCard() {
               </div>
             </div>
 
-            <div className="flex-1">
-              <div className="text-[16px] font-semibold leading-[20px]">비비</div>
+            <div className="flex-1 gap-[6px]">
+              <div className="text-[16px] font-Semibold leading-[20px]">비비</div>
               <div className="text-[12px] text-black/50 leading-[16px] mt-[2px]">여성 22세</div>
               <div className="text-[12px] text-[#6D6AFE] leading-[16px] mt-[2px]">
                 관심분야: 뷰티, 패션
@@ -48,19 +46,30 @@ export default function ProfileCard() {
           </div>
         </div>
 
-        <div className="h-[1px] bg-black/5" />
+        <div className="w-full max-w-[375px] h-[10px] bg-[#F3F3FA]"></div>
 
         {/* content */}
-        <div className="px-[23px] pb-[86px]">
+        <div className="h-[96px] px-4">
           {/* SNS */}
           <Section title="SNS 계정">
-            <div className="flex items-center gap-3">
-              <div className="w-[22px] h-[22px] rounded bg-black/5 grid place-items-center">
-                <span className="text-[12px] text-black/50">◎</span>
+            <div className="flex items-center gap-2">
+              <div className="w-[20px] h-[20px]">
+                <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.83333 0H11.8333C14.5 0 16.6667 2.16667 16.6667 4.83333V11.8333C16.6667 13.1152 16.1574 14.3446 15.251 15.251C14.3446 16.1574 13.1152 16.6667 11.8333 16.6667H4.83333C2.16667 16.6667 0 14.5 0 11.8333V4.83333C0 3.55145 0.509225 2.32208 1.41565 1.41565C2.32208 0.509225 3.55145 0 4.83333 0ZM4.66667 1.66667C3.87102 1.66667 3.10796 1.98274 2.54535 2.54535C1.98274 3.10796 1.66667 3.87102 1.66667 4.66667V12C1.66667 13.6583 3.00833 15 4.66667 15H12C12.7956 15 13.5587 14.6839 14.1213 14.1213C14.6839 13.5587 15 12.7956 15 12V4.66667C15 3.00833 13.6583 1.66667 12 1.66667H4.66667ZM12.7083 2.91667C12.9846 2.91667 13.2496 3.02641 13.4449 3.22176C13.6403 3.41711 13.75 3.68207 13.75 3.95833C13.75 4.2346 13.6403 4.49955 13.4449 4.6949C13.2496 4.89025 12.9846 5 12.7083 5C12.4321 5 12.1671 4.89025 11.9718 4.6949C11.7764 4.49955 11.6667 4.2346 11.6667 3.95833C11.6667 3.68207 11.7764 3.41711 11.9718 3.22176C12.1671 3.02641 12.4321 2.91667 12.7083 2.91667ZM8.33333 4.16667C9.4384 4.16667 10.4982 4.60565 11.2796 5.38705C12.061 6.16846 12.5 7.22826 12.5 8.33333C12.5 9.4384 12.061 10.4982 11.2796 11.2796C10.4982 12.061 9.4384 12.5 8.33333 12.5C7.22826 12.5 6.16846 12.061 5.38705 11.2796C4.60565 10.4982 4.16667 9.4384 4.16667 8.33333C4.16667 7.22826 4.60565 6.16846 5.38705 5.38705C6.16846 4.60565 7.22826 4.16667 8.33333 4.16667ZM8.33333 5.83333C7.67029 5.83333 7.03441 6.09672 6.56557 6.56557C6.09672 7.03441 5.83333 7.67029 5.83333 8.33333C5.83333 8.99637 6.09672 9.63226 6.56557 10.1011C7.03441 10.5699 7.67029 10.8333 8.33333 10.8333C8.99637 10.8333 9.63226 10.5699 10.1011 10.1011C10.5699 9.63226 10.8333 8.99637 10.8333 8.33333C10.8333 7.67029 10.5699 7.03441 10.1011 6.56557C9.63226 6.09672 8.99637 5.83333 8.33333 5.83333Z" fill="#A7A7AD"/>
+                </svg>
               </div>
-              <div className="flex-1 text-[14px] text-black/70">www.instagram.com/vivi</div>
-              <button type="button" className="text-[14px] text-black/40">
-                ✎
+              <div className="text-[14px] leading-[20px] text-[#5B5D6B]">www.instagram.com/vivi</div>
+              <button type="button">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_1474_81253)">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5625 8.43731V7.26294L6.1125 2.71294L7.2875 3.88731L2.7375 8.43731H1.5625ZM7.95 3.22419L8.45312 2.72106C8.48223 2.69203 8.50532 2.65755 8.52107 2.61958C8.53682 2.58162 8.54493 2.54092 8.54493 2.49981C8.54493 2.45871 8.53682 2.41801 8.52107 2.38004C8.50532 2.34207 8.48223 2.30759 8.45312 2.27856L7.72125 1.54669C7.69222 1.51758 7.65774 1.49449 7.61977 1.47874C7.58181 1.46299 7.5411 1.45488 7.5 1.45488C7.4589 1.45488 7.41819 1.46299 7.38023 1.47874C7.34226 1.49449 7.30778 1.51758 7.27875 1.54669L6.77562 2.04981L7.95 3.22419ZM0.625 8.43731V6.87481L6.61625 0.883561C6.85066 0.649222 7.16854 0.517578 7.5 0.517578C7.83146 0.517578 8.14934 0.649222 8.38375 0.883561L9.11625 1.61606C9.35059 1.85047 9.48223 2.16836 9.48223 2.49981C9.48223 2.83127 9.35059 3.14915 9.11625 3.38356L3.125 9.37481H0.625V8.43731Z" fill="#9B9BA1"/>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_1474_81253">
+                    <rect width="10" height="10" fill="white"/>
+                    </clipPath>
+                  </defs>
+                </svg>
               </button>
             </div>
           </Section>
@@ -156,7 +165,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="pt-[18px]">
+    <section className="py-6">
       <div className="flex items-center justify-between mb-[12px]">
         <div className="text-[14px] font-semibold text-black/80">{title}</div>
         {right}

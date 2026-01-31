@@ -1,4 +1,4 @@
-import { type ChatRoom } from "../routes/_main/chat/types/ChatRoom";
+import { type ChatRoom } from "../routes/_main/chat/ChatList";
 
 export const rooms: ChatRoom[] = [
   {
@@ -7,9 +7,9 @@ export const rooms: ChatRoom[] = [
     lastMessage: "안녕하세요! 제안 확인 부탁드립니다.안녕하세요 제안 확인 부탁드립니다 안녕하세요 제안 확인 부탁드립니다 안녕하세요 제안 확인 부탁드립니다",
     updatedAt: new Date().toISOString(),
     unreadCount: 2,
-    status: "matching",
     logoUrl: "",
     type: "sent",
+    isCollaborating: true,
   },
   {
     id: "2",
@@ -17,9 +17,9 @@ export const rooms: ChatRoom[] = [
     lastMessage: "검토 중입니다!",
     updatedAt: "2025-01-05T10:00:00",
     unreadCount: 0,
-    status: "reviewing",
     logoUrl: "",
-    type: "received",
+    type: "sent",
+    isCollaborating: false,
   },
 ];
 

@@ -1,4 +1,5 @@
 import { type ChatMessage } from "./TextMessageTypes";
+import { useNavigate } from "@tanstack/react-router";
 
 type Props = {
   message: ChatMessage;
@@ -9,6 +10,7 @@ export default function ProposalMessage({ message }: Props) {
   const timeText = message.time ?? "";
   const isLeft = message.side === "other" || message.side === "system";
   const avatarSrc = undefined;
+  const navigate = useNavigate();
 
   if (isMe) return (
     <div className="flex w-full justify-end">
@@ -36,7 +38,10 @@ export default function ProposalMessage({ message }: Props) {
                 </div>
                 <button
                   type="button"
-                  onClick={() => {}} // TODO: 캠페인 상세 보기
+                  onClick={() => navigate({ 
+                    to: "/proposal",
+                    search: { type: "sent" }, 
+                  })} // 보낸 제안 보기
                   className="w-6 h-6 grid place-items-center text-gray2"
                   aria-label="expand"
                 >
@@ -106,7 +111,10 @@ export default function ProposalMessage({ message }: Props) {
 
                     <button
                       type="button"
-                      onClick={() => {}} // TODO: 캠페인 상세 보기
+                      onClick={() => navigate({ 
+                        to: "/proposal",
+                        search: { type: "received" }, 
+                      })} // 받은 제안 보기
                       className="w-6 h-6 grid place-items-center text-gray2"
                       aria-label="expand"
                     >

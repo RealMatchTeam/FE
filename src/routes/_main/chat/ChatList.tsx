@@ -1,6 +1,16 @@
-import { type ChatRoom } from "../types/ChatRoom";
-import { formatKoreanDateTime } from "../../../../utils/dateTime";
+import { formatKoreanDateTime } from "../../../utils/dateTime";
 import { useNavigate } from "@tanstack/react-router";
+
+export type ChatRoom = {
+  id: string;
+  brandName: string;
+  lastMessage: string;
+  updatedAt: string;
+  unreadCount: number;
+  logoUrl: string; 
+  type: "sent" | "received";
+  isCollaborating: boolean;
+};
 
 export function ChatList({ rooms }: { rooms: ChatRoom[] }) {
   return (
@@ -13,25 +23,14 @@ export function ChatList({ rooms }: { rooms: ChatRoom[] }) {
 }
 
 export function ChatListItem({ room }: { room: ChatRoom }) {
-  const statusLabel =
-    room.status === "matching" ? "매칭" : room.status === "reviewing" ? "검토 중" : "거절";
-
-  // 뱃지 톤: 매칭=보라, 검토중=연보라, 거절=그레이
-  const statusClass =
-    room.status === "matching"
-      ? "bg-[#E6E6F3] text-[#6666E5]"
-      : room.status === "reviewing"
-        ? "bg-[#EBEEFB] text-[#A7B8FC]"
-        : "bg-[#F3F3F3] text-text-gray3";
 
   const { dateText, timeText } = formatKoreanDateTime(room.updatedAt);
-
   const navigate = useNavigate();
 
   return (
     <button
       type="button"
-      className=" w-full max-w-[420px] rounded-[10px] bg-white px-4 py-[14px] flex items-start gap-[14px] text-left"
+      className=" w-full max-w-[420px] rounded-[10px] bg-white px-4 py-[14px] flex items-start gap-[14px] text-left active:bg-[#F2F2F5]"
       onClick={() =>
         navigate({
           to: "/rooms/$chatId",
@@ -62,18 +61,20 @@ export function ChatListItem({ room }: { room: ChatRoom }) {
             {room.brandName}
           </div>
 
-          <span
-            className={`
-              ${statusClass}
-              text-[10px]
-              text-Medium
-              px-[6px] py-[2px]
-              rounded-[5px]
-              shrink-0
-            `}
-          >
-            {statusLabel}
-          </span>
+          {room.isCollaborating && (
+            <span
+              className={`
+                bg-[#B7B7F380] text-[#6666E5]
+                text-[10px]
+                text-Medium
+                px-[6px] py-[2px]
+                rounded-[5px]
+                shrink-0
+              `}
+            >
+              협업 중
+            </span>
+            )}
         </div>
 
         {/* 2줄 미리보기 */}

@@ -1,13 +1,18 @@
 import { type ChatMessage } from "./TextMessageTypes";
+import { useNavigate } from "@tanstack/react-router";
+import MessageStatus from "./MessageStatus";
 
 type Props = {
   message: ChatMessage;
 };
+//onRetry: (id: string) => void;
+//onDelete: (id: string) => void;
 
-export default function MatchedCampaignMessage({ message }: Props) {
+export default function MatchedCampaignMessage({ message, }: Props) {
   const timeText = message.time ?? "";
   const avatarSize = 38;
   const avatarSrc = undefined;
+  const navigate = useNavigate();
 
   return (
     <div className="flex justify-start">
@@ -32,7 +37,7 @@ export default function MatchedCampaignMessage({ message }: Props) {
         </div>
 
         {/* bubble + time */}
-        <div className="flex items-end gap-[8px] max-w-[calc(100%-48px)]">
+        <div className="flex items-end gap-[4px] max-w-[calc(100%-48px)]">
           <div className="p-[1px] rounded-[12px] bg-gradient-to-r from-[#CBCBF5] via-[#6666E5] to-[#CBCBF5]">
             <div className="w-[240px] rounded-[12px] bg-[#FFFFFF] px-[10px] py-[10px] flex flex-col gap-[8px]">
               <div className="text-[12px] leading-[16px] style-Medium text-[#6666E5]">
@@ -46,7 +51,7 @@ export default function MatchedCampaignMessage({ message }: Props) {
 
                 <button
                   type="button"
-                  onClick={() => {}} // TODO: 캠페인 상세 보기
+                  onClick={() => navigate({to: "/campaign"})} // 캠페인 상세 보기
                   className="w-6 h-6 grid place-items-center text-gray2"
                   aria-label="expand"
                 >
@@ -73,11 +78,12 @@ export default function MatchedCampaignMessage({ message }: Props) {
               </div>
             </div>
           </div>
-          {timeText ? (
-            <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
-              {timeText}
-            </div>
-          ) : null}
+          <MessageStatus
+            message={message}
+            timeText={timeText}
+            onRetry={() => {}}//Todo: onRetry
+            onDelete={() => {}}// Todo: onDelete
+          />
         </div>
       </div>
     </div>
