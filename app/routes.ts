@@ -42,7 +42,6 @@ export default [
 
     route("business", "routes/business/route.tsx", [
       route("calendar", "routes/business/calendar/route.tsx"),
-      route("campaign", "routes/business/campaign/route.tsx"),
       route("proposal", "routes/business/proposal/route.tsx"),
       route("rejection", "routes/business/rejection/route.tsx"),
     ]),
@@ -57,6 +56,9 @@ export default [
 
     route("brand", "routes/brand/route.tsx"),
   ]),
+
+  // Campaign detail route (without main layout)
+  route("business/campaign/:campaignId", "routes/business/campaign/$campaignId.tsx"),
 
   // 404 Catch-all
   route("*", "routes/not-found.tsx"),

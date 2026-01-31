@@ -36,7 +36,7 @@ export default function CampaignContent() {
   return (
     // 전체 컨테이너를 흰색 배경으로 설정
     <div className="flex flex-col w-full min-h-screen bg-[var(--color-bg-w)] relative">
-      <RealmatchHeader title="캠페인 보기" showBack={true} />
+      <RealmatchHeader showBack={true} />
 
       {/* 기타 협의 사항까지만 회색 배경을 씌움 */}
       <main className="flex flex-col px-4 py-6 gap-6 bg-[var(--color-bluegray-1)]">

@@ -1,4 +1,4 @@
-import { axiosInstance } from "../../../../../api/axois";
+import { axiosInstance } from "../../../../api/axios";
 
 export interface CampaignRequest {
   brandId: number;

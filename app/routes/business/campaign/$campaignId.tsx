@@ -1,11 +1,10 @@
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 
-import RealmatchHeader from "../../../components/common/RealmatchHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
-import { type ProposalDetail } from "../../../data/campaign";
+import { type ProposalDetail, getProposalDetail } from "../../../data/campaign";
 
 import editIcon from "../../../assets/icon-edit.svg";
 import dropdownIcon from "../../../assets/arrow-down.svg";
@@ -15,6 +14,7 @@ import calendarIcon from "../../../assets/icon-calender.svg";
 
 export default function CampaignContent() {
   const { campaignId } = useParams();
+  const navigate = useNavigate();
   const [isContentOpen, setIsContentOpen] = useState(false);
 
   const [data, setData] = useState<ProposalDetail | null>(null);
@@ -23,41 +23,14 @@ export default function CampaignContent() {
     console.log("1. 현재 주소창에서 가져온 ID:", campaignId);
     if (!campaignId) return;
 
-    // 비동기 데이터 로딩
     const loadData = async () => {
-      // --- 여기부터 가짜 데이터 ---
-      const mockData: ProposalDetail = {
-        proposalId: campaignId,
-        brandId: 1,
-        creatorId: 100,
-        title: "비플레인 클렌징 및 세럼 리뷰 콘텐츠", // 화면에 나올 제목
-        description: "비플레인의 가치가 제 채널과 잘 맞아서 제안드립니다.",
-        rewardAmount: 200000,
-        productId: 10,
-        startDate: "2025-01-20",
-        endDate: "2025-01-30",
-        status: "검토 중",
-        createdAt: "2025-01-15T10:00:00Z",
-        contentTags: {
-          formats: [{ id: "1", name: "인스타그램 릴스" }],
-          categories: [{ id: "2", name: "뷰티" }],
-          tones: [{ id: "3", name: "일상적인" }],
-          involvements: [{ id: "4", name: "가이드 제공" }],
-          usageRanges: [{ id: "5", name: "크리에이터 1차 활용" }],
-        }
-      };
-
-      setData(mockData);
-
-      /*
       try {
         const res = await getProposalDetail(campaignId);
-        console.log("2. 서버에서 받은 진짜 데이터:", res);
+        console.log("2. 서버에서 받은 데이터:", res);
         setData(res);
       } catch (err) {
         console.error("3. API 호출 중 발생한 에러:", err);
       }
-      */
     };
 
     loadData();
@@ -72,10 +45,24 @@ export default function CampaignContent() {
   return (
     <div className="flex flex-col w-full min-h-screen bg-[var(--color-bluegray-1)]">
       {/* Header */}
-      <RealmatchHeader title="캠페인 보기" showBack={true} />
+      <header className="h-[56px] w-full bg-white border-b border-gray-100">
+        <div className="relative flex items-center justify-center h-full px-4">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="absolute left-4 flex items-center justify-center"
+            aria-label="뒤로가기"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M17 3L8 12L17 21" stroke="#5B5D6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <h1 className="text-title1 text-text-black">캠페인 보기</h1>
+        </div>
+      </header>
 
       <main className="flex flex-col px-4 py-6 gap-6 pb-24">
-        <CampaignBrandCard brandId={data.brandId} />
+        <CampaignBrandCard showChatSection={false} statusText={data.status} />
 
         <div className="flex flex-col gap-5">
           {/* 캠페인명 */}

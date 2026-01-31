@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import BrandLogo from "../../../assets/brand-logo.png";
 import ArrowRight from "../../../assets/icon/arrow-right.svg";
 import SearchIcon from "../../../assets/icon/search.svg";
@@ -10,6 +11,7 @@ interface CampaignCardProps {
   endDate: string;
   logo?: string;
   showButton?: boolean;
+  campaignId?: string | number;
 }
 
 export default function CampaignCard({
@@ -19,7 +21,9 @@ export default function CampaignCard({
   endDate,
   logo,
   showButton = true,
+  campaignId = 1,
 }: CampaignCardProps) {
+  const navigate = useNavigate();
   const BUTTON_WIDTH = '280px';
 
   // 로고 컴포넌트
@@ -60,6 +64,7 @@ export default function CampaignCard({
         {/* 캠페인 보기 버튼 */}
         {showButton && (
           <button
+            onClick={() => navigate(`/business/campaign/${campaignId}`)}
             className="relative flex items-center justify-center bg-[#EBEEFB] rounded-[6px] transition-colors hover:bg-[#DEE2F5]"
             style={{ width: BUTTON_WIDTH, height: '50px' }}
           >

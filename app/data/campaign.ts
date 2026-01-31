@@ -125,7 +125,7 @@ interface ProposalResponse {
 
 // 상세 조회 API 호출 함수
 export const getProposalDetail = async (id: string): Promise<ProposalDetail> => {
-  const response = await apiClient.get<ProposalResponse>(`/api/v1/campaigns/proposal/${id}`);
+  const response = await apiClient.get<ProposalResponse>(`/api/v1/campaigns/${id}`);
 
   console.log("API 전체 응답:", response.data);
 
