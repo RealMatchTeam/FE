@@ -119,3 +119,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// apiClient alias for backward compatibility
+export const apiClient = axiosInstance;

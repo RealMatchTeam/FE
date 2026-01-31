@@ -7,27 +7,11 @@ import CampaignFilterBar from "./components/CampaignFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import { apiClient } from "../../../lib/api-client";
 import { tokenStorage } from "../../../lib/token";
 import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";
-
-
-interface MatchingCampaign {
-    id: number;
-    brandName: string;
-    name?: string;
-    title?: string;
-    category: string;
-    manuscriptFee?: number;
-    reward?: number;
-    matchingRatio?: number;
-    matchRate?: number;
-    applicants: number;
-    isLiked: boolean;
-    logoUrl?: string;
-}
+import { getMatchingCampaigns, MatchingTestRequiredError, type MatchingCampaign } from "../api/matching";
 
 export default function CampaignContent() {
     const [searchParams] = useSearchParams();
@@ -46,24 +30,23 @@ export default function CampaignContent() {
     useEffect(() => {
         const fetchMatchingCampaigns = async () => {
             try {
-                const userId = tokenStorage.getUserId();
-                if (!userId) {
-                    setHasMatchingResult(false);
-                    setIsLoading(false);
-                    return;
-                }
+                const campaigns = await getMatchingCampaigns();
 
-                const response = await apiClient.get(`/api/v1/matches/campaigns/${userId}`);
-
-                if (response.data.result && response.data.result.brands && response.data.result.brands.length > 0) {
-                    setCampaigns(response.data.result.brands);
+                if (campaigns && campaigns.length > 0) {
+                    setCampaigns(campaigns);
                     setHasMatchingResult(true);
                 } else {
                     setHasMatchingResult(false);
                 }
             } catch (error) {
                 console.error("Failed to fetch matching campaigns:", error);
-                setHasMatchingResult(false);
+
+                // 매칭 검사 필요 에러인 경우
+                if (error instanceof MatchingTestRequiredError) {
+                    setHasMatchingResult(false);
+                } else {
+                    setHasMatchingResult(false);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -79,12 +62,13 @@ export default function CampaignContent() {
         navigate(`/matching/campaign?type=${newCategory}`);
     };
 
-    // 카테고리 + 검색어 필터링 
+    // 카테고리 + 검색어 필터링
     const filteredCampaigns = useMemo(() => {
         return campaigns.filter(campaign => {
             const matchesCategory = campaign.category === category;
+            const campaignTitle = campaign.title || campaign.name || "";
             const matchesSearch = deferredKeyword === "" ||
-                campaign.title.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
+                campaignTitle.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
                 campaign.brandName.toLowerCase().includes(deferredKeyword.toLowerCase());
             return matchesCategory && matchesSearch;
         });
@@ -183,9 +167,9 @@ export default function CampaignContent() {
                         <CampaignCard
                             key={campaign.id}
                             brandName={campaign.brandName}
-                            title={campaign.name || campaign.title}
-                            reward={campaign.manuscriptFee || campaign.reward}
-                            matchRate={campaign.matchingRatio || campaign.matchRate}
+                            title={campaign.name || campaign.title || "캠페인"}
+                            reward={campaign.manuscriptFee || campaign.reward || 0}
+                            matchRate={campaign.matchingRatio || campaign.matchRate || 0}
                             applicants={campaign.applicants}
                             isLiked={campaign.isLiked}
                             onLike={() => toggleLike(campaign.id)}

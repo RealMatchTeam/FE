@@ -7,23 +7,10 @@ import BrandFilterBar from "./components/BrandFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import { apiClient } from "../../../lib/api-client";
-import { tokenStorage } from "../../../lib/token";
 import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";
-
-
-interface MatchingBrand {
-    id: number;
-    name: string;
-    category: string;
-    matchingRatio: number;
-    matchRate: number;
-    tags: string[];
-    isLiked: boolean;
-    logoUrl?: string;
-}
+import { getMatchingBrands, toggleBrandLike, MatchingTestRequiredError, type MatchingBrand } from "../api/matching";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
@@ -41,24 +28,23 @@ export default function BrandContent() {
     useEffect(() => {
         const fetchMatchingBrands = async () => {
             try {
-                const userId = tokenStorage.getUserId();
-                if (!userId) {
-                    setHasMatchingResult(false);
-                    setIsLoading(false);
-                    return;
-                }
+                const brands = await getMatchingBrands();
 
-                const response = await apiClient.get(`/api/v1/matches/brands/${userId}`);
-
-                if (response.data.result && response.data.result.brands && response.data.result.brands.length > 0) {
-                    setBrands(response.data.result.brands);
+                if (brands && brands.length > 0) {
+                    setBrands(brands);
                     setHasMatchingResult(true);
                 } else {
                     setHasMatchingResult(false);
                 }
             } catch (error) {
                 console.error("Failed to fetch matching brands:", error);
-                setHasMatchingResult(false);
+
+                // 매칭 검사 필요 에러인 경우
+                if (error instanceof MatchingTestRequiredError) {
+                    setHasMatchingResult(false);
+                } else {
+                    setHasMatchingResult(false);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -80,21 +66,61 @@ export default function BrandContent() {
             const matchesCategory = brand.category === category;
             const matchesSearch = deferredKeyword === "" ||
                 brand.name.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
-                brand.tags.some((tag: string) => tag.toLowerCase().includes(deferredKeyword.toLowerCase()));
+                (brand.tags && brand.tags.some((tag: string) => tag.toLowerCase().includes(deferredKeyword.toLowerCase())));
             return matchesCategory && matchesSearch;
         });
     }, [brands, category, deferredKeyword]);
 
-    const toggleLike = (id: number) => {
-        setBrands(prev => prev.map(brand =>
-            brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
-        ));
+    const toggleLike = async (id: number) => {
+        try {
+            // 낙관적 업데이트 (UI 먼저 업데이트)
+            setBrands(prev => prev.map(brand =>
+                brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
+            ));
+
+            // API 호출
+            const newLikeStatus = await toggleBrandLike(id);
+
+            // API 응답에 따라 상태 동기화
+            setBrands(prev => prev.map(brand =>
+                brand.id === id ? { ...brand, isLiked: newLikeStatus } : brand
+            ));
+        } catch (error) {
+            console.error("Failed to toggle brand like:", error);
+            // 에러 발생 시 원래 상태로 복구
+            setBrands(prev => prev.map(brand =>
+                brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
+            ));
+        }
     };
 
-    const handleFilterApply = (sort: string, tags: string[]) => {
+    const handleFilterApply = async (sort: string, tags: string[]) => {
         setSortOption(sort);
         setSelectedTags(tags);
-        // TODO: 정렬 및 태그 필터 적용 로직
+
+        // 정렬 및 태그 필터 적용하여 브랜드 목록 재조회
+        try {
+            setIsLoading(true);
+
+            // sortBy 변환 (UI 라벨 -> API 파라미터)
+            const sortByMap: Record<string, string> = {
+                "정렬 필터": "MATCH_SCORE",
+                "매칭률 순": "MATCH_SCORE",
+                "인기순": "POPULARITY",
+                "신규순": "NEWEST"
+            };
+            const sortBy = sortByMap[sort] || "MATCH_SCORE";
+
+            const brands = await getMatchingBrands(sortBy, category, tags.length > 0 ? tags : undefined);
+
+            if (brands && brands.length > 0) {
+                setBrands(brands);
+            }
+        } catch (error) {
+            console.error("Failed to apply filters:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const getSortButtonLabel = () => {
@@ -178,7 +204,7 @@ export default function BrandContent() {
                             key={brand.id}
                             name={brand.name}
                             matchRate={brand.matchingRatio || brand.matchRate}
-                            tags={brand.tags}
+                            tags={brand.tags || []}
                             isLiked={brand.isLiked}
                             onLike={() => toggleLike(brand.id)}
                             logoUrl={brand.logoUrl || `/dummy-logo-${brand.id}.png`}

@@ -10,6 +10,7 @@ import { GenderSection } from "../components/GenderSection";
 import { ContentCategorySection } from "../components/ContentCategorySection";
 import { useAuthStore } from "../../../../stores/auth-store";
 import { useSignupStore } from "../../../../stores/signupStore";
+import { tokenStorage } from "../../../../lib/token";
 
 interface SocialFormData {
   name: string;
@@ -28,6 +29,10 @@ function SignUpInfoContent() {
   const me = useAuthStore((state) => state.me);
   const { setBasicInfo, setAdditionalInfo } = useSignupStore();
 
+  // JWT 토큰에서 이메일 파싱
+  const emailFromToken = tokenStorage.getEmail();
+  const nameFromToken = tokenStorage.getName();
+
   // 에러/성공 상태
   const [socialNicknameError, setSocialNicknameError] = useState<string | null>(null);
   const [socialNicknameSuccess, setSocialNicknameSuccess] = useState<string | null>(null);
@@ -35,7 +40,8 @@ function SignUpInfoContent() {
   // Social form
   const socialForm = useForm<SocialFormData>({
     defaultValues: {
-      email: me?.email || "",
+      email: emailFromToken || me?.email || "",
+      name: nameFromToken || me?.name || "",
     }
   });
   const socialNicknameValue = useWatch({ control: socialForm.control, name: "nickname" });
@@ -126,7 +132,7 @@ function SignUpInfoContent() {
           <EmailSection<SocialFormData>
             register={socialForm.register}
             errors={socialForm.formState.errors}
-            emailValue={me?.email || ""}
+            emailValue={emailFromToken || me?.email || ""}
             verificationCodeError={null}
             onEmailVerify={() => { }}
             readOnly

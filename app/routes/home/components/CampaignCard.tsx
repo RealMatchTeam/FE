@@ -12,12 +12,7 @@ type Props = {
 };
 
 export default function CampaignCard({ item, variant, onClick }: Props) {
-  const rightText =
-    variant === "popular"
-      ? `${item.progressText}명`
-      : item.matchRate != null
-        ? `${item.matchRate}%`
-        : "";
+  const rightText = item.progressText ? `${item.progressText}명` : "";
 
   return (
     <button
