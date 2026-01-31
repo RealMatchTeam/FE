@@ -1,4 +1,4 @@
-import CampaignCard from "../../components/CampaignCard";
+import CampaignCard from "../../home/components/CampaignCard";
 import { toCampaignItem, type BrandOngoingCampaign } from "./toCampaignItem";
 
 type Props = {

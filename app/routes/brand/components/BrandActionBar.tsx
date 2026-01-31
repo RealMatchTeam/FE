@@ -1,4 +1,4 @@
-import HeartButton from "../../components/HeartButton";
+import HeartButton from "../../home/components/HeartButton";
 
 type Props = {
   isHearted: boolean;

@@ -54,6 +54,8 @@ export default [
     ]),
 
     route("mypage", "routes/mypage/route.tsx"),
+
+    route("brand", "routes/brand/route.tsx"),
   ]),
 
   // 404 Catch-all
