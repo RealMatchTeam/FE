@@ -1,1 +1,0 @@
-function g(e){const t=new Date(e),n=String(t.getFullYear()).slice(2),a=String(t.getMonth()+1).padStart(2,"0"),r=String(t.getDate()).padStart(2,"0"),o=String(t.getHours()).padStart(2,"0"),i=String(t.getMinutes()).padStart(2,"0");return{dateText:`${n}.${a}.${r}`,timeText:`${o}:${i}`}}export{g as f};
