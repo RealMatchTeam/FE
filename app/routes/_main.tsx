@@ -1,12 +1,10 @@
-import { Outlet, Navigate } from "react-router";
+import { Outlet } from "react-router";
 import { useState } from "react";
 import BottomTab from "../components/layout/BottomTab";
 import { LayoutContext } from "./layout-context";
 import Logo from "../assets/logo/RealMatchLogo_ex.svg";
-import { useAuthStore } from "../stores/auth-store";
 
 export default function MainLayout() {
-  const { me } = useAuthStore();
   const [hideBottomTab, setHideBottomTab] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
 

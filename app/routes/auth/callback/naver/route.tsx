@@ -4,6 +4,13 @@ import { jwtDecode } from "jwt-decode";
 import { tokenStorage } from "../../../../lib/token";
 import { useAuthStore } from "../../../../stores/auth-store";
 
+interface JwtPayload {
+  sub: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export default function NaverCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -19,7 +26,7 @@ export default function NaverCallback() {
       tokenStorage.setTokens(accessToken, refreshToken);
 
       try {
-        const decoded = jwtDecode<any>(accessToken);
+        const decoded = jwtDecode<JwtPayload>(accessToken);
         if (decoded.role === "GUEST") {
           setMe({
             id: decoded.sub,
@@ -52,7 +59,7 @@ export default function NaverCallback() {
     if (code) {
       console.log("[Naver] Code present but no token.");
     }
-  }, [code, navigate, setMe]);
+  }, [code, navigate, searchParams, setMe]);
 
 
   return (

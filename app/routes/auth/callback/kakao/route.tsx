@@ -4,6 +4,13 @@ import { jwtDecode } from "jwt-decode";
 import { tokenStorage } from "../../../../lib/token";
 import { useAuthStore } from "../../../../stores/auth-store";
 
+interface JwtPayload {
+  sub: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export default function KakaoCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -18,7 +25,7 @@ export default function KakaoCallback() {
       tokenStorage.setTokens(accessToken, refreshToken);
 
       try {
-        const decoded = jwtDecode<any>(accessToken);
+        const decoded = jwtDecode<JwtPayload>(accessToken);
         if (decoded.role === "GUEST") {
           setMe({
             id: decoded.sub,
@@ -52,7 +59,7 @@ export default function KakaoCallback() {
       console.log("[Kakao] Code present but no token. Backend might have failed to redirect with token.");
     }
 
-  }, [code, navigate, setMe]);
+  }, [code, navigate, searchParams, setMe]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
