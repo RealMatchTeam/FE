@@ -33,6 +33,9 @@ build
 .tanstack/
 .tanstack/tmp
 
+# React Router auto-generated
+.react-router/
+
 # Claude
 .claude.md
 CLAUDE.md
