@@ -259,3 +259,56 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
     throw error;
   }
 };
+
+// 캠페인 제안 요청 타입
+export interface CampaignContentTagRequest {
+  id: string;
+  customValue?: string;
+}
+
+export interface CampaignProposalRequestDto {
+  brandId: number;
+  creatorId: number;
+  campaignId?: number | null;
+  campaignName: string;
+  description: string;
+  formats: CampaignContentTagRequest[];
+  categories: CampaignContentTagRequest[];
+  tones: CampaignContentTagRequest[];
+  involvements: CampaignContentTagRequest[];
+  usageRanges: CampaignContentTagRequest[];
+  rewardAmount: number;
+  productId: number;
+  startDate: string;
+  endDate: string;
+}
+
+interface CampaignProposalResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}
+
+/**
+ * 캠페인 제안하기
+ */
+export const createCampaignProposal = async (
+  data: CampaignProposalRequestDto
+): Promise<string> => {
+  try {
+    const response = await apiClient.post<CampaignProposalResponse>(
+      '/api/v1/campaigns/proposal/request',
+      data
+    );
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "캠페인 제안 실패");
+    }
+
+    return response.data.result;
+  } catch (error: any) {
+    console.error("캠페인 제안 실패:", error);
+    throw error;
+  }
+};

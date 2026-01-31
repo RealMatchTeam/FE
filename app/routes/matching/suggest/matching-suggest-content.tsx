@@ -7,11 +7,11 @@ export default function MatchingSuggestContent() {
   const navigate = useNavigate();
 
   const handleNewCampaign = () => {
-    navigate({ to: "/matching/suggest/create", search: { type: "new" } });
+    navigate("/matching/suggest/create?type=new");
   };
 
   const handleExistingCampaign = () => {
-    navigate({ to: "/matching/suggest/create", search: { type: "existing" } });
+    navigate("/matching/suggest/create?type=existing");
   };
 
   return (
