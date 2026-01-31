@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import type { CategoryKey, HomeAfterMatchCategoryData } from "./types";
 import { HOME_AFTER_MATCH_MOCK } from "./home.mock";
 import HeroCarousel from "./components/HeroCarousel";
@@ -9,6 +10,7 @@ import CampaignCard from "./components/CampaignCard";
 import CreatorProfileCard from "./components/CreatorProfileCard";
 
 export default function HomeAfterMatchPage() {
+  const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("beauty");
 
   const data: HomeAfterMatchCategoryData = useMemo(() => {
@@ -40,7 +42,14 @@ export default function HomeAfterMatchPage() {
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
             {data.topBrands.map((brand) => (
-              <BrandCard key={brand.id} item={brand} />
+              <BrandCard
+                key={brand.id}
+                item={brand}
+                onClick={() => {
+                  console.log("CLICK BRAND", brand.id, brand.domain);
+                  navigate(`/brand?brandId=${brand.id}&domain=${brand.domain}`);
+                }}
+              />
             ))}
           </div>
         </section>
@@ -57,7 +66,14 @@ export default function HomeAfterMatchPage() {
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
             {data.topCampaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} item={campaign} variant="top" />
+              <CampaignCard
+                key={campaign.id}
+                item={campaign}
+                variant="top"
+                onClick={() => {
+                  navigate(`/campaign?campaignId=${campaign.id}`);
+                }}
+              />
             ))}
           </div>
         </section>
@@ -85,6 +101,9 @@ export default function HomeAfterMatchPage() {
                 key={campaign.id}
                 item={campaign}
                 variant="popular"
+                onClick={() => {
+                  navigate(`/campaign?campaignId=${campaign.id}`);
+                }}
               />
             ))}
           </div>
