@@ -92,6 +92,11 @@ type Pages = {
   "/business/campaign": {
     params: {};
   };
+  "/business/campaign/:campaignId": {
+    params: {
+      "campaignId": string;
+    };
+  };
   "/business/proposal": {
     params: {};
   };
@@ -122,7 +127,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth" | "/auth/login" | "/auth/callback" | "/auth/callback/google" | "/auth/callback/kakao" | "/auth/callback/naver" | "/auth/signup" | "/auth/signup/terms" | "/auth/signup/type" | "/auth/signup/info" | "/auth/signup/info-more" | "/auth/signup/purpose" | "/auth/signup/success" | "/matching" | "/matching/brand" | "/matching/campaign" | "/matching/suggest" | "/matching/suggest/create" | "/matching/test" | "/matching/test/step1" | "/matching/test/step2" | "/matching/test/step3" | "/matching/test/result" | "/business" | "/business/calendar" | "/business/campaign" | "/business/proposal" | "/business/rejection" | "/chat" | "/rooms" | "/rooms/:chatId" | "/mypage" | "/*";
+    page: "/" | "/auth" | "/auth/login" | "/auth/callback" | "/auth/callback/google" | "/auth/callback/kakao" | "/auth/callback/naver" | "/auth/signup" | "/auth/signup/terms" | "/auth/signup/type" | "/auth/signup/info" | "/auth/signup/info-more" | "/auth/signup/purpose" | "/auth/signup/success" | "/matching" | "/matching/brand" | "/matching/campaign" | "/matching/suggest" | "/matching/suggest/create" | "/matching/test" | "/matching/test/step1" | "/matching/test/step2" | "/matching/test/step3" | "/matching/test/result" | "/business" | "/business/calendar" | "/business/campaign" | "/business/campaign/:campaignId" | "/business/proposal" | "/business/rejection" | "/chat" | "/rooms" | "/rooms/:chatId" | "/mypage" | "/*";
   };
   "routes/auth/route.tsx": {
     id: "routes/auth/route";
@@ -178,7 +183,7 @@ type RouteFiles = {
   };
   "routes/_main.tsx": {
     id: "routes/_main";
-    page: "/" | "/matching" | "/matching/brand" | "/matching/campaign" | "/matching/suggest" | "/matching/suggest/create" | "/matching/test" | "/matching/test/step1" | "/matching/test/step2" | "/matching/test/step3" | "/matching/test/result" | "/business" | "/business/calendar" | "/business/campaign" | "/business/proposal" | "/business/rejection" | "/chat" | "/rooms" | "/rooms/:chatId" | "/mypage";
+    page: "/" | "/matching" | "/matching/brand" | "/matching/campaign" | "/matching/suggest" | "/matching/suggest/create" | "/matching/test" | "/matching/test/step1" | "/matching/test/step2" | "/matching/test/step3" | "/matching/test/result" | "/business" | "/business/calendar" | "/business/campaign" | "/business/campaign/:campaignId" | "/business/proposal" | "/business/rejection" | "/chat" | "/rooms" | "/rooms/:chatId" | "/mypage";
   };
   "routes/home/index.tsx": {
     id: "routes/home/index";
@@ -230,7 +235,7 @@ type RouteFiles = {
   };
   "routes/business/route.tsx": {
     id: "routes/business/route";
-    page: "/business" | "/business/calendar" | "/business/campaign" | "/business/proposal" | "/business/rejection";
+    page: "/business" | "/business/calendar" | "/business/campaign" | "/business/campaign/:campaignId" | "/business/proposal" | "/business/rejection";
   };
   "routes/business/calendar/route.tsx": {
     id: "routes/business/calendar/route";
@@ -238,7 +243,11 @@ type RouteFiles = {
   };
   "routes/business/campaign/route.tsx": {
     id: "routes/business/campaign/route";
-    page: "/business/campaign";
+    page: "/business/campaign" | "/business/campaign/:campaignId";
+  };
+  "routes/business/campaign/detail.tsx": {
+    id: "routes/business/campaign/detail";
+    page: "/business/campaign/:campaignId";
   };
   "routes/business/proposal/route.tsx": {
     id: "routes/business/proposal/route";
@@ -301,6 +310,7 @@ type RouteModules = {
   "routes/business/route": typeof import("./app/routes/business/route.tsx");
   "routes/business/calendar/route": typeof import("./app/routes/business/calendar/route.tsx");
   "routes/business/campaign/route": typeof import("./app/routes/business/campaign/route.tsx");
+  "routes/business/campaign/detail": typeof import("./app/routes/business/campaign/detail.tsx");
   "routes/business/proposal/route": typeof import("./app/routes/business/proposal/route.tsx");
   "routes/business/rejection/route": typeof import("./app/routes/business/rejection/route.tsx");
   "routes/chat/route": typeof import("./app/routes/chat/route.tsx");

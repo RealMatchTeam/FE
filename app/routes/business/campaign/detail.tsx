@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useParams } from "react-router";
+import { useState, useEffect } from "react";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
+
+import { getProposalDetail, type ProposalDetail } from "../../../data/campaign";
 
 import editIcon from "../../../assets/icon-edit.svg";
 import dropdownIcon from "../../../assets/arrow-down.svg";
@@ -11,7 +14,62 @@ import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 import calendarIcon from "../../../assets/icon-calender.svg";
 
 export default function CampaignContent() {
+  const { campaignId } = useParams();
   const [isContentOpen, setIsContentOpen] = useState(false);
+
+  const [data, setData] = useState<ProposalDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log("1. 현재 주소창에서 가져온 ID:", campaignId);
+    if (campaignId) {
+    setIsLoading(true);
+
+    // --- 여기부터 가짜 데이터 ---
+    const mockData: ProposalDetail = {
+      proposalId: campaignId,
+      brandId: 1,
+      creatorId: 100,
+      title: "비플레인 클렌징 및 세럼 리뷰 콘텐츠", // 화면에 나올 제목
+      description: "비플레인의 가치가 제 채널과 잘 맞아서 제안드립니다.",
+      rewardAmount: 200000,
+      productId: 10,
+      startDate: "2025-01-20",
+      endDate: "2025-01-30",
+      status: "검토 중",
+      createdAt: "2025-01-15T10:00:00Z",
+      contentTags: {
+        formats: [{ id: "1", name: "인스타그램 릴스" }],
+        categories: [{ id: "2", name: "뷰티" }],
+        tones: [{ id: "3", name: "일상적인" }],
+        involvements: [{ id: "4", name: "가이드 제공" }],
+        usageRanges: [{ id: "5", name: "크리에이터 1차 활용" }],
+      }
+    };
+
+    setData(mockData);
+    setIsLoading(false);
+
+    /*if (campaignId) {
+      getProposalDetail(campaignId)
+        .then((res) => {
+          console.log("2. 서버에서 받은 진짜 데이터:", res);
+          setData(res);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("3. API 호출 중 발생한 에러:", err);
+          setIsLoading(false);
+        });*/
+    }
+  }, [campaignId]);
+
+  // 3. 로딩 중일 때 보여줄 화면
+  if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+  if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
+
+  // 태그들을 예쁘게 합쳐주는 함수 (예: ["릴스", "숏폼"] -> "릴스, 숏폼")
+  const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-[var(--color-bluegray-1)]">
@@ -19,7 +77,7 @@ export default function CampaignContent() {
       <Header title="캠페인 보기" />
 
       <main className="flex flex-col px-4 py-6 gap-6 pb-24">
-        <CampaignBrandCard />
+        <CampaignBrandCard brandId={data.brandId} />
 
         <div className="flex flex-col gap-5">
           {/* 캠페인명 */}
@@ -28,7 +86,7 @@ export default function CampaignContent() {
             right={<img src={editIcon} alt="edit" className="w-4 h-4" />}
           >
             <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1">
-              비플레인 클렌징 및 세럼 리뷰 콘텐츠
+              {data.title}
             </div>
           </CampaignInfoGroup>
 
@@ -51,8 +109,7 @@ export default function CampaignContent() {
                   설명
                 </p>
                 <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1 leading-relaxed">
-                  안녕하세요 크리에이터 비비 입니다! 비플레인의 가치가 제 채널에서
-                  소개하는 뷰티 콘텐츠와 잘 맞닿아 있다고 생각되어 협찬을 제안드립니다.
+                  {data.description} {/* data.description으로 변경 */}
                 </div>
               </div>
 
@@ -60,13 +117,13 @@ export default function CampaignContent() {
               {isContentOpen && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <ContentItem label="형식" value="인스타그램 릴스" />
+                    <ContentItem label="형식" value={formatTags(data.contentTags.formats)} />
                   </div>
 
-                  <ContentItem label="종류" value="겟레디윗미, 스토리" />
-                  <ContentItem label="톤" value="수다적인, 일상적인" />
-                  <ContentItem label="관여도" value="가이드만 제공" />
-                  <ContentItem label="활용 범위" value="크리에이터 1차 활용" />
+                  <ContentItem label="종류" value={formatTags(data.contentTags.categories)} />
+                  <ContentItem label="톤" value={formatTags(data.contentTags.tones)} />
+                  <ContentItem label="관여도" value={formatTags(data.contentTags.involvements)} />
+                  <ContentItem label="활용 범위" value={formatTags(data.contentTags.usageRanges)} />
                 </div>
               )}
             </div>
@@ -76,14 +133,14 @@ export default function CampaignContent() {
           <div className="grid grid-cols-2 gap-4">
             <CampaignInfoGroup label="협찬품">
               <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1 flex justify-between items-center">
-                글로우 크림 1개
+                상품 ID: {data.productId}
                 <img src={arrowRightIcon} alt="arrow" className="w-4 h-4" />
               </div>
             </CampaignInfoGroup>
 
             <CampaignInfoGroup label="원고료">
               <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1 flex justify-between items-center">
-                200,000 <span>원</span>
+                {data.rewardAmount.toLocaleString()}<span>원</span>
               </div>
             </CampaignInfoGroup>
           </div>
@@ -95,13 +152,13 @@ export default function CampaignContent() {
           >
             <div className="flex items-center gap-2">
               <div className="flex-1 p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1">
-                2025년 1월 20일
+                {data.startDate.replace(/-/g, '. ')}
               </div>
 
               <span className="text-[var(--color-text-gray3)]">~</span>
 
               <div className="flex-1 p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1">
-                2025년 1월 30일
+                {data.endDate.replace(/-/g, '. ')}
               </div>
             </div>
           </CampaignInfoGroup>
@@ -112,7 +169,7 @@ export default function CampaignContent() {
             right={<img src={editIcon} alt="edit" className="w-4 h-4" />}
           >
             <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1 text-[var(--color-text-gray3)]">
-              기타 협의 사항을 입력해주세요
+              {data.refusalReason || "기타 협의 사항이 없습니다."}
             </div>
           </CampaignInfoGroup>
         </div>

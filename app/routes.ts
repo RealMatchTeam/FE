@@ -42,7 +42,11 @@ export default [
 
     route("business", "routes/business/route.tsx", [
       route("calendar", "routes/business/calendar/route.tsx"),
-      route("campaign", "routes/business/campaign/route.tsx"),
+      // 1. campaign을 부모로 만들고 그 안에 자식을 넣습니다.
+      route("campaign", "routes/business/campaign/route.tsx", [
+        // 2. 이렇게 해야 주소가 /business/campaign/123 이 됩니다.
+        route(":campaignId", "routes/business/campaign/detail.tsx"),
+      ]),
       route("proposal", "routes/business/proposal/route.tsx"),
       route("rejection", "routes/business/rejection/route.tsx"),
     ]),
