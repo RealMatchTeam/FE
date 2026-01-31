@@ -1,12 +1,21 @@
-import { Outlet } from "react-router";
-import { useState } from "react";
+import { Outlet, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
 import BottomTab from "../components/layout/BottomTab";
 import { LayoutContext } from "./layout-context";
 import Logo from "../assets/logo/RealMatchLogo_ex.svg";
+import { tokenStorage } from "../lib/token";
 
 export default function MainLayout() {
   const [hideBottomTab, setHideBottomTab] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+    }
+  }, [navigate]);
 
   return (
     <LayoutContext.Provider value={{ hideBottomTab, setHideBottomTab, hideHeader, setHideHeader }}>
