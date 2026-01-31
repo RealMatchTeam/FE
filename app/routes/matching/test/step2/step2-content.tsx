@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Step2SectionKey, Step2SelectedState } from "../../../../../stores/matching-test";
+import type { Step2SectionKey, Step2SelectedState } from "../../../../stores/matching-test";
 
 import SelectChip from "../components/SelectChip";
 import FormField from "../components/FormField";
@@ -43,8 +43,6 @@ const BODY_SHAPE_OPTIONS = ["마름", "표준", "통통", "근육형", "웨이�
 const TOP_SIZE_OPTIONS = ["33", "44", "55", "66", "77"] as const;
 
 export default function MatchingTestStep2Content({
-  // progressText는 이제 TopBar가 step/total로 그리므로 사실상 불필요하지만,
-  // 부모 props 변경이 귀찮으면 일단 유지해도 됨.
   maxText,
   maxPerSection,
   selected,
@@ -77,7 +75,7 @@ export default function MatchingTestStep2Content({
   return (
     <div className="min-h-dvh bg-white">
       <div className={CONTAINER}>
-        {/* ✅ 공용 상단 (2/3) */}
+        {/* 공용 상단 */}
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
         <div className="px-5 pb-6">

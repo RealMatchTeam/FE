@@ -1,4 +1,3 @@
-// src/routes/_home/components/HeartButton.tsx
 import { useState } from "react";
 import heartOn from "../../../assets/heart_on.svg";
 import heartOff from "../../../assets/heart_off.svg";
@@ -34,7 +33,7 @@ export default function HeartButton({
         className,
       ].join(" ")}
     >
-      {/* ✅ 하트 아이콘 크기 고정(항상 유지) */}
+      {/* 하트 아이콘 크기 고정(항상 유지) */}
       <img src={pressed ? heartOn : heartOff} alt="" className="h-5 w-5" />
     </button>
   );

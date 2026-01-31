@@ -13,27 +13,12 @@ import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";
 
-interface Campaign {
-    id: number;
-    title: string;
-    name?: string;
-    brandName: string;
-    category: string;
-    matchingRatio?: number;
-    matchRate?: number;
-    manuscriptFee?: number;
-    reward?: number;
-    applicants: number;
-    isLiked: boolean;
-    logoUrl?: string;
-}
-
 
 export default function CampaignContent() {
     const [searchParams] = useSearchParams();
     const category = (searchParams.get("type") || "BEAUTY") as CampaignCategory;
     const navigate = useNavigate();
-    const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+    const [campaigns, setCampaigns] = useState<any[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);

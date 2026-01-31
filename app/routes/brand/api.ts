@@ -9,7 +9,7 @@ export async function fetchBrandDetail(params: {
 
   const data = BRAND_DETAIL_MOCK[brandId];
   if (!data) {
-    // ✅ 여기서 바로 잡히면 home에서 넘어오는 id가 잘못된 것
+    // 여기서 바로 잡히면 home에서 넘어오는 id가 잘못된 것
     throw new Error(`Unknown brandId: ${brandId}`);
   }
 

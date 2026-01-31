@@ -13,23 +13,12 @@ import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";
 
-interface Brand {
-    id: number;
-    name: string;
-    category: string;
-    tags: string[];
-    matchingRatio?: number;
-    matchRate?: number;
-    isLiked: boolean;
-    logoUrl?: string;
-}
-
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
     const category = (searchParams.get("type") || "BEAUTY") as BrandCategory;
     const navigate = useNavigate();
-    const [brands, setBrands] = useState<Brand[]>([]);
+    const [brands, setBrands] = useState<any[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);

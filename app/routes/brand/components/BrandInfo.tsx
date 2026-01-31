@@ -20,7 +20,7 @@ export default function BrandInfo({
           {name}
         </div>
 
-        {/* ✅ 기존 한 줄 유지 + 숫자만 크게 */}
+        {/* 기존 한 줄 유지 + 숫자만 크게 */}
         <div
           className="text-[14px] font-semibold leading-none"
           style={{ color: PRIMARY }}

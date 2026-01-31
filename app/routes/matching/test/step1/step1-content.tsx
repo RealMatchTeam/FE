@@ -44,10 +44,10 @@ export default function MatchingTestContent({
 }: MatchingTestContentProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* ✅ 공용 상단 (1/3) */}
+      {/* 공용 상단 */}
       <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
 
-      {/* ✅ 본문 */}
+      {/* 본문 */}
       <main className="flex-1 px-6">
         {/* 타이틀 */}
         <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
@@ -57,7 +57,7 @@ export default function MatchingTestContent({
         </h1>
         <p className="text-body1 text-text-gray3 mt-2">{maxText}</p>
 
-        {/* ✅ 섹션들 */}
+        {/* 섹션들 */}
         {sections.map((section) => {
           const sectionSelectedCount = selected[section.key].length;
           const sectionLimitReached = sectionSelectedCount >= maxPerSection;
@@ -89,7 +89,7 @@ export default function MatchingTestContent({
         })}
       </main>
 
-      {/* ✅ 하단 고정 */}
+      {/* 하단 고정 */}
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
         <Button
           variant="primary"

@@ -19,7 +19,7 @@ export default function HistoryRow({ item }: Props) {
         {item.title}
       </div>
 
-      {/* ✅ 우측 컬럼: 고정폭 박스 안에서 우측정렬 */}
+      {/* 우측 컬럼: 고정폭 박스 안에서 우측정렬 */}
       <div className="w-[140px] shrink-0 text-right">
         <span
           className="text-[13px] font-medium"

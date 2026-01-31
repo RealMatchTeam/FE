@@ -50,7 +50,7 @@ const EMPTY_STEP3_CHIPS: Step3ChipsState = {
   editingRange: [],
 };
 
-// ✅ 결과 변환용 (홈/추천에서 공통으로 쓸 카테고리)
+// 결과 변환용 (추천에서 공통으로 쓸 카테고리)
 export type MatchCategory = "beauty" | "fashion";
 
 // store
@@ -87,7 +87,7 @@ type MatchingTestStore = {
   step3Chips: Step3ChipsState;
   toggleStep3Chip: (key: Step3ChipKey, label: string, max: number) => void;
 
-  // ✅ 추가: 최종 결과 payload 생성(홈 추천/API에 그대로 넘길 수 있게)
+  // 최종 결과 payload 생성(추천 API에 그대로 넘길 수 있게)
   buildResult: (category: MatchCategory) => { category: MatchCategory; tags: string[] };
 
   resetAll: () => void;
@@ -180,7 +180,7 @@ export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
     set({ step3Chips: { ...prevAll, [key]: [...cur, label] } });
   },
 
-  // ✅ 임시 입력값 -> 결과 요약(tags)
+  // 임시 입력값 -> 결과 요약(tags)
   buildResult: (category) => {
     const s1 = get().selected;
     const s2 = get().step2Selected;

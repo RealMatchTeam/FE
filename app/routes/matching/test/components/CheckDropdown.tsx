@@ -1,7 +1,7 @@
 interface CheckDropdownProps<T extends readonly string[]> {
   options: T;
-  values: string[]; // ✅ 다중 선택
-  onToggle: (v: T[number]) => void; // ✅ 토글
+  values: string[]; // 다중 선택
+  onToggle: (v: T[number]) => void; // 토글
   onDone: () => void;
 }
 

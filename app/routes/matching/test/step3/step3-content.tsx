@@ -73,10 +73,10 @@ export default function MatchingTestStep3Content({
 
   return (
     <div className="min-h-dvh bg-white">
-      {/* ✅ step1과 동일한 상단 컴포넌트만 사용 */}
+      {/* 공용 상단 */}
       <MatchingTestTopBar step={3} totalSteps={3} onBack={onBack} />
 
-      {/* ✅ step1 기준: px-6 */}
+      {/* 본문 */}
       <div className="px-6 pb-6">
         <h1 className="text-title1 text-text-black">
           <span className="text-core-1">콘텐츠 특성</span>을 모두 선택해주세요
@@ -199,7 +199,7 @@ export default function MatchingTestStep3Content({
         </Section>
       </div>
 
-      {/* ✅ step1 기준: px-6 */}
+      {/* 하단 고정 */}
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
         <Button
           variant="primary"

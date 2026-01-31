@@ -26,7 +26,7 @@ type State = {
 export const useMatchResultStore = create<State>()(
   persist(
     (set) => ({
-      result: null, // ✅ 처음은 무조건 pre로
+      result: null,
       setResult: (r) => set({ result: r }),
       resetResult: () => set({ result: null }),
     }),
