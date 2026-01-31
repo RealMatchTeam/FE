@@ -5,8 +5,9 @@ export type ChatRoom = {
   updatedAt: string;
   unreadCount: number;
   status: RoomStatus;
-  logoUrl: string; 
+  logoUrl: string;
   type: "sent" | "received";
+  isCollaborating: boolean;
 };
 
 export type RoomStatus = "matching" | "reviewing" | "rejected";

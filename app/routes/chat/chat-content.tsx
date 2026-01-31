@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import { type SortOption, SORT_LABEL } from "./types/SortOption";
+import { SORT_LABEL, type SortOption } from "./components/SortingSheetConstant";
 import { rooms } from "../../data/chat-room";
 import ChatListHeader from "./components/ChatListHeader";
 import SortFilterSheet from "./components/SortingSheet";
-import ChatList from "./components/ChatList";
+import ChatList from "./ChatList";
 import { EmptyChatState } from "./components/EmptyState";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 
@@ -21,21 +21,19 @@ function ChatPage() {
     return rooms.filter((room) => room.type === activeTab);
   }, [activeTab]);
 
-  // 정렬 적용
+  // 정렬 + (필요시) 협업중 필터
   const sortedRooms = useMemo(() => {
-
-    // 받은/보낸 필터링
     let filtered = filteredRooms;
 
-    // latest가 아니면 status로 한 번 더 필터
-    if (sort !== "latest") {
-      filtered = filteredRooms.filter((room) => room.status === sort);
+    // 협업중만 보기
+    if (sort === "collaborating") {
+      filtered = filteredRooms.filter((room) => room.isCollaborating);
     }
 
     const copy = [...filtered];
-    copy.sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
+    copy.sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
 
     return copy;
   }, [filteredRooms, sort]);

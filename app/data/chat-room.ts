@@ -10,6 +10,7 @@ export const rooms: ChatRoom[] = [
     status: "matching",
     logoUrl: "",
     type: "sent",
+    isCollaborating: true,
   },
   {
     id: "2",
@@ -20,6 +21,7 @@ export const rooms: ChatRoom[] = [
     status: "reviewing",
     logoUrl: "",
     type: "received",
+    isCollaborating: false,
   },
 ];
 
