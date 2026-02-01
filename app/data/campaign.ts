@@ -84,7 +84,7 @@ export const CAMPAIGN_DATA: Campaign[] = [
   },
 ];
 
-import { apiClient } from "../lib/api-client"; //
+import { apiClient } from "../lib/api-client"; // 캠페인 제안 보기 api
 
 // 상세 정보 내 태그 아이템 타입
 export interface TagItem {
