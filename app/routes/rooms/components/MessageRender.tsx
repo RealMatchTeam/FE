@@ -16,7 +16,7 @@ export default function MessageRenderer({ message }: TextMessageProps) {
       return <ProposalMessage message={message} />;
 
     case "MATCHED_CAMPAIGN":
-      return <MatchingMessage message={message} />;
+      return <MatchingMessage message={message} />; //onRetry={handleRetryMessage} onDelete={handleDeleteMessage} 추가
 
     case "SYSTEM_MATCHED":
       return (<SystemEventMessage text={CHAT_NOTICE_TEXT.MATCHED} />);

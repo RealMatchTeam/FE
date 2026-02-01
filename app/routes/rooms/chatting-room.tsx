@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ChatRoomHeader from "./components/ChatRoomHeader";
+import NavigationHeader from "../../components/common/NavigateHeader";
 import { type ChatMessage } from "./components/Bubbles/TextMessageTypes";
 import ChatComposer from "./components/ChatComposer";
 import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
 import MessageRenderer from "./components/MessageRender";
 import { formatKoreanDateTime } from "../../utils/dateTime";
+import CollaborationSummaryBar from "./components/CollaborationBar";
+import { useHideBottomTab } from "../../hooks/useHideBottomTab";
+import { useHideHeader } from "../../hooks/useHideHeader";
 
 type Props = {
   chatId: string;
@@ -40,7 +43,7 @@ export default function ChattingRoom( {chatId} : Props ) {
       campaignName: "글로우 쿠션 신제품 론칭 리뷰",
       campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
       time: "26.01.22\n00:10",
-      status: "sent",
+      status: "failed",
       price: 500000,
       orderId: "ORD1234567890",
     },
@@ -65,7 +68,7 @@ export default function ChattingRoom( {chatId} : Props ) {
       ext: "png",
       time: "26.01.22\n10:11",
       avatarSize: 38,
-      avartarSrc: "/brand.png",
+      avatarSrc: "/brand.png",
     },
     {
       id: "file1",
@@ -89,27 +92,33 @@ export default function ChattingRoom( {chatId} : Props ) {
   }, [chatId]);
 
   const partnerName = "민주"; // TODO: API/route loader에서 받아오기
-  const hashtags = "#청정자극 #저자극 #심플한 감성"; // TODO: 프로필/카드에서 받아오기
-  const matchStatus: "MATCHED" | "REJECTED" | "REVIEWING" = "REVIEWING"; // TODO: 서버에서 받아오기
-  const partnerAvatarUrl = ""
-; // TODO: 프로필/카드에서 받아오기
+  const partnerAvatarUrl = ""; // TODO: 프로필/카드에서 받아오기
+
+  const isCollaborating = messages.some((m) => m.type === "MATCHED_CAMPAIGN");
+  // 임시 로직: MATCHED_CAMPAIGN 메시지가 있으면 협업중이라고 가정
+  // 실제로는 chatRoom.isCollaborating
+
+  // 협업 요약바에 넣을 데이터(임시: 매칭 캠페인 메시지에서 뽑음)
+  const matchedCampaignMessage = useMemo(() => {
+    return messages.find((m) => m.type === "MATCHED_CAMPAIGN");
+  }, [messages]);
 
   // 대화 시작 여부
-  const hasStartedChat = messages.some((m) => m.side === "me" || m.side === "other");
+  //const hasStartedChat = messages.some((m) => m.side === "me" || m.side === "other");
   // 전송 중 상태
   //const [isSending, setIsSending] = useState(false);
 
-  const statusLabelMap = {
-  MATCHED: "매칭",
-  REJECTED: "거절",
-  REVIEWING: "검토중",
-  } as const;
+  const collabTitle = matchedCampaignMessage?.campaignName ?? "";
+  const collabSubtitle = matchedCampaignMessage ? "일주일 챌린지" : "";
+  const collabThumb = partnerAvatarUrl; // 콜라보 상품 이미지. 임시로 브랜드 프로필로 설정
 
-  const subtitleClass = hasStartedChat ? "text-[#6666E5]" : "text-[#5B5D6B]";
-  const subtitleText = hasStartedChat ? statusLabelMap[matchStatus] : hashtags;
+  const summaryBarHeight = isCollaborating ? 64 : 0;
 
   const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useHideBottomTab(true);
+  useHideHeader(true);
 
   const actions: AttachmentAction[] = useMemo(
     () => [
@@ -147,6 +156,7 @@ export default function ChattingRoom( {chatId} : Props ) {
     const trimmed = text.trim();
     if (!trimmed) return;
 
+    //일반 메시지 전송
     setMessages((prev) => [
       ...prev,
       {
@@ -155,9 +165,7 @@ export default function ChattingRoom( {chatId} : Props ) {
         content: trimmed,
         time: `${dateText}\n${timeText}`,
         type: "TEXT",
-        status: "sent", // 수정필요
-        campaignName: "",
-        campaignContent: "",
+        status: "sent", 
       },
     ]);
     setText(""); // 입력창 비우기
@@ -165,19 +173,35 @@ export default function ChattingRoom( {chatId} : Props ) {
     requestAnimationFrame(() => inputRef.current?.focus()); // 한 프레임 뒤 focus 복귀
   };
 
+  /*const handleDeleteMessage = (id: string) => {
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+  };
+
+  const handleRetryMessage = (id: string) => {
+    setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: "sending" } : m)));
+    // TODO: API 재전송 후 성공/실패에 따라 status 갱신
+  };*/
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
-      <ChatRoomHeader
+    <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+      <NavigationHeader
         title={partnerName}
-        subtitle={subtitleText}
-        subTitleClass={subtitleClass}
         onBack={() => history.back()}
       />
+
+      {isCollaborating && (
+      <CollaborationSummaryBar
+        thumbnailUrl= {collabThumb}
+        title={collabTitle}
+        subtitle={collabSubtitle}
+      />
+      )}
 
       {/* 메시지 영역 */}
       <div
         ref={listRef}
-        className="h-[calc(100vh-60px-49px)] overflow-y-auto px-4 py-5"
+        className="overflow-y-auto px-4 py-5"
+        style={{ height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px)` }}
       >
         <div className="w-full">
           <div className="w-full space-y-2">

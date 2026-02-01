@@ -1,14 +1,11 @@
-
 type Props = {
-  title: string;
-  subtitle: string;
-  subTitleClass?: string;
-  onBack?: () => void;
+  title: string; // 텍스트
+  onBack?: () => void; //onBack={() => history.back()} 뒤로가기
 };
 
-export default function ChatRoomHeader({ title, subtitle, subTitleClass, onBack }: Props) {
+export default function NavigationHeader({ title, onBack }: Props) {
   return (
-    <div className="h-[60px] flex items-center px-4 py-[10px] bg-[#F6F6FF]">
+    <div className="h-[60px] flex items-center px-4 py-[10px] bg-[#FFFFFF]">
       <button
         type="button"
         onClick={onBack}
@@ -28,9 +25,6 @@ export default function ChatRoomHeader({ title, subtitle, subTitleClass, onBack 
 
       <div className="flex-1 text-center">
         <div className="text-Title1 text-black text-4">{title}</div>
-        {subtitle ? (
-          <div className={["text-Semibold text-[12px] text", subTitleClass ?? "text-[#9B9BA1]"].join(" ")}>{subtitle}</div>
-        ) : null}
       </div>
 
       {/* 오른쪽 여백 맞추기 */}
