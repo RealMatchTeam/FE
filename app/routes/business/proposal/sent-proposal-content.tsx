@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { getProposalDetail, getBrandDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
+import type { BrandDetail } from "../../../data/brand";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -11,45 +14,85 @@ import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
 
 export default function ProposalContent() {
+    const [searchParams] = useSearchParams();
     const [isContentOpen, setIsContentOpen] = useState(false);
+
+    // 데이터 상태 관리
+    const [data, setData] = useState<ProposalDetail | null>(null);
+    const [brand, setBrand] = useState<BrandDetail | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const proposalId = searchParams.get("proposalId") || "1";
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                const proposalResult = await getProposalDetail(proposalId);
+                setData(proposalResult);
+
+                // 브랜드 상세 정보
+                if (proposalResult.brandId) {
+                    const brandResult = await getBrandDetail(proposalResult.brandId);
+                    setBrand(brandResult);
+                }
+
+            } catch (error) {
+                console.error("제안 상세 조회 실패:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [proposalId]);
+
+    if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+    if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
+
+    // 태그 배열을 문자열로 변환하는 헬퍼 함수
+    const getTagNames = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
             <Header title="제안 보기" />
 
             <main className="flex flex-col pb-24">
-                {/* 1. 상단 섹션: 브랜드 카드 및 제안 프로필 */}
+                {/* 브랜드 카드 및 제안 프로필 */}
                 <div className="px-4 py-6">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText="검토 중"
+                        statusText={data.status}
+                        brandName={brand?.brandName}
+                        brandTags={brand?.brandTag}
                     />
 
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-title1 text-text-black">신규 캠페인</h2>
+                        <h2 className="text-title1 text-text-black">{data.title}</h2>
 
                         <div className="flex flex-col gap-2">
                             <p className="text-title3 text-text-gray2">제안 프로필</p>
-                            
+
                             <div className="w-full p-4 bg-bluegray-2 rounded-2xl flex justify-between items-center border border-core-70">
                                 <div className="flex items-center gap-3">
                                     <div className="flex items-center justify-center">
                                         <img src={profileIcon} alt="profile" />
                                     </div>
-                                    <span className="text-callout1 text-text-black">@ivveeee</span>
+                                    <span className="text-callout1 text-text-black">
+                                        @{data.creatorId || "unknown"}
+                                    </span>
                                 </div>
-                                <img src={arrowPurpleIcon} alt="arrow"/>
+                                <img src={arrowPurpleIcon} alt="arrow" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 2. 상세 정보 섹션 */}
+                {/* 상세 정보 섹션 */}
                 <div className="bg-bluegray-1 px-4 py-8 flex flex-col gap-6">
                     {/* 캠페인명 */}
                     <CampaignInfoGroup label="캠페인명">
                         <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 text-text-gray1">
-                            비플레인 클렌징 및 세럼 리뷰 콘텐츠
+                            {data.title}
                         </div>
                     </CampaignInfoGroup>
 
@@ -70,8 +113,7 @@ export default function ProposalContent() {
                             <div className="flex flex-col gap-2">
                                 <p className="text-caption2 text-text-gray3">설명</p>
                                 <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 leading-relaxed text-text-gray1">
-                                    안녕하세요 크리에이터 비비 입니다! 비플레인의 가치가 제 채널에서 소개하는
-                                    뷰티 콘텐츠와 잘 맞닿아 있다고 생각되어 협찬을 제안드립니다.
+                                    {data.description}
                                 </div>
                             </div>
 
@@ -79,12 +121,12 @@ export default function ProposalContent() {
                             {isContentOpen && (
                                 <div className="grid grid-cols-2 gap-4 animate-slide-up">
                                     <div className="col-span-2">
-                                        <ContentItem label="형식" value="인스타그램 릴스" />
+                                        <ContentItem label="형식" value={getTagNames(data.contentTags.formats)} />
                                     </div>
-                                    <ContentItem label="종류" value="겟레디윗미, 스토리" />
-                                    <ContentItem label="톤" value="수다적인, 일상적인" />
-                                    <ContentItem label="관여도" value="가이드만 제공" />
-                                    <ContentItem label="활용 범위" value="크리에이터 1차 활용" />
+                                    <ContentItem label="종류" value={getTagNames(data.contentTags.categories)} />
+                                    <ContentItem label="톤" value={getTagNames(data.contentTags.tones)} />
+                                    <ContentItem label="관여도" value={getTagNames(data.contentTags.involvements)} />
+                                    <ContentItem label="활용 범위" value={getTagNames(data.contentTags.usageRanges)} />
                                 </div>
                             )}
                         </div>
@@ -94,14 +136,14 @@ export default function ProposalContent() {
                     <div className="grid grid-cols-2 gap-4">
                         <CampaignInfoGroup label="협찬품">
                             <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 flex justify-between items-center text-text-gray1">
-                                <span className="truncate">글로우 크림 1개</span>
+                                <span className="truncate">상품 ID: {data.productId}</span>
                                 <img src={arrowRightIcon} alt="arrow" className="w-4 h-4 opacity-30" />
                             </div>
                         </CampaignInfoGroup>
 
                         <CampaignInfoGroup label="원고료">
                             <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 flex justify-between items-center text-text-gray1">
-                                200,000 <span className="text-text-black">원</span>
+                                {data.rewardAmount.toLocaleString()} <span className="text-text-black">원</span>
                             </div>
                         </CampaignInfoGroup>
                     </div>
@@ -110,11 +152,11 @@ export default function ProposalContent() {
                     <CampaignInfoGroup label="제작 기간">
                         <div className="flex items-center gap-2 text-text-gray1">
                             <div className="flex-1 p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1">
-                                2025년 1월 20일
+                                {(data?.startDate || "").replace(/-/g, '. ')}
                             </div>
                             <span className="text-text-gray3">~</span>
                             <div className="flex-1 p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1">
-                                2025년 1월 30일
+                                {(data?.endDate || "").replace(/-/g, '. ')}
                             </div>
                         </div>
                     </CampaignInfoGroup>
