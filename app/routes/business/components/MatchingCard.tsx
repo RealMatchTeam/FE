@@ -6,6 +6,7 @@ interface MatchingCardProps {
   status: "매칭" | "검토 중" | "거절";
   date: string;
   actionLabel: string;
+  onClick?: () => void;
 }
 
 export default function MatchingCard({
@@ -13,6 +14,7 @@ export default function MatchingCard({
   status,
   date,
   actionLabel,
+  onClick,
 }: MatchingCardProps) {
   // 상태에 따른 텍스트 컬러
   const getStatusStyle = () => {
@@ -53,7 +55,10 @@ export default function MatchingCard({
 
         <div className="flex gap-2 items-center">
           {/* 제안 보기 버튼 */}
-          <button className="flex-2 py-2 flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-lg transition-opacity hover:opacity-90">
+          <button 
+            onClick={onClick} 
+            className="flex-2 py-2 flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-lg transition-opacity hover:opacity-90 active:scale-[0.98]"
+          >
             <img src={searchIcon} alt="조회" className="w-3.5 h-3.5" />
             <span className="text-title7 text-text-gray2">{actionLabel}</span>
           </button>
