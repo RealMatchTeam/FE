@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type {
   Step2SectionKey,
   Step2SelectedState,
@@ -18,12 +18,12 @@ type Props = {
   isLoading: boolean;
   errorText: string | null;
 
-  sections: Array<{ key: Step2SectionKey; title: string; max: number }>;
+  sections: Array<{ key: Step2SectionKey; title: string }>;
   itemsBySection: Record<Step2SectionKey, TagItem[]>;
 
   selected: Step2SelectedState;
   isSelected: (section: Step2SectionKey, id: number) => boolean;
-  onToggle: (section: Step2SectionKey, id: number, max: number) => void;
+  onToggle: (section: Step2SectionKey, id: number) => void; // ✅ max 제거
 
   fashionBody: FashionBodyTags;
   onSetFashionBody: (key: keyof FashionBodyTags, id: number | null) => void;
@@ -56,7 +56,6 @@ export default function MatchingTestStep2Content({
   errorText,
   sections,
   itemsBySection,
-  selected,
   isSelected,
   onToggle,
   fashionBody,
@@ -68,17 +67,6 @@ export default function MatchingTestStep2Content({
   const [sheet, setSheet] = useState<SheetType>(null);
   const open = (t: SheetType) => setSheet(t);
   const close = () => setSheet(null);
-
-  const chipDisabled = useMemo(() => {
-    const getMax = (k: Step2SectionKey) =>
-      sections.find((s) => s.key === k)?.max ?? 5;
-
-    return {
-      fashionStyle: selected.fashionStyle.length >= getMax("fashionStyle"),
-      interestItem: selected.interestItem.length >= getMax("interestItem"),
-      brandType: selected.brandType.length >= getMax("brandType"),
-    } satisfies Record<Step2SectionKey, boolean>;
-  }, [selected, sections]);
 
   const heightText =
     fashionBody.heightTag === null ? "" : `${fashionBody.heightTag} cm`;
@@ -134,14 +122,12 @@ export default function MatchingTestStep2Content({
               <ChipRow>
                 {items.map((tag) => {
                   const sel = isSelected(sec.key, tag.id);
-                  const disabled = !sel && (chipDisabled[sec.key] ?? false);
                   return (
                     <SelectChip
                       key={tag.id}
                       label={tag.name}
                       isSelected={sel}
-                      disabled={disabled}
-                      onToggle={() => onToggle(sec.key, tag.id, sec.max)}
+                      onToggle={() => onToggle(sec.key, tag.id)} // ✅ 무제한
                     />
                   );
                 })}

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import MatchingTestStep2Content from "./step2-content";
 import {
   useMatchingTestStore,
@@ -8,10 +8,10 @@ import {
 import { useFashionTags } from "../_shared/tags/tags.query";
 import type { TagItem } from "../_shared/tags/tags.types";
 
-const SECTIONS: Array<{ key: Step2SectionKey; title: string; max: number }> = [
-  { key: "fashionStyle", title: "관심 스타일", max: 5 },
-  { key: "interestItem", title: "관심 아이템/분야", max: 5 },
-  { key: "brandType", title: "관심 브랜드 종류", max: 5 },
+const SECTIONS: Array<{ key: Step2SectionKey; title: string }> = [
+  { key: "fashionStyle", title: "관심 스타일" },
+  { key: "interestItem", title: "관심 아이템/분야" },
+  { key: "brandType", title: "관심 브랜드 종류" }, // ✅ 표시 타이틀
 ];
 
 type ItemsBySection = Record<Step2SectionKey, TagItem[]>;
@@ -63,9 +63,12 @@ export default function MatchingTestStep2Page() {
         "관심 아이템",
         "아이템/분야",
         "아이템",
+        "관심 분야",
+        "분야",
       ]),
       brandType: pickCategory(categories, [
         "관심 브랜드 종류",
+        "선호 브랜드 종류", // ✅ API 응답 키 대응
         "브랜드 종류",
         "브랜드 타입",
         "브랜드",
@@ -82,6 +85,7 @@ export default function MatchingTestStep2Page() {
 
   const canGoNext = useMemo(() => {
     const chipsOk = computedSections.every((s) => selected[s.key].length >= 1);
+
     const bodyOk =
       fashionBody.heightTag !== null &&
       fashionBody.weightTypeTag !== null &&
@@ -101,7 +105,7 @@ export default function MatchingTestStep2Page() {
       itemsBySection={itemsBySection}
       selected={selected}
       isSelected={isSelected}
-      onToggle={(section, id, max) => toggle(section, id, max)}
+      onToggle={(section, id) => toggle(section, id)}
       fashionBody={fashionBody}
       onSetFashionBody={setFashionBody}
       canGoNext={canGoNext}

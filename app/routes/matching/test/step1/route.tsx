@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import MatchingTestContent from "./step1-content";
 import { useBeautyTags } from "../_shared/tags/tags.query";
 import {
@@ -8,16 +8,12 @@ import {
 } from "../../../../stores/matching-test";
 import type { TagItem } from "../_shared/tags/tags.types";
 
-const SECTIONS: Array<{ key: SectionKey; title: string; max: number }> = [
-  { key: "style", title: "관심 스타일", max: Number.POSITIVE_INFINITY },
-  { key: "function", title: "관심 기능", max: Number.POSITIVE_INFINITY },
-  { key: "skinType", title: "피부 타입", max: Number.POSITIVE_INFINITY },
-  { key: "skinTone", title: "피부 밝기", max: Number.POSITIVE_INFINITY },
-  {
-    key: "makeupStyle",
-    title: "메이크업 스타일",
-    max: Number.POSITIVE_INFINITY,
-  },
+const SECTIONS: Array<{ key: SectionKey; title: string }> = [
+  { key: "style", title: "관심 스타일" },
+  { key: "function", title: "관심 기능" },
+  { key: "skinType", title: "피부 타입" },
+  { key: "skinTone", title: "피부 밝기" },
+  { key: "makeupStyle", title: "메이크업 스타일" },
 ];
 
 type ItemsBySection = Record<SectionKey, TagItem[]>;
@@ -47,7 +43,6 @@ const pickCategory = (
 
 export default function MatchingTestStep1Page() {
   const navigate = useNavigate();
-
   const { data, isLoading, error } = useBeautyTags();
 
   const selected = useMatchingTestStore((s) => s.selected);
@@ -93,9 +88,8 @@ export default function MatchingTestStep1Page() {
       errorText={errorText}
       sections={SECTIONS}
       itemsBySection={itemsBySection}
-      selected={selected}
       isSelected={isSelected}
-      onToggle={(section, id, max) => toggleStep1(section, id, max)}
+      onToggle={(section, id) => toggleStep1(section, id)}
       canGoNext={canGoNext}
       onBack={() => navigate("/")}
       onNext={() => navigate("/matching/test/step2")}

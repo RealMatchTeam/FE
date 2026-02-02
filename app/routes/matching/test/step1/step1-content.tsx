@@ -1,22 +1,18 @@
 import MatchingTestTopBar from "../components/MatchingTestHeader";
 import SelectChip from "../components/SelectChip";
 import Button from "../../../../components/common/Button";
-import type {
-  SectionKey,
-  SelectedState,
-} from "../../../../stores/matching-test";
+import type { SectionKey } from "../../../../stores/matching-test";
 import type { TagItem } from "../_shared/tags/tags.types";
 
 type Props = {
   isLoading: boolean;
   errorText: string | null;
 
-  sections: Array<{ key: SectionKey; title: string; max: number }>;
+  sections: Array<{ key: SectionKey; title: string }>;
   itemsBySection: Record<SectionKey, TagItem[]>;
-  selected: SelectedState;
 
   isSelected: (section: SectionKey, id: number) => boolean;
-  onToggle: (section: SectionKey, id: number, max: number) => void;
+  onToggle: (section: SectionKey, id: number) => void;
 
   canGoNext: boolean;
   onBack: () => void;
@@ -28,7 +24,6 @@ export default function MatchingTestContent({
   errorText,
   sections,
   itemsBySection,
-  selected,
   isSelected,
   onToggle,
   canGoNext,
@@ -61,14 +56,13 @@ export default function MatchingTestContent({
 
       <main className="flex-1 px-6">
         <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
-          관심 있는 <span className="text-core-1">뷰티 특성</span>을<br />
+          관심 있는 <span className="text-core-1">뷰티 특성</span>을
+          <br />
           <span className="text-core-1">모두</span> 선택해주세요
         </h1>
 
         {sections.map((section) => {
           const items = itemsBySection[section.key] ?? [];
-          const sectionSelectedCount = selected[section.key].length;
-          const sectionLimitReached = sectionSelectedCount >= section.max;
 
           return (
             <section key={section.key} className="mt-8">
@@ -79,17 +73,13 @@ export default function MatchingTestContent({
               <div className="flex flex-wrap gap-3">
                 {items.map((tag) => {
                   const checked = isSelected(section.key, tag.id);
-                  const disabled = !checked && sectionLimitReached;
 
                   return (
                     <SelectChip
                       key={tag.id}
                       label={tag.name}
                       isSelected={checked}
-                      disabled={disabled}
-                      onToggle={() =>
-                        onToggle(section.key, tag.id, section.max)
-                      }
+                      onToggle={() => onToggle(section.key, tag.id)}
                     />
                   );
                 })}
