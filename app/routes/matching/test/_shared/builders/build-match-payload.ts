@@ -1,55 +1,131 @@
 import { useMatchingTestStore } from "../../../../../stores/matching-test";
 import type { MatchesRequest } from "../types/matches.types";
 
-function mustMany(v: number[] | null | undefined): number[] {
-  if (!v || v.length < 1) throw new Error();
+function requireOne(arr: number[], fieldName: string): number {
+  const v = arr[0];
+  if (typeof v !== "number") {
+    throw new Error(`${fieldName} 값이 비어있습니다.`);
+  }
   return v;
 }
 
-function mustOne(v: number | null | undefined): number {
-  if (v == null) throw new Error();
+function requireNonEmpty(arr: number[], fieldName: string): number[] {
+  if (!Array.isArray(arr) || arr.length === 0) {
+    throw new Error(`${fieldName} 값이 비어있습니다.`);
+  }
+  return arr;
+}
+
+function requireNumber(v: number | null, fieldName: string): number {
+  if (typeof v !== "number") {
+    throw new Error(`${fieldName} 값이 비어있습니다.`);
+  }
   return v;
 }
 
 export function buildMatchPayload(): MatchesRequest {
   const s = useMatchingTestStore.getState();
 
+  const step1 = s.selected;
+  const step2 = s.step2Selected;
+  const body = s.fashionBody;
+
+  const step3Sel = s.step3Selected;
+  const step3Chips = s.step3Chips;
+
+  // ✅ beauty: 일부는 단일 number로 보내야 함
+  const interestStyleTags = requireNonEmpty(
+    step1.style,
+    "beauty.interestStyleTags",
+  );
+  const prefferedFunctionTags = requireNonEmpty(
+    step1.function,
+    "beauty.prefferedFunctionTags",
+  );
+
+  const skinTypeTags = requireOne(step1.skinType, "beauty.skinTypeTags");
+  const skinToneTags = requireOne(step1.skinTone, "beauty.skinToneTags");
+  const makeupStyleTags = requireOne(
+    step1.makeupStyle,
+    "beauty.makeupStyleTags",
+  );
+
+  // ✅ fashion: 전부 number (null 금지)
+  const heightTag = requireNumber(body.heightTag, "fashion.heightTag");
+  const weightTypeTag = requireNumber(
+    body.weightTypeTag,
+    "fashion.weightTypeTag",
+  );
+  const topSizeTag = requireNumber(body.topSizeTag, "fashion.topSizeTag");
+  const bottomSizeTag = requireNumber(
+    body.bottomSizeTag,
+    "fashion.bottomSizeTag",
+  );
+
+  // ✅ content
+  const url = s.snsUrl.trim();
+  if (!url) throw new Error("content.sns.url 값이 비어있습니다.");
+
   return {
     beauty: {
-      interestStyleTags: mustMany(s.selected.style),
-      prefferedFunctionTags: mustMany(s.selected.function),
-      skinTypeTags: mustMany(s.selected.skinType),
-      skinToneTags: mustMany(s.selected.skinTone),
-      makeupStyleTags: mustMany(s.selected.makeupStyle),
+      interestStyleTags,
+      prefferedFunctionTags,
+      skinTypeTags,
+      skinToneTags,
+      makeupStyleTags,
     },
-
     fashion: {
-      interestStyleTags: mustMany(s.step2Selected.fashionStyle),
-      preferredItemTags: mustMany(s.step2Selected.interestItem),
-      preferredBrandTags: mustMany(s.step2Selected.brandType),
-      heightTag: mustOne(s.fashionBody.heightTag),
-      weightTypeTag: mustOne(s.fashionBody.weightTypeTag),
-      topSizeTag: mustOne(s.fashionBody.topSizeTag),
-      bottomSizeTag: mustOne(s.fashionBody.bottomSizeTag),
+      interestStyleTags: requireNonEmpty(
+        step2.fashionStyle,
+        "fashion.interestStyleTags",
+      ),
+      preferredItemTags: requireNonEmpty(
+        step2.interestItem,
+        "fashion.preferredItemTags",
+      ),
+      preferredBrandTags: requireNonEmpty(
+        step2.brandType,
+        "fashion.preferredBrandTags",
+      ),
+      heightTag,
+      weightTypeTag,
+      topSizeTag,
+      bottomSizeTag,
     },
-
     content: {
       sns: {
-        url: s.snsUrl,
+        url,
         mainAudience: {
-          genderTags: mustMany(s.step3Selected.gender),
-          ageTags: mustMany(s.step3Selected.ageGroup),
+          genderTags: requireNonEmpty(
+            step3Sel.gender,
+            "content.sns.mainAudience.genderTags",
+          ),
+          ageTags: requireNonEmpty(
+            step3Sel.ageGroup,
+            "content.sns.mainAudience.ageTags",
+          ),
         },
         averageAudience: {
-          videoLengthTags: mustMany(s.step3Selected.videoLength),
-          videoViewsTags: mustMany(s.step3Selected.views),
+          videoLengthTags: requireNonEmpty(
+            step3Sel.videoLength,
+            "content.sns.averageAudience.videoLengthTags",
+          ),
+          videoViewsTags: requireNonEmpty(
+            step3Sel.views,
+            "content.sns.averageAudience.videoViewsTags",
+          ),
         },
       },
-
-      typeTags: mustMany(s.step3Chips.contentType),
-      toneTags: mustMany(s.step3Chips.contentTone),
-      prefferedInvolvementTags: mustMany(s.step3Chips.contentHardness),
-      prefferedCoverageTags: mustMany(s.step3Chips.editingRange),
+      typeTags: requireNonEmpty(step3Chips.contentType, "content.typeTags"),
+      toneTags: requireNonEmpty(step3Chips.contentTone, "content.toneTags"),
+      prefferedInvolvementTags: requireNonEmpty(
+        step3Chips.contentHardness,
+        "content.prefferedInvolvementTags",
+      ),
+      prefferedCoverageTags: requireNonEmpty(
+        step3Chips.editingRange,
+        "content.prefferedCoverageTags",
+      ),
     },
   };
 }

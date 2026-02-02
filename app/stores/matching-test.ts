@@ -8,7 +8,6 @@ export type SectionKey =
   | "makeupStyle";
 
 export type Step2SectionKey = "fashionStyle" | "interestItem" | "brandType";
-
 export type Step3SelectKey = "gender" | "ageGroup" | "videoLength" | "views";
 
 export type Step3ChipKey =
@@ -23,6 +22,7 @@ export type Step2SelectedState = Record<Step2SectionKey, number[]>;
 export type Step3SelectedState = Record<Step3SelectKey, number[]>;
 export type Step3ChipsState = Record<Step3ChipKey, number[]>;
 
+// ✅ 전부 "태그 id"를 저장
 export type FashionBodyTags = {
   heightTag: number | null;
   weightTypeTag: number | null;
@@ -75,7 +75,7 @@ type MatchingTestStore = {
   toggleStep2: (section: Step2SectionKey, id: number) => void;
 
   fashionBody: FashionBodyTags;
-  setFashionBody: (key: keyof FashionBodyTags, id: number | null) => void;
+  setFashionBody: (key: keyof FashionBodyTags, tagId: number | null) => void;
 
   step3Selected: Step3SelectedState;
   toggleStep3Select: (key: Step3SelectKey, id: number) => void;
@@ -86,7 +86,6 @@ type MatchingTestStore = {
 
   snsUrl: string;
   setSnsUrl: (v: string) => void;
-  isValidInstagramUrl: () => boolean;
 
   resetAll: () => void;
 };
@@ -129,9 +128,9 @@ export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
 
   fashionBody: EMPTY_FASHION_BODY,
 
-  setFashionBody: (key, id) => {
+  setFashionBody: (key, tagId) => {
     const prev = get().fashionBody;
-    set({ fashionBody: { ...prev, [key]: id } });
+    set({ fashionBody: { ...prev, [key]: tagId } });
   },
 
   step3Selected: EMPTY_STEP3_SELECTED,
@@ -171,8 +170,6 @@ export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
 
   snsUrl: "",
   setSnsUrl: (v) => set({ snsUrl: v }),
-  isValidInstagramUrl: () =>
-    /^https?:\/\/(www\.)?instagram\.com\/.+/i.test(get().snsUrl.trim()),
 
   resetAll: () =>
     set({

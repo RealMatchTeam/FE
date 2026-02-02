@@ -133,8 +133,6 @@ export default function MatchingResultContent() {
             ))}
           </div>
 
-          {/* 버튼 밀어내기 */}
-
           <div className="mt-[50px] pb-[22px]">
             <Button
               variant="primary"

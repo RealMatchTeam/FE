@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import MatchingTestStep3Content from "./step3-content";
 
 import {
   useMatchingTestStore,
-  type Step3SelectKey,
   type Step3ChipKey,
+  type Step3SelectKey,
 } from "../../../../stores/matching-test";
 
 import { useContentTags } from "../_shared/tags/tags.query";
@@ -71,21 +72,18 @@ export default function MatchingTestStep3Page() {
 
     try {
       const payload = buildMatchPayload();
+      console.log("[matches payload]", payload);
+
       const res = await postMatches(payload);
+      console.log("[matches response]", res);
 
-      if (!res.isSuccess) {
-        setSubmitError(res.message || "제출 실패");
-        return;
-      }
-
-      // ✅ 성공하면 무조건 결과 화면으로 이동
       navigate("/matching/test/result", { replace: true });
     } catch (e) {
-      setSubmitError(
-        e instanceof Error ? e.message : "제출 중 오류가 발생했어요.",
-      );
-    } finally {
-      setSubmitting(false);
+      if (axios.isAxiosError(e)) {
+        console.log("[matches error status]", e.response?.status);
+        console.log("[matches error body]", e.response?.data);
+      }
+      throw e;
     }
   };
 

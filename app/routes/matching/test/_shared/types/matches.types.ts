@@ -9,9 +9,9 @@ export type MatchesRequest = {
   beauty: {
     interestStyleTags: number[];
     prefferedFunctionTags: number[];
-    skinTypeTags: number[];
-    skinToneTags: number[];
-    makeupStyleTags: number[];
+    skinTypeTags: number;
+    skinToneTags: number;
+    makeupStyleTags: number;
   };
   fashion: {
     interestStyleTags: number[];

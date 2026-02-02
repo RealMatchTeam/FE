@@ -1,18 +1,19 @@
-import { useState } from "react";
-import type {
-  Step2SectionKey,
-  Step2SelectedState,
-  FashionBodyTags,
-} from "../../../../stores/matching-test";
-import type { TagItem } from "../_shared/tags/tags.types";
-
+import { useMemo, useState } from "react";
+import MatchingTestTopBar from "../components/MatchingTestHeader";
 import SelectChip from "../components/SelectChip";
-import FormField from "../components/FormField";
+import Button from "../../../../components/common/Button";
+
 import BottomSheet from "../components/BottomSheet";
 import InputSheet from "../components/InputSheet";
 import SelectSheet from "../components/SelectSheet";
-import MatchingTestTopBar from "../components/MatchingTestHeader";
-import Button from "../../../../components/common/Button";
+import FormField from "../components/FormField";
+
+import type {
+  FashionBodyTags,
+  Step2SectionKey,
+  Step2SelectedState,
+} from "../../../../stores/matching-test";
+import type { TagItem } from "../_shared/tags/tags.types";
 
 type Props = {
   isLoading: boolean;
@@ -20,76 +21,125 @@ type Props = {
 
   sections: Array<{ key: Step2SectionKey; title: string }>;
   itemsBySection: Record<Step2SectionKey, TagItem[]>;
-
   selected: Step2SelectedState;
+
   isSelected: (section: Step2SectionKey, id: number) => boolean;
-  onToggle: (section: Step2SectionKey, id: number) => void; // ✅ max 제거
+  onToggle: (section: Step2SectionKey, id: number) => void;
 
   fashionBody: FashionBodyTags;
   onSetFashionBody: (key: keyof FashionBodyTags, id: number | null) => void;
+
+  // ✅ 패션 태그 전체 categories (키/체형/상의/하의 찾기)
+  fashionCategories: Record<string, TagItem[]>;
 
   canGoNext: boolean;
   onBack: () => void;
   onNext: () => void;
 };
 
-type SheetType = null | "height" | "bodyShape" | "topSize" | "bottomSize";
+type Sheet = null | "height" | "weightType" | "topSize" | "bottomSize";
 
-const BODY_SHAPE_OPTIONS = [
-  { id: 1, label: "마름" },
-  { id: 2, label: "표준" },
-  { id: 3, label: "통통" },
-  { id: 4, label: "근육형" },
-  { id: 5, label: "웨이브" },
-] as const;
+const normalize = (s: string) => s.replace(/\s+/g, "").trim();
 
-const TOP_SIZE_OPTIONS = [
-  { id: 33, label: "33" },
-  { id: 44, label: "44" },
-  { id: 55, label: "55" },
-  { id: 66, label: "66" },
-  { id: 77, label: "77" },
-] as const;
+const pickCategory = (
+  categories: Record<string, TagItem[]>,
+  candidates: readonly string[],
+): TagItem[] => {
+  for (const key of candidates) {
+    const v = categories[key];
+    if (Array.isArray(v)) return v;
+  }
+  const keys = Object.keys(categories);
+  for (const cand of candidates) {
+    const hit = keys.find((k) => normalize(k) === normalize(cand));
+    if (hit) {
+      const v = categories[hit];
+      if (Array.isArray(v)) return v;
+    }
+  }
+  return [];
+};
+
+const idByName = (name: string, options: TagItem[]) =>
+  options.find((o) => normalize(o.name) === normalize(name))?.id ?? null;
+
+const nameById = (id: number | null, options: TagItem[]) =>
+  id == null ? "" : (options.find((o) => o.id === id)?.name ?? "");
+
+// ✅ 숫자 입력을 태그 name으로 매핑해서 id 찾기
+// height: "180" + "cm" => "180cm"
+// bottom: "27" + "" => "27"
+const idByNumericInput = (raw: string, options: TagItem[], suffix: string) => {
+  const v = raw.trim();
+  if (!/^\d+$/.test(v)) return null;
+  return idByName(suffix ? `${v}${suffix}` : v, options);
+};
 
 export default function MatchingTestStep2Content({
   isLoading,
   errorText,
+
   sections,
   itemsBySection,
   isSelected,
   onToggle,
+
   fashionBody,
   onSetFashionBody,
+  fashionCategories,
+
   canGoNext,
   onBack,
   onNext,
 }: Props) {
-  const [sheet, setSheet] = useState<SheetType>(null);
-  const open = (t: SheetType) => setSheet(t);
+  const [sheet, setSheet] = useState<Sheet>(null);
+  const open = (s: Sheet) => setSheet(s);
   const close = () => setSheet(null);
 
-  const heightText =
-    fashionBody.heightTag === null ? "" : `${fashionBody.heightTag} cm`;
-  const bottomText =
-    fashionBody.bottomSizeTag === null ? "" : `${fashionBody.bottomSizeTag} in`;
+  // 입력용 state (키/하의만)
+  const [heightInput, setHeightInput] = useState("");
+  const [bottomInput, setBottomInput] = useState("");
 
-  const bodyShapeText =
-    fashionBody.weightTypeTag === null
-      ? ""
-      : (BODY_SHAPE_OPTIONS.find((o) => o.id === fashionBody.weightTypeTag)
-          ?.label ?? "");
+  const heightOptions = useMemo(
+    () => pickCategory(fashionCategories, ["키"]),
+    [fashionCategories],
+  );
+  const weightTypeOptions = useMemo(
+    () => pickCategory(fashionCategories, ["체형"]),
+    [fashionCategories],
+  );
+  const topSizeOptions = useMemo(
+    () => pickCategory(fashionCategories, ["상의 사이즈"]),
+    [fashionCategories],
+  );
+  const bottomSizeOptions = useMemo(
+    () => pickCategory(fashionCategories, ["하의 사이즈"]),
+    [fashionCategories],
+  );
 
-  const topSizeText =
-    fashionBody.topSizeTag === null
-      ? ""
-      : (TOP_SIZE_OPTIONS.find((o) => o.id === fashionBody.topSizeTag)?.label ??
-        String(fashionBody.topSizeTag));
+  // 표시값 (store는 id 저장, 화면은 name 표시)
+  const heightValue = useMemo(
+    () => nameById(fashionBody.heightTag, heightOptions),
+    [fashionBody.heightTag, heightOptions],
+  );
+  const weightValue = useMemo(
+    () => nameById(fashionBody.weightTypeTag, weightTypeOptions),
+    [fashionBody.weightTypeTag, weightTypeOptions],
+  );
+  const topSizeValue = useMemo(
+    () => nameById(fashionBody.topSizeTag, topSizeOptions),
+    [fashionBody.topSizeTag, topSizeOptions],
+  );
+  const bottomValue = useMemo(
+    () => nameById(fashionBody.bottomSizeTag, bottomSizeOptions),
+    [fashionBody.bottomSizeTag, bottomSizeOptions],
+  );
 
   if (isLoading) {
     return (
-      <div className="min-h-dvh bg-white">
+      <div className="min-h-screen bg-white">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
-        <div className="px-5 py-10 text-sm text-text-gray3">
+        <div className="px-6 py-10 text-sm text-text-gray3">
           태그를 불러오는 중...
         </div>
       </div>
@@ -98,96 +148,107 @@ export default function MatchingTestStep2Content({
 
   if (errorText) {
     return (
-      <div className="min-h-dvh bg-white">
+      <div className="min-h-screen bg-white">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
-        <div className="px-5 py-10 text-sm text-red-500">{errorText}</div>
+        <div className="px-6 py-10 text-sm text-red-500">{errorText}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
-      <div className="px-5 pb-6">
-        <h1 className="text-title1 text-text-black">
-          관심 있는 <span className="text-core-1">패션 특성</span>을 <br />
-          모두 선택해주세요!
+      <main className="flex-1 px-6">
+        <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
+          관심 있는 <span className="text-core-1">패션 특성</span>을
+          <br />
+          <span className="text-core-1">모두</span> 선택해주세요
         </h1>
 
-        {sections.map((sec) => {
-          const items = itemsBySection[sec.key] ?? [];
+        {/* 칩 섹션들(기존 유지) */}
+        {sections.map((section) => {
+          const items = itemsBySection[section.key] ?? [];
+
           return (
-            <Section key={sec.key} title={sec.title}>
-              <ChipRow>
+            <section key={section.key} className="mt-8">
+              <h2 className="text-[16px] leading-[24px] font-semibold text-text-black mb-3">
+                {section.title}
+              </h2>
+
+              <div className="flex flex-wrap gap-3">
                 {items.map((tag) => {
-                  const sel = isSelected(sec.key, tag.id);
+                  const checked = isSelected(section.key, tag.id);
+
                   return (
                     <SelectChip
                       key={tag.id}
                       label={tag.name}
-                      isSelected={sel}
-                      onToggle={() => onToggle(sec.key, tag.id)} // ✅ 무제한
+                      isSelected={checked}
+                      onToggle={() => onToggle(section.key, tag.id)}
                     />
                   );
                 })}
-              </ChipRow>
-            </Section>
+              </div>
+            </section>
           );
         })}
 
-        <div className="mt-7">
-          <div className="text-sm font-semibold text-text-black">체형 정보</div>
+        {/* 체형 정보(UI 유지) */}
+        <section className="mt-8">
+          <h2 className="text-[16px] leading-[24px] font-semibold text-text-black mb-2">
+            체형 정보
+          </h2>
 
-          <div className="mt-3">
-            <div className="text-body2 text-text-gray3">키를 입력해주세요</div>
-            <div className="mt-2">
-              <FormField
-                label="키(cm)"
-                value={heightText}
-                placeholder="입력하기"
-                onClick={() => open("height")}
-              />
-            </div>
+          <div className="text-body2 text-text-gray3">키를 입력해주세요</div>
+          <div className="mt-2">
+            <FormField
+              label="키(cm)"
+              value={heightValue}
+              placeholder="입력하기"
+              onClick={() => {
+                setHeightInput(heightValue.replace("cm", ""));
+                open("height");
+              }}
+            />
           </div>
 
-          <div className="mt-4">
-            <div className="text-body2 text-text-gray3">
-              체형을 선택해주세요
-            </div>
-            <div className="mt-2">
-              <FormField
-                label="체형"
-                value={bodyShapeText}
-                placeholder="선택하기"
-                onClick={() => open("bodyShape")}
-              />
-            </div>
+          <div className="mt-4 text-body2 text-text-gray3">
+            체형을 선택해주세요
+          </div>
+          <div className="mt-2">
+            <FormField
+              label="체형"
+              value={weightValue}
+              placeholder="선택하기"
+              onClick={() => open("weightType")}
+            />
           </div>
 
-          <div className="mt-4">
-            <div className="text-body2 text-text-gray3">
-              평소 입는 옷 사이즈를 선택해주세요
-            </div>
-            <div className="mt-2 grid grid-cols-2 gap-3">
-              <FormField
-                label="상의 사이즈"
-                value={topSizeText}
-                placeholder="선택하기"
-                onClick={() => open("topSize")}
-              />
-              <FormField
-                label="하의 사이즈 (in)"
-                value={bottomText}
-                placeholder="입력하기"
-                onClick={() => open("bottomSize")}
-              />
-            </div>
+          <div className="mt-4 text-body2 text-text-gray3">
+            평소 입는 옷 사이즈를 선택해주세요
           </div>
-        </div>
-      </div>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <FormField
+              label="상의 사이즈"
+              value={topSizeValue}
+              placeholder="선택하기"
+              onClick={() => open("topSize")}
+            />
+            <FormField
+              label="하의 사이즈 (in)"
+              value={bottomValue}
+              placeholder="입력하기"
+              onClick={() => {
+                setBottomInput(bottomValue);
+                open("bottomSize");
+              }}
+            />
+          </div>
+        </section>
+      </main>
 
-      <div className="sticky bottom-0 bg-white px-5 pb-6 pt-3">
+      <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
         <Button
           variant="primary"
           size="lg"
@@ -199,74 +260,76 @@ export default function MatchingTestStep2Content({
         </Button>
       </div>
 
+      {/* ✅ 키 입력: 숫자 -> "180cm" -> id 저장 */}
       {sheet === "height" ? (
         <BottomSheet title="키 입력" onClose={close}>
           <InputSheet
-            value={
-              fashionBody.heightTag === null
-                ? ""
-                : String(fashionBody.heightTag)
-            }
-            placeholder="숫자만 입력"
-            onChange={(v) => {
-              const n = Number(v.replace(/[^\d]/g, ""));
-              onSetFashionBody(
-                "heightTag",
-                Number.isFinite(n) && n > 0 ? n : null,
-              );
+            value={heightInput}
+            placeholder="예: 180"
+            onChange={setHeightInput}
+            doneDisabled={!/^\d+$/.test(heightInput.trim())}
+            onDone={() => {
+              const id = idByNumericInput(heightInput, heightOptions, "cm");
+              if (id != null) onSetFashionBody("heightTag", id);
+              close();
             }}
-            doneDisabled={fashionBody.heightTag === null}
-            onDone={close}
-            suffix="cm"
+            helperText="예: 180"
+            errorText={
+              heightInput.trim().length > 0 && !/^\d+$/.test(heightInput.trim())
+                ? "숫자만 입력해주세요."
+                : undefined
+            }
           />
         </BottomSheet>
       ) : null}
 
+      {/* ✅ 하의 입력: 숫자 -> "27" -> id 저장 */}
       {sheet === "bottomSize" ? (
         <BottomSheet title="하의 사이즈 입력" onClose={close}>
           <InputSheet
-            value={
-              fashionBody.bottomSizeTag === null
-                ? ""
-                : String(fashionBody.bottomSizeTag)
-            }
-            placeholder="숫자만 입력"
-            onChange={(v) => {
-              const n = Number(v.replace(/[^\d]/g, ""));
-              onSetFashionBody(
-                "bottomSizeTag",
-                Number.isFinite(n) && n > 0 ? n : null,
-              );
+            value={bottomInput}
+            placeholder="예: 27"
+            onChange={setBottomInput}
+            doneDisabled={!/^\d+$/.test(bottomInput.trim())}
+            onDone={() => {
+              const id = idByNumericInput(bottomInput, bottomSizeOptions, "");
+              if (id != null) onSetFashionBody("bottomSizeTag", id);
+              close();
             }}
-            doneDisabled={fashionBody.bottomSizeTag === null}
-            onDone={close}
-            suffix="in"
+            helperText="예: 27"
+            errorText={
+              bottomInput.trim().length > 0 && !/^\d+$/.test(bottomInput.trim())
+                ? "숫자만 입력해주세요."
+                : undefined
+            }
           />
         </BottomSheet>
       ) : null}
 
-      {sheet === "bodyShape" ? (
+      {/* ✅ 체형 선택: 선택 name -> id 저장 */}
+      {sheet === "weightType" ? (
         <BottomSheet title="체형 선택" onClose={close}>
           <SelectSheet
-            options={BODY_SHAPE_OPTIONS.map((o) => o.label)}
-            value={bodyShapeText}
-            onSelect={(label) => {
-              const hit = BODY_SHAPE_OPTIONS.find((o) => o.label === label);
-              onSetFashionBody("weightTypeTag", hit ? hit.id : null);
+            options={weightTypeOptions.map((x) => x.name)}
+            value={weightValue}
+            onSelect={(name) => {
+              const id = idByName(name, weightTypeOptions);
+              if (id != null) onSetFashionBody("weightTypeTag", id);
               close();
             }}
           />
         </BottomSheet>
       ) : null}
 
+      {/* ✅ 상의 선택: 선택 name -> id 저장 */}
       {sheet === "topSize" ? (
         <BottomSheet title="상의 사이즈 선택" onClose={close}>
           <SelectSheet
-            options={TOP_SIZE_OPTIONS.map((o) => o.label)}
-            value={topSizeText}
-            onSelect={(label) => {
-              const hit = TOP_SIZE_OPTIONS.find((o) => o.label === label);
-              onSetFashionBody("topSizeTag", hit ? hit.id : null);
+            options={topSizeOptions.map((x) => x.name)}
+            value={topSizeValue}
+            onSelect={(name) => {
+              const id = idByName(name, topSizeOptions);
+              if (id != null) onSetFashionBody("topSizeTag", id);
               close();
             }}
           />
@@ -274,23 +337,4 @@ export default function MatchingTestStep2Content({
       ) : null}
     </div>
   );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mt-5">
-      <div className="text-sm font-semibold text-text-black">{title}</div>
-      <div className="mt-2">{children}</div>
-    </div>
-  );
-}
-
-function ChipRow({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-wrap gap-2">{children}</div>;
 }
