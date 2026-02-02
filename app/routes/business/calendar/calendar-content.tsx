@@ -22,7 +22,7 @@ export default function CalendarContent() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("전체");
 
-  const hasData = true;
+  //const hasData = true;
 
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -88,7 +88,7 @@ export default function CalendarContent() {
 
   // [필터링 로직]
   const todayStr = new Date().toISOString().split('T')[0];
-  const currentMonthStr = todayStr.substring(0, 7); 
+  const currentMonthStr = todayStr.substring(0, 7);
   const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
 
   const filteredList = campaigns.filter((item) => {
@@ -99,8 +99,12 @@ export default function CalendarContent() {
     return item.startDate.includes(currentMonthStr) || item.endDate.includes(currentMonthStr);
   });
 
-  const handleCardClick = (type: "sent" | "received") => {
-    navigate(`/business/proposal?type=${type}`);
+  const handleCardClick = (item: CampaignCollaboration) => {
+    if (item.status === "REJECTED") {
+      navigate(`/rejection?id=${item.campaignId || item.proposalId}`);
+    } else {
+      navigate(`/business/proposal?type=${matchingSubTab}`);
+    }
   };
 
   return (
@@ -205,15 +209,16 @@ export default function CalendarContent() {
               <div className="flex flex-col gap-4">
                 {isLoading ? (
                   <p>로딩 중...</p>
-                ) : matchingList.length > 0 ? ( // filteredList에서 matchingList로 변경
+                ) : matchingList.length > 0 ? (
                   matchingList.map((item) => (
                     <MatchingCard
                       key={item.campaignId || item.proposalId}
                       brand={item.brandName}
                       status={getStatusLabel(item.status)}
-                      date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)} // 12.23.25 포맷
+                      date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)}
                       actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
-                      onClick={() => handleCardClick(matchingSubTab)}
+                      // [수정된 부분] item 객체 자체를 넘겨서 상태에 따라 분기 처리
+                      onClick={() => handleCardClick(item)}
                     />
                   ))
                 ) : (

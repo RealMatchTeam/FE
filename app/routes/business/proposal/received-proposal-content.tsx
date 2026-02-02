@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import RealmatchHeader from "../../../components/common/RealmatchHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
+
+import { getProposalDetail, getBrandDetail, type ProposalDetail } from "./api/proposal";
+import type { BrandDetail } from "../../../data/brand";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
@@ -12,33 +16,74 @@ import checkIcon from "../../../assets/icon/icon-check-circle.svg";
 import closeIcon from "../../../assets/icon/icon-close.svg";
 
 export default function ReceivedProposalContent() {
+    const [searchParams] = useSearchParams();
+    const proposalId = searchParams.get("id");
+
+    const [proposal, setProposal] = useState<ProposalDetail | null>(null);
+    const [brand, setBrand] = useState<BrandDetail | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [modalType, setModalType] = useState<"none" | "confirm" | "success">("none");
     const [isContentOpen, setIsContentOpen] = useState(false);
+
+    // 1. 데이터 패칭 로직
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!proposalId) return;
+            try {
+                setIsLoading(true);
+                // 1. 제안 상세 정보 가져오기
+                const proposalResult = await getProposalDetail(proposalId);
+                setProposal(proposalResult);
+
+                // 2. 제안 정보에 있는 brandId로 브랜드 상세 정보 가져오기
+                if (proposalResult.brandId) {
+                    const brandResult = await getBrandDetail(proposalResult.brandId);
+                    setBrand(brandResult);
+                }
+            } catch (error) {
+                console.error("데이터 로드 실패:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [proposalId])
 
     const handleAcceptClick = () => setModalType("confirm");
     const handleConfirm = () => setModalType("success");
     const closeModal = () => setModalType("none");
 
+    // 태그 배열을 문자열로 변환하는 헬퍼 함수
+    const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
+    
+    // 날짜 포맷 변경 함수 (2026-02-01 -> 2026. 02. 01)
+    const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
+
+    if (isLoading) return <div className="p-10 text-center text-text-gray3 font-pretendard">로딩 중...</div>;
+    if (!proposal) return <div className="p-10 text-center text-text-gray3 font-pretendard">데이터를 찾을 수 없습니다.</div>;
+
     return (
         <div className="flex flex-col w-full min-h-screen bg-[var(--color-bg-w)] font-pretendard relative">
             <RealmatchHeader title="제안 보기" showBack={true} />
 
-            {/* 배경색 및 간격을 CampaignContent와 동일하게 유지 */}
             <main className="flex flex-col bg-[var(--color-bluegray-1)]">
-                {/* 1. 상단 섹션: 브랜드 카드 및 타이틀 */}
-                {/* CampaignContent와 동일하게 상단만 흰색 배경 유지하거나 구분감 부여 */}
                 <div className="bg-[var(--color-bg-w)] px-4 py-6 flex flex-col gap-2">
-                    <CampaignBrandCard showChatSection={false} statusText="검토 중" />
+                    <CampaignBrandCard 
+                        showChatSection={false} 
+                        statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"} 
+                        brandName={brand?.brandName}
+                        brandTags={brand?.brandTag}
+                    />
                     <div>
-                        <h2 className="text-title1 text-text-black">브랜드 제안 캠페인</h2>
+                        <h2 className="text-title1 text-text-black">{proposal.title}</h2>
                     </div>
                 </div>
 
-                {/* 2. 상세 정보 섹션: 여기서부터 회색 배경(bluegray-1) */}
+                {/* 2. 상세 정보 섹션 */}
                 <div className="px-4 py-8 flex flex-col gap-6">
                     <CampaignInfoGroup label="캠페인명">
                         <div className="w-full h-[36px] px-4 flex items-center bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)]">
-                            비플레인 선크림 리뷰 콘텐츠
+                            {proposal.title}
                         </div>
                     </CampaignInfoGroup>
 
@@ -47,7 +92,7 @@ export default function ReceivedProposalContent() {
                         label="캠페인 내용"
                         right={
                             <button onClick={() => setIsContentOpen((prev) => !prev)}>
-                                <img src={isContentOpen ? dropupIcon : dropdownIcon} alt="toggle" className="w-4 h-4" />
+                                <img src={isContentOpen ? dropupIcon : dropdownIcon} alt="toggle" className="w-5 h-5" />
                             </button>
                         }
                     >
@@ -55,37 +100,36 @@ export default function ReceivedProposalContent() {
                             <div className="flex flex-col gap-2">
                                 <p className="text-callout1 text-[var(--color-text-gray2)]">설명</p>
                                 <div className="w-full min-h-[68px] px-[16px] py-[10px] bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)] leading-relaxed">
-                                    안녕하세요 비플레인 입니다! <br />
-                                    크리에이터님과 이미지가 잘 맞아 협찬을 제안드립니다.
+                                    {proposal.description}
                                 </div>
                             </div>
 
                             {isContentOpen && (
                                 <div className="grid grid-cols-2 gap-x-[11px] gap-y-4 animate-in fade-in duration-300">
                                     <div className="col-span-2">
-                                        <ContentItem label="형식" value="인스타그램 릴스" />
+                                        <ContentItem label="형식" value={formatTags(proposal.contentTags.formats)} />
                                     </div>
-                                    <ContentItem label="종류" value="겟레디윗미, 스토리" />
-                                    <ContentItem label="톤" value="수다적인, 일상적인" />
-                                    <ContentItem label="관여도" value="가이드만 제공" />
-                                    <ContentItem label="활용 범위" value="크리에이터 1차 활용" />
+                                    <ContentItem label="종류" value={formatTags(proposal.contentTags.categories)} />
+                                    <ContentItem label="톤" value={formatTags(proposal.contentTags.tones)} />
+                                    <ContentItem label="관여도" value={formatTags(proposal.contentTags.involvements)} />
+                                    <ContentItem label="활용 범위" value={formatTags(proposal.contentTags.usageRanges)} />
                                 </div>
                             )}
                         </div>
                     </CampaignInfoGroup>
 
-                    {/* 협찬품 / 원고료: 높이 36px 통일 */}
+                    {/* 협찬품 / 원고료 */}
                     <div className="grid grid-cols-2 gap-4">
                         <CampaignInfoGroup label="협찬품">
                             <div className="w-full h-[36px] px-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)] flex justify-between items-center">
-                                <span className="truncate">글로우 크림 1개</span>
+                                <span className="truncate">협찬품 확인</span>
                                 <img src={arrowRightIcon} alt="arrow" className="w-4 h-4 opacity-30" />
                             </div>
                         </CampaignInfoGroup>
 
                         <CampaignInfoGroup label="원고료">
                             <div className="w-full h-[36px] px-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)] flex justify-between items-center">
-                                <span>200,000</span>
+                                <span>{proposal.rewardAmount.toLocaleString()}</span>
                                 <span className="shrink-0 ml-1">원</span>
                             </div>
                         </CampaignInfoGroup>
@@ -95,11 +139,11 @@ export default function ReceivedProposalContent() {
                     <CampaignInfoGroup label="제작 기간">
                         <div className="flex items-center gap-2">
                             <div className="flex-1 h-[36px] flex items-center pl-[16px] bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)]">
-                                2025-01-20
+                                {formatDate(proposal.startDate)}
                             </div>
                             <span className="text-[var(--color-text-gray3)] text-date-separator">~</span>
                             <div className="flex-1 h-[36px] flex items-center pl-[16px] bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)]">
-                                2025-01-30
+                                {formatDate(proposal.endDate)}
                             </div>
                         </div>
                     </CampaignInfoGroup>
@@ -121,7 +165,7 @@ export default function ReceivedProposalContent() {
             </div>
 
             <Modal isOpen={modalType !== "none"} onClose={closeModal}>
-                {/* 모달 내용은 기존 디자인 유지 (글로벌 규격 적용) */}
+                {/* 모달 */}
                 {modalType === "confirm" && (
                     <div className="flex flex-col items-center text-center">
                         <button onClick={closeModal} className="absolute top-4 left-4">
@@ -163,7 +207,6 @@ export default function ReceivedProposalContent() {
     );
 }
 
-// ContentItem: CampaignContent의 규격(h-34, text-callout1)으로 수정
 function ContentItem({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex flex-col gap-2">
