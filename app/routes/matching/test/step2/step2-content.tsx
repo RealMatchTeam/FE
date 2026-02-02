@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
-import type { Step2SectionKey, Step2SelectedState } from "../../../../stores/matching-test";
+import type {
+  Step2SectionKey,
+  Step2SelectedState,
+  TagId,
+} from "../../../../stores/matching-test";
+import type { TagItem } from "../_shared/tags/tags.types";
 
 import SelectChip from "../components/SelectChip";
 import FormField from "../components/FormField";
@@ -10,12 +15,15 @@ import MatchingTestTopBar from "../components/MatchingTestHeader";
 import Button from "../../../../components/common/Button";
 
 type Props = {
-  maxText: string;
-  maxPerSection: number;
+  isLoading: boolean;
+  errorText: string | null;
+
+  sections: Array<{ key: Step2SectionKey; title: string; max: number }>;
+  itemsBySection: Record<Step2SectionKey, TagItem[]>;
 
   selected: Step2SelectedState;
-  isSelected: (section: Step2SectionKey, label: string) => boolean;
-  onToggle: (section: Step2SectionKey, label: string) => void;
+  isSelected: (section: Step2SectionKey, id: TagId) => boolean;
+  onToggle: (section: Step2SectionKey, id: TagId, max: number) => void;
 
   heightCm: string;
   bodyShape: string;
@@ -32,19 +40,22 @@ type Props = {
   onNext: () => void;
 };
 
-const CONTAINER = "mx-auto w-full max-w-[420px]";
 type SheetType = null | "height" | "bodyShape" | "topSize" | "bottomSize";
 
-const STYLE = ["미니멀", "페미닌", "러블리", "비즈니스 캐주얼", "캐주얼", "스트리트"] as const;
-const ITEM = ["의류", "가방", "신발", "주얼리", "패션 소품"] as const;
-const BRAND = ["SPA", "빈티지", "중가 브랜드", "디자이너 브랜드", "명품 브랜드"] as const;
-
-const BODY_SHAPE_OPTIONS = ["마름", "표준", "통통", "근육형", "웨이브"] as const;
+const BODY_SHAPE_OPTIONS = [
+  "마름",
+  "표준",
+  "통통",
+  "근육형",
+  "웨이브",
+] as const;
 const TOP_SIZE_OPTIONS = ["33", "44", "55", "66", "77"] as const;
 
 export default function MatchingTestStep2Content({
-  maxText,
-  maxPerSection,
+  isLoading,
+  errorText,
+  sections,
+  itemsBySection,
   selected,
   isSelected,
   onToggle,
@@ -65,141 +76,136 @@ export default function MatchingTestStep2Content({
   const close = () => setSheet(null);
 
   const chipDisabled = useMemo(() => {
-    return {
-      fashionStyle: selected.fashionStyle.length >= maxPerSection,
-      interestItem: selected.interestItem.length >= maxPerSection,
-      brandType: selected.brandType.length >= maxPerSection,
+    const out: Record<Step2SectionKey, boolean> = {
+      fashionStyle:
+        selected.fashionStyle.length >=
+        (sections.find((s) => s.key === "fashionStyle")?.max ?? 5),
+      interestItem:
+        selected.interestItem.length >=
+        (sections.find((s) => s.key === "interestItem")?.max ?? 5),
+      brandType:
+        selected.brandType.length >=
+        (sections.find((s) => s.key === "brandType")?.max ?? 5),
     };
-  }, [selected, maxPerSection]);
+    return out;
+  }, [selected, sections]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-dvh bg-white">
+        <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
+        <div className="px-5 py-10 text-sm text-text-gray3">
+          태그를 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
+  if (errorText) {
+    return (
+      <div className="min-h-dvh bg-white">
+        <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
+        <div className="px-5 py-10 text-sm text-red-500">{errorText}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-white">
-      <div className={CONTAINER}>
-        {/* 공용 상단 */}
-        <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
+      <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
-        <div className="px-5 pb-6">
-          <h1 className="text-title1 text-text-black">
-            관심 있는 <span className="text-core-1">패션 특성</span>을 <br />
-            모두 선택해주세요!
-          </h1>
-          <p className="mt-2 text-body2 text-text-gray3">{maxText}</p>
+      <div className="px-5 pb-6">
+        <h1 className="text-title1 text-text-black">
+          관심 있는 <span className="text-core-1">패션 특성</span>을 <br />
+          모두 선택해주세요!
+        </h1>
 
-          {/* Chips */}
-          <Section title="관심 스타일">
-            <ChipRow>
-              {STYLE.map((label) => {
-                const sel = isSelected("fashionStyle", label);
-                const disabled = !sel && chipDisabled.fashionStyle;
-                return (
-                  <SelectChip
-                    key={label}
-                    label={label}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggle("fashionStyle", label)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
+        {/* Chips: 서버 태그 기반 */}
+        {sections.map((sec) => {
+          const items = itemsBySection[sec.key] ?? [];
+          return (
+            <Section key={sec.key} title={sec.title}>
+              <ChipRow>
+                {items.map((tag) => {
+                  const sel = isSelected(sec.key, tag.id);
+                  const disabled = !sel && (chipDisabled[sec.key] ?? false);
+                  return (
+                    <SelectChip
+                      key={String(tag.id)}
+                      label={tag.name}
+                      isSelected={sel}
+                      disabled={disabled}
+                      onToggle={() => onToggle(sec.key, tag.id, sec.max)}
+                    />
+                  );
+                })}
+              </ChipRow>
+            </Section>
+          );
+        })}
 
-          <Section title="관심 아이템/분야">
-            <ChipRow>
-              {ITEM.map((label) => {
-                const sel = isSelected("interestItem", label);
-                const disabled = !sel && chipDisabled.interestItem;
-                return (
-                  <SelectChip
-                    key={label}
-                    label={label}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggle("interestItem", label)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
+        {/* Body Info: 기존 그대로 */}
+        <div className="mt-7">
+          <div className="text-sm font-semibold text-text-black">체형 정보</div>
 
-          <Section title="관심 브랜드 종류">
-            <ChipRow>
-              {BRAND.map((label) => {
-                const sel = isSelected("brandType", label);
-                const disabled = !sel && chipDisabled.brandType;
-                return (
-                  <SelectChip
-                    key={label}
-                    label={label}
-                    isSelected={sel}
-                    disabled={disabled}
-                    onToggle={() => onToggle("brandType", label)}
-                  />
-                );
-              })}
-            </ChipRow>
-          </Section>
-
-          {/* Body Info */}
-          <div className="mt-7">
-            <div className="text-sm font-semibold text-text-black">체형 정보</div>
-
-            <div className="mt-3">
-              <div className="text-body2 text-text-gray3">키를 입력해주세요</div>
-              <div className="mt-2">
-                <FormField
-                  label="키(cm)"
-                  value={heightCm ? `${heightCm} cm` : ""}
-                  placeholder="입력하기"
-                  onClick={() => open("height")}
-                />
-              </div>
+          <div className="mt-3">
+            <div className="text-body2 text-text-gray3">키를 입력해주세요</div>
+            <div className="mt-2">
+              <FormField
+                label="키(cm)"
+                value={heightCm ? `${heightCm} cm` : ""}
+                placeholder="입력하기"
+                onClick={() => open("height")}
+              />
             </div>
+          </div>
 
-            <div className="mt-4">
-              <div className="text-body2 text-text-gray3">체형을 선택해주세요</div>
-              <div className="mt-2">
-                <FormField
-                  label="체형"
-                  value={bodyShape}
-                  placeholder="선택하기"
-                  onClick={() => open("bodyShape")}
-                />
-              </div>
+          <div className="mt-4">
+            <div className="text-body2 text-text-gray3">
+              체형을 선택해주세요
             </div>
+            <div className="mt-2">
+              <FormField
+                label="체형"
+                value={bodyShape}
+                placeholder="선택하기"
+                onClick={() => open("bodyShape")}
+              />
+            </div>
+          </div>
 
-            <div className="mt-4">
-              <div className="text-body2 text-text-gray3">평소 입는 옷 사이즈를 선택해주세요</div>
-              <div className="mt-2 grid grid-cols-2 gap-3">
-                <FormField
-                  label="상의 사이즈"
-                  value={topSize}
-                  placeholder="선택하기"
-                  onClick={() => open("topSize")}
-                />
-                <FormField
-                  label="하의 사이즈 (in)"
-                  value={bottomSizeIn ? `${bottomSizeIn} in` : ""}
-                  placeholder="입력하기"
-                  onClick={() => open("bottomSize")}
-                />
-              </div>
+          <div className="mt-4">
+            <div className="text-body2 text-text-gray3">
+              평소 입는 옷 사이즈를 선택해주세요
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-3">
+              <FormField
+                label="상의 사이즈"
+                value={topSize}
+                placeholder="선택하기"
+                onClick={() => open("topSize")}
+              />
+              <FormField
+                label="하의 사이즈 (in)"
+                value={bottomSizeIn ? `${bottomSizeIn} in` : ""}
+                placeholder="입력하기"
+                onClick={() => open("bottomSize")}
+              />
             </div>
           </div>
         </div>
+      </div>
 
-        {/* CTA */}
-        <div className="sticky bottom-0 bg-white px-5 pb-6 pt-3">
-          <Button
-            variant="primary"
-            size="lg"
-            fullWidth
-            onClick={onNext}
-            disabled={!canGoNext}
-          >
-            다음
-          </Button>
-        </div>
+      <div className="sticky bottom-0 bg-white px-5 pb-6 pt-3">
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onClick={onNext}
+          disabled={!canGoNext}
+        >
+          다음
+        </Button>
       </div>
 
       {/* Sheets */}
@@ -258,8 +264,13 @@ export default function MatchingTestStep2Content({
   );
 }
 
-/* ============== local layout helpers ============== */
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="mt-5">
       <div className="text-sm font-semibold text-text-black">{title}</div>

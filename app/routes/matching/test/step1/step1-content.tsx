@@ -1,66 +1,75 @@
-import SelectChip from "../components/SelectChip";
 import MatchingTestTopBar from "../components/MatchingTestHeader";
+import SelectChip from "../components/SelectChip";
 import Button from "../../../../components/common/Button";
+import type {
+  SectionKey,
+  SelectedState,
+  TagId,
+} from "../../../../stores/matching-test";
+import type { TagItem } from "../_shared/tags/tags.types";
 
-type SectionKey = "style" | "function" | "skinType" | "skinTone" | "makeupStyle";
+type Props = {
+  isLoading: boolean;
+  errorText: string | null;
 
-interface MatchingSection {
-  key: SectionKey;
-  title: string;
-  items: readonly string[];
-}
-
-type SelectedState = Record<SectionKey, string[]>;
-
-interface MatchingTestContentProps {
-  // 기존 props 유지(부모에서 내려주고 있으면 안 깨지게)
-  progressText: string; // 이제 TopBar가 step/total로 직접 보여주므로 사실상 불필요하지만 유지
-  maxText: string;
-
-  sections: readonly MatchingSection[];
+  sections: Array<{ key: SectionKey; title: string; max: number }>;
+  itemsBySection: Record<SectionKey, TagItem[]>;
   selected: SelectedState;
 
-  maxPerSection: number;
-
-  isSelected: (section: SectionKey, label: string) => boolean;
-  onToggle: (section: SectionKey, label: string) => void;
+  isSelected: (section: SectionKey, id: TagId) => boolean;
+  onToggle: (section: SectionKey, id: TagId, max: number) => void;
 
   canGoNext: boolean;
   onBack: () => void;
   onNext: () => void;
-}
+};
 
 export default function MatchingTestContent({
-  // progressText는 더 이상 쓰지 않지만(부모 변경 전까지) props는 유지 가능
-  maxText,
+  isLoading,
+  errorText,
   sections,
+  itemsBySection,
   selected,
-  maxPerSection,
   isSelected,
   onToggle,
   canGoNext,
   onBack,
   onNext,
-}: MatchingTestContentProps) {
+}: Props) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
+        <div className="px-6 py-10 text-sm text-text-gray3">
+          태그를 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
+  if (errorText) {
+    return (
+      <div className="min-h-screen bg-white">
+        <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
+        <div className="px-6 py-10 text-sm text-red-500">{errorText}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* 공용 상단 */}
       <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
 
-      {/* 본문 */}
       <main className="flex-1 px-6">
-        {/* 타이틀 */}
         <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
-          관심 있는 <span className="text-core-1">뷰티 특성</span>을
-          <br />
+          관심 있는 <span className="text-core-1">뷰티 특성</span>을<br />
           <span className="text-core-1">모두</span> 선택해주세요
         </h1>
-        <p className="text-body1 text-text-gray3 mt-2">{maxText}</p>
 
-        {/* 섹션들 */}
         {sections.map((section) => {
+          const items = itemsBySection[section.key] ?? [];
           const sectionSelectedCount = selected[section.key].length;
-          const sectionLimitReached = sectionSelectedCount >= maxPerSection;
+          const sectionLimitReached = sectionSelectedCount >= section.max;
 
           return (
             <section key={section.key} className="mt-8">
@@ -69,17 +78,19 @@ export default function MatchingTestContent({
               </h2>
 
               <div className="flex flex-wrap gap-3">
-                {section.items.map((label) => {
-                  const checked = isSelected(section.key, label);
+                {items.map((tag) => {
+                  const checked = isSelected(section.key, tag.id);
                   const disabled = !checked && sectionLimitReached;
 
                   return (
                     <SelectChip
-                      key={label}
-                      label={label}
+                      key={String(tag.id)}
+                      label={tag.name}
                       isSelected={checked}
                       disabled={disabled}
-                      onToggle={() => onToggle(section.key, label)}
+                      onToggle={() =>
+                        onToggle(section.key, tag.id, section.max)
+                      }
                     />
                   );
                 })}
@@ -89,7 +100,6 @@ export default function MatchingTestContent({
         })}
       </main>
 
-      {/* 하단 고정 */}
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
         <Button
           variant="primary"
