@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { createCampaignProposal } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
 import Button from "../../../../components/common/Button";
@@ -103,7 +104,7 @@ export default function CreateCampaignContent() {
       const userId = tokenStorage.getUserId();
 
       if (!userId) {
-        alert("로그인이 필요합니다.");
+        toast.error("로그인이 필요합니다.");
         return;
       }
 
@@ -130,11 +131,11 @@ export default function CreateCampaignContent() {
 
       await createCampaignProposal(requestData);
 
-      alert("캠페인 제안이 완료되었습니다!");
+      toast.success("캠페인 제안이 완료되었습니다!");
       navigate("/matching/suggest");
     } catch (error) {
       console.error("캠페인 제안 실패:", error);
-      alert("캠페인 제안에 실패했습니다. 다시 시도해주세요.");
+      toast.error("캠페인 제안에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
       setIsConfirmDialogOpen(false);

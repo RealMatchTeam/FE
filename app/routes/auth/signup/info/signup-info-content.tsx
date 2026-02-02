@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { NameSection } from "../components/NameSection";
@@ -72,12 +73,12 @@ function SignUpInfoContent() {
   const handleNext = () => {
     // 필수 입력값 검증
     if (!socialNicknameValue || !socialBirthDateValue || !socialGenderValue) {
-      alert("모든 필수 정보를 입력해주세요.");
+      toast.warning("모든 필수 정보를 입력해주세요.");
       return;
     }
 
     if (selectedCategories.length === 0) {
-      alert("콘텐츠 분야를 하나 이상 선택해주세요.");
+      toast.warning("콘텐츠 분야를 하나 이상 선택해주세요.");
       return;
     }
 
