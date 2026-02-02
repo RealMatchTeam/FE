@@ -262,6 +262,112 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   }
 };
 
+// ==================== 매칭 분석 API ====================
+
+// 매칭 분석 요청 타입
+export interface SizeDto {
+  upper: number;
+  bottom: number;
+}
+
+export interface BeautyDto {
+  interests: string[];
+  functions: string[];
+  skinType: string;
+  skinTone: string;
+  makeupStyle: string;
+}
+
+export interface FashionDto {
+  styles: string[];
+  items: string[];
+  preferredBrands: string[];
+}
+
+export interface MainAudienceDto {
+  sex: string[];
+  age: string[];
+}
+
+export interface ContentStyleDto {
+  avgVideoLength: string;
+  avgViews: string;
+  format: string;
+  type: string;
+  contributionLevel: string;
+  usageCoverage: string;
+}
+
+export interface SnsDto {
+  url: string;
+  mainAudience: MainAudienceDto;
+  contentStyle: ContentStyleDto;
+}
+
+export interface MatchRequestDto {
+  userId: string;
+  brandId?: string;
+  sex: string;
+  age: number;
+  height: number;
+  weight: number;
+  size: SizeDto;
+  beauty: BeautyDto;
+  fashion: FashionDto;
+  sns: SnsDto;
+}
+
+// 매칭 분석 응답 타입
+export interface BrandDto {
+  brandId: number;
+  brandName: string;
+  matchingRatio: number;
+}
+
+export interface HighMatchingBrandListDto {
+  count: number;
+  brands: BrandDto[];
+}
+
+export interface MatchResponseDto {
+  userType: string;
+  typeTag: string[];
+  highMatchingBrandList: HighMatchingBrandListDto;
+}
+
+interface MatchAnalysisResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: MatchResponseDto;
+}
+
+/**
+ * 크리에이터 매칭 분석 API
+ * 크리에이터 정보를 기반으로 매칭 분석 결과와 추천 브랜드 목록을 반환합니다.
+ */
+export const analyzeMatch = async (
+  data: MatchRequestDto
+): Promise<MatchResponseDto> => {
+  try {
+    const response = await apiClient.post<MatchAnalysisResponse>(
+      '/api/v1/matches',
+      data
+    );
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "매칭 분석 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("매칭 분석 실패:", error);
+    throw error;
+  }
+};
+
+// ==================== 캠페인 제안 API ====================
+
 // 캠페인 제안 요청 타입
 export interface CampaignContentTagRequest {
   id: string;

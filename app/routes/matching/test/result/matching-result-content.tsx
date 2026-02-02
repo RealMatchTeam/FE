@@ -1,41 +1,34 @@
-import { useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useMatchResultStore } from "../../../../stores/matching-result"; // ✅ 실제 상대경로로 조정
+import { useNavigate } from "react-router";
+import { useMatchResultStore } from "../../../../stores/matching-result";
 import MatchResultHeader from "../../../../components/common/RealmatchHeader";
 import MainIcon from "../../../../assets/MainIcon.svg";
 import Button from "../../../../components/common/Button";
 
 export default function MatchingResultContent() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const setResult = useMatchResultStore((s) => s.setResult);
+  const result = useMatchResultStore((s) => s.result);
 
-  const resultData = useMemo(() => {
-    const userName = searchParams.get("userName") ?? "OO";
-    const beauty = searchParams.get("fitTraits") ?? "00 핏 특성들";
-    const style = searchParams.get("styleTraits") ?? "00 패션 특성들";
-    const content = searchParams.get("moodTraits") ?? "00 콘텐츠 특성들";
-    const recommendedBrand =
-      searchParams.get("recommendedBrand") ?? "00한 브랜드와";
+  // 결과가 없으면 매칭 테스트로 리다이렉트
+  if (!result) {
+    return (
+      <div className="min-h-screen bg-linear-to-b from-[#F6F7FF] to-white flex flex-col items-center justify-center px-6">
+        <p className="text-[16px] text-[#5B5D6B] mb-4">매칭 결과가 없습니다.</p>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={() => navigate("/matching/test/step1")}
+        >
+          매칭 테스트 하기
+        </Button>
+      </div>
+    );
+  }
 
-    return { userName, beauty, style, content, recommendedBrand };
-  }, [searchParams]);
+  const { summary, apiResult } = result;
+  const brands = apiResult?.highMatchingBrandList.brands || [];
+  const topBrands = brands.slice(0, 3);
 
   const onStart = () => {
-    setResult({
-      completed: true,
-      updatedAt: Date.now(),
-      summary: {
-        userName: resultData.userName,
-        traits: {
-          beauty: resultData.beauty,
-          style: resultData.style,
-          content: resultData.content,
-        },
-        recommendedBrand: resultData.recommendedBrand,
-      },
-    });
-
     navigate("/");
   };
 
@@ -56,38 +49,50 @@ export default function MatchingResultContent() {
             bg-clip-text
             text-transparent"
         >
-          <span className="mr-1">{resultData.userName}</span>한 크리에이터{" "}
+          <span className="mr-1">{summary.userName}</span> 크리에이터
         </h1>
 
         <p className="mt-[30px] text-[12px] font-medium text-[#5B5D6B]">
-          {resultData.userName}님의 특성
+          나의 특성
         </p>
 
         <div className="mt-3 space-y-2">
-          <p className="text-[14px] font-semibold text-[#5B63FF]">
-            {resultData.beauty}
-          </p>
-          <p className="text-[14px] font-semibold text-[#5B63FF]">
-            {resultData.style}
-          </p>
-          <p className="text-[14px] font-semibold text-[#5B63FF]">
-            {resultData.content}
-          </p>
+          {apiResult?.typeTag.map((tag, index) => (
+            <p key={index} className="text-[14px] font-semibold text-[#5B63FF]">
+              {tag}
+            </p>
+          ))}
         </div>
 
-        <div className="mt-8 space-y-[8px]">
-          <p className="text-[12px] font-medium text-[#8C91A7]">
-            {resultData.userName}님과 어울리는 브랜드
-          </p>
+        {topBrands.length > 0 && (
+          <>
+            <div className="mt-8 space-y-[8px]">
+              <p className="text-[12px] font-medium text-[#8C91A7]">
+                나와 어울리는 브랜드 TOP {topBrands.length}
+              </p>
 
-          <p className="mt-2 text-[16px] font-bold text-[#5B63FF]">
-            {resultData.recommendedBrand}
-          </p>
+              <div className="mt-2 space-y-2">
+                {topBrands.map((brand, index) => (
+                  <div key={brand.brandId} className="flex items-center justify-center gap-2">
+                    <span className="text-[14px] font-medium text-[#8C91A7]">
+                      {index + 1}.
+                    </span>
+                    <span className="text-[16px] font-bold text-[#5B63FF]">
+                      {brand.brandName}
+                    </span>
+                    <span className="text-[12px] font-medium text-[#5B63FF]">
+                      ({brand.matchingRatio}% 매칭)
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-          <p className="mt-2 text-[16px] font-medium text-[#8C91A7]">
-            잘 어울릴 것으로 보여요
-          </p>
-        </div>
+              <p className="mt-4 text-[16px] font-medium text-[#8C91A7]">
+                잘 어울릴 것으로 보여요
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="mt-16 flex items-center justify-center">
           <img
@@ -102,7 +107,6 @@ export default function MatchingResultContent() {
       </main>
 
       <div className="sticky bottom-0 w-full bg-white/70 px-6 pb-8 pt-4 backdrop-blur">
-        {/* ✅ to="/" 대신 onClick */}
         <Button
           variant="primary"
           size="lg"
