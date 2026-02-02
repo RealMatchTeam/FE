@@ -42,8 +42,8 @@ export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
     thumbnailUrl: "", 
     title: "자작나무 수분크림 체험단",
     status: "MATCHED",
-    startDate: "2025-12-23",
-    endDate: "2025-12-30",
+    startDate: "2026-02-02",
+    endDate: "2026-02-07",
     type: "SENT",
   },
   {
@@ -53,8 +53,8 @@ export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
     thumbnailUrl: "",
     title: "'글로우업' 선크림 신제품 홍보",
     status: "REVIEWING",
-    startDate: "2025-12-23",
-    endDate: "2025-12-30",
+    startDate: "2026-02-04",
+    endDate: "2025-02-05",
     type: "RECEIVED",
   },
   {
@@ -64,8 +64,8 @@ export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
     thumbnailUrl: "",
     title: "봄 신상 코디 콘텐츠 제작",
     status: "REVIEWING",
-    startDate: "2025-12-23",
-    endDate: "2025-12-30",
+    startDate: "2026-02-23",
+    endDate: "2026-02-24",
     type: "RECEIVED",
   },
   {
@@ -75,8 +75,8 @@ export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
     thumbnailUrl: "",
     title: "비타민C 세럼 리뷰 캠페인",
     status: "REJECTED",
-    startDate: "2025-12-23",
-    endDate: "2025-12-30",
+    startDate: "2026-02-01",
+    endDate: "2025-02-04",
     type: "SENT",
   },
 ];

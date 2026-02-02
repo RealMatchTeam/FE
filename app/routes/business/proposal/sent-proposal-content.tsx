@@ -22,7 +22,7 @@ export default function ProposalContent() {
     const [brand, setBrand] = useState<BrandDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const proposalId = searchParams.get("proposalId") || "1";
+    const proposalId = searchParams.get("proposalId") || "29";
 
     useEffect(() => {
         const fetchData = async () => {

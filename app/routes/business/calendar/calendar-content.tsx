@@ -88,7 +88,8 @@ export default function CalendarContent() {
 
   // [필터링 로직]
   const todayStr = new Date().toISOString().split('T')[0];
-  const currentMonthStr = todayStr.substring(0, 7); // "2026-02"
+  const currentMonthStr = todayStr.substring(0, 7); 
+  const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
 
   const filteredList = campaigns.filter((item) => {
     if (activeTab === "today") {
@@ -136,11 +137,11 @@ export default function CalendarContent() {
             <section className="flex flex-col gap-3">
               <SectionTitle title="진행 중인 협업" />
               <p className="text-title1 font-bold text-text-black">이번주 일정</p>
-              <WeeklyCalendar events={campaigns} />
+              <WeeklyCalendar events={calendarEvents} />
             </section>
             <section className="flex flex-col gap-3">
               <p className="text-title1 font-bold text-text-black">이번달 일정</p>
-              <MonthlyCalendar events={campaigns} />
+              <MonthlyCalendar events={calendarEvents} />
             </section>
 
             {/* 하단 리스트 섹션 */}
