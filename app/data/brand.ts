@@ -20,3 +20,20 @@ export const BRAND_DATA: Brand[] = [
     { id: 5, name: "디스이즈네버댓", matchRate: 88, tags: ["스트릿", "캐주얼", "트렌디"], isLiked: true, category: "FASHION" },
     { id: 6, name: "커버낫", matchRate: 82, tags: ["아메리칸 캐주얼", "빈티지", "유니섹스"], isLiked: false, category: "FASHION" },
 ];
+
+// 캠페인 보기에서 사용하는 브랜드
+export interface BrandDetail {
+  brandName: string;
+  brandTag: string[];
+  brandDescription: string;
+  brandMatchingRatio: number;
+  brandIsLiked: boolean;
+  brandCategory: string[];
+}
+
+export interface BrandResponse {
+    isSuccess: boolean;
+    code: string;
+    message: string;
+    result: BrandDetail[];
+}

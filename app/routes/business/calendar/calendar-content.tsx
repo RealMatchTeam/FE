@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMyCollaborations } from "./api/calendar";
 import type { CampaignCollaboration } from "./api/calendar";
 import FilterBottomSheet from "../components/FilterBottomSheet";
@@ -13,6 +14,7 @@ import EmptyState from "../components/EmptyState";
 
 
 export default function CalendarContent() {
+  const navigate = useNavigate();
   const [mainTab, setMainTab] = useState<"collaboration" | "matching">("collaboration");
   const [activeTab, setActiveTab] = useState<"thisMonth" | "today">("thisMonth");
   const [matchingSubTab, setMatchingSubTab] = useState<"sent" | "received">("sent");
@@ -53,6 +55,10 @@ export default function CalendarContent() {
     // 이번달 기준 (시작일이나 종료일이 이번 달에 포함된 경우)
     return item.startDate.includes(currentMonthStr) || item.endDate.includes(currentMonthStr);
   });
+
+  const handleCardClick = (type: "sent" | "received") => {
+    navigate(`/business/proposal?type=${type}`);
+  };
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
@@ -156,17 +162,41 @@ export default function CalendarContent() {
                 <div className="flex flex-col gap-4">
                   {matchingSubTab === "sent" ? (
                     <>
-                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                      <MatchingCard 
+                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" 
+                        onClick={() => handleCardClick("sent")} // 4. 핸들러 연결
+                      />
+                      <MatchingCard 
+                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                        onClick={() => handleCardClick("sent")}
+                      />
+                      <MatchingCard 
+                        brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                        onClick={() => handleCardClick("sent")}
+                      />
+                      <MatchingCard 
+                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" 
+                        onClick={() => handleCardClick("sent")}
+                      />
                     </>
                   ) : (
                     <>
-                      <MatchingCard brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" />
-                      <MatchingCard brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" />
+                      <MatchingCard 
+                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" 
+                        onClick={() => handleCardClick("received")} // 4. 핸들러 연결
+                      />
+                      <MatchingCard 
+                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                        onClick={() => handleCardClick("received")}
+                      />
+                      <MatchingCard 
+                        brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                        onClick={() => handleCardClick("received")}
+                      />
+                      <MatchingCard 
+                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" 
+                        onClick={() => handleCardClick("received")}
+                      />
                     </>
                   )}
                 </div>
