@@ -28,7 +28,8 @@ export default function BrandContent() {
     useEffect(() => {
         const fetchMatchingBrands = async () => {
             try {
-                const brands = await getMatchingBrands();
+                // URL의 category 파라미터에 따라 API 호출
+                const brands = await getMatchingBrands("MATCH_SCORE", category);
 
                 if (brands && brands.length > 0) {
                     setBrands(brands);
@@ -51,7 +52,7 @@ export default function BrandContent() {
         };
 
         fetchMatchingBrands();
-    }, []);
+    }, [category]);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);

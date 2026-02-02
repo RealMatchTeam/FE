@@ -29,7 +29,8 @@ export default function CampaignContent() {
     useEffect(() => {
         const fetchMatchingCampaigns = async () => {
             try {
-                const campaigns = await getMatchingCampaigns();
+                // URL의 category 파라미터에 따라 API 호출
+                const campaigns = await getMatchingCampaigns("MATCH_SCORE", category);
 
                 if (campaigns && campaigns.length > 0) {
                     setCampaigns(campaigns);
@@ -52,7 +53,7 @@ export default function CampaignContent() {
         };
 
         fetchMatchingCampaigns();
-    }, []);
+    }, [category]);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
