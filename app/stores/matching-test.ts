@@ -22,7 +22,6 @@ export type Step2SelectedState = Record<Step2SectionKey, number[]>;
 export type Step3SelectedState = Record<Step3SelectKey, number[]>;
 export type Step3ChipsState = Record<Step3ChipKey, number[]>;
 
-// ✅ 전부 "태그 id"를 저장
 export type FashionBodyTags = {
   heightTag: number | null;
   weightTypeTag: number | null;

@@ -29,7 +29,6 @@ type Props = {
   fashionBody: FashionBodyTags;
   onSetFashionBody: (key: keyof FashionBodyTags, id: number | null) => void;
 
-  // ✅ 패션 태그 전체 categories (키/체형/상의/하의 찾기)
   fashionCategories: Record<string, TagItem[]>;
 
   canGoNext: boolean;
@@ -66,9 +65,6 @@ const idByName = (name: string, options: TagItem[]) =>
 const nameById = (id: number | null, options: TagItem[]) =>
   id == null ? "" : (options.find((o) => o.id === id)?.name ?? "");
 
-// ✅ 숫자 입력을 태그 name으로 매핑해서 id 찾기
-// height: "180" + "cm" => "180cm"
-// bottom: "27" + "" => "27"
 const idByNumericInput = (raw: string, options: TagItem[], suffix: string) => {
   const v = raw.trim();
   if (!/^\d+$/.test(v)) return null;
@@ -96,7 +92,6 @@ export default function MatchingTestStep2Content({
   const open = (s: Sheet) => setSheet(s);
   const close = () => setSheet(null);
 
-  // 입력용 state (키/하의만)
   const [heightInput, setHeightInput] = useState("");
   const [bottomInput, setBottomInput] = useState("");
 
@@ -117,7 +112,6 @@ export default function MatchingTestStep2Content({
     [fashionCategories],
   );
 
-  // 표시값 (store는 id 저장, 화면은 name 표시)
   const heightValue = useMemo(
     () => nameById(fashionBody.heightTag, heightOptions),
     [fashionBody.heightTag, heightOptions],
@@ -166,7 +160,6 @@ export default function MatchingTestStep2Content({
           <span className="text-core-1">모두</span> 선택해주세요
         </h1>
 
-        {/* 칩 섹션들(기존 유지) */}
         {sections.map((section) => {
           const items = itemsBySection[section.key] ?? [];
 
@@ -194,7 +187,6 @@ export default function MatchingTestStep2Content({
           );
         })}
 
-        {/* 체형 정보(UI 유지) */}
         <section className="mt-8">
           <h2 className="text-[16px] leading-[24px] font-semibold text-text-black mb-2">
             체형 정보
@@ -260,7 +252,6 @@ export default function MatchingTestStep2Content({
         </Button>
       </div>
 
-      {/* ✅ 키 입력: 숫자 -> "180cm" -> id 저장 */}
       {sheet === "height" ? (
         <BottomSheet title="키 입력" onClose={close}>
           <InputSheet
@@ -283,7 +274,6 @@ export default function MatchingTestStep2Content({
         </BottomSheet>
       ) : null}
 
-      {/* ✅ 하의 입력: 숫자 -> "27" -> id 저장 */}
       {sheet === "bottomSize" ? (
         <BottomSheet title="하의 사이즈 입력" onClose={close}>
           <InputSheet
@@ -306,7 +296,6 @@ export default function MatchingTestStep2Content({
         </BottomSheet>
       ) : null}
 
-      {/* ✅ 체형 선택: 선택 name -> id 저장 */}
       {sheet === "weightType" ? (
         <BottomSheet title="체형 선택" onClose={close}>
           <SelectSheet
@@ -321,7 +310,6 @@ export default function MatchingTestStep2Content({
         </BottomSheet>
       ) : null}
 
-      {/* ✅ 상의 선택: 선택 name -> id 저장 */}
       {sheet === "topSize" ? (
         <BottomSheet title="상의 사이즈 선택" onClose={close}>
           <SelectSheet

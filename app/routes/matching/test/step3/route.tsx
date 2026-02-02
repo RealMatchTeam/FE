@@ -14,6 +14,13 @@ import { useContentTags } from "../_shared/tags/tags.query";
 import { postMatches } from "../_shared/api/matches.api";
 import { buildMatchPayload } from "../_shared/builders/build-match-payload";
 
+function getApiFailMessage(data: unknown): string | null {
+  if (typeof data !== "object" || data === null) return null;
+  if (!("message" in data)) return null;
+  const msg = (data as Record<string, unknown>).message;
+  return typeof msg === "string" ? msg : null;
+}
+
 export default function MatchingTestStep3Page() {
   const navigate = useNavigate();
 
@@ -77,13 +84,26 @@ export default function MatchingTestStep3Page() {
       const res = await postMatches(payload);
       console.log("[matches response]", res);
 
-      navigate("/matching/test/result", { replace: true });
+      navigate("/matching/test/result", {
+        replace: true,
+        state: {
+          apiResult: res.result,
+        },
+      });
     } catch (e) {
       if (axios.isAxiosError(e)) {
         console.log("[matches error status]", e.response?.status);
         console.log("[matches error body]", e.response?.data);
+
+        const apiMsg = getApiFailMessage(e.response?.data);
+        setSubmitError(apiMsg ?? "매칭 결과 요청에 실패했어요.");
+      } else {
+        setSubmitError(
+          e instanceof Error ? e.message : "알 수 없는 오류가 발생했어요.",
+        );
       }
-      throw e;
+    } finally {
+      setSubmitting(false);
     }
   };
 

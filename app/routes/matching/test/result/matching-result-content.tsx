@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useMatchResultStore } from "../../../../stores/matching-result";
 import MainIcon from "../../../../assets/MainIcon.svg";
 import Button from "../../../../components/common/Button";
@@ -11,19 +11,49 @@ type Brand = {
   logoUrl?: string;
 };
 
+type ApiResult = {
+  userType: string;
+  typeTag: string[];
+  highMatchingBrandList: {
+    count: number;
+    brands: Brand[];
+  };
+};
+
+type LocationState = {
+  apiResult?: ApiResult;
+};
+
 export default function MatchingResultContent() {
   const navigate = useNavigate();
+  const location = useLocation() as { state: LocationState | null };
   const [searchParams] = useSearchParams();
   const setResult = useMatchResultStore((s) => s.setResult);
 
   const data = useMemo(() => {
-    const userName = searchParams.get("userName") ?? "비비";
-    const userType = searchParams.get("userType") ?? "섬세한 설계자";
+    const apiResult = location.state?.apiResult;
 
+    // userName은 아직 API에 없으므로 기존대로 query/default 사용
+    const userName = searchParams.get("userName") ?? "비비";
+
+    if (apiResult) {
+      const userType = apiResult.userType;
+      const tags = apiResult.typeTag.slice(0, 3);
+      const brands = [...apiResult.highMatchingBrandList.brands]
+        .sort((a, b) => b.matchingRatio - a.matchingRatio)
+        .slice(0, 3);
+
+      return { userName, userType, tags, brands };
+    }
+
+    // fallback (직접 진입/새로고침으로 state 사라진 경우)
+    const userType = searchParams.get("userType") ?? "섬세한 설계자";
     const tags = searchParams
       .get("typeTag")
       ?.split(",")
-      .map((v) => v.trim()) ?? ["기획중심", "구조탄탄", "디테일중심"];
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .slice(0, 3) ?? ["기획중심", "구조탄탄", "디테일중심"];
 
     const brands: Brand[] = [
       { brandId: 1, brandName: "beplain", matchingRatio: 98 },
@@ -31,8 +61,8 @@ export default function MatchingResultContent() {
       { brandId: 3, brandName: "ma:nyo", matchingRatio: 91 },
     ];
 
-    return { userName, userType, tags: tags.slice(0, 3), brands };
-  }, [searchParams]);
+    return { userName, userType, tags, brands };
+  }, [location.state, searchParams]);
 
   const onStart = () => {
     setResult({
@@ -41,11 +71,11 @@ export default function MatchingResultContent() {
       summary: {
         userName: data.userName,
         traits: {
-          beauty: data.tags[0],
-          style: data.tags[1],
-          content: data.tags[2],
+          beauty: data.tags[0] ?? "",
+          style: data.tags[1] ?? "",
+          content: data.tags[2] ?? "",
         },
-        recommendedBrand: data.brands[0].brandName,
+        recommendedBrand: data.brands[0]?.brandName ?? "",
       },
     });
 
@@ -72,12 +102,8 @@ export default function MatchingResultContent() {
           <div className="mt-[14px] flex justify-center gap-2">
             {data.tags.map((tag) => (
               <span
-                className="
-    rounded-full border border-[#D9DDF5] bg-white/75
-    px-[12px] py-[4px]
-    text-[12px] font-medium text-[#5B5D6B]
-    shadow-[0_4px_12px_rgba(90,95,160,0.10)]
-  "
+                key={tag}
+                className="rounded-full border border-[#D9DDF5] bg-white/75 px-[12px] py-[4px] text-[12px] font-medium text-[#5B5D6B] shadow-[0_4px_12px_rgba(90,95,160,0.10)]"
               >
                 #{tag}
               </span>
@@ -100,13 +126,7 @@ export default function MatchingResultContent() {
           <div className="mt-[12px] flex w-full justify-center gap-[12px]">
             {data.brands.map((b) => (
               <div key={b.brandId} className="w-[88px]">
-                <div
-                  className="
-          flex aspect-square w-full items-center justify-center
-          rounded-[12px] border border-[#E6E8F5] bg-white
-          shadow-[0_6px_14px_rgba(39,56,146,0.10)]
-        "
-                >
+                <div className="flex aspect-square w-full items-center justify-center rounded-[12px] border border-[#E6E8F5] bg-white shadow-[0_6px_14px_rgba(39,56,146,0.10)]">
                   {b.logoUrl ? (
                     <img
                       src={b.logoUrl}
@@ -122,7 +142,7 @@ export default function MatchingResultContent() {
                 </div>
 
                 <div className="mt-[6px] flex justify-between text-[12px]">
-                  <span className="font-medium text-[#5B5D6B] ml-[4px]">
+                  <span className="ml-[4px] font-medium text-[#5B5D6B]">
                     {b.brandName}
                   </span>
                   <span className="font-bold text-[#4A4CFF]">

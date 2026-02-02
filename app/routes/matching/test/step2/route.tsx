@@ -86,7 +86,6 @@ export default function MatchingTestStep2Page() {
   const canGoNext = useMemo(() => {
     const chipsOk = computedSections.every((s) => selected[s.key].length >= 1);
 
-    // ✅ 너가 정한 정책대로: 키/하의는 필수, 체형/상의는 "선택"
     const bodyOk =
       fashionBody.heightTag !== null && fashionBody.bottomSizeTag !== null;
 

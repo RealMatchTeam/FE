@@ -33,7 +33,6 @@ export function buildMatchPayload(): MatchesRequest {
   const step3Sel = s.step3Selected;
   const step3Chips = s.step3Chips;
 
-  // ✅ beauty: 일부는 단일 number로 보내야 함
   const interestStyleTags = requireNonEmpty(
     step1.style,
     "beauty.interestStyleTags",
@@ -50,7 +49,6 @@ export function buildMatchPayload(): MatchesRequest {
     "beauty.makeupStyleTags",
   );
 
-  // ✅ fashion: 전부 number (null 금지)
   const heightTag = requireNumber(body.heightTag, "fashion.heightTag");
   const weightTypeTag = requireNumber(
     body.weightTypeTag,
@@ -62,7 +60,6 @@ export function buildMatchPayload(): MatchesRequest {
     "fashion.bottomSizeTag",
   );
 
-  // ✅ content
   const url = s.snsUrl.trim();
   if (!url) throw new Error("content.sns.url 값이 비어있습니다.");
 
