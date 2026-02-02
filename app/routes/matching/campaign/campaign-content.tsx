@@ -7,7 +7,6 @@ import CampaignFilterBar from "./components/CampaignFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import { tokenStorage } from "../../../lib/token";
 import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";

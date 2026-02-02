@@ -111,7 +111,7 @@ export const getMatchingCampaigns = async (
       throw new MatchingTestRequiredError();
     }
 
-    const params: any = { sortBy, category };
+    const params: Record<string, string | string[]> = { sortBy, category };
     if (tags && tags.length > 0) {
       params.tags = tags;
     }
@@ -132,17 +132,18 @@ export const getMatchingCampaigns = async (
     }
 
     return response.data.result.campaigns || [];
-  } catch (error: any) {
+  } catch (error: unknown) {
     // MatchingTestRequiredError는 그대로 throw
     if (error instanceof MatchingTestRequiredError) {
       throw error;
     }
 
     // 404 에러나 기타 에러 시 매칭 검사 필요 메시지
-    if (error.response?.status === 404 ||
-        error.response?.status === 400 ||
-        error.response?.data?.message?.includes("매칭") ||
-        error.response?.data?.message?.includes("테스트")) {
+    const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+    if (axiosError.response?.status === 404 ||
+        axiosError.response?.status === 400 ||
+        axiosError.response?.data?.message?.includes("매칭") ||
+        axiosError.response?.data?.message?.includes("테스트")) {
       throw new MatchingTestRequiredError();
     }
 
@@ -168,7 +169,7 @@ export const getMatchingBrands = async (
       throw new MatchingTestRequiredError();
     }
 
-    const params: any = { sortBy, category };
+    const params: Record<string, string | string[]> = { sortBy, category };
     if (tags && tags.length > 0) {
       params.tags = tags;
     }
@@ -189,17 +190,18 @@ export const getMatchingBrands = async (
     }
 
     return response.data.result.brands || [];
-  } catch (error: any) {
+  } catch (error: unknown) {
     // MatchingTestRequiredError는 그대로 throw
     if (error instanceof MatchingTestRequiredError) {
       throw error;
     }
 
     // 404 에러나 기타 에러 시 매칭 검사 필요 메시지
-    if (error.response?.status === 404 ||
-        error.response?.status === 400 ||
-        error.response?.data?.message?.includes("매칭") ||
-        error.response?.data?.message?.includes("테스트")) {
+    const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+    if (axiosError.response?.status === 404 ||
+        axiosError.response?.status === 400 ||
+        axiosError.response?.data?.message?.includes("매칭") ||
+        axiosError.response?.data?.message?.includes("테스트")) {
       throw new MatchingTestRequiredError();
     }
 
@@ -220,7 +222,7 @@ export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
     }
 
     return response.data.result || [];
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("브랜드 필터 조회 실패:", error);
     throw error;
   }
@@ -254,7 +256,7 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
 
     // 응답이 배열 형태이므로 첫 번째 요소의 brandIsLiked 반환
     return response.data.result[0]?.brandIsLiked || false;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("브랜드 좋아요 토글 실패:", error);
     throw error;
   }
@@ -307,7 +309,7 @@ export const createCampaignProposal = async (
     }
 
     return response.data.result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("캠페인 제안 실패:", error);
     throw error;
   }
