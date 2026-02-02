@@ -11,6 +11,7 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
+import { MATCHING_DUMMY_DATA } from "../calendar/api/calendar";
 
 
 export default function CalendarContent() {
@@ -23,26 +24,67 @@ export default function CalendarContent() {
 
   const hasData = true;
 
-  // API 데이터 상태
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  // 데이터 로드
+
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
         setIsLoading(true);
-        // 협업 현황 조회를 위해 전체 데이터를 가져옵니다.
         const data = await getMyCollaborations();
-        setCampaigns(data);
+
+        if (data && data.length > 0) {
+          setCampaigns(data);
+        } else {
+          // 실제 데이터가 없으면 우리가 만든 MATCHING_DUMMY_DATA를 사용
+          setCampaigns(MATCHING_DUMMY_DATA);
+        }
       } catch (error) {
-        console.error("캠페인 로드 실패:", error);
+        console.error("데이터 로드 실패, 더미 사용:", error);
+        setCampaigns(MATCHING_DUMMY_DATA);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchCampaigns();
   }, []);
+
+  // [상태 변환 헬퍼 함수]
+  const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
+    switch (status) {
+      case "MATCHED":
+        return "매칭";
+      case "REVIEWING":
+      case "NONE": // NONE 상태도 '검토 중'으로 처리하거나 기획에 맞게 할당
+        return "검토 중";
+      case "REJECTED":
+        return "거절";
+      default:
+        // API에서 예상치 못한 값이 올 경우 기본값으로 "검토 중"을 반환하여 에러 방지
+        return "검토 중";
+    }
+  };
+
+  const getActionLabel = (status: CampaignCollaboration["status"]) => {
+    return status === "REJECTED" ? "거절 사유 보기" : "제안 보기";
+  };
+
+  // [매칭 현황 필터링 로직]
+  // 1. 탭에 따른 필터링 (보낸 제안: SENT/APPLIED, 받은 제안: RECEIVED)
+  // 2. 우측 상단 드롭다운 필터(activeFilter) 적용
+  const matchingList = campaigns.filter((item) => {
+    const isCorrectSubTab =
+      matchingSubTab === "sent"
+        ? (item.type === "SENT" || item.type === "APPLIED")
+        : item.type === "RECEIVED";
+
+    if (!isCorrectSubTab) return false;
+
+    if (activeFilter === "전체") return true;
+    return getStatusLabel(item.status) === activeFilter;
+  });
+
+
 
   // [필터링 로직]
   const todayStr = new Date().toISOString().split('T')[0];
@@ -90,7 +132,7 @@ export default function CalendarContent() {
         {mainTab === "collaboration" ? (
           /* [A] 협업 현황 */
           <div className="flex flex-col gap-6 px-4 py-6">
-              {/* 주간 캘린더 연동 */}
+            {/* 주간 캘린더 연동 */}
             <section className="flex flex-col gap-3">
               <SectionTitle title="진행 중인 협업" />
               <p className="text-title1 font-bold text-text-black">이번주 일정</p>
@@ -147,68 +189,41 @@ export default function CalendarContent() {
           <div className="flex flex-col flex-1">
             <MatchingTabSection subTab={matchingSubTab} setSubTab={setMatchingSubTab} />
 
-            {hasData ? (
-              <div className="flex flex-col gap-4 px-4 flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <h2 className="text-title1 font-bold text-text-black">매칭 현황</h2>
-                  <button
-                    onClick={() => setIsFilterOpen(true)}
-                    className="flex items-center gap-1 px-3 py-1 border border-text-gray4 rounded-full bg-white active:bg-bluegray-2 transition-colors"
-                  >
-                    <span className="text-callout1 text-text-gray2">{activeFilter}</span>
-                    <img src={dropdownIcon} alt="open filter" />
-                  </button>
-                </div>
-                <div className="flex flex-col gap-4">
-                  {matchingSubTab === "sent" ? (
-                    <>
-                      <MatchingCard 
-                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" 
-                        onClick={() => handleCardClick("sent")} // 4. 핸들러 연결
-                      />
-                      <MatchingCard 
-                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
-                        onClick={() => handleCardClick("sent")}
-                      />
-                      <MatchingCard 
-                        brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
-                        onClick={() => handleCardClick("sent")}
-                      />
-                      <MatchingCard 
-                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" 
-                        onClick={() => handleCardClick("sent")}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <MatchingCard 
-                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" 
-                        onClick={() => handleCardClick("received")} // 4. 핸들러 연결
-                      />
-                      <MatchingCard 
-                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
-                        onClick={() => handleCardClick("received")}
-                      />
-                      <MatchingCard 
-                        brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
-                        onClick={() => handleCardClick("received")}
-                      />
-                      <MatchingCard 
-                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" 
-                        onClick={() => handleCardClick("received")}
-                      />
-                    </>
-                  )}
-                </div>
+            <div className="flex flex-col gap-4 px-4 flex-1">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-title1 font-bold text-text-black">매칭 현황</h2>
+                <button
+                  onClick={() => setIsFilterOpen(true)}
+                  className="flex items-center gap-1 px-3 py-1 border border-text-gray4 rounded-full bg-white active:bg-bluegray-2 transition-colors"
+                >
+                  <span className="text-callout1 text-text-gray2">{activeFilter}</span>
+                  <img src={dropdownIcon} alt="open filter" />
+                </button>
+              </div>
 
+              <div className="flex flex-col gap-4">
+                {isLoading ? (
+                  <p>로딩 중...</p>
+                ) : matchingList.length > 0 ? ( // filteredList에서 matchingList로 변경
+                  matchingList.map((item) => (
+                    <MatchingCard
+                      key={item.campaignId || item.proposalId}
+                      brand={item.brandName}
+                      status={getStatusLabel(item.status)}
+                      date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)} // 12.23.25 포맷
+                      actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
+                      onClick={() => handleCardClick(matchingSubTab)}
+                    />
+                  ))
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center py-20">
+                    <EmptyState
+                      message={`${matchingSubTab === "sent" ? "보낸" : "받은"} 제안이 없어요`}
+                    />
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <EmptyState
-                  message={`${(matchingSubTab as string) === "sent" ? "보낸" : "받은"} 제안이 없어요`}
-                />
-              </div>
-            )}
+            </div>
 
             <FilterBottomSheet
               isOpen={isFilterOpen}
