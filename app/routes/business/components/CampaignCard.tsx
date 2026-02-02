@@ -24,7 +24,6 @@ export default function CampaignCard({
   campaignId = 1,
 }: CampaignCardProps) {
   const navigate = useNavigate();
-  const BUTTON_WIDTH = '280px';
 
   // 로고 컴포넌트
   const Logo = (
@@ -39,39 +38,41 @@ export default function CampaignCard({
 
   return (
     <Card image={Logo}>
-      <div
-        className="flex flex-col h-[72px] justify-between"
-        style={{ width: BUTTON_WIDTH }}
-      >
-        {/* 브랜드 + 제목/날짜 */}
-        <div className="flex flex-col w-full">
+      {/* 1. 컨테이너: 세로 배치, 간격 10px, 하단 정렬 */}
+      <div className="flex flex-col justify-end items-end gap-[10px] w-full self-stretch">
+        
+        {/* 2. 상단 정보 섹션 */}
+        <div className="flex flex-col w-full gap-1">
+          {/* 브랜드명 */}
           <div className="flex items-center gap-1">
-            <span className="text-[17px] font-bold text-text-black leading-tight">{brand}</span>
+            <span className="text-[17px] font-bold text-text-black leading-tight">
+              {brand}
+            </span>
             <img src={ArrowRight} alt="이동" className="w-4 h-4 object-contain" />
           </div>
 
+          {/* 제목 및 날짜: 양 끝 정렬 */}
           <div className="flex justify-between items-start w-full">
-            <p className="text-[13px] text-text-gray2 truncate flex-1 leading-tight">
+            <p className="text-[13px] text-text-gray2 truncate flex-1 leading-tight mr-2">
               {title}
             </p>
-            <div className="flex flex-col items-end text-[10px] text-text-gray3 leading-tight ml-2 flex-shrink-0">
-              <span>{startDate}.25</span>
-              <span>{endDate}.25</span>
+            <div className="flex flex-col items-end text-[10px] text-text-gray3 leading-tight flex-shrink-0">
+              <span>{startDate}</span>
+              <span>{endDate}</span>
             </div>
           </div>
         </div>
 
-        {/* 캠페인 보기 버튼 */}
+        {/* 3. 캠페인 보기 버튼: 디자인 규격에 맞춰 높이와 너비 조정 */}
         {showButton && (
           <button
             onClick={() => navigate(`/business/campaign/${campaignId}`)}
-            className="relative flex items-center justify-center bg-[#EBEEFB] rounded-[6px] transition-colors hover:bg-[#DEE2F5]"
-            style={{ width: BUTTON_WIDTH, height: '50px' }}
+            className="flex items-center justify-center bg-[#EBEEFB] rounded-[6px] transition-colors hover:bg-[#DEE2F5] w-full h-[32px] gap-[4px]"
           >
             <img
               src={SearchIcon}
               alt="돋보기"
-              className="absolute left-[12px] w-3.5 h-3.5 object-contain"
+              className="w-3.5 h-3.5 object-contain"
             />
             <span className="text-[13px] font-medium text-text-black">
               캠페인 보기
