@@ -7,7 +7,7 @@ export type ChatRoom = {
   lastMessage: string;
   updatedAt: string;
   unreadCount: number;
-  logoUrl: string;
+  logoUrl: string; 
   type: "sent" | "received";
   isCollaborating: boolean;
 };

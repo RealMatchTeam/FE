@@ -1,5 +1,5 @@
 import searchIcon from "../../../assets/search2.svg";
-import closeIcon from "../../../assets/cancel.svg";
+import closeIcon from "../../../assets/cancel.svg"; 
 import { useState } from "react";
 
 export function ChatListHeader({
@@ -11,7 +11,7 @@ export function ChatListHeader({
   sortLabel: string;
   onClickSort: () => void;
   sortOpen: boolean;
-
+  
 }) {
   const [query, setQuery] = useState("");
 
@@ -22,7 +22,7 @@ export function ChatListHeader({
       {/* 검색 입력창 */}
       <div className="flex items-center w-full relative bg-bg-w border border-core-2 rounded-[8px] px-3 py-2">
         <img src={searchIcon} alt="search" className="w-4 h-4 opacity-40" />
-
+        
         <input
           className="flex-1 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
           placeholder="검색어 입력"
@@ -30,7 +30,7 @@ export function ChatListHeader({
           onChange={(e) => setQuery(e.target.value)}
         />
 
-        <button
+        <button 
           onClick={() => setQuery("")}
           className="flex-shrink-0"
         >

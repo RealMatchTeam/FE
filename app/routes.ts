@@ -52,7 +52,15 @@ export default [
       route(":chatId", "routes/rooms/$chatId.tsx"),
     ]),
 
-    route("mypage", "routes/mypage/route.tsx"),
+    route("mypage", "routes/mypage/route.tsx", [
+      index("routes/mypage/mypage/route.tsx"),
+      route("profileCard", "routes/mypage/profileCard/route.tsx"),
+      route("edit", "routes/mypage/edit/route.tsx"),
+      route("likes", "routes/mypage/likes/route.tsx"),
+      route("privacy", "routes/mypage/privacy/route.tsx"),
+      route("terms", "routes/mypage/terms/route.tsx")
+    ]),
+
 
     route("brand", "routes/brand/route.tsx"),
   ]),

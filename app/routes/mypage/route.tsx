@@ -1,5 +1,9 @@
-import MyPage from "./mypage-content";
+import { Outlet } from "react-router";
 
-export default function MyPageRoute() {
-  return <MyPage />;
+export default function MyPageLayout() {
+  return (
+    <div>
+      <Outlet />
+    </div>
+  )
 }
