@@ -1,54 +1,83 @@
-import { useNavigate } from "react-router";
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
 import MatchingTestContent from "./step1-content";
-
+import { useBeautyTags } from "../_shared/tags/tags.query";
 import {
   useMatchingTestStore,
   type SectionKey,
-  type TagId,
 } from "../../../../stores/matching-test";
-import { useBeautyTags } from "../_shared/tags/tags.query";
 import type { TagItem } from "../_shared/tags/tags.types";
 
-// ⚠️ 중요: 아래 key는 swagger에 additionalProp로 나와서 실제 키를 백엔드에게 확인해야 함.
-// 실제 예: "interests", "functions", "skinTypes", "skinTones", "makeupStyles" 등
-const BEAUTY_CATEGORY_KEY: Record<SectionKey, string> = {
-  style: "style",
-  function: "function",
-  skinType: "skinType",
-  skinTone: "skinTone",
-  makeupStyle: "makeupStyle",
-};
-
 const SECTIONS: Array<{ key: SectionKey; title: string; max: number }> = [
-  { key: "style", title: "관심 스타일", max: 5 },
-  { key: "function", title: "관심 기능", max: 5 },
-  { key: "skinType", title: "피부 타입", max: 1 },
-  { key: "skinTone", title: "피부 밝기", max: 1 },
-  { key: "makeupStyle", title: "메이크업 스타일", max: 1 },
+  { key: "style", title: "관심 스타일", max: Number.POSITIVE_INFINITY },
+  { key: "function", title: "관심 기능", max: Number.POSITIVE_INFINITY },
+  { key: "skinType", title: "피부 타입", max: Number.POSITIVE_INFINITY },
+  { key: "skinTone", title: "피부 밝기", max: Number.POSITIVE_INFINITY },
+  {
+    key: "makeupStyle",
+    title: "메이크업 스타일",
+    max: Number.POSITIVE_INFINITY,
+  },
 ];
+
+type ItemsBySection = Record<SectionKey, TagItem[]>;
+
+const pickCategory = (
+  categories: Record<string, TagItem[]>,
+  candidates: readonly string[],
+): TagItem[] => {
+  for (const key of candidates) {
+    const v = categories[key];
+    if (Array.isArray(v)) return v;
+  }
+
+  const normalize = (s: string) => s.replace(/\s+/g, "").trim();
+  const keys = Object.keys(categories);
+
+  for (const cand of candidates) {
+    const hit = keys.find((k) => normalize(k) === normalize(cand));
+    if (hit) {
+      const v = categories[hit];
+      if (Array.isArray(v)) return v;
+    }
+  }
+
+  return [];
+};
 
 export default function MatchingTestStep1Page() {
   const navigate = useNavigate();
+
   const { data, isLoading, error } = useBeautyTags();
 
   const selected = useMatchingTestStore((s) => s.selected);
   const toggleStep1 = useMatchingTestStore((s) => s.toggleStep1);
-  const setSingleStep1 = useMatchingTestStore((s) => s.setSingleStep1);
 
-  const sectionItems = useMemo(() => {
+  const itemsBySection = useMemo((): ItemsBySection => {
     const categories = data?.categories ?? {};
-    const out: Record<SectionKey, TagItem[]> = {
-      style: categories[BEAUTY_CATEGORY_KEY.style] ?? [],
-      function: categories[BEAUTY_CATEGORY_KEY.function] ?? [],
-      skinType: categories[BEAUTY_CATEGORY_KEY.skinType] ?? [],
-      skinTone: categories[BEAUTY_CATEGORY_KEY.skinTone] ?? [],
-      makeupStyle: categories[BEAUTY_CATEGORY_KEY.makeupStyle] ?? [],
+
+    return {
+      style: pickCategory(categories, ["관심 스타일"]),
+      function: pickCategory(categories, ["관심 기능"]),
+      skinType: pickCategory(categories, ["피부 타입"]),
+      skinTone: pickCategory(categories, [
+        "피부 밝기",
+        "피부 밝기(톤)",
+        "피부 밝기 (톤)",
+        "피부 톤",
+        "피부톤",
+      ]),
+      makeupStyle: pickCategory(categories, [
+        "메이크업 스타일",
+        "메이크업 스타일(연출)",
+        "메이크업 스타일 (연출)",
+        "메이크업",
+        "메이크업스타일",
+      ]),
     };
-    return out;
   }, [data]);
 
-  const isSelected = (section: SectionKey, id: TagId) =>
+  const isSelected = (section: SectionKey, id: number) =>
     selected[section].includes(id);
 
   const canGoNext = useMemo(
@@ -56,18 +85,17 @@ export default function MatchingTestStep1Page() {
     [selected],
   );
 
+  const errorText = error ? error.message : null;
+
   return (
     <MatchingTestContent
       isLoading={isLoading}
-      errorText={error instanceof Error ? error.message : null}
+      errorText={errorText}
       sections={SECTIONS}
-      itemsBySection={sectionItems}
+      itemsBySection={itemsBySection}
       selected={selected}
       isSelected={isSelected}
-      onToggle={(section, id, max) => {
-        if (max === 1) setSingleStep1(section, id);
-        else toggleStep1(section, id, max);
-      }}
+      onToggle={(section, id, max) => toggleStep1(section, id, max)}
       canGoNext={canGoNext}
       onBack={() => navigate("/")}
       onNext={() => navigate("/matching/test/step2")}

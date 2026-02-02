@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type {
   Step2SectionKey,
   Step2SelectedState,
-  TagId,
+  FashionBodyTags,
 } from "../../../../stores/matching-test";
 import type { TagItem } from "../_shared/tags/tags.types";
 
@@ -22,18 +22,11 @@ type Props = {
   itemsBySection: Record<Step2SectionKey, TagItem[]>;
 
   selected: Step2SelectedState;
-  isSelected: (section: Step2SectionKey, id: TagId) => boolean;
-  onToggle: (section: Step2SectionKey, id: TagId, max: number) => void;
+  isSelected: (section: Step2SectionKey, id: number) => boolean;
+  onToggle: (section: Step2SectionKey, id: number, max: number) => void;
 
-  heightCm: string;
-  bodyShape: string;
-  topSize: string;
-  bottomSizeIn: string;
-
-  onHeightChange: (v: string) => void;
-  onBodyShapeChange: (v: string) => void;
-  onTopSizeChange: (v: string) => void;
-  onBottomSizeChange: (v: string) => void;
+  fashionBody: FashionBodyTags;
+  onSetFashionBody: (key: keyof FashionBodyTags, id: number | null) => void;
 
   canGoNext: boolean;
   onBack: () => void;
@@ -43,13 +36,20 @@ type Props = {
 type SheetType = null | "height" | "bodyShape" | "topSize" | "bottomSize";
 
 const BODY_SHAPE_OPTIONS = [
-  "마름",
-  "표준",
-  "통통",
-  "근육형",
-  "웨이브",
+  { id: 1, label: "마름" },
+  { id: 2, label: "표준" },
+  { id: 3, label: "통통" },
+  { id: 4, label: "근육형" },
+  { id: 5, label: "웨이브" },
 ] as const;
-const TOP_SIZE_OPTIONS = ["33", "44", "55", "66", "77"] as const;
+
+const TOP_SIZE_OPTIONS = [
+  { id: 33, label: "33" },
+  { id: 44, label: "44" },
+  { id: 55, label: "55" },
+  { id: 66, label: "66" },
+  { id: 77, label: "77" },
+] as const;
 
 export default function MatchingTestStep2Content({
   isLoading,
@@ -59,14 +59,8 @@ export default function MatchingTestStep2Content({
   selected,
   isSelected,
   onToggle,
-  heightCm,
-  bodyShape,
-  topSize,
-  bottomSizeIn,
-  onHeightChange,
-  onBodyShapeChange,
-  onTopSizeChange,
-  onBottomSizeChange,
+  fashionBody,
+  onSetFashionBody,
   canGoNext,
   onBack,
   onNext,
@@ -76,19 +70,32 @@ export default function MatchingTestStep2Content({
   const close = () => setSheet(null);
 
   const chipDisabled = useMemo(() => {
-    const out: Record<Step2SectionKey, boolean> = {
-      fashionStyle:
-        selected.fashionStyle.length >=
-        (sections.find((s) => s.key === "fashionStyle")?.max ?? 5),
-      interestItem:
-        selected.interestItem.length >=
-        (sections.find((s) => s.key === "interestItem")?.max ?? 5),
-      brandType:
-        selected.brandType.length >=
-        (sections.find((s) => s.key === "brandType")?.max ?? 5),
-    };
-    return out;
+    const getMax = (k: Step2SectionKey) =>
+      sections.find((s) => s.key === k)?.max ?? 5;
+
+    return {
+      fashionStyle: selected.fashionStyle.length >= getMax("fashionStyle"),
+      interestItem: selected.interestItem.length >= getMax("interestItem"),
+      brandType: selected.brandType.length >= getMax("brandType"),
+    } satisfies Record<Step2SectionKey, boolean>;
   }, [selected, sections]);
+
+  const heightText =
+    fashionBody.heightTag === null ? "" : `${fashionBody.heightTag} cm`;
+  const bottomText =
+    fashionBody.bottomSizeTag === null ? "" : `${fashionBody.bottomSizeTag} in`;
+
+  const bodyShapeText =
+    fashionBody.weightTypeTag === null
+      ? ""
+      : (BODY_SHAPE_OPTIONS.find((o) => o.id === fashionBody.weightTypeTag)
+          ?.label ?? "");
+
+  const topSizeText =
+    fashionBody.topSizeTag === null
+      ? ""
+      : (TOP_SIZE_OPTIONS.find((o) => o.id === fashionBody.topSizeTag)?.label ??
+        String(fashionBody.topSizeTag));
 
   if (isLoading) {
     return (
@@ -120,7 +127,6 @@ export default function MatchingTestStep2Content({
           모두 선택해주세요!
         </h1>
 
-        {/* Chips: 서버 태그 기반 */}
         {sections.map((sec) => {
           const items = itemsBySection[sec.key] ?? [];
           return (
@@ -131,7 +137,7 @@ export default function MatchingTestStep2Content({
                   const disabled = !sel && (chipDisabled[sec.key] ?? false);
                   return (
                     <SelectChip
-                      key={String(tag.id)}
+                      key={tag.id}
                       label={tag.name}
                       isSelected={sel}
                       disabled={disabled}
@@ -144,7 +150,6 @@ export default function MatchingTestStep2Content({
           );
         })}
 
-        {/* Body Info: 기존 그대로 */}
         <div className="mt-7">
           <div className="text-sm font-semibold text-text-black">체형 정보</div>
 
@@ -153,7 +158,7 @@ export default function MatchingTestStep2Content({
             <div className="mt-2">
               <FormField
                 label="키(cm)"
-                value={heightCm ? `${heightCm} cm` : ""}
+                value={heightText}
                 placeholder="입력하기"
                 onClick={() => open("height")}
               />
@@ -167,7 +172,7 @@ export default function MatchingTestStep2Content({
             <div className="mt-2">
               <FormField
                 label="체형"
-                value={bodyShape}
+                value={bodyShapeText}
                 placeholder="선택하기"
                 onClick={() => open("bodyShape")}
               />
@@ -181,13 +186,13 @@ export default function MatchingTestStep2Content({
             <div className="mt-2 grid grid-cols-2 gap-3">
               <FormField
                 label="상의 사이즈"
-                value={topSize}
+                value={topSizeText}
                 placeholder="선택하기"
                 onClick={() => open("topSize")}
               />
               <FormField
                 label="하의 사이즈 (in)"
-                value={bottomSizeIn ? `${bottomSizeIn} in` : ""}
+                value={bottomText}
                 placeholder="입력하기"
                 onClick={() => open("bottomSize")}
               />
@@ -208,14 +213,23 @@ export default function MatchingTestStep2Content({
         </Button>
       </div>
 
-      {/* Sheets */}
       {sheet === "height" ? (
         <BottomSheet title="키 입력" onClose={close}>
           <InputSheet
-            value={heightCm}
+            value={
+              fashionBody.heightTag === null
+                ? ""
+                : String(fashionBody.heightTag)
+            }
             placeholder="숫자만 입력"
-            onChange={(v) => onHeightChange(v.replace(/[^\d]/g, ""))}
-            doneDisabled={heightCm.trim().length === 0}
+            onChange={(v) => {
+              const n = Number(v.replace(/[^\d]/g, ""));
+              onSetFashionBody(
+                "heightTag",
+                Number.isFinite(n) && n > 0 ? n : null,
+              );
+            }}
+            doneDisabled={fashionBody.heightTag === null}
             onDone={close}
             suffix="cm"
           />
@@ -225,10 +239,20 @@ export default function MatchingTestStep2Content({
       {sheet === "bottomSize" ? (
         <BottomSheet title="하의 사이즈 입력" onClose={close}>
           <InputSheet
-            value={bottomSizeIn}
+            value={
+              fashionBody.bottomSizeTag === null
+                ? ""
+                : String(fashionBody.bottomSizeTag)
+            }
             placeholder="숫자만 입력"
-            onChange={(v) => onBottomSizeChange(v.replace(/[^\d]/g, ""))}
-            doneDisabled={bottomSizeIn.trim().length === 0}
+            onChange={(v) => {
+              const n = Number(v.replace(/[^\d]/g, ""));
+              onSetFashionBody(
+                "bottomSizeTag",
+                Number.isFinite(n) && n > 0 ? n : null,
+              );
+            }}
+            doneDisabled={fashionBody.bottomSizeTag === null}
             onDone={close}
             suffix="in"
           />
@@ -238,10 +262,11 @@ export default function MatchingTestStep2Content({
       {sheet === "bodyShape" ? (
         <BottomSheet title="체형 선택" onClose={close}>
           <SelectSheet
-            options={BODY_SHAPE_OPTIONS}
-            value={bodyShape}
-            onSelect={(v) => {
-              onBodyShapeChange(v);
+            options={BODY_SHAPE_OPTIONS.map((o) => o.label)}
+            value={bodyShapeText}
+            onSelect={(label) => {
+              const hit = BODY_SHAPE_OPTIONS.find((o) => o.label === label);
+              onSetFashionBody("weightTypeTag", hit ? hit.id : null);
               close();
             }}
           />
@@ -251,10 +276,11 @@ export default function MatchingTestStep2Content({
       {sheet === "topSize" ? (
         <BottomSheet title="상의 사이즈 선택" onClose={close}>
           <SelectSheet
-            options={TOP_SIZE_OPTIONS}
-            value={topSize}
-            onSelect={(v) => {
-              onTopSizeChange(v);
+            options={TOP_SIZE_OPTIONS.map((o) => o.label)}
+            value={topSizeText}
+            onSelect={(label) => {
+              const hit = TOP_SIZE_OPTIONS.find((o) => o.label === label);
+              onSetFashionBody("topSizeTag", hit ? hit.id : null);
               close();
             }}
           />

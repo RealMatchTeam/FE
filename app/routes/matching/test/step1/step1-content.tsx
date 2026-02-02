@@ -4,7 +4,6 @@ import Button from "../../../../components/common/Button";
 import type {
   SectionKey,
   SelectedState,
-  TagId,
 } from "../../../../stores/matching-test";
 import type { TagItem } from "../_shared/tags/tags.types";
 
@@ -16,8 +15,8 @@ type Props = {
   itemsBySection: Record<SectionKey, TagItem[]>;
   selected: SelectedState;
 
-  isSelected: (section: SectionKey, id: TagId) => boolean;
-  onToggle: (section: SectionKey, id: TagId, max: number) => void;
+  isSelected: (section: SectionKey, id: number) => boolean;
+  onToggle: (section: SectionKey, id: number, max: number) => void;
 
   canGoNext: boolean;
   onBack: () => void;
@@ -84,7 +83,7 @@ export default function MatchingTestContent({
 
                   return (
                     <SelectChip
-                      key={String(tag.id)}
+                      key={tag.id}
                       label={tag.name}
                       isSelected={checked}
                       disabled={disabled}

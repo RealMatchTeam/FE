@@ -9,18 +9,18 @@ export type MatchesRequest = {
   beauty: {
     interestStyleTags: number[];
     prefferedFunctionTags: number[];
-    skinTypeTags: number;
-    skinToneTags: number;
-    makeupStyleTags: number;
+    skinTypeTags: number[];
+    skinToneTags: number[];
+    makeupStyleTags: number[];
   };
   fashion: {
     interestStyleTags: number[];
     preferredItemTags: number[];
     preferredBrandTags: number[];
-    heightTags: number;
-    weightTypeTags: number;
-    topSizeTags: number;
-    bottomSizeTags: number;
+    heightTag: number;
+    weightTypeTag: number;
+    topSizeTag: number;
+    bottomSizeTag: number;
   };
   content: {
     sns: {
@@ -41,4 +41,20 @@ export type MatchesRequest = {
   };
 };
 
-export type MatchesResponseResult = unknown;
+export type MatchedBrand = {
+  brandId: number;
+  brandName: string;
+  matchingRatio: number;
+  logoUrl?: string;
+};
+
+export type HighMatchingBrandList = {
+  count: number;
+  brands: MatchedBrand[];
+};
+
+export type MatchesResponseResult = {
+  userType: string;
+  typeTag: string[];
+  highMatchingBrandList: HighMatchingBrandList;
+};

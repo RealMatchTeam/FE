@@ -1,30 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  fetchBeautyTags,
-  fetchFashionTags,
-  fetchContentTags,
-} from "./tags.api";
+import { fetchBeautyTags } from "./tags.api";
+import type { BeautyTags } from "./tags.types";
 
 export function useBeautyTags() {
-  return useQuery({
+  return useQuery<BeautyTags, Error>({
     queryKey: ["tags", "beauty"],
     queryFn: fetchBeautyTags,
     staleTime: 1000 * 60 * 10,
   });
 }
-
 export function useFashionTags() {
-  return useQuery({
+  return useQuery<FashionTags, Error>({
     queryKey: ["tags", "fashion"],
     queryFn: fetchFashionTags,
-    staleTime: 1000 * 60 * 10,
-  });
-}
-
-export function useContentTags() {
-  return useQuery({
-    queryKey: ["tags", "content"],
-    queryFn: fetchContentTags,
-    staleTime: 1000 * 60 * 10,
+    staleTime: STALE,
   });
 }
