@@ -24,7 +24,6 @@ export default function CampaignCard({
   campaignId = 1,
 }: CampaignCardProps) {
   const navigate = useNavigate();
-  const BUTTON_WIDTH = '280px';
 
   // 로고 컴포넌트
   const Logo = (
