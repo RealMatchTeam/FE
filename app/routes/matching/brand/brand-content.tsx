@@ -10,7 +10,7 @@ import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";
-import { getMatchingBrands, toggleBrandLike, MatchingTestRequiredError, type MatchingBrand } from "../api/matching";
+import { getMatchingBrands, toggleBrandLike, MatchingTestRequiredError, getTagNamesByCategory, type MatchingBrand } from "../api/matching";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
@@ -28,8 +28,8 @@ export default function BrandContent() {
     useEffect(() => {
         const fetchMatchingBrands = async () => {
             try {
-                // URL의 category 파라미터에 따라 API 호출
-                const brands = await getMatchingBrands("MATCH_SCORE", category);
+                const categoryTags = await getTagNamesByCategory(category);
+                const brands = await getMatchingBrands("MATCH_SCORE", category, categoryTags);
 
                 if (brands && brands.length > 0) {
                     setBrands(brands);
@@ -40,7 +40,7 @@ export default function BrandContent() {
             } catch (error) {
                 console.error("Failed to fetch matching brands:", error);
 
-                // 매칭 검사 필요 에러인 경우
+                // 매칭 검사 필요
                 if (error instanceof MatchingTestRequiredError) {
                     setHasMatchingResult(false);
                 } else {
@@ -112,7 +112,10 @@ export default function BrandContent() {
             };
             const sortBy = sortByMap[sort] || "MATCH_SCORE";
 
-            const brands = await getMatchingBrands(sortBy, category, tags.length > 0 ? tags : undefined);
+            // 태그가 선택되지 않은 경우 카테고리별 태그 API를 먼저 호출
+            const tagsToSend = tags.length > 0 ? tags : await getTagNamesByCategory(category);
+
+            const brands = await getMatchingBrands(sortBy, category, tagsToSend);
 
             if (brands && brands.length > 0) {
                 setBrands(brands);

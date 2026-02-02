@@ -1,5 +1,4 @@
 import { apiClient } from "../../../api/axios";
-import { tokenStorage } from "../../../lib/token";
 
 // 매칭 캠페인 응답 타입
 export interface MatchingCampaign {
@@ -41,12 +40,28 @@ interface ApiBrand {
   brandTags?: string[];
 }
 
+// API 원본 캠페인 응답 타입
+interface ApiCampaign {
+  brandId: number;
+  brandName: string;
+  brandLogoUrl?: string;
+  brandMatchingRatio: number;
+  brandIsLiked: boolean;
+  brandIsRecruiting?: boolean;
+  campaignManuscriptFee?: number;
+  campaignDetail?: string;
+  campaignDDay?: number;
+  campaignTotalRecruit?: number;
+  campaignTotalCurrentRecruit?: number;
+}
+
 interface MatchingCampaignResponse {
   isSuccess: boolean;
   code: string;
   message: string;
   result: {
-    campaigns: MatchingCampaign[];
+    count: number;
+    brands: ApiCampaign[];
   };
 }
 
@@ -119,11 +134,6 @@ export const getMatchingCampaigns = async (
   tags?: string[]
 ): Promise<MatchingCampaign[]> => {
   try {
-    const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
-
     const params: Record<string, string | string[]> = { sortBy, category };
     if (tags && tags.length > 0) {
       params.tags = tags;
@@ -135,31 +145,26 @@ export const getMatchingCampaigns = async (
     );
 
     if (!response.data.isSuccess) {
-      // 매칭 테스트 미완료 에러 체크
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
-        response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
-        throw new MatchingTestRequiredError();
-      }
       throw new Error(response.data.message || "캠페인 목록 조회 실패");
     }
 
-    return response.data.result.campaigns || [];
+    // API 응답을 프론트 타입으로 변환
+    const apiCampaigns = response.data.result.brands || [];
+    return apiCampaigns.map((campaign): MatchingCampaign => ({
+      id: campaign.brandId,
+      brandName: campaign.brandName,
+      name: campaign.campaignDetail,
+      title: campaign.campaignDetail,
+      category: category, // 요청 시 사용한 카테고리
+      manuscriptFee: campaign.campaignManuscriptFee,
+      reward: campaign.campaignManuscriptFee,
+      matchingRatio: campaign.brandMatchingRatio,
+      matchRate: campaign.brandMatchingRatio,
+      applicants: campaign.campaignTotalCurrentRecruit || 0,
+      isLiked: campaign.brandIsLiked,
+      logoUrl: campaign.brandLogoUrl,
+    }));
   } catch (error: unknown) {
-    // MatchingTestRequiredError는 그대로 throw
-    if (error instanceof MatchingTestRequiredError) {
-      throw error;
-    }
-
-    // 404 에러나 기타 에러 시 매칭 검사 필요 메시지
-    const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
-    if (axiosError.response?.status === 404 ||
-      axiosError.response?.status === 400 ||
-      axiosError.response?.data?.message?.includes("매칭") ||
-      axiosError.response?.data?.message?.includes("테스트")) {
-      throw new MatchingTestRequiredError();
-    }
-
     console.error("매칭 캠페인 조회 실패:", error);
     throw error;
   }
@@ -177,11 +182,6 @@ export const getMatchingBrands = async (
   tags?: string[]
 ): Promise<MatchingBrand[]> => {
   try {
-    const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
-
     const params: Record<string, string | string[]> = { sortBy, category };
     if (tags && tags.length > 0) {
       params.tags = tags;
@@ -193,12 +193,6 @@ export const getMatchingBrands = async (
     );
 
     if (!response.data.isSuccess) {
-      // 매칭 테스트 미완료 에러 체크
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
-        response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
-        throw new MatchingTestRequiredError();
-      }
       throw new Error(response.data.message || "브랜드 목록 조회 실패");
     }
 
@@ -216,20 +210,6 @@ export const getMatchingBrands = async (
       category: category, // 요청 시 사용한 카테고리
     }));
   } catch (error: unknown) {
-    // MatchingTestRequiredError는 그대로 throw
-    if (error instanceof MatchingTestRequiredError) {
-      throw error;
-    }
-
-    // 404 에러나 기타 에러 시 매칭 검사 필요 메시지
-    const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
-    if (axiosError.response?.status === 404 ||
-      axiosError.response?.status === 400 ||
-      axiosError.response?.data?.message?.includes("매칭") ||
-      axiosError.response?.data?.message?.includes("테스트")) {
-      throw new MatchingTestRequiredError();
-    }
-
     console.error("매칭 브랜드 조회 실패:", error);
     throw error;
   }
@@ -387,6 +367,222 @@ export const analyzeMatch = async (
     return response.data.result;
   } catch (error: unknown) {
     console.error("매칭 분석 실패:", error);
+    throw error;
+  }
+};
+
+// ==================== 태그 API ====================
+
+// 태그 아이템 타입
+export interface TagItem {
+  id: number;
+  name: string;
+}
+
+// 태그 응답 타입 (뷰티/패션)
+export interface TagResponse {
+  tagType: string;
+  categories: Record<string, TagItem[]>;
+}
+
+interface TagApiResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: TagResponse;
+}
+
+// 컨텐츠 태그 아이템 타입
+export interface TagItemResponse {
+  id: string;
+  name: string;
+}
+
+// 컨텐츠 태그 응답 타입
+export interface ContentTagResponse {
+  formats: TagItemResponse[];
+  categories: TagItemResponse[];
+  tones: TagItemResponse[];
+  involvements: TagItemResponse[];
+  usageRanges: TagItemResponse[];
+}
+
+interface ContentTagApiResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: ContentTagResponse;
+}
+
+/**
+ * 뷰티 태그 조회
+ */
+export const getBeautyTags = async (): Promise<TagResponse> => {
+  try {
+    const response = await apiClient.get<TagApiResponse>('/api/v1/tags/beauty');
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "뷰티 태그 조회 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("뷰티 태그 조회 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 패션 태그 조회
+ */
+export const getFashionTags = async (): Promise<TagResponse> => {
+  try {
+    const response = await apiClient.get<TagApiResponse>('/api/v1/tags/fashion');
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "패션 태그 조회 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("패션 태그 조회 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 컨텐츠 태그 조회
+ */
+export const getContentTags = async (): Promise<ContentTagResponse> => {
+  try {
+    const response = await apiClient.get<ContentTagApiResponse>('/api/v1/tags/content');
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "컨텐츠 태그 조회 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("컨텐츠 태그 조회 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 태그 타입별 조회
+ * @param tagType 태그 타입
+ */
+export const getTagsByType = async (tagType: string): Promise<TagResponse> => {
+  try {
+    const response = await apiClient.get<TagApiResponse>(`/api/v1/tags/${tagType}`);
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "태그 조회 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("태그 조회 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 모든 태그 이름 조회 (뷰티, 패션, 컨텐츠)
+ * @returns 모든 태그 이름 배열
+ */
+export const getAllTagNames = async (): Promise<string[]> => {
+  try {
+    const [beautyTags, fashionTags, contentTags] = await Promise.all([
+      getBeautyTags(),
+      getFashionTags(),
+      getContentTags()
+    ]);
+
+    const tagNames: string[] = [];
+
+    // 뷰티 태그에서 이름 추출
+    if (beautyTags.categories) {
+      Object.values(beautyTags.categories).forEach(items => {
+        items.forEach(item => tagNames.push(item.name));
+      });
+    }
+
+    // 패션 태그에서 이름 추출
+    if (fashionTags.categories) {
+      Object.values(fashionTags.categories).forEach(items => {
+        items.forEach(item => tagNames.push(item.name));
+      });
+    }
+
+    // 컨텐츠 태그에서 이름 추출
+    if (contentTags.formats) {
+      contentTags.formats.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.categories) {
+      contentTags.categories.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.tones) {
+      contentTags.tones.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.involvements) {
+      contentTags.involvements.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.usageRanges) {
+      contentTags.usageRanges.forEach(item => tagNames.push(item.name));
+    }
+
+    return tagNames;
+  } catch (error: unknown) {
+    console.error("모든 태그 조회 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 카테고리별 태그 이름 조회 (뷰티/패션 + 컨텐츠)
+ * BEAUTY: 뷰티 태그 + 컨텐츠 태그
+ * FASHION: 패션 태그 + 컨텐츠 태그
+ * @param category 카테고리 (BEAUTY 또는 FASHION)
+ * @returns 해당 카테고리의 태그 이름 배열
+ */
+export const getTagNamesByCategory = async (category: string): Promise<string[]> => {
+  try {
+    // 카테고리에 따라 적절한 태그 API 호출
+    const [categoryTags, contentTags] = await Promise.all([
+      category === 'BEAUTY' ? getBeautyTags() : getFashionTags(),
+      getContentTags()
+    ]);
+
+    const tagNames: string[] = [];
+
+    // 카테고리별 태그에서 이름 추출
+    if (categoryTags.categories) {
+      Object.values(categoryTags.categories).forEach(items => {
+        items.forEach(item => tagNames.push(item.name));
+      });
+    }
+
+    // 컨텐츠 태그에서 이름 추출
+    if (contentTags.formats) {
+      contentTags.formats.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.categories) {
+      contentTags.categories.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.tones) {
+      contentTags.tones.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.involvements) {
+      contentTags.involvements.forEach(item => tagNames.push(item.name));
+    }
+    if (contentTags.usageRanges) {
+      contentTags.usageRanges.forEach(item => tagNames.push(item.name));
+    }
+
+    return tagNames;
+  } catch (error: unknown) {
+    console.error("카테고리별 태그 조회 실패:", error);
     throw error;
   }
 };
