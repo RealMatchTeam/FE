@@ -28,7 +28,7 @@ export default function BrandContent() {
     useEffect(() => {
         const fetchMatchingBrands = async () => {
             try {
-                const brands = await getMatchingBrands();
+                const { brands } = await getMatchingBrands("MATCH_SCORE", category);
 
                 if (brands && brands.length > 0) {
                     setBrands(brands);
@@ -51,7 +51,7 @@ export default function BrandContent() {
         };
 
         fetchMatchingBrands();
-    }, []);
+    }, [category]);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
@@ -60,16 +60,15 @@ export default function BrandContent() {
         navigate(`/matching/brand?type=${newCategory}`);
     };
 
-    // 카테고리 + 검색어 필터링
+    // 검색어 필터링 (카테고리는 API에서 이미 필터링됨)
     const filteredBrands = useMemo(() => {
         return brands.filter(brand => {
-            const matchesCategory = brand.category === category;
             const matchesSearch = deferredKeyword === "" ||
                 brand.name.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
                 (brand.tags && brand.tags.some((tag: string) => tag.toLowerCase().includes(deferredKeyword.toLowerCase())));
-            return matchesCategory && matchesSearch;
+            return matchesSearch;
         });
-    }, [brands, category, deferredKeyword]);
+    }, [brands, deferredKeyword]);
 
     const toggleLike = async (id: number) => {
         try {
@@ -111,7 +110,7 @@ export default function BrandContent() {
             };
             const sortBy = sortByMap[sort] || "MATCH_SCORE";
 
-            const brands = await getMatchingBrands(sortBy, category, tags.length > 0 ? tags : undefined);
+            const { brands } = await getMatchingBrands(sortBy, category, tags.length > 0 ? tags : undefined);
 
             if (brands && brands.length > 0) {
                 setBrands(brands);

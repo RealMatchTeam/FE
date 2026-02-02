@@ -17,6 +17,10 @@
   ],
   "tags": [
     {
+      "name": "Brand-Campain",
+      "description": "브랜드의 캠페인 API"
+    },
+    {
       "name": "Chat",
       "description": "채팅 REST API"
     },
@@ -150,62 +154,38 @@
                   "summary": "뷰티 중심 크리에이터",
                   "description": "뷰티 크리에이터 예시",
                   "value": {
-                    "userId": "1",
-                    "brandId": "101",
-                    "sex": "여성",
-                    "age": 25,
-                    "height": 165,
-                    "weight": 52,
-                    "size": {
-                      "upper": 55,
-                      "bottom": 26
-                    },
                     "beauty": {
-                      "interests": [
-                        "스킨케어",
-                        "메이크업"
-                      ],
-                      "functions": [
-                        "보습",
-                        "미백"
-                      ],
-                      "skinType": "복합성",
-                      "skinTone": "웜톤",
-                      "makeupStyle": "내추럴"
+                      "interestStyleTags": [1, 2],
+                      "prefferedFunctionTags": [6, 7],
+                      "skinTypeTags": 12,
+                      "skinToneTags": 13,
+                      "makeupStyleTags": 2
                     },
                     "fashion": {
-                      "styles": [
-                        "미니멀",
-                        "캐주얼"
-                      ],
-                      "items": [
-                        "원피스",
-                        "블라우스"
-                      ],
-                      "preferredBrands": [
-                        "자라",
-                        "유니클로"
-                      ]
+                      "interestStyleTags": [16, 17],
+                      "preferredItemTags": [22, 23],
+                      "preferredBrandTags": [27, 28],
+                      "heightTag": 72,
+                      "weightTypeTag": 94,
+                      "topSizeTag": 108,
+                      "bottomSizeTag": 178
                     },
-                    "sns": {
-                      "url": "https://www.instagram.com/beauty_creator",
-                      "mainAudience": {
-                        "sex": [
-                          "여성"
-                        ],
-                        "age": [
-                          "20대",
-                          "30대"
-                        ]
+                    "content": {
+                      "sns": {
+                        "url": "https://www.instagram.com/vivi",
+                        "mainAudience": {
+                          "genderTags": [221, 222],
+                          "ageTags": [223, 224]
+                        },
+                        "averageAudience": {
+                          "videoLengthTags": [228, 229],
+                          "videoViewsTags": [232, 233]
+                        }
                       },
-                      "contentStyle": {
-                        "avgVideoLength": "30초~1분",
-                        "avgViews": "50000",
-                        "format": "릴스",
-                        "type": "리뷰",
-                        "contributionLevel": "높음",
-                        "usageCoverage": "전체"
-                      }
+                      "typeTags": [236, 237],
+                      "toneTags": [245, 246],
+                      "prefferedInvolvementTags": [251, 252],
+                      "prefferedCoverageTags": [255, 256]
                     }
                   }
                 }
@@ -386,11 +366,13 @@
           {
             "name": "campaignId",
             "in": "path",
+            "description": "캠페인 ID",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
-            }
+            },
+            "example": 1
           }
         ],
         "requestBody": {
@@ -417,14 +399,105 @@
         }
       }
     },
+    "/api/v1/campaigns/proposal/{campaignProposalID}/re-request": {
+      "post": {
+        "tags": [
+          "Business"
+        ],
+        "summary": "캠페인 제안 수정(다시 제안하기) API by 박지영",
+        "description": "내가 제안했던 것을 다시 제안하는 API 입니다.\n/api/v1/campaigns/proposal/request에서 생성했던 제안을 수정해서 다시 제안할 때, 해당 API를 사용해주세요.\n\ncampaignProposalId는 /api/v1/campaigns/collaborations/me에서 확인해주세요.\n(masterJWT로 조회 불가능 API, 크리에이터/브랜드 계정으로 로그인 필요)\n",
+        "operationId": "modifyCampaignProposal",
+        "parameters": [
+          {
+            "name": "campaignProposalID",
+            "in": "path",
+            "description": "캠페인 Proposal ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignProposalRequestDto"
+              },
+              "examples": {
+                "CampaignProposalRequestExample": {
+                  "summary": "캠페인 수정 요청 예시",
+                  "description": "CampaignProposalRequestExample",
+                  "value": {
+                    "brandId": 1,
+                    "creatorId": 1,
+                    "campaignId": null,
+                    "campaignName": "비플레인 선크림 리뷰 캠페인",
+                    "description": "비플레인 선크림을 체험하고 솔직한 리뷰 콘텐츠를 제작해주세요.",
+                    "formats": [
+                      {
+                        "id": 1
+                      }
+                    ],
+                    "categories": [
+                      {
+                        "id": 2,
+                        "customValue": "성분 분석 리뷰"
+                      },
+                      {
+                        "id": 7
+                      }
+                    ],
+                    "tones": [
+                      {
+                        "id": 3
+                      }
+                    ],
+                    "involvements": [
+                      {
+                        "id": 5
+                      }
+                    ],
+                    "usageRanges": [
+                      {
+                        "id": 6
+                      }
+                    ],
+                    "rewardAmount": 100000,
+                    "productId": 5,
+                    "startDate": "2025-03-29",
+                    "endDate": "2025-04-01"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/campaigns/proposal/request": {
       "post": {
         "tags": [
           "Business"
         ],
         "summary": "캠페인 제안 생성 API by 박지영",
-        "description": "크리에이터가 브랜드에 캠페인을 제안합니다.\n\n신규 캠페인인 경우 campaignId null을 보내주세요.\n기존 캠페인인 경우 campaignId을 보내주세요.\n\n기타인 경우 customValue를 포함해서 보내주세요.\n\n태그 ID는 api/v1/tags/content에서 확인할 수 있습니다.\n",
-        "operationId": "requestCampaignProposal",
+        "description": "크리에이터가 브랜드에 캠페인을 제안합니다.\n\n신규 캠페인인 경우 campaignId null 을 보내주세요.\n기존 캠페인인 경우 campaignId을 보내주세요.\n\n기타인 경우 customValue를 포함해서 보내주세요.\n",
+        "operationId": "createCampaignProposal",
         "requestBody": {
           "content": {
             "application/json": {
@@ -443,31 +516,31 @@
                     "description": "비플레인 선크림을 체험하고 솔직한 리뷰 콘텐츠를 제작해주세요.",
                     "formats": [
                       {
-                        "id": "32000000-0000-0000-0000-000000000000"
+                        "id": 1
                       }
                     ],
                     "categories": [
                       {
-                        "id": "31310000-0000-0000-0000-000000000000",
+                        "id": 2,
                         "customValue": "성분 분석 리뷰"
                       }
                     ],
                     "tones": [
                       {
-                        "id": "31360000-0000-0000-0000-000000000000"
+                        "id": 3
                       },
                       {
-                        "id": "31330000-0000-0000-0000-000000000000"
+                        "id": 4
                       }
                     ],
                     "involvements": [
                       {
-                        "id": "32320000-0000-0000-0000-000000000000"
+                        "id": 5
                       }
                     ],
                     "usageRanges": [
                       {
-                        "id": "32350000-0000-0000-0000-000000000000"
+                        "id": 6
                       }
                     ],
                     "rewardAmount": 200000,
@@ -610,7 +683,7 @@
           "Attachment"
         ],
         "summary": "첨부파일 업로드 API",
-        "description": "첨부 파일을 업로드하고 메타 정보를 반환합니다.",
+        "description": "첨부 파일을 업로드하고 메타 정보를 반환합니다.\n- IMAGE: png, jpeg(jpg)만 허용\n- FILE: pdf, doc, docx만 허용\n",
         "operationId": "uploadAttachment",
         "parameters": [
           {
@@ -623,6 +696,19 @@
               "enum": [
                 "IMAGE",
                 "FILE"
+              ]
+            }
+          },
+          {
+            "name": "usage",
+            "in": "query",
+            "description": "용도 (CHAT: 채팅첨부, PUBLIC: 브랜드/캠페인 등 공개자산)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CHAT",
+                "PUBLIC"
               ]
             }
           }
@@ -718,7 +804,17 @@
             }
           },
           "ATTACHMENT400_5": {
-            "description": "지원하지 않는 이미지 형식입니다.",
+            "description": "지원하지 않는 이미지 형식입니다. (png, jpeg만 허용)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseAttachmentUploadResponse"
+                }
+              }
+            }
+          },
+          "ATTACHMENT400_7": {
+            "description": "지원하지 않는 첨부파일 형식입니다. (pdf, doc, docx만 허용)",
             "content": {
               "*/*": {
                 "schema": {
@@ -733,6 +829,58 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomResponseAttachmentUploadResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/me/feature": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "내 특성 조회 API By 고경수",
+        "description": "로그인한 사용자의 특성 정보를 조회합니다. (하드코딩)",
+        "operationId": "getMyFeature",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseMyFeatureResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "summary": "내 특성 수정 API By 고경수",
+        "description": "로그인한 사용자의 특성 정보를 수정합니다. (하드코딩)",
+        "operationId": "updateMyFeature",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MyFeatureUpdateRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseVoid"
                 }
               }
             }
@@ -851,28 +999,6 @@
         }
       }
     },
-    "/api/v1/users/me/feature": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "내 특성 조회 API By 고경수",
-        "description": "로그인한 사용자의 특성 정보를 조회합니다. (하드코딩)",
-        "operationId": "getMyFeature",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomResponseMyFeatureResponseDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/tags/{tagType}": {
       "get": {
         "tags": [
@@ -971,24 +1097,15 @@
         }
       }
     },
-    "/api/v1/matches/campaigns/{userId}": {
+    "/api/v1/matches/campaigns": {
       "get": {
         "tags": [
           "Match"
         ],
         "summary": "매칭 캠페인 목록 조회",
-        "description": "사용자 ID를 기반으로 매칭률이 높은 캠페인 목록을 조회합니다.\n정렬 옵션: MATCH_SCORE(매칭률 순), POPULARITY(인기순), NEWEST(신규순)\n카테고리 필터: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n태그 필터: 뷰티/패션 관련 태그로 필터링\n",
+        "description": "JWT 토큰의 사용자 ID를 기반으로 매칭률이 높은 캠페인 목록을 조회합니다.\n정렬 옵션: MATCH_SCORE(매칭률 순), POPULARITY(인기순), NEWEST(신규순)\n카테고리 필터: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n태그 필터: 뷰티/패션 관련 태그로 필터링\n",
         "operationId": "getMatchingCampaigns",
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "사용자 ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "sortBy",
             "in": "query",
@@ -1046,24 +1163,15 @@
         }
       }
     },
-    "/api/v1/matches/brands/{userId}": {
+    "/api/v1/matches/brands": {
       "get": {
         "tags": [
           "Match"
         ],
         "summary": "매칭 브랜드 목록 조회",
-        "description": "사용자 ID를 기반으로 매칭률이 높은 브랜드 목록을 조회합니다.\n정렬 옵션: MATCH_SCORE(매칭률 순), POPULARITY(인기순), NEWEST(신규순)\n카테고리 필터: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n태그 필터: 뷰티/패션 관련 태그로 필터링\n",
+        "description": "JWT 토큰의 사용자 ID를 기반으로 매칭률이 높은 브랜드 목록을 조회합니다.\n정렬 옵션: MATCH_SCORE(매칭률 순), POPULARITY(인기순), NEWEST(신규순)\n카테고리 필터: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n태그 필터: 뷰티/패션 관련 태그로 필터링\n",
         "operationId": "getMatchingBrands",
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "사용자 ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "sortBy",
             "in": "query",
@@ -1329,16 +1437,18 @@
         ],
         "summary": "내가 지원한 캠페인 상세 조회 API by 박지영",
         "description": "내가 지원한 캠페인의 상세 조회입니다.\ncampaign_ID를 보내주세요.\n\nREVIEWING : 검토중\nMATCHED : 수락\nREJECTED : 거절\n",
-        "operationId": "getMyApplyCampainDetails",
+        "operationId": "getMyApplyCampaignDetails",
         "parameters": [
           {
             "name": "campaignId",
             "in": "path",
+            "description": "캠페인 ID",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
-            }
+            },
+            "example": 1
           }
         ],
         "responses": {
@@ -1360,18 +1470,20 @@
         "tags": [
           "Business"
         ],
-        "summary": "켐페인 제안 상세 조회 API by 박지영",
-        "description": "한 건의 캠페인 제안 상세 정보를 조회합니다.\n\n\u003C태그\u003E\nformats : 형식\ncategories : 종류\ntones : 톤\ninvolvements : 관여도\nusageRanges : 활용 범위\n",
+        "summary": "캠페인 제안 상세 조회 API by 박지영",
+        "description": "한 건의 캠페인 제안 상세 정보를 조회합니다.\n\ncampaignProposalId는 /api/v1/campaigns/collaborations/me에서 확인해주세요.\n(masterJWT로 조회 불가능 API, 크리에이터/브랜드 계정으로 로그인 필요)\n\n\u003C태그\u003E\nformats : 형식\ncategories : 종류\ntones : 톤\ninvolvements : 관여도\nusageRanges : 활용 범위\n",
         "operationId": "getProposalDetail",
         "parameters": [
           {
             "name": "campaignProposalId",
             "in": "path",
+            "description": "캠페인 Proposal ID",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
           }
         ],
         "responses": {
@@ -1393,13 +1505,14 @@
         "tags": [
           "Business"
         ],
-        "summary": "나의 켐페인 조회 API by 박지영",
+        "summary": "나의 캠페인 조회 API by 박지영",
         "description": "내가 지원, 제안 보냄, 제안 받음을 한 모든 캠페인 내역을 조회합니다.\n사용자와 연관된 캠페인을 조회할 때는 해당 api를 사용해주세요. (부족한 정보가 있다면 말해주세요. 응답에 추가하겠습니다.\n쿼리 스트링으로 아래의 옵션들을 선택할 수 있습니다.\n\n1) 참여 타입\n- APPLIED : 지원\n- SENT : 제안 보냄\n- RECEIVED : 제안 받음\n\n* 지원은 proposalId가 null입니다.\n* 신규 캠페인에 제안하거나/받은 경우 campaignId가 null이고, 기존 캠페인에 제안하거나/받은 경우 campaignId가 존재합니다.\n\n2) 상태\nREVIEWING : 검토중\nMATCHED : 매칭됨\nREJECTED : 거절\n\n3) 날짜\nstartDate : 제작 시작 날짜\nendDate : 제작 마감 날짜\n",
         "operationId": "getMyCollaborations",
         "parameters": [
           {
             "name": "type",
             "in": "query",
+            "description": "참여 타입 (APPLIED, SENT, RECEIVED)",
             "required": false,
             "schema": {
               "type": "string",
@@ -1413,6 +1526,7 @@
           {
             "name": "status",
             "in": "query",
+            "description": "상태 (REVIEWING, MATCHED, REJECTED)",
             "required": false,
             "schema": {
               "type": "string",
@@ -1427,6 +1541,7 @@
           {
             "name": "startDate",
             "in": "query",
+            "description": "제작 시작 날짜",
             "required": false,
             "schema": {
               "type": "string",
@@ -1436,6 +1551,7 @@
           {
             "name": "endDate",
             "in": "query",
+            "description": "제작 마감 날짜",
             "required": false,
             "schema": {
               "type": "string",
@@ -1592,6 +1708,130 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/brands/{brandId}/existing-campaigns": {
+      "get": {
+        "tags": [
+          "Brand-Campain"
+        ],
+        "summary": "브랜드의 기존 캠페인 제안 목록 조회 API by 박지영",
+        "description": "브랜드의 기존 캠페인 목록을 조회합니다.\n\n캠페인 제안(기존 캠페인 선택) 시 사용되는 API입니다.\n",
+        "operationId": "getExistingCampaigns",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "description": "브랜드 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseBrandExistingCampaignResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/brands/{brandId}/campaigns": {
+      "get": {
+        "tags": [
+          "Brand-Campain"
+        ],
+        "summary": "브랜드의 캠페인 내역 조회 API by 박지영",
+        "description": "브랜드의 캠페인을 조회합니다.\n\n마지막으로 조회된 캠페인의 id를 cursor로 사용하는 페이징 방식입니다.\n- 최초 조회 시 cursor 없이 요청합니다.\n- 이후 조회 시 응답으로 받은 nextCursor 값을 cursor로 전달합니다.\n- 정렬 조건 : UPCOMING /RECRUITING → 모집 시작 날짜 기준, CLOSED → 모집 끝나는 날짜 기준\n\n캠페인 모집 상태는 다음 중 하나로 응답됩니다.\n- UPCOMING   : 모집 예정\n- CLOSED     : 완료\n❗️ (수정사항 260201 : 진행중은 따로 조회한다고 PM 님께 답변 받아서, 진행 중 상태를 제외했습니다.  ❗️\n",
+        "operationId": "getBrandCampaigns",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "description": "브랜드 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseBrandCampaignSliceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/brands/{brandId}/campaigns/recruiting": {
+      "get": {
+        "tags": [
+          "Brand-Campain"
+        ],
+        "summary": "브랜드의 진행 중인 캠페인 조회 API by 박지영",
+        "description": "해당 브랜드의 현재 모집 중인 캠페인 목록을 조회합니다. (Day 남은 일수 포함)\n\n- 모집 상태가 RECRUITING 인 캠페인만 조회됩니다.\n- 브랜드 홈 상단 '진행 중인 캠페인' 영역에 사용됩니다.\n",
+        "operationId": "getRecruitingCampaigns",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "description": "브랜드 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseBrandRecruitingCampaignResponse"
                 }
               }
             }
@@ -1777,91 +2017,149 @@
           }
         }
       },
-      "BeautyDto": {
+      "AverageAudienceDto": {
         "type": "object",
         "properties": {
-          "interests": {
+          "videoLengthTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "functions": {
+          "videoViewsTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
-          },
-          "skinType": {
-            "type": "string"
-          },
-          "skinTone": {
-            "type": "string"
-          },
-          "makeupStyle": {
-            "type": "string"
           }
         }
       },
-      "ContentStyleDto": {
+      "BeautyDto": {
         "type": "object",
         "properties": {
-          "avgVideoLength": {
-            "type": "string"
+          "interestStyleTags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           },
-          "avgViews": {
-            "type": "string"
+          "prefferedFunctionTags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           },
-          "format": {
-            "type": "string"
+          "skinTypeTags": {
+            "type": "integer",
+            "format": "int32"
           },
-          "type": {
-            "type": "string"
+          "skinToneTags": {
+            "type": "integer",
+            "format": "int32"
           },
-          "contributionLevel": {
-            "type": "string"
+          "makeupStyleTags": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ContentDto": {
+        "type": "object",
+        "properties": {
+          "sns": {
+            "$ref": "#/components/schemas/SnsDto"
           },
-          "usageCoverage": {
-            "type": "string"
+          "typeTags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "toneTags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "prefferedInvolvementTags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "prefferedCoverageTags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       },
       "FashionDto": {
         "type": "object",
         "properties": {
-          "styles": {
+          "interestStyleTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "items": {
+          "preferredItemTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "preferredBrands": {
+          "preferredBrandTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
+          },
+          "heightTag": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "weightTypeTag": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "topSizeTag": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bottomSizeTag": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
       "MainAudienceDto": {
         "type": "object",
         "properties": {
-          "sex": {
+          "genderTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "age": {
+          "ageTags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         }
@@ -1869,51 +2167,14 @@
       "MatchRequestDto": {
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "brandId": {
-            "type": "string"
-          },
-          "sex": {
-            "type": "string"
-          },
-          "age": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "height": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "$ref": "#/components/schemas/SizeDto"
-          },
           "beauty": {
             "$ref": "#/components/schemas/BeautyDto"
           },
           "fashion": {
             "$ref": "#/components/schemas/FashionDto"
           },
-          "sns": {
-            "$ref": "#/components/schemas/SnsDto"
-          }
-        }
-      },
-      "SizeDto": {
-        "type": "object",
-        "properties": {
-          "upper": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "bottom": {
-            "type": "integer",
-            "format": "int32"
+          "content": {
+            "$ref": "#/components/schemas/ContentDto"
           }
         }
       },
@@ -1926,8 +2187,8 @@
           "mainAudience": {
             "$ref": "#/components/schemas/MainAudienceDto"
           },
-          "contentStyle": {
-            "$ref": "#/components/schemas/ContentStyleDto"
+          "averageAudience": {
+            "$ref": "#/components/schemas/AverageAudienceDto"
           }
         }
       },
@@ -1939,6 +2200,9 @@
             "format": "int64"
           },
           "brandName": {
+            "type": "string"
+          },
+          "logoUrl": {
             "type": "string"
           },
           "matchingRatio": {
@@ -2080,8 +2344,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "format": "uuid"
+            "type": "integer",
+            "format": "int64"
           },
           "customValue": {
             "type": "string"
@@ -2390,7 +2654,8 @@
             "enum": [
               "UPLOADED",
               "READY",
-              "FAILED"
+              "FAILED",
+              "DELETE_PENDING"
             ]
           },
           "createdAt": {
@@ -2413,6 +2678,134 @@
           },
           "result": {
             "$ref": "#/components/schemas/AttachmentUploadResponse"
+          }
+        }
+      },
+      "BeautyTypeUpdate": {
+        "type": "object",
+        "properties": {
+          "skinType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "skinBrightness": {
+            "type": "string"
+          },
+          "makeupStyle": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interestCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interestFunctions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ContentsTypeUpdate": {
+        "type": "object",
+        "properties": {
+          "viewerGender": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "viewerAge": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avgVideoLength": {
+            "type": "string"
+          },
+          "avgViews": {
+            "type": "string"
+          },
+          "contentFormats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contentTones": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "desiredInvolvement": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "desiredUsageScope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FashionTypeUpdate": {
+        "type": "object",
+        "properties": {
+          "bodyStats": {
+            "type": "string"
+          },
+          "bodyShape": {
+            "type": "string"
+          },
+          "topSize": {
+            "type": "string"
+          },
+          "bottomSize": {
+            "type": "string"
+          },
+          "interestFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interestStyles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interestBrands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MyFeatureUpdateRequestDto": {
+        "type": "object",
+        "properties": {
+          "beautyType": {
+            "$ref": "#/components/schemas/BeautyTypeUpdate"
+          },
+          "fashionType": {
+            "$ref": "#/components/schemas/FashionTypeUpdate"
+          },
+          "contentsType": {
+            "$ref": "#/components/schemas/ContentsTypeUpdate"
           }
         }
       },
@@ -2908,8 +3301,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "format": "uuid"
+            "type": "integer",
+            "format": "int64"
           },
           "name": {
             "type": "string"
@@ -2924,6 +3317,9 @@
             "format": "int64"
           },
           "brandName": {
+            "type": "string"
+          },
+          "brandLogoUrl": {
             "type": "string"
           },
           "brandMatchingRatio": {
@@ -3193,7 +3589,8 @@
             "enum": [
               "UPLOADED",
               "READY",
-              "FAILED"
+              "FAILED",
+              "DELETE_PENDING"
             ]
           }
         }
@@ -3403,8 +3800,8 @@
         "type": "object",
         "properties": {
           "proposalId": {
-            "type": "string",
-            "format": "uuid"
+            "type": "integer",
+            "format": "int64"
           },
           "brandId": {
             "type": "integer",
@@ -3476,8 +3873,8 @@
             "format": "int64"
           },
           "proposalId": {
-            "type": "string",
-            "format": "uuid"
+            "type": "integer",
+            "format": "int64"
           },
           "brandName": {
             "type": "string"
@@ -3861,6 +4258,163 @@
           },
           "action": {
             "$ref": "#/components/schemas/ActionDto"
+          }
+        }
+      },
+      "BrandExistingCampaignResponse": {
+        "type": "object",
+        "properties": {
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignItem"
+            }
+          }
+        }
+      },
+      "CampaignItem": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomResponseBrandExistingCampaignResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/BrandExistingCampaignResponse"
+          }
+        }
+      },
+      "BrandCampaignResponseDto": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "recruitStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "recruitEndDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "UPCOMING",
+              "RECRUITING",
+              "CLOSED"
+            ]
+          }
+        }
+      },
+      "BrandCampaignSliceResponse": {
+        "type": "object",
+        "properties": {
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrandCampaignResponseDto"
+            }
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CustomResponseBrandCampaignSliceResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/BrandCampaignSliceResponse"
+          }
+        }
+      },
+      "BrandRecruitingCampaignResponse": {
+        "type": "object",
+        "properties": {
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignCard"
+            }
+          }
+        }
+      },
+      "CampaignCard": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "brandName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "recruitQuota": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rewardAmount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "dday": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CustomResponseBrandRecruitingCampaignResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/BrandRecruitingCampaignResponse"
           }
         }
       },

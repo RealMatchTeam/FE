@@ -56,17 +56,16 @@ export default function CampaignContent() {
         navigate(`/matching/campaign?type=${newCategory}`);
     };
 
-    // 카테고리 + 검색어 필터링
+    // 검색어 필터링 (카테고리는 API에서 이미 필터링됨)
     const filteredCampaigns = useMemo(() => {
         return campaigns.filter(campaign => {
-            const matchesCategory = campaign.category === category;
             const campaignTitle = campaign.title || campaign.name || "";
             const matchesSearch = deferredKeyword === "" ||
                 campaignTitle.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
                 campaign.brandName.toLowerCase().includes(deferredKeyword.toLowerCase());
-            return matchesCategory && matchesSearch;
+            return matchesSearch;
         });
-    }, [campaigns, category, deferredKeyword]);
+    }, [campaigns, deferredKeyword]);
 
     const toggleLike = (id: number) => {
         setCampaigns(prev => prev.map(campaign =>

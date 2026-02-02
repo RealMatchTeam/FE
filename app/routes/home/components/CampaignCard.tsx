@@ -9,16 +9,16 @@ type Props = {
   item: CampaignItem;
   variant: "top" | "popular";
   onClick?: () => void;
+  onLikeToggle?: (id: string, newValue: boolean) => void;
 };
 
-export default function CampaignCard({ item, variant, onClick }: Props) {
+export default function CampaignCard({ item, variant, onClick, onLikeToggle }: Props) {
   const rightText = item.progressText ? `${item.progressText}명` : "";
 
   return (
-    <button
-      type="button"
+    <div
       onClick={onClick}
-      className="w-[118px] shrink-0 text-left"
+      className="w-[118px] shrink-0 cursor-pointer text-left"
     >
       <div className="relative aspect-square rounded-2xl border border-black/5 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.06)]">
         <div className="absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between">
@@ -27,10 +27,12 @@ export default function CampaignCard({ item, variant, onClick }: Props) {
             {item.ddayLabel ? <BadgePill text={item.ddayLabel} /> : null}
           </div>
 
-          <HeartButton
-            defaultPressed={!!item.isLiked}
-            onChange={(v) => console.log("toggle like campaign", item.id, v)}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <HeartButton
+              defaultPressed={!!item.isLiked}
+              onChange={(newValue) => onLikeToggle?.(item.id, newValue)}
+            />
+          </div>
         </div>
 
         <div className="flex h-full items-center justify-center px-3">
@@ -62,6 +64,6 @@ export default function CampaignCard({ item, variant, onClick }: Props) {
           </div>
         ) : null}
       </div>
-    </button>
+    </div>
   );
 }
