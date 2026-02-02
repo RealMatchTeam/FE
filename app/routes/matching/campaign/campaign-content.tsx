@@ -7,11 +7,10 @@ import CampaignFilterBar from "./components/CampaignFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import { tokenStorage } from "../../../lib/token";
 import MainIcon from "../../../assets/MainIcon.svg";
 import MiniLogo from "../../../assets/logo/mini-logo.svg";
 import Button from "../../../components/common/Button";
-import { getMatchingCampaigns, MatchingTestRequiredError, type MatchingCampaign } from "../api/matching";
+import { getMatchingCampaigns, getTagNamesByCategory, type MatchingCampaign } from "../api/matching";
 
 export default function CampaignContent() {
     const [searchParams] = useSearchParams();
@@ -30,7 +29,8 @@ export default function CampaignContent() {
     useEffect(() => {
         const fetchMatchingCampaigns = async () => {
             try {
-                const campaigns = await getMatchingCampaigns();
+                const categoryTags = await getTagNamesByCategory(category);
+                const campaigns = await getMatchingCampaigns("MATCH_SCORE", category, categoryTags);
 
                 if (campaigns && campaigns.length > 0) {
                     setCampaigns(campaigns);
@@ -40,20 +40,14 @@ export default function CampaignContent() {
                 }
             } catch (error) {
                 console.error("Failed to fetch matching campaigns:", error);
-
-                // 매칭 검사 필요 에러인 경우
-                if (error instanceof MatchingTestRequiredError) {
-                    setHasMatchingResult(false);
-                } else {
-                    setHasMatchingResult(false);
-                }
+                setHasMatchingResult(false);
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchMatchingCampaigns();
-    }, []);
+    }, [category]);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
@@ -80,10 +74,36 @@ export default function CampaignContent() {
         ));
     };
 
-    const handleFilterApply = (sort: string, tags: string[]) => {
+    const handleFilterApply = async (sort: string, tags: string[]) => {
         setSortOption(sort);
         setSelectedTags(tags);
-        // TODO: 정렬 및 태그 필터 적용 로직
+
+        // 정렬 및 태그 필터 적용하여 캠페인 목록 재조회
+        try {
+            setIsLoading(true);
+
+            // sortBy 변환 (UI 라벨 -> API 파라미터)
+            const sortByMap: Record<string, string> = {
+                "정렬 필터": "MATCH_SCORE",
+                "매칭률 순": "MATCH_SCORE",
+                "인기 순": "POPULARITY",
+                "금액 순": "FEE",
+                "마감 순": "DEADLINE",
+            };
+            const sortBy = sortByMap[sort] || "MATCH_SCORE";
+
+            const tagsToSend = tags.length > 0 ? tags : await getTagNamesByCategory(category);
+
+            const campaigns = await getMatchingCampaigns(sortBy, category, tagsToSend);
+
+            if (campaigns && campaigns.length > 0) {
+                setCampaigns(campaigns);
+            }
+        } catch (error) {
+            console.error("Failed to apply filters:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // 필터 버튼 라벨 생성

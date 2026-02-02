@@ -106,8 +106,8 @@ export default function BrandContent() {
             const sortByMap: Record<string, string> = {
                 "정렬 필터": "MATCH_SCORE",
                 "매칭률 순": "MATCH_SCORE",
-                "인기순": "POPULARITY",
-                "신규순": "NEWEST"
+                "인기 순": "POPULARITY",
+                "신규 순": "NEWEST",
             };
             const sortBy = sortByMap[sort] || "MATCH_SCORE";
 
