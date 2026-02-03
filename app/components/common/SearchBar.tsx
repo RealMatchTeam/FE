@@ -20,18 +20,15 @@ export default function SearchBar({ placeholder = "검색", className = "", valu
                 onChange={(e) => onChange(e.target.value)}
                 className="w-full h-10 pl-10 pr-10 text-center text-body2 bg-white border border-gray-200 rounded-[8px] placeholder-text-gray3 focus:outline-none focus:border-core-1 transition-colors"
             />
-            {value && (
-                <button
-                    type="button"
-                    onClick={() => onChange("")}
-                    className="absolute right-3 flex items-center justify-center w-5 h-5 bg-text-gray4 rounded-full text-white cursor-pointer"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            )}
+            <button
+                type="button"
+                onClick={() => onChange("")}
+                className="absolute right-3 flex items-center justify-center w-6 h-6 cursor-pointer z-10"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 13.62L14.32 15.94C14.4667 16.0867 14.6533 16.16 14.88 16.16C15.1067 16.16 15.2933 16.0867 15.44 15.94C15.5867 15.7933 15.66 15.6067 15.66 15.38C15.66 15.1533 15.5867 14.9667 15.44 14.82L13.12 12.5L15.44 10.18C15.5867 10.0333 15.66 9.84666 15.66 9.62C15.66 9.39333 15.5867 9.20667 15.44 9.06C15.2933 8.91333 15.1067 8.84 14.88 8.84C14.6533 8.84 14.4667 8.91333 14.32 9.06L12 11.38L9.68 9.06C9.53333 8.91333 9.34666 8.84 9.12 8.84C8.89333 8.84 8.70666 8.91333 8.56 9.06C8.41333 9.20667 8.34 9.39333 8.34 9.62C8.34 9.84666 8.41333 10.0333 8.56 10.18L10.88 12.5L8.56 14.82C8.41333 14.9667 8.34 15.1533 8.34 15.38C8.34 15.6067 8.41333 15.7933 8.56 15.94C8.70666 16.0867 8.89333 16.16 9.12 16.16C9.34666 16.16 9.53333 16.0867 9.68 15.94L12 13.62ZM12 20.5C10.8933 20.5 9.85333 20.2899 8.88 19.8696C7.90667 19.4493 7.06 18.8795 6.34 18.16C5.62 17.4405 5.05013 16.5939 4.6304 15.62C4.21067 14.6461 4.00053 13.6061 4 12.5C3.99947 11.3939 4.2096 10.3539 4.6304 9.38C5.0512 8.40613 5.62107 7.55947 6.34 6.84C7.05893 6.12053 7.9056 5.55067 8.88 5.1304C9.8544 4.71013 10.8944 4.5 12 4.5C13.1056 4.5 14.1456 4.71013 15.12 5.1304C16.0944 5.55067 16.9411 6.12053 17.66 6.84C18.3789 7.55947 18.9491 8.40613 19.3704 9.38C19.7917 10.3539 20.0016 11.3939 20 12.5C19.9984 13.6061 19.7883 14.6461 19.3696 15.62C18.9509 16.5939 18.3811 17.4405 17.66 18.16C16.9389 18.8795 16.0923 19.4496 15.12 19.8704C14.1477 20.2912 13.1077 20.5011 12 20.5Z" fill="#D4D4D9" />
+                </svg>
+            </button>
         </div>
     );
 }

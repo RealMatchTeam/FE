@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import type { Role } from "~/types/auth";
+import type { Role } from "../types/auth";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
@@ -88,6 +88,22 @@ export const tokenStorage = {
   getProvider: (): string | null => {
     const payload = tokenStorage.decodeAccessToken();
     return payload?.providerId || null;
+  },
+
+  /**
+   * 현재 로그인한 사용자 Email 반환
+   */
+  getEmail: (): string | null => {
+    const payload = tokenStorage.decodeAccessToken();
+    return payload?.email || null;
+  },
+
+  /**
+   * 현재 로그인한 사용자 Name 반환
+   */
+  getName: (): string | null => {
+    const payload = tokenStorage.decodeAccessToken();
+    return payload?.name || null;
   },
 
   /**

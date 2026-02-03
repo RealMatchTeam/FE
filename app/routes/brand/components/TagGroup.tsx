@@ -14,7 +14,7 @@ export default function TagGroup({ label, chips }: Props) {
       <div className="flex flex-wrap gap-2">
         {chips.map((c) => (
           <PillChip key={c} variant="outline">
-            {c}
+            {c.startsWith("#") ? c : `#${c}`}
           </PillChip>
         ))}
       </div>

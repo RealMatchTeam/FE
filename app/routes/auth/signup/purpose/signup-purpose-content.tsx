@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { toast } from "sonner";
 import Button from "../../../../components/common/Button";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { PurposeSection } from "./components/PurposeSection";
@@ -28,7 +29,7 @@ function SignUpPurposeContent() {
 
   const handleNext = async () => {
     if (selectedPurposes.length === 0) {
-      alert("목적을 하나 이상 선택해주세요.");
+      toast.warning("목적을 하나 이상 선택해주세요.");
       return;
     }
 
@@ -51,7 +52,7 @@ function SignUpPurposeContent() {
         .filter((id) => id !== undefined);
 
       if (purposeIds.length === 0) {
-        alert("유효한 목적을 선택해주세요.");
+        toast.warning("유효한 목적을 선택해주세요.");
         return;
       }
 
@@ -61,7 +62,7 @@ function SignUpPurposeContent() {
       const signupData = getSignupData();
 
       if (!signupData) {
-        alert("회원가입 정보가 누락되었습니다. 처음부터 다시 진행해주세요.");
+        toast.error("회원가입 정보가 누락되었습니다. 처음부터 다시 진행해주세요.");
         navigate(`/auth/signup/terms?provider=${provider || "kakao"}`);
         return;
       }
@@ -79,11 +80,11 @@ function SignUpPurposeContent() {
         }
       } else {
         // 회원가입 실패
-        alert(response.message || "회원가입에 실패했습니다.");
+        toast.error(response.message || "회원가입에 실패했습니다.");
       }
     } catch (error) {
       console.error("Signup error:", error);
-      alert("회원가입 중 오류가 발생했습니다.");
+      toast.error("회원가입 중 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
     }

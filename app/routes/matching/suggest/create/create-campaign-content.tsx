@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { createCampaignProposal } from "../../api/matching";
+import { tokenStorage } from "../../../../lib/token";
 import Button from "../../../../components/common/Button";
 import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
 import {
@@ -50,11 +53,13 @@ export default function CreateCampaignContent() {
   const [isSponsorProductSheetOpen, setIsSponsorProductSheetOpen] = useState(false);
   const [isStartDateSheetOpen, setIsStartDateSheetOpen] = useState(false);
   const [isEndDateSheetOpen, setIsEndDateSheetOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 바텀탭 숨기기 (바텀시트 열렸을 때)
   const anySheetOpen = isSheetOpen || isFormatSheetOpen || isCategorySheetOpen ||
     isToneSheetOpen || isInvolvementSheetOpen || isUsageScopeSheetOpen || isSponsorProductSheetOpen ||
-    isStartDateSheetOpen || isEndDateSheetOpen;
+    isStartDateSheetOpen || isEndDateSheetOpen || isConfirmDialogOpen;
   useHideBottomTab(anySheetOpen);
 
   // react-hook-form + zod
@@ -86,8 +91,55 @@ export default function CreateCampaignContent() {
     navigate("/matching/suggest");
   };
 
-  const onSubmit = (data: CampaignFormData) => {
-    console.log("캠페인 제안하기", { type, selectedCampaignIds, data });
+  const onSubmit = () => {
+    // 폼 검증 후 확인 다이얼로그 표시
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+
+      const formData = formValues;
+      const userId = tokenStorage.getUserId();
+
+      if (!userId) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+
+      // TODO: brandId는 어디서 가져올지 확인 필요
+      const brandId = 1; // 임시값
+
+      // API 요청 데이터 구성
+      const requestData = {
+        brandId,
+        creatorId: Number(userId),
+        campaignId: type === "existing" ? selectedCampaignIds[0] : null,
+        campaignName: formData.campaignName || "",
+        description: formData.description || "",
+        formats: formData.format ? [{ id: formData.format }] : [],
+        categories: formData.category ? [{ id: formData.category }] : [],
+        tones: formData.tone ? [{ id: formData.tone }] : [],
+        involvements: formData.involvement ? [{ id: formData.involvement }] : [],
+        usageRanges: formData.usageScope ? [{ id: formData.usageScope }] : [],
+        rewardAmount: Number(formData.fee) || 0,
+        productId: Number(formData.sponsorProduct) || 0,
+        startDate: formData.startDate || "",
+        endDate: formData.endDate || "",
+      };
+
+      await createCampaignProposal(requestData);
+
+      toast.success("캠페인 제안이 완료되었습니다!");
+      navigate("/matching/suggest");
+    } catch (error) {
+      console.error("캠페인 제안 실패:", error);
+      toast.error("캠페인 제안에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+      setIsConfirmDialogOpen(false);
+    }
   };
 
   // 선택된 캠페인 이름 가져오기
@@ -390,6 +442,39 @@ export default function CreateCampaignContent() {
         initialValue={formValues.endDate}
         onSelect={(date) => setValue("endDate", date)}
       />
+
+      {/* 제안 확인 다이얼로그 */}
+      <FilterBottomSheet
+        isOpen={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        className="h-auto"
+      >
+        <div className="px-5 py-6 flex flex-col gap-6">
+          <h3 className="text-title1 text-text-black text-center">
+            제안하시겠습니까?
+          </h3>
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              onClick={() => setIsConfirmDialogOpen(false)}
+              disabled={isSubmitting}
+            >
+              취소
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={handleConfirmSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "제안 중..." : "제안하기"}
+            </Button>
+          </div>
+        </div>
+      </FilterBottomSheet>
     </div>
   );
 }

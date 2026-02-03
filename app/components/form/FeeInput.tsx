@@ -12,15 +12,15 @@ export default function FeeInput({
   unit = "원",
 }: FeeInputProps) {
   return (
-    <div className="flex items-center flex-1 h-[34px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80">
+    <div className="relative flex items-center flex-1 h-[34px] px-4 rounded-md border border-core-2 bg-white/80">
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, ""))}
-        className="flex-1 text-title3 text-text-black placeholder:text-text-gray3 focus:outline-none bg-transparent text-right"
+        className="flex-1 text-title3 text-text-black placeholder:text-text-gray3 focus:outline-none bg-transparent text-right pr-8"
         placeholder={placeholder}
       />
-      <span className="text-title3 text-text-black shrink-0">{unit}</span>
+      <span className="absolute right-4 text-title3 text-text-black shrink-0 pointer-events-none">{unit}</span>
     </div>
   );
 }

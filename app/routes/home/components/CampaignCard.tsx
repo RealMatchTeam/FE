@@ -1,4 +1,3 @@
-// src/routes/_home/components/CampaignCard.tsx
 import type { CampaignItem } from "../types";
 import HeartButton from "./HeartButton";
 import BadgePill from "./BadgePill";
@@ -7,35 +6,31 @@ const PRIMARY = "#5B5DEB";
 
 type Props = {
   item: CampaignItem;
-  variant: "top" | "popular";
   onClick?: () => void;
+  onLikeToggle?: (id: string, newValue: boolean) => void;
 };
 
-export default function CampaignCard({ item, variant, onClick }: Props) {
-  const rightText =
-    variant === "popular"
-      ? `${item.progressText}명`
-      : item.matchRate != null
-        ? `${item.matchRate}%`
-        : "";
+export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
+  const applicantsBadge = item.progressText ? `${item.progressText}명` : "";
 
   return (
-    <button
-      type="button"
+    <div
       onClick={onClick}
-      className="w-[118px] shrink-0 text-left"
+      className="w-[118px] shrink-0 cursor-pointer text-left"
     >
       <div className="relative aspect-square rounded-2xl border border-black/5 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.06)]">
         <div className="absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between">
           <div className="flex max-w-[76px] items-center gap-1 overflow-hidden">
-            {variant === "top" && item.startAt ? <BadgePill text={item.startAt} /> : null}
+            {applicantsBadge ? <BadgePill text={applicantsBadge} /> : null}
             {item.ddayLabel ? <BadgePill text={item.ddayLabel} /> : null}
           </div>
 
-          <HeartButton
-            defaultPressed={!!item.isLiked}
-            onChange={(v) => console.log("toggle like campaign", item.id, v)}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <HeartButton
+              defaultPressed={!!item.isLiked}
+              onChange={(newValue) => onLikeToggle?.(item.id, newValue)}
+            />
+          </div>
         </div>
 
         <div className="flex h-full items-center justify-center px-3">
@@ -55,7 +50,7 @@ export default function CampaignCard({ item, variant, onClick }: Props) {
         <div className="flex items-baseline justify-between">
           <div className="text-[12px] font-semibold text-black/80">{item.brandName}</div>
           <div className="text-[12px] font-semibold" style={{ color: PRIMARY }}>
-            {rightText}
+            {item.matchRate ? `${item.matchRate}%` : ""}
           </div>
         </div>
 
@@ -67,6 +62,6 @@ export default function CampaignCard({ item, variant, onClick }: Props) {
           </div>
         ) : null}
       </div>
-    </button>
+    </div>
   );
 }

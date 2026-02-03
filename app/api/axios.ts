@@ -51,8 +51,8 @@ axiosInstance.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // 401 에러이고, 재시도하지 않은 요청인 경우
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 400 또는 401 에러이고, 재시도하지 않은 요청인 경우
+    if ((error.response?.status === 401 || error.response?.status === 400) && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (!isRefreshing) {
@@ -119,3 +119,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+// apiClient alias for backward compatibility
+export const apiClient = axiosInstance;

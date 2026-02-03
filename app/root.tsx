@@ -6,6 +6,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 import MobileContainer from "./components/layout/MobileContainer";
 import "./globals.css";
 
@@ -45,6 +46,7 @@ export default function Root() {
       <MobileContainer>
         <Outlet />
       </MobileContainer>
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 }

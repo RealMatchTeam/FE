@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import MyPageHome from "./MyPageHome";
+import MyPageHome from "../components/MyPageHome";
 import { useAuthStore } from "../../../stores/auth-store";
 
 export default function MyPageContent() {

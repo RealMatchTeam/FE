@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { NavLink } from 'react-router';
 
 export interface TabItem {
     label: string;
@@ -22,11 +22,10 @@ export default function Tabs({ tabs, activeTab, onTabChange, className = "" }: T
                 // Mode 1: Link-based Tab
                 if (tab.path) {
                     return (
-                        <Link
+                        <NavLink
                             key={tab.value}
                             to={tab.path}
                             className="flex-1 select-none"
-                            activeOptions={{ exact: false }}
                         >
                             {({ isActive }) => (
                                 <div
@@ -39,7 +38,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, className = "" }: T
                                     )}
                                 </div>
                             )}
-                        </Link>
+                        </NavLink>
                     );
                 }
 
