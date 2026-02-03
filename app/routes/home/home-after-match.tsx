@@ -160,7 +160,10 @@ export default function HomeAfterMatchPage() {
                   name: brand.name,
                   logoUrl: brand.logoUrl,
                   matchRate: brand.matchRate,
-                  subText: brand.tags?.join(", ") || "",
+                  subText: (brand.tags ?? [])
+                    .slice(0, 2)
+                    .map((t) => `#${t}`)
+                    .join(" "),
                   badgeText: "모집중",
                   domain: brand.name?.toLowerCase() || "",
                   isLiked: brand.isLiked,

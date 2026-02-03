@@ -33,7 +33,7 @@ export default function BrandDetailContent({ data }: Props) {
           <BrandInfo
             name={data.name}
             matchRate={data.matchRate}
-            hashtags={data.hashtags}
+            hashtags={(data.hashtags ?? []).slice(0, 2)}
             description={data.description}
           />
 

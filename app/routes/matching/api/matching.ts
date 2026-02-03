@@ -1,6 +1,33 @@
 import { apiClient } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
 
+/** ---------------------------------------
+ *  Common response + error helpers
+ *  ------------------------------------- */
+
+type ApiErrorData = { code?: string; message?: string };
+type ApiErrorResponse = { status: number; data?: ApiErrorData };
+type ApiThrown = { response?: ApiErrorResponse };
+
+const isMatchTestNotCompleted = (code?: string, message?: string) => {
+  if (code === "MATCH_TEST_NOT_COMPLETED") return true;
+  // 메시지 기반 판별은 오탐이 많아서 최소한으로만 사용
+  if (!message) return false;
+  return message.includes("매칭 테스트") || message.includes("테스트를 먼저");
+};
+
+// 커스텀 에러 클래스
+export class MatchingTestRequiredError extends Error {
+  constructor(message: string = "매칭 검사를 먼저 진행해주세요") {
+    super(message);
+    this.name = "MatchingTestRequiredError";
+  }
+}
+
+/** ---------------------------------------
+ *  Match analysis
+ *  ------------------------------------- */
+
 // 매칭 분석 결과 조회 응답 타입
 export interface MatchResult {
   userType: string;
@@ -28,8 +55,6 @@ interface MatchResultResponse {
   result: MatchResult;
 }
 
-// ... existing imports
-
 /**
  * 매칭 분석 결과 조회
  * Get /api/v1/matches
@@ -37,17 +62,13 @@ interface MatchResultResponse {
 export const getMatchAnalysis = async (): Promise<MatchResult> => {
   try {
     const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
+    if (!userId) throw new MatchingTestRequiredError();
 
-    const response = await apiClient.get<MatchResultResponse>(`/api/v1/matches`);
+    const response =
+      await apiClient.get<MatchResultResponse>(`/api/v1/matches`);
 
     if (!response.data.isSuccess) {
-      // 매칭 테스트 미완료 에러 체크
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
-        response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
+      if (isMatchTestNotCompleted(response.data.code, response.data.message)) {
         throw new MatchingTestRequiredError();
       }
       throw new Error(response.data.message || "매칭 분석 결과 조회 실패");
@@ -55,26 +76,43 @@ export const getMatchAnalysis = async (): Promise<MatchResult> => {
 
     return response.data.result;
   } catch (error: unknown) {
-    if (error instanceof MatchingTestRequiredError) {
-      throw error;
+    if (error instanceof MatchingTestRequiredError) throw error;
+
+    const axiosError = error as ApiThrown;
+    const code = axiosError.response?.data?.code;
+    const message = axiosError.response?.data?.message;
+    if (isMatchTestNotCompleted(code, message)) {
+      throw new MatchingTestRequiredError();
     }
+
     console.error("매칭 분석 결과 조회 실패:", error);
     throw error;
   }
 };
 
+/** ---------------------------------------
+ *  Matching list types
+ *  ------------------------------------- */
+
 // 매칭 캠페인 응답 타입 (CampaignDto)
+// ✅ Home에서 campaignId를 안정적으로 쓰도록 campaignId/brandId를 같이 둠
 export interface MatchingCampaign {
-  id: number;
+  id: number; // CampaignCard 등 기존 호환용
+  campaignId?: number;
+  brandId?: number;
+
   brandName: string;
   name?: string;
   title?: string;
   campaignName?: string;
   category: string;
+
   manuscriptFee?: number; // reward
   reward?: number;
+
   matchingRatio?: number; // matchRate
   matchRate?: number;
+
   applicants: number;
   isLiked: boolean;
   logoUrl?: string; // brandLogoUrl
@@ -116,30 +154,47 @@ interface MatchingBrandResponse {
 interface MatchCampaignRawItem {
   brandId: number;
   campaignId?: number;
+
   brandName: string;
   campaignName: string;
   category: string;
+
   campaignManuscriptFee: number;
   brandMatchingRatio: number;
+
   campaignTotalCurrentRecruit: number;
   campaignTotalRecruit: number;
+
   brandIsLiked: boolean;
   brandLogoUrl: string;
+
   campaignDDay: number;
   campaignDetail?: string;
 }
 
+// ✅ 서버 응답 키(brandLogoUrl/brandMatchingRatio/brandIsLike/brandTags)를 반영
 interface MatchBrandRawItem {
   brandId: number;
   brandName: string;
-  logoUrl: string;
-  matchingRatio: number;
+
+  brandLogoUrl?: string;
+  brandMatchingRatio?: number;
+  brandIsLike?: boolean;
+  brandTags?: string[];
+  brandIsRecruiting?: boolean;
+
+  // fallback (환경/버전 차이를 대비)
+  logoUrl?: string;
+  matchingRatio?: number;
   brandIsLiked?: boolean;
   category?: string;
   tags?: string[];
 }
 
-// 브랜드 필터 타입
+/** ---------------------------------------
+ *  Brand filter DTOs
+ *  ------------------------------------- */
+
 export interface CategoryDto {
   categoryId: number;
   categoryName: string;
@@ -178,13 +233,9 @@ interface BrandFilterResponse {
   result: BrandFilterResponseDto[];
 }
 
-// 커스텀 에러 클래스
-export class MatchingTestRequiredError extends Error {
-  constructor(message: string = "매칭 검사를 먼저 진행해주세요") {
-    super(message);
-    this.name = "MatchingTestRequiredError";
-  }
-}
+/** ---------------------------------------
+ *  Matching campaigns
+ *  ------------------------------------- */
 
 /**
  * 매칭 캠페인 목록 조회
@@ -201,76 +252,75 @@ export const getMatchingCampaigns = async (
   tags?: string[],
   keyword?: string,
   page: number = 0,
-  size: number = 20
+  size: number = 20,
 ): Promise<{ campaigns: MatchingCampaign[]; count: number }> => {
   try {
     const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
+    if (!userId) throw new MatchingTestRequiredError();
 
     const params: Record<string, string | number | string[]> = {
       sortBy,
       category,
       page,
-      size
+      size,
     };
-
-    if (tags && tags.length > 0) {
-      params.tags = tags;
-    }
-
-    if (keyword) {
-      params.keyword = keyword;
-    }
+    if (tags && tags.length > 0) params.tags = tags;
+    if (keyword) params.keyword = keyword;
 
     const response = await apiClient.get<MatchingCampaignResponse>(
       `/api/v1/matches/campaigns`,
-      { params }
+      { params },
     );
 
     if (!response.data.isSuccess) {
-      // 매칭 테스트 미완료 에러 체크
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
-        response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
+      if (isMatchTestNotCompleted(response.data.code, response.data.message)) {
         throw new MatchingTestRequiredError();
       }
       throw new Error(response.data.message || "캠페인 목록 조회 실패");
     }
 
-    // API 응답 필드를 인터페이스 형식으로 변환
-    const campaigns = (response.data.result.brands || []).map((item) => ({
-      id: item.brandId || item.campaignId || 0,
-      brandName: item.brandName,
-      name: item.campaignName || item.campaignDetail,
-      title: item.campaignName || item.campaignDetail,
-      campaignName: item.campaignName,
-      category: category,
-      manuscriptFee: item.campaignManuscriptFee,
-      reward: item.campaignManuscriptFee,
-      matchingRatio: item.brandMatchingRatio || 0,
-      matchRate: item.brandMatchingRatio || 0,
-      applicants: item.campaignTotalRecruit || 0,
-      isLiked: item.brandIsLiked || false,
-      logoUrl: item.brandLogoUrl,
-      dDay: item.campaignDDay
-    }));
+    const campaigns = (response.data.result.brands || []).map((item) => {
+      const campaignId = item.campaignId ?? 0;
+
+      return {
+        // ✅ 기존 호환: id는 "campaignId" 우선 (brandId 우선이면 상세/좋아요가 깨짐)
+        id: campaignId || 0,
+        campaignId: item.campaignId,
+        brandId: item.brandId,
+
+        brandName: item.brandName,
+        name: item.campaignName || item.campaignDetail,
+        title: item.campaignName || item.campaignDetail,
+        campaignName: item.campaignName,
+
+        category,
+
+        manuscriptFee: item.campaignManuscriptFee,
+        reward: item.campaignManuscriptFee,
+
+        matchingRatio: item.brandMatchingRatio || 0,
+        matchRate: item.brandMatchingRatio || 0,
+
+        // NOTE: 기존 코드 유지 (필요하면 currentRecruit로 바꾸기)
+        applicants: item.campaignTotalRecruit || 0,
+
+        isLiked: item.brandIsLiked || false,
+        logoUrl: item.brandLogoUrl,
+        dDay: item.campaignDDay,
+      };
+    });
 
     return {
       campaigns,
-      count: response.data.result.count || 0
+      count: response.data.result.count || 0,
     };
   } catch (error: unknown) {
-    if (error instanceof MatchingTestRequiredError) {
-      throw error;
-    }
+    if (error instanceof MatchingTestRequiredError) throw error;
 
-    const axiosError = error as { response?: { status: number; data?: { message?: string } } };
-    if (axiosError.response?.status === 404 ||
-      axiosError.response?.status === 400 ||
-      axiosError.response?.data?.message?.includes("매칭") ||
-      axiosError.response?.data?.message?.includes("테스트")) {
+    const axiosError = error as ApiThrown;
+    const code = axiosError.response?.data?.code;
+    const message = axiosError.response?.data?.message;
+    if (isMatchTestNotCompleted(code, message)) {
       throw new MatchingTestRequiredError();
     }
 
@@ -278,6 +328,10 @@ export const getMatchingCampaigns = async (
     throw error;
   }
 };
+
+/** ---------------------------------------
+ *  Matching brands
+ *  ------------------------------------- */
 
 /**
  * 매칭 브랜드 목록 조회
@@ -288,72 +342,95 @@ export const getMatchingCampaigns = async (
 export const getMatchingBrands = async (
   sortBy: string = "MATCH_SCORE",
   category: string = "ALL",
-  tags?: string[]
+  tags?: string[],
 ): Promise<{ brands: MatchingBrand[]; count: number }> => {
   try {
     const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
+    if (!userId) throw new MatchingTestRequiredError();
 
-    const params: Record<string, string | number | string[]> = { sortBy, category };
-    if (tags && tags.length > 0) {
-      params.tags = tags;
-    }
+    const params: Record<string, string | number | string[]> = {
+      sortBy,
+      category,
+    };
+    if (tags && tags.length > 0) params.tags = tags;
 
     const response = await apiClient.get<MatchingBrandResponse>(
       `/api/v1/matches/brands`,
-      { params }
+      { params },
     );
 
     if (!response.data.isSuccess) {
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
-        response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
+      if (isMatchTestNotCompleted(response.data.code, response.data.message)) {
         throw new MatchingTestRequiredError();
       }
       throw new Error(response.data.message || "브랜드 목록 조회 실패");
     }
 
-    const brands = (response.data.result.brands || []).map((item) => ({
-      id: item.brandId,
-      name: item.brandName,
-      logoUrl: item.logoUrl,
-      matchRate: item.matchingRatio || 0,
-      matchingRatio: item.matchingRatio,
-      isLiked: item.brandIsLiked || false,
-      category: item.category || category,
-      tags: item.tags || []
-    }));
+    // ✅ 서버 응답 키 mismatch 해결: brandLogoUrl/brandMatchingRatio/brandIsLike/brandTags
+    const brands = (response.data.result.brands || []).map((item) => {
+      const matchingRatio = item.brandMatchingRatio ?? item.matchingRatio ?? 0;
+
+      return {
+        id: item.brandId,
+        name: item.brandName,
+
+        logoUrl: item.brandLogoUrl ?? item.logoUrl,
+
+        matchRate: matchingRatio,
+        matchingRatio,
+
+        isLiked: item.brandIsLike ?? item.brandIsLiked ?? false,
+
+        category: item.category || category,
+
+        tags: item.brandTags ?? item.tags ?? [],
+      };
+    });
 
     return {
       brands,
-      count: response.data.result.count || 0
+      count: response.data.result.count || 0,
     };
   } catch (error: unknown) {
-    if (error instanceof MatchingTestRequiredError) {
-      throw error;
-    }
+    if (error instanceof MatchingTestRequiredError) throw error;
 
-    const axiosError = error as { response?: { status: number; data?: { message?: string } } };
-    if (axiosError.response?.status === 404 ||
-      axiosError.response?.status === 400 ||
-      axiosError.response?.data?.message?.includes("매칭") ||
-      axiosError.response?.data?.message?.includes("테스트")) {
+    // ✅ 여기서 400/404를 매칭테스트 미완료로 뭉뚱그리면 디버깅이 막힘
+    const axiosError = error as ApiThrown;
+    const status = axiosError.response?.status;
+    const code = axiosError.response?.data?.code;
+    const message = axiosError.response?.data?.message;
+
+    if (isMatchTestNotCompleted(code, message)) {
       throw new MatchingTestRequiredError();
     }
 
-    console.error("매칭 브랜드 조회 실패:", error);
+    // 인증 문제는 원인 파악이 쉽도록 분리
+    if (status === 401 || status === 403) {
+      throw new Error("로그인이 필요하거나 권한이 없습니다.");
+    }
+
+    console.error("매칭 브랜드 조회 실패:", {
+      status,
+      code,
+      message,
+      raw: axiosError.response?.data,
+    });
     throw error;
   }
 };
+
+/** ---------------------------------------
+ *  Brand filters
+ *  ------------------------------------- */
 
 /**
  * 브랜드 필터 옵션 조회
  */
 export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
   try {
-    const response = await apiClient.get<BrandFilterResponse>('/api/v1/brands/filters');
+    const response = await apiClient.get<BrandFilterResponse>(
+      "/api/v1/brands/filters",
+    );
 
     if (!response.data.isSuccess) {
       throw new Error(response.data.message || "브랜드 필터 조회 실패");
@@ -365,6 +442,10 @@ export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
     throw error;
   }
 };
+
+/** ---------------------------------------
+ *  Brand like
+ *  ------------------------------------- */
 
 // 브랜드 좋아요 응답 타입
 export interface BrandLikeResponseDto {
@@ -382,7 +463,7 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   try {
     const response = await apiClient.post<BrandLikeResponse>(
       `/api/v1/brands/${brandId}/like`,
-      {} // 빈 객체 body 추가
+      {}, // 빈 객체 body 추가
     );
 
     if (!response.data.isSuccess) {
@@ -397,20 +478,22 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   }
 };
 
+/** ---------------------------------------
+ *  Tag names (stub)
+ *  ------------------------------------- */
+
 /**
  * 카테고리별 태그 이름 가져오기
- * @param category 카테고리 (BEAUTY, FASHION 등)
  * @returns 태그 이름 배열
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getTagNamesByCategory = async (_category: string): Promise<string[]> => {
-  // 카테고리별로 기본 태그를 반환하여 모든 태그 포함
-  // 실제로는 API에서 카테고리별 태그를 가져와야 할 수 있음
+export const getTagNamesByCategory = async (): Promise<string[]> => {
   return [];
 };
 
+/** ---------------------------------------
+ *  Campaign proposal
+ *  ------------------------------------- */
 
-// 캠페인 제안 요청 타입
 export interface CreateCampaignProposalRequest {
   brandId: number;
   creatorId: number;
@@ -428,7 +511,6 @@ export interface CreateCampaignProposalRequest {
   endDate: string;
 }
 
-// 캠페인 제안 응답 타입
 interface CreateCampaignProposalResponse {
   isSuccess: boolean;
   code: string;
@@ -441,11 +523,13 @@ interface CreateCampaignProposalResponse {
 /**
  * 캠페인 제안하기 (역제안)
  */
-export const createCampaignProposal = async (data: CreateCampaignProposalRequest): Promise<number> => {
+export const createCampaignProposal = async (
+  data: CreateCampaignProposalRequest,
+): Promise<number> => {
   try {
     const response = await apiClient.post<CreateCampaignProposalResponse>(
       "/api/v1/campaigns/proposal",
-      data
+      data,
     );
 
     if (!response.data.isSuccess) {
@@ -459,7 +543,10 @@ export const createCampaignProposal = async (data: CreateCampaignProposalRequest
   }
 };
 
-// 매칭 테스트 요청 DTO
+/** ---------------------------------------
+ *  Match test request
+ *  ------------------------------------- */
+
 export interface MatchRequestDto {
   userId: string | number;
   sex: string;
@@ -503,11 +590,13 @@ export interface MatchRequestDto {
  * 매칭 테스트 결과 분석 요청
  * POST /api/v1/matches
  */
-export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> => {
+export const analyzeMatch = async (
+  data: MatchRequestDto,
+): Promise<MatchResult> => {
   try {
     const response = await apiClient.post<MatchResultResponse>(
       "/api/v1/matches",
-      data
+      data,
     );
 
     if (!response.data.isSuccess) {
