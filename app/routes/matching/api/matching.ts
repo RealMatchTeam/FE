@@ -94,6 +94,7 @@ export interface MatchingBrand {
   isLiked: boolean;
   category: string;
   tags?: string[];
+  isRecruiting?: boolean;
 }
 
 interface MatchingCampaignResponse {
@@ -135,11 +136,12 @@ interface MatchCampaignRawItem {
 interface MatchBrandRawItem {
   brandId: number;
   brandName: string;
-  logoUrl: string;
-  matchingRatio: number;
+  brandLogoUrl: string;
+  brandMatchingRatio: number;
   brandIsLiked?: boolean;
+  brandIsRecruiting?: boolean;
   category?: string;
-  tags?: string[];
+  brandTags?: string[];
 }
 
 // 브랜드 필터 타입
@@ -332,12 +334,13 @@ export const getMatchingBrands = async (
     const brands = (response.data.result.brands || []).map((item) => ({
       id: item.brandId,
       name: item.brandName,
-      logoUrl: item.logoUrl,
-      matchRate: item.matchingRatio || 0,
-      matchingRatio: item.matchingRatio,
+      logoUrl: item.brandLogoUrl,
+      matchRate: item.brandMatchingRatio || 0,
+      matchingRatio: item.brandMatchingRatio,
       isLiked: item.brandIsLiked || false,
       category: item.category || category,
-      tags: item.tags || [],
+      tags: item.brandTags || [],
+      isRecruiting: item.brandIsRecruiting || false
     }));
 
     return {
@@ -467,8 +470,8 @@ export const createCampaignProposal = async (
 ): Promise<number> => {
   try {
     const response = await axiosInstance.post<CreateCampaignProposalResponse>(
-      "/api/v1/campaigns/proposal",
-      data,
+      "/api/v1/campaign/request",
+      data
     );
 
     if (!response.data.isSuccess) {
