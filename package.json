@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "pnpm run watch-routes & vite",
+    "build": "pnpm run generate-routes && tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-routes": "tsr generate --routesDirectory src/routes --generatedRouteTree src/routeTree.gen.ts",
+    "watch-routes": "tsr watch --routesDirectory src/routes --generatedRouteTree src/routeTree.gen.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -29,6 +31,7 @@
     "@babel/plugin-bugfix-firefox-class-in-computed-class-key": "^7.28.5",
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.18",
+    "@tanstack/router-cli": "^1.157.16",
     "@tanstack/router-devtools": "^1.145.7",
     "@tanstack/router-plugin": "^1.145.7",
     "@types/node": "^24.10.1",

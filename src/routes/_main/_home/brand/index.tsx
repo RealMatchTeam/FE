@@ -1,16 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import BrandDetailContent from "./brand-detail-content";
 import type { BrandDomain } from "./types";
 import { useBrandDetail } from "./query";
-import BrandDetailContent from "./brand-detail-content";
 
 export const Route = createFileRoute("/_main/_home/brand/")({
   validateSearch: (search: Record<string, unknown>) => {
     const brandId =
-      typeof search.brandId === "string" && search.brandId.length > 0
-        ? search.brandId
-        : "beplain";
+      typeof search.brandId === "string" ? search.brandId : "beplain";
 
-    const domain: BrandDomain | undefined =
+    const domain =
       search.domain === "beauty" || search.domain === "fashion"
         ? (search.domain as BrandDomain)
         : undefined;
@@ -22,7 +20,6 @@ export const Route = createFileRoute("/_main/_home/brand/")({
 
 function BrandDetailPage() {
   const { brandId, domain } = Route.useSearch();
-  console.log("BRAND SEARCH", brandId, domain);
   const { data, isLoading, isError } = useBrandDetail(brandId, domain);
 
   if (isLoading) {
