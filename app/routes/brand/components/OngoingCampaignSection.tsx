@@ -1,5 +1,6 @@
 import CampaignCard from "../../home/components/CampaignCard";
-import { toCampaignItem, type BrandOngoingCampaign } from "./toCampaignItem";
+import { toCampaignItem } from "./toCampaignItem";
+import type { BrandOngoingCampaign } from "../types";
 
 type Props = {
   campaigns: BrandOngoingCampaign[];
@@ -30,11 +31,8 @@ export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
         <div className="flex gap-3">
           {campaigns.map((c) => (
             <CampaignCard
-              key={c.id}
+              key={c.campaignId}
               item={toCampaignItem(c)}
-              variant="popular"
-              showStartAt
-              rightTextMode="matchRate"
             />
           ))}
         </div>

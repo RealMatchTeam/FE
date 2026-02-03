@@ -1,3 +1,4 @@
+import { useState } from "react";
 import BrandHero from "./components/BrandHero";
 import BrandInfo from "./components/BrandInfo";
 import BrandActionBar from "./components/BrandActionBar";
@@ -14,6 +15,12 @@ type Props = {
 };
 
 export default function BrandDetailContent({ data }: Props) {
+  const [historyLimit, setHistoryLimit] = useState(4);
+
+  const handleLoadMoreHistory = () => {
+    setHistoryLimit((prev) => prev + 4);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto min-h-screen max-w-[430px] bg-white">
@@ -113,23 +120,25 @@ export default function BrandDetailContent({ data }: Props) {
             <div className="text-title7 text-text-black">캠페인 내역</div>
 
             <div className="mt-3">
-              {data.histories.map((h) => (
+              {data.histories.slice(0, historyLimit).map((h) => (
                 <HistoryRow key={h.id} item={h} />
               ))}
 
-              <div className="flex items-center border-t border-bluegray-2 py-3">
-                <div className="flex-1" />
-                <div className="w-[140px] shrink-0 text-right">
-                  <button
-                    type="button"
-                    onClick={() => console.log("더보기")}
-                    className="inline-block bg-transparent p-0 text-[13px] font-medium text-text-gray3 outline-none"
-                    aria-label="캠페인 내역 더보기"
-                  >
-                    + 더보기
-                  </button>
+              {historyLimit < data.histories.length && (
+                <div className="flex items-center border-t border-bluegray-2 py-3">
+                  <div className="flex-1" />
+                  <div className="w-[140px] shrink-0 text-right">
+                    <button
+                      type="button"
+                      onClick={handleLoadMoreHistory}
+                      className="inline-block bg-transparent p-0 text-[13px] font-medium text-text-gray3 outline-none"
+                      aria-label="캠페인 내역 더보기"
+                    >
+                      + 더보기
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </section>
         </div>

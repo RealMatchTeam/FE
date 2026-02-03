@@ -33,7 +33,7 @@ export default function BrandInfo({
       </div>
 
       <div className="mt-1 text-[12px] text-text-gray3">
-        {hashtags.join(" ")}
+        {hashtags.map(tag => tag.startsWith("#") ? tag : `#${tag}`).join(" ")}
       </div>
 
       <div className="mt-2 text-[12px] leading-5 text-text-gray2">

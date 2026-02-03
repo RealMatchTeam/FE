@@ -443,26 +443,26 @@
                     ],
                     "categories": [
                       {
-                        "id": 2,
+                        "id": 11,
                         "customValue": "성분 분석 리뷰"
                       },
-                      {
-                        "id": 7
-                      }
-                    ],
-                    "tones": [
-                      {
-                        "id": 3
-                      }
-                    ],
-                    "involvements": [
                       {
                         "id": 5
                       }
                     ],
+                    "tones": [
+                      {
+                        "id": 12
+                      }
+                    ],
+                    "involvements": [
+                      {
+                        "id": 21
+                      }
+                    ],
                     "usageRanges": [
                       {
-                        "id": 6
+                        "id": 26
                       }
                     ],
                     "rewardAmount": 100000,
@@ -521,26 +521,26 @@
                     ],
                     "categories": [
                       {
-                        "id": 2,
+                        "id": 11,
                         "customValue": "성분 분석 리뷰"
                       }
                     ],
                     "tones": [
                       {
-                        "id": 3
+                        "id": 12
                       },
                       {
-                        "id": 4
+                        "id": 13
                       }
                     ],
                     "involvements": [
                       {
-                        "id": 5
+                        "id": 20
                       }
                     ],
                     "usageRanges": [
                       {
-                        "id": 6
+                        "id": 25
                       }
                     ],
                     "rewardAmount": 200000,
@@ -1102,14 +1102,23 @@
         "tags": [
           "Match"
         ],
-        "summary": "매칭 캠페인 목록 조회",
-        "description": "JWT 토큰의 사용자 ID를 기반으로 매칭률이 높은 캠페인 목록을 조회합니다.\n정렬 옵션: MATCH_SCORE(매칭률 순), POPULARITY(인기순), NEWEST(신규순)\n카테고리 필터: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n태그 필터: 뷰티/패션 관련 태그로 필터링\n",
+        "summary": "매칭 캠페인 목록 조회 및 검색",
+        "description": "JWT 토큰의 사용자 ID를 기반으로 매칭 캠페인 목록을 검색하거나 매칭 캠페인 목록을 조회합니다.\n\n**검색**: keyword를 입력하면 캠페인명(title)만 검색합니다. (브랜드명, 설명 등은 검색 대상 제외)\n\n**정렬 옵션**:\n- MATCH_SCORE: 매칭률 순 (동점 시 인기순 우선)\n- POPULARITY: 인기 순 (좋아요 수)\n- REWARD_AMOUNT: 금액 순 (원고료 높은 순)\n- D_DAY: 마감 순 (마감 임박순)\n\n**카테고리 필터**: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n\n**페이지네이션**: page(0부터 시작), size(기본 20)\n",
         "operationId": "getMatchingCampaigns",
         "parameters": [
           {
+            "name": "keyword",
+            "in": "query",
+            "description": "캠페인명 검색어 (캠페인 title만 검색)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "sortBy",
             "in": "query",
-            "description": "정렬 기준 (MATCH_SCORE, POPULARITY, NEWEST)",
+            "description": "정렬 기준 (MATCH_SCORE, POPULARITY, REWARD_AMOUNT, D_DAY)",
             "required": false,
             "schema": {
               "type": "string",
@@ -1117,7 +1126,8 @@
               "enum": [
                 "MATCH_SCORE",
                 "POPULARITY",
-                "NEWEST"
+                "REWARD_AMOUNT",
+                "D_DAY"
               ]
             }
           },
@@ -1147,11 +1157,33 @@
                 "type": "string"
               }
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "페이지 번호 (0부터 시작)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "페이지 크기 (기본 20, 최대 50)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "캠페인 목록 조회 성공",
+            "description": "캠페인 목록 조회 및 검색 성공",
             "content": {
               "*/*": {
                 "schema": {
@@ -2554,7 +2586,7 @@
           "signupPurposeIds": {
             "type": "array",
             "description": "가입 목적 ID 리스트",
-            "example": [1, 2],
+            "example": [1, 2, 3, 6],
             "items": {
               "type": "integer",
               "format": "int64"
@@ -2563,7 +2595,7 @@
           "contentCategoryIds": {
             "type": "array",
             "description": "관심 콘텐츠 카테고리 ID 리스트",
-            "example": [1, 3, 5],
+            "example": [1, 2],
             "items": {
               "type": "integer",
               "format": "int64"
@@ -3336,7 +3368,7 @@
             "type": "integer",
             "format": "int32"
           },
-          "campaignDetail": {
+          "campaignName": {
             "type": "string"
           },
           "campaignDDay": {
@@ -3373,15 +3405,15 @@
       "MatchCampaignResponseDto": {
         "type": "object",
         "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int32"
-          },
           "brands": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CampaignDto"
             }
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

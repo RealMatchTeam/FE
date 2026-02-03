@@ -1,5 +1,6 @@
-import { useState, useMemo, useDeferredValue, useEffect } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import FilterButton from "../../../components/common/FilterButton";
 import BrandCard from "./components/BrandCard";
 import { type BrandCategory } from "../../../data/brand";
@@ -8,50 +9,52 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import MainIcon from "../../../assets/MainIcon.svg";
-import MiniLogo from "../../../assets/logo/mini-logo.svg";
-import Button from "../../../components/common/Button";
-import { getMatchingBrands, toggleBrandLike, MatchingTestRequiredError, type MatchingBrand } from "../api/matching";
+import { getMatchingBrands, toggleBrandLike, type MatchingBrand } from "../api/matching";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
     const category = (searchParams.get("type") || "BEAUTY") as BrandCategory;
     const navigate = useNavigate();
-    const [brands, setBrands] = useState<MatchingBrand[]>([]);
+    const queryClient = useQueryClient();
+
+    // 필터 상태
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    // 검색 상태
     const [searchKeyword, setSearchKeyword] = useState("");
     const deferredKeyword = useDeferredValue(searchKeyword);
-    const [hasMatchingResult, setHasMatchingResult] = useState<boolean | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchMatchingBrands = async () => {
-            try {
-                const { brands } = await getMatchingBrands("MATCH_SCORE", category);
+    // 정렬 옵션 매핑
+    const sortByMap: Record<string, string> = {
+        "정렬 필터": "MATCH_SCORE",
+        "매칭률 순": "MATCH_SCORE",
+        "인기 순": "POPULARITY",
+        "신규 순": "NEWEST",
+    };
+    const sortBy = sortByMap[sortOption] || "MATCH_SCORE";
 
-                if (brands && brands.length > 0) {
-                    setBrands(brands);
-                    setHasMatchingResult(true);
-                } else {
-                    setHasMatchingResult(false);
-                }
-            } catch (error) {
-                console.error("Failed to fetch matching brands:", error);
+    // 데이터 페칭
+    const {
+        data,
+        isLoading,
+        error
+    } = useInfiniteQuery({
+        queryKey: ["matching-brands", category, sortOption, selectedTags],
+        queryFn: async () => {
+            // 페이지네이션 없이 한 번만 호출 
+            const response = await getMatchingBrands(sortBy, category, selectedTags.length > 0 ? selectedTags : undefined);
+            return response;
+        },
+        initialPageParam: 0,
+        getNextPageParam: () => undefined, // 단일 페이지
+        staleTime: 1000 * 60 * 1, // 1분간 캐시 유지
+    });
 
-                // 매칭 검사 필요 에러인 경우
-                if (error instanceof MatchingTestRequiredError) {
-                    setHasMatchingResult(false);
-                } else {
-                    setHasMatchingResult(false);
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchMatchingBrands();
-    }, [category]);
+    const brands = useMemo(() => {
+        return data?.pages.flatMap(page => page.brands) || [];
+    }, [data]);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
@@ -60,7 +63,7 @@ export default function BrandContent() {
         navigate(`/matching/brand?type=${newCategory}`);
     };
 
-    // 검색어 필터링 (카테고리는 API에서 이미 필터링됨)
+    // 검색어 필터링
     const filteredBrands = useMemo(() => {
         return brands.filter(brand => {
             const matchesSearch = deferredKeyword === "" ||
@@ -71,55 +74,48 @@ export default function BrandContent() {
     }, [brands, deferredKeyword]);
 
     const toggleLike = async (id: number) => {
-        try {
-            // 낙관적 업데이트 (UI 먼저 업데이트)
-            setBrands(prev => prev.map(brand =>
-                brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
-            ));
+        const queryKey = ["matching-brands", category, sortOption, selectedTags];
 
-            // API 호출
+        // 낙관적 업데이트
+        queryClient.setQueryData(queryKey, (oldData: { pages: { brands: MatchingBrand[] }[] } | undefined) => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map((page) => ({
+                    ...page,
+                    brands: page.brands.map((brand: MatchingBrand) =>
+                        brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
+                    )
+                }))
+            };
+        });
+
+        try {
             const newLikeStatus = await toggleBrandLike(id);
 
-            // API 응답에 따라 상태 동기화
-            setBrands(prev => prev.map(brand =>
-                brand.id === id ? { ...brand, isLiked: newLikeStatus } : brand
-            ));
+            // API 응답으로 상태 확정
+            queryClient.setQueryData(queryKey, (oldData: { pages: { brands: MatchingBrand[] }[] } | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page) => ({
+                        ...page,
+                        brands: page.brands.map((brand: MatchingBrand) =>
+                            brand.id === id ? { ...brand, isLiked: newLikeStatus } : brand
+                        )
+                    }))
+                };
+            });
         } catch (error) {
             console.error("Failed to toggle brand like:", error);
-            // 에러 발생 시 원래 상태로 복구
-            setBrands(prev => prev.map(brand =>
-                brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
-            ));
+            // 에러 발생 시 롤백
+            queryClient.invalidateQueries({ queryKey });
         }
     };
 
-    const handleFilterApply = async (sort: string, tags: string[]) => {
+    const handleFilterApply = (sort: string, tags: string[]) => {
         setSortOption(sort);
         setSelectedTags(tags);
-
-        // 정렬 및 태그 필터 적용하여 브랜드 목록 재조회
-        try {
-            setIsLoading(true);
-
-            // sortBy 변환 (UI 라벨 -> API 파라미터)
-            const sortByMap: Record<string, string> = {
-                "정렬 필터": "MATCH_SCORE",
-                "매칭률 순": "MATCH_SCORE",
-                "인기 순": "POPULARITY",
-                "신규 순": "NEWEST",
-            };
-            const sortBy = sortByMap[sort] || "MATCH_SCORE";
-
-            const { brands } = await getMatchingBrands(sortBy, category, tags.length > 0 ? tags : undefined);
-
-            if (brands && brands.length > 0) {
-                setBrands(brands);
-            }
-        } catch (error) {
-            console.error("Failed to apply filters:", error);
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     const getSortButtonLabel = () => {
@@ -142,26 +138,18 @@ export default function BrandContent() {
         );
     }
 
-    // 매칭 결과가 없을 때
-    if (hasMatchingResult === false) {
+    // 매칭 결과가 없거나 에러
+    if (error || (brands.length === 0 && !isLoading)) {
+        if (error) console.error("Failed to fetch matching brands:", error);
+
         return (
-            <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-[#E8E8F8] to-white px-6">
-                <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
-                <p className="text-title1 text-text-black text-center mb-2">
-                    매칭된 기업이 없어요
-                </p>
-                <p className="text-body2 text-text-gray3 text-center mb-8">
-                    매칭 검사를 먼저 진행해주세요
-                </p>
-                <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => navigate("/matching/test/step1")}
-                    className="w-full max-w-[300px] flex items-center justify-center gap-2"
-                >
-                    <img src={MiniLogo} alt="logo" className="w-5 h-5" />
-                    매칭 검사하기
-                </Button>
+            <div className="flex flex-col h-full bg-core-2">
+                <div className="flex flex-col items-center justify-center flex-1 bg-gradient-to-b from-[#E8E8F8] to-white px-6">
+                    <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
+                    <p className="text-title1 text-text-black text-center mb-2">
+                        매칭된 기업이 없어요
+                    </p>
+                </div>
             </div>
         );
     }

@@ -13,14 +13,35 @@ interface BrandMakeUpTagDto {
 }
 
 interface BrandOnGoingCampaignDto {
-  campaignId: number;
-  campaignTitle: string;
-  campaignStartDate?: string;
+  brandId: number;
+  brandName: string;
+  recruitingTotalNumber: number;
+  recruitedNumber: number;
+  campaginDescription: string;
+  campaginManuscriptFee: string;
   campaignDDay?: number;
-  campaignMatchingRatio?: number;
-  campaignDescription?: string;
-  campaginManuscriptFee?: string;
-  campaignIsLiked?: boolean;
+  logoUrl?: string;
+  isLiked?: boolean;
+}
+
+// 진행 중인 캠페인 API 응답 (api.md 1839줄)
+interface RecruitingCampaignCardDto {
+  campaignId: number;
+  brandName: string;
+  title: string;
+  recruitQuota: number;
+  rewardAmount: number;
+  imageUrl?: string;
+  dday: number;
+}
+
+interface RecruitingCampaignsApiResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    campaigns: RecruitingCampaignCardDto[];
+  };
 }
 
 interface AvailableSponsorProdDto {
@@ -52,21 +73,96 @@ interface BrandDetailApiResponse {
   result: BrandDetailResponseDto[];
 }
 
+interface SponsorProductListResponseDto {
+  id: number;
+  name: string;
+  thumbnailImageUrl: string;
+  totalCount: number;
+  currentCount: number;
+}
+
+interface SponsorProductListApiResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: SponsorProductListResponseDto[];
+}
+
+interface BrandCampaignResponseDto {
+  campaignId: number;
+  title: string;
+  recruitStartDate: string;
+  recruitEndDate: string;
+  status: "UPCOMING" | "RECRUITING" | "CLOSED";
+}
+
+interface BrandCampaignSliceResponse {
+  campaigns: BrandCampaignResponseDto[];
+  nextCursor?: number;
+}
+
+interface BrandCampaignApiResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: BrandCampaignSliceResponse;
+}
+
+// 날짜 포맷팅 헬퍼
+function formatHistoryDate(campaign: BrandCampaignResponseDto): { text: string; highlight: boolean } {
+  if (campaign.status === "UPCOMING" || campaign.status === "RECRUITING") {
+    const date = new Date(campaign.recruitStartDate);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return {
+      text: `${month}월 ${day}일 진행예정`,
+      highlight: true
+    };
+  } else {
+    const date = new Date(campaign.recruitEndDate);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear().toString().slice(2);
+    return {
+      text: `${month}/${day}/${year} 완료`,
+      highlight: false
+    };
+  }
+}
+
+
 export async function fetchBrandDetail(params: {
   brandId: string;
   domain?: BrandDomain;
 }): Promise<BrandDetailData> {
   const { brandId, domain } = params;
 
-  const response = await apiClient.get<BrandDetailApiResponse>(
-    `/api/v1/brands/${brandId}`
-  );
+  // 네 API 병렬 호출 (상세, 협찬제품, 캠페인 내역, 진행중인 캠페인)
+  const [detailResponse, productsResponse, campaignsResponse, recruitingResponse] = await Promise.all([
+    apiClient.get<BrandDetailApiResponse>(`/api/v1/brands/${brandId}`),
+    // 협찬 가능 제품 리스트 별도 호출 (api.md line 1652)
+    apiClient.get<SponsorProductListApiResponse>(`/api/v1/brands/${brandId}/sponsor-products`),
+    // 캠페인 내역 호출 (api.md line 1785)
+    apiClient.get<BrandCampaignApiResponse>(`/api/v1/brands/${brandId}/campaigns`),
+    // 진행 중인 캠페인 호출 (api.md line 1839)
+    apiClient.get<RecruitingCampaignsApiResponse>(`/api/v1/brands/${brandId}/campaigns/recruiting`)
+  ]);
 
-  if (!response.data.isSuccess || !response.data.result?.length) {
+  if (!detailResponse.data.isSuccess || !detailResponse.data.result?.length) {
     throw new Error("브랜드 상세 조회 실패");
   }
 
-  const data = response.data.result[0];
+  const data = detailResponse.data.result[0];
+
+  // 협찬 제품 리스트
+  const productList = productsResponse.data.isSuccess ? productsResponse.data.result : [];
+
+  // 캠페인 내역 리스트
+  const historyList = campaignsResponse.data.isSuccess ? campaignsResponse.data.result.campaigns : [];
+
+  // 진행 중인 캠페인 리스트
+  const recruitingList = recruitingResponse.data.isSuccess ? recruitingResponse.data.result.campaigns : [];
+
 
   // 태그 섹션 구성
   const tagSections: Array<{ title: string; groups: TagGroup[] }> = [];
@@ -97,7 +193,6 @@ export async function fetchBrandDetail(params: {
     }
   }
 
-  // API 응답을 프론트 타입으로 변환
   return {
     id: brandId,
     domain: domain || "beauty",
@@ -109,21 +204,30 @@ export async function fetchBrandDetail(params: {
     description: data.brandDescription || "",
     categories: data.brandCategory || [],
     tagSections,
-    ongoingCampaigns: (data.brandOnGoingCampaign || []).map((campaign) => ({
-      id: String(campaign.campaignId),
-      brandName: data.brandName,
-      startAt: campaign.campaignStartDate || "",
-      ddayLabel: campaign.campaignDDay ? `D-${campaign.campaignDDay}` : "",
-      matchRate: campaign.campaignMatchingRatio || 0,
-      descText: campaign.campaignDescription || campaign.campaignTitle,
-      rewardText: campaign.campaginManuscriptFee || "",
-      isLiked: campaign.campaignIsLiked || false,
+    ongoingCampaigns: recruitingList.map((campaign) => ({
+      campaignId: campaign.campaignId,
+      brandName: campaign.brandName,
+      title: campaign.title,
+      recruitQuota: campaign.recruitQuota,
+      rewardAmount: campaign.rewardAmount,
+      imageUrl: campaign.imageUrl,
+      dday: campaign.dday,
+      isLiked: false,
     })),
-    products: (data.availableSponsorProd || []).map((product) => ({
-      id: String(product.productId),
-      title: product.productName,
-      imageUrl: product.productImageUrl || "",
+    products: productList.map((product) => ({
+      id: String(product.id),
+      title: product.name,
+      imageUrl: product.thumbnailImageUrl || "",
     })),
-    histories: [], // API에서 제공하지 않음
+    // 캠페인 내역 매핑
+    histories: historyList.map(campaign => {
+      const { text, highlight } = formatHistoryDate(campaign);
+      return {
+        id: String(campaign.campaignId),
+        title: campaign.title,
+        rightText: text,
+        highlight
+      };
+    }),
   };
 }
