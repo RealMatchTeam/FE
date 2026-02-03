@@ -3,6 +3,7 @@ import RealMatchLogo from "../../assets/logo/RealMatchLogo_ex.svg"
 
 type RealMatchHeaderProps = {
   /** 뒤로가기 버튼 노출 여부 */
+  title?: string;
   showBack?: boolean;
   /** 뒤로가기 클릭 시 동작 커스텀 (없으면 navigate({to: ".."}) 시도 후 history.back) */
   onBack?: () => void;

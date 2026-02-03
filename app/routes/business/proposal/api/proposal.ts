@@ -18,8 +18,8 @@ export interface ProposalDetail {
   description: string;
   rewardAmount: number;
   productId: number;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
   status: string;
   refusalReason: string | null;
   contentTags: {
@@ -33,7 +33,6 @@ export interface ProposalDetail {
 
 export const getProposalDetail = async (proposalId: string): Promise<ProposalDetail> => {
   const BASE_URL = "https://api.realmatch.co.kr";
-
   // 1. tokenStorage 유틸을 사용하여 안전하게 토큰을 가져옵니다.
   const token = tokenStorage.getAccessToken();
 
@@ -55,12 +54,14 @@ export const getProposalDetail = async (proposalId: string): Promise<ProposalDet
       return response.data.result;
     }
 
+
     throw new Error(response.data.message || "데이터 로드 실패");
   } catch (error) { // : any 삭제
     if (axios.isAxiosError(error)) { // axios 에러인지 확인하는 가드 추가 (권장)
       if (error.response?.status === 401) {
         console.error("401 에러: 토큰이 유효하지 않거나 로그인이 필요합니다.");
       }
+
     }
     throw error;
   }
@@ -85,7 +86,8 @@ export const getBrandDetail = async (brandId: number | string): Promise<BrandDet
     }
 
     throw new Error(response.data.message || "브랜드 정보 로드 실패");
-  } catch (error) { // : any 삭제
+  } catch (error) {
+
     console.error("브랜드 상세 조회 실패:", error);
     throw error;
   }
