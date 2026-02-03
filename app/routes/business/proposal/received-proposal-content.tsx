@@ -28,7 +28,7 @@ export default function ReceivedProposalContent() {
     // 1. 데이터 패칭 로직
     useEffect(() => {
         const fetchData = async () => {
-            if (!proposalId) return;
+            if (!proposalId || typeof proposalId !== "string") return;
             try {
                 setIsLoading(true);
                 // 1. 제안 상세 정보 가져오기
@@ -59,7 +59,7 @@ export default function ReceivedProposalContent() {
         return tags.map(t => t.name).join(", ");
     };
 
-    // 날짜 포맷 변경 함수 (2026-02-01 -> 2026. 02. 01)
+    // 날짜 포맷 변경 함수
     const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
 
     if (isLoading) return <div className="p-10 text-center text-text-gray3 font-pretendard">로딩 중...</div>;
@@ -142,11 +142,11 @@ export default function ReceivedProposalContent() {
                     <CampaignInfoGroup label="제작 기간">
                         <div className="flex items-center gap-2">
                             <div className="flex-1 h-[36px] flex items-center pl-[16px] bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)]">
-                                {formatDate(proposal.startDate)}
+                                {formatDate(proposal?.startDate || "")}
                             </div>
                             <span className="text-[var(--color-text-gray3)] text-date-separator">~</span>
                             <div className="flex-1 h-[36px] flex items-center pl-[16px] bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)]">
-                                {formatDate(proposal.endDate)}
+                                {formatDate(proposal?.startDate || "")}
                             </div>
                         </div>
                     </CampaignInfoGroup>
