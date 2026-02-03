@@ -34,7 +34,7 @@ export const getMyCollaborations = async (params?: {
   return response.data.result;
 };
 
-export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
+/*export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
   {
     campaignId: 1,
     proposalId: "p1",
@@ -79,4 +79,4 @@ export const MATCHING_DUMMY_DATA: CampaignCollaboration[] = [
     endDate: "2025-02-04",
     type: "SENT",
   },
-];
+];*/

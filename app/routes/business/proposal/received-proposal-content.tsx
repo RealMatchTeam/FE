@@ -17,7 +17,7 @@ import closeIcon from "../../../assets/icon/icon-close.svg";
 
 export default function ReceivedProposalContent() {
     const [searchParams] = useSearchParams();
-    const proposalId = searchParams.get("id");
+    const proposalId = searchParams.get("id") || searchParams.get("proposalId");
 
     const [proposal, setProposal] = useState<ProposalDetail | null>(null);
     const [brand, setBrand] = useState<BrandDetail | null>(null);
@@ -54,8 +54,11 @@ export default function ReceivedProposalContent() {
     const closeModal = () => setModalType("none");
 
     // 태그 배열을 문자열로 변환하는 헬퍼 함수
-    const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
-    
+    const formatTags = (tags: { name: string }[] | undefined | null) => {
+        if (!tags || tags.length === 0) return "정보 없음"; // 데이터가 없을 경우 처리
+        return tags.map(t => t.name).join(", ");
+    };
+
     // 날짜 포맷 변경 함수 (2026-02-01 -> 2026. 02. 01)
     const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
 
@@ -68,9 +71,9 @@ export default function ReceivedProposalContent() {
 
             <main className="flex flex-col bg-[var(--color-bluegray-1)]">
                 <div className="bg-[var(--color-bg-w)] px-4 py-6 flex flex-col gap-2">
-                    <CampaignBrandCard 
-                        showChatSection={false} 
-                        statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"} 
+                    <CampaignBrandCard
+                        showChatSection={false}
+                        statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"}
                         brandName={brand?.brandName}
                         brandTags={brand?.brandTag}
                     />

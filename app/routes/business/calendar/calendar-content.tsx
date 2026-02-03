@@ -11,7 +11,7 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
-import { MATCHING_DUMMY_DATA } from "../calendar/api/calendar";
+//import { MATCHING_DUMMY_DATA } from "../calendar/api/calendar";
 
 
 export default function CalendarContent() {
@@ -35,13 +35,13 @@ export default function CalendarContent() {
 
         if (data && data.length > 0) {
           setCampaigns(data);
-        } else {
+        } /*else {
           // 실제 데이터가 없으면 우리가 만든 MATCHING_DUMMY_DATA를 사용
           setCampaigns(MATCHING_DUMMY_DATA);
-        }
+        }*/
       } catch (error) {
         console.error("데이터 로드 실패, 더미 사용:", error);
-        setCampaigns(MATCHING_DUMMY_DATA);
+        /*setCampaigns(MATCHING_DUMMY_DATA);*/
       } finally {
         setIsLoading(false);
       }
@@ -100,12 +100,17 @@ export default function CalendarContent() {
   });
 
   const handleCardClick = (item: CampaignCollaboration) => {
-    if (item.status === "REJECTED") {
-      navigate(`/rejection?id=${item.campaignId || item.proposalId}`);
-    } else {
-      navigate(`/business/proposal?type=${matchingSubTab}`);
-    }
-  };
+  // 1. 거절된 상태일 경우 거절 사유 페이지로 이동
+  if (item.status === "REJECTED") {
+    navigate(`/rejection?id=${item.campaignId || item.proposalId}`);
+  } 
+  // 2. 그 외(매칭, 검토 중) 상태일 경우 제안 상세 조회 페이지로 이동
+  else {
+    // API 명세에 따른 campaignProposalId (item의 proposalId 혹은 campaignId)를 경로에 전달
+    const proposalId = item.proposalId || item.campaignId;
+    navigate(`/business/proposal?id=${proposalId}`);
+  }
+};
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">

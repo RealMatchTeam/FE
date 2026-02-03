@@ -18,8 +18,8 @@ export interface ProposalDetail {
   description: string;
   rewardAmount: number;
   productId: number;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
   status: string;
   refusalReason: string | null;
   contentTags: {
