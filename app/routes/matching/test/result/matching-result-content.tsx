@@ -1,122 +1,170 @@
-import { useNavigate } from "react-router";
+import { useMemo } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useMatchResultStore } from "../../../../stores/matching-result";
-import MatchResultHeader from "../../../../components/common/RealmatchHeader";
 import MainIcon from "../../../../assets/MainIcon.svg";
 import Button from "../../../../components/common/Button";
 
+type Brand = {
+  brandId: number;
+  brandName: string;
+  matchingRatio: number;
+  logoUrl?: string;
+};
+
+type ApiResult = {
+  userType: string;
+  typeTag: string[];
+  highMatchingBrandList: {
+    count: number;
+    brands: Brand[];
+  };
+};
+
+type LocationState = {
+  apiResult?: ApiResult;
+};
+
 export default function MatchingResultContent() {
   const navigate = useNavigate();
-  const result = useMatchResultStore((s) => s.result);
+  const location = useLocation() as { state: LocationState | null };
+  const [searchParams] = useSearchParams();
+  const setResult = useMatchResultStore((s) => s.setResult);
 
-  // 결과가 없으면 매칭 테스트로 리다이렉트
-  if (!result) {
-    return (
-      <div className="min-h-screen bg-linear-to-b from-[#F6F7FF] to-white flex flex-col items-center justify-center px-6">
-        <p className="text-[16px] text-[#5B5D6B] mb-4">매칭 결과가 없습니다.</p>
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={() => navigate("/matching/test/step1")}
-        >
-          매칭 테스트 하기
-        </Button>
-      </div>
-    );
-  }
+  const data = useMemo(() => {
+    const apiResult = location.state?.apiResult;
 
-  const { summary, apiResult } = result;
-  const brands = apiResult?.highMatchingBrandList.brands || [];
-  const topBrands = brands.slice(0, 3);
+    // userName은 아직 API에 없으므로 기존대로 query/default 사용
+    const userName = searchParams.get("userName") ?? "비비";
+
+    if (apiResult) {
+      const userType = apiResult.userType;
+      const tags = apiResult.typeTag.slice(0, 3);
+      const brands = [...apiResult.highMatchingBrandList.brands]
+        .sort((a, b) => b.matchingRatio - a.matchingRatio)
+        .slice(0, 3);
+
+      return { userName, userType, tags, brands };
+    }
+
+    // fallback (직접 진입/새로고침으로 state 사라진 경우)
+    const userType = searchParams.get("userType") ?? "섬세한 설계자";
+    const tags = searchParams
+      .get("typeTag")
+      ?.split(",")
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .slice(0, 3) ?? ["기획중심", "구조탄탄", "디테일중심"];
+
+    const brands: Brand[] = [
+      { brandId: 1, brandName: "beplain", matchingRatio: 98 },
+      { brandId: 2, brandName: "isntree", matchingRatio: 96 },
+      { brandId: 3, brandName: "ma:nyo", matchingRatio: 91 },
+    ];
+
+    return { userName, userType, tags, brands };
+  }, [location.state, searchParams]);
 
   const onStart = () => {
+    setResult({
+      completed: true,
+      updatedAt: Date.now(),
+      summary: {
+        userName: data.userName,
+        traits: {
+          beauty: data.tags[0] ?? "",
+          style: data.tags[1] ?? "",
+          content: data.tags[2] ?? "",
+        },
+        recommendedBrand: data.brands[0]?.brandName ?? "",
+      },
+    });
+
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-[#F6F7FF] to-white">
-      <MatchResultHeader />
+    <div className="bg-linear-to-b from-[#E6E6F3]">
+      <div className="mx-auto w-full max-w-[430px]">
+        <div className="mx-auto flex w-full max-w-[370px] flex-col px-5 text-center">
+          <div className="h-[64px]" />
 
-      <main className="flex w-full flex-col items-center px-6 text-center">
-        <div className="mt-[84px] mb-[24px]" />
-        <p className="text-[14px] font-medium text-[#404252]">매칭 결과</p>
+          <p className="text-[13px] font-medium text-[#5B5D6B]">
+            <span className="font-semibold text-[#4A4CFF]">
+              {data.userName}
+            </span>{" "}
+            님의 매칭 결과
+          </p>
 
-        <h1
-          className="
-            text-[24px]
-            font-extrabold
-            tracking-[-0.02em]
-            bg-[radial-gradient(circle_at_top,#5D5DFF_0%,#382FE4_45%,#3915DA_100%)]
-            bg-clip-text
-            text-transparent"
-        >
-          <span className="mr-1">{summary.userName}</span> 크리에이터
-        </h1>
+          <h1 className="mt-[8px] text-[30px] font-extrabold tracking-[-0.02em] text-[#4A4CFF]">
+            {data.userType}
+          </h1>
 
-        <p className="mt-[30px] text-[12px] font-medium text-[#5B5D6B]">
-          나의 특성
-        </p>
+          <div className="mt-[14px] flex justify-center gap-2">
+            {data.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-[#D9DDF5] bg-white/75 px-[12px] py-[4px] text-[12px] font-medium text-[#5B5D6B] shadow-[0_4px_12px_rgba(90,95,160,0.10)]"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
 
-        <div className="mt-3 space-y-2">
-          {apiResult?.typeTag.map((tag, index) => (
-            <p key={index} className="text-[14px] font-semibold text-[#5B63FF]">
-              {tag}
-            </p>
-          ))}
-        </div>
+          <div className="mt-[26px] flex justify-center">
+            <img
+              src={MainIcon}
+              alt="매칭 결과 아이콘"
+              className="w-[220px] select-none"
+              draggable={false}
+            />
+          </div>
 
-        {topBrands.length > 0 && (
-          <>
-            <div className="mt-8 space-y-[8px]">
-              <p className="text-[12px] font-medium text-[#8C91A7]">
-                나와 어울리는 브랜드 TOP {topBrands.length}
-              </p>
+          <p className="mt-[30px] text-[15px] font-semibold text-[#5B5D6B]">
+            나와 어울리는 TOP3 브랜드
+          </p>
 
-              <div className="mt-2 space-y-2">
-                {topBrands.map((brand, index) => (
-                  <div key={brand.brandId} className="flex items-center justify-center gap-2">
-                    <span className="text-[14px] font-medium text-[#8C91A7]">
-                      {index + 1}.
+          <div className="mt-[12px] flex w-full justify-center gap-[12px]">
+            {data.brands.map((b) => (
+              <div key={b.brandId} className="w-[88px]">
+                <div className="flex aspect-square w-full items-center justify-center rounded-[12px] border border-[#E6E8F5] bg-white shadow-[0_6px_14px_rgba(39,56,146,0.10)]">
+                  {b.logoUrl ? (
+                    <img
+                      src={b.logoUrl}
+                      alt={b.brandName}
+                      className="max-h-[28px] max-w-[78%] object-contain"
+                      draggable={false}
+                    />
+                  ) : (
+                    <span className="text-[12.5px] font-bold text-[#1F2330]">
+                      {b.brandName}
                     </span>
-                    <span className="text-[16px] font-bold text-[#5B63FF]">
-                      {brand.brandName}
-                    </span>
-                    <span className="text-[12px] font-medium text-[#5B63FF]">
-                      ({brand.matchingRatio}% 매칭)
-                    </span>
-                  </div>
-                ))}
+                  )}
+                </div>
+
+                <div className="mt-[6px] flex justify-between text-[12px]">
+                  <span className="ml-[4px] font-medium text-[#5B5D6B]">
+                    {b.brandName}
+                  </span>
+                  <span className="font-bold text-[#4A4CFF]">
+                    {b.matchingRatio}%
+                  </span>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <p className="mt-4 text-[16px] font-medium text-[#8C91A7]">
-                잘 어울릴 것으로 보여요
-              </p>
-            </div>
-          </>
-        )}
-
-        <div className="mt-16 flex items-center justify-center">
-          <img
-            src={MainIcon}
-            alt="메인 아이콘"
-            className="h-auto w-[170px] select-none"
-            draggable={false}
-          />
+          <div className="mt-[50px] pb-[22px]">
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              withLogo
+              onClick={onStart}
+            >
+              RealMatch 시작하기
+            </Button>
+          </div>
         </div>
-
-        <div className="h-10" />
-      </main>
-
-      <div className="sticky bottom-0 w-full bg-white/70 px-6 pb-8 pt-4 backdrop-blur">
-        <Button
-          variant="primary"
-          size="lg"
-          fullWidth
-          withLogo
-          type="button"
-          onClick={onStart}
-        >
-          RealMatch 시작하기
-        </Button>
       </div>
     </div>
   );

@@ -1,8 +1,33 @@
 import { create } from "zustand";
 
-// step1
-export type SectionKey = "style" | "function" | "skinType" | "skinTone" | "makeupStyle";
-export type SelectedState = Record<SectionKey, string[]>;
+export type SectionKey =
+  | "style"
+  | "function"
+  | "skinType"
+  | "skinTone"
+  | "makeupStyle";
+
+export type Step2SectionKey = "fashionStyle" | "interestItem" | "brandType";
+export type Step3SelectKey = "gender" | "ageGroup" | "videoLength" | "views";
+
+export type Step3ChipKey =
+  | "contentFormat"
+  | "contentType"
+  | "contentTone"
+  | "contentHardness"
+  | "editingRange";
+
+export type SelectedState = Record<SectionKey, number[]>;
+export type Step2SelectedState = Record<Step2SectionKey, number[]>;
+export type Step3SelectedState = Record<Step3SelectKey, number[]>;
+export type Step3ChipsState = Record<Step3ChipKey, number[]>;
+
+export type FashionBodyTags = {
+  heightTag: number | null;
+  weightTypeTag: number | null;
+  topSizeTag: number | null;
+  bottomSizeTag: number | null;
+};
 
 const EMPTY_STEP1: SelectedState = {
   style: [],
@@ -12,19 +37,11 @@ const EMPTY_STEP1: SelectedState = {
   makeupStyle: [],
 };
 
-// step2
-export type Step2SectionKey = "fashionStyle" | "interestItem" | "brandType";
-export type Step2SelectedState = Record<Step2SectionKey, string[]>;
-
 const EMPTY_STEP2: Step2SelectedState = {
   fashionStyle: [],
   interestItem: [],
   brandType: [],
 };
-
-// step3
-export type Step3SelectKey = "gender" | "ageGroup" | "videoLength" | "views";
-export type Step3SelectedState = Record<Step3SelectKey, string[]>;
 
 const EMPTY_STEP3_SELECTED: Step3SelectedState = {
   gender: [],
@@ -32,15 +49,6 @@ const EMPTY_STEP3_SELECTED: Step3SelectedState = {
   videoLength: [],
   views: [],
 };
-
-export type Step3ChipKey =
-  | "contentFormat"
-  | "contentType"
-  | "contentTone"
-  | "contentHardness"
-  | "editingRange";
-
-export type Step3ChipsState = Record<Step3ChipKey, string[]>;
 
 const EMPTY_STEP3_CHIPS: Step3ChipsState = {
   contentFormat: [],
@@ -50,166 +58,125 @@ const EMPTY_STEP3_CHIPS: Step3ChipsState = {
   editingRange: [],
 };
 
-// 결과 변환용 (추천에서 공통으로 쓸 카테고리)
-export type MatchCategory = "beauty" | "fashion";
+const EMPTY_FASHION_BODY: FashionBodyTags = {
+  heightTag: null,
+  weightTypeTag: null,
+  topSizeTag: null,
+  bottomSizeTag: null,
+};
 
-// store
 type MatchingTestStore = {
-  // step1
   selected: SelectedState;
-  toggleStep1: (section: SectionKey, label: string, maxPerSection: number) => void;
+  toggleStep1: (section: SectionKey, id: number) => void;
+  setSingleStep1: (section: SectionKey, id: number) => void;
 
-  // step2
   step2Selected: Step2SelectedState;
-  toggleStep2: (section: Step2SectionKey, label: string, maxPerSection: number) => void;
+  toggleStep2: (section: Step2SectionKey, id: number) => void;
 
-  heightCm: string;
-  bodyShape: string;
-  topSize: string;
-  bottomSizeIn: string;
-
-  setHeightCm: (v: string) => void;
-  setBodyShape: (v: string) => void;
-  setTopSize: (v: string) => void;
-  setBottomSizeIn: (v: string) => void;
-
-  // step3
-  snsUrl: string;
-  setSnsUrl: (v: string) => void;
-  isValidInstagramUrl: () => boolean;
+  fashionBody: FashionBodyTags;
+  setFashionBody: (key: keyof FashionBodyTags, tagId: number | null) => void;
 
   step3Selected: Step3SelectedState;
-  toggleStep3Select: (key: Step3SelectKey, label: string, max: number) => void;
-
-  // 추가: 단일 선택(성별/나이대 같은 라디오용)
-  setSingleStep3Select: (key: Step3SelectKey, label: string) => void;
+  toggleStep3Select: (key: Step3SelectKey, id: number) => void;
+  setSingleStep3Select: (key: Step3SelectKey, id: number) => void;
 
   step3Chips: Step3ChipsState;
-  toggleStep3Chip: (key: Step3ChipKey, label: string, max: number) => void;
+  toggleStep3Chip: (key: Step3ChipKey, id: number) => void;
 
-  // 최종 결과 payload 생성(추천 API에 그대로 넘길 수 있게)
-  buildResult: (category: MatchCategory) => { category: MatchCategory; tags: string[] };
+  snsUrl: string;
+  setSnsUrl: (v: string) => void;
 
   resetAll: () => void;
 };
 
 export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
-  // step1
   selected: EMPTY_STEP1,
-  toggleStep1: (section, label, maxPerSection) => {
+
+  toggleStep1: (section, id) => {
     const prev = get().selected;
     const cur = prev[section];
-    const already = cur.includes(label);
+    const already = cur.includes(id);
 
-    if (already) {
-      set({ selected: { ...prev, [section]: cur.filter((x) => x !== label) } });
-      return;
-    }
-    if (cur.length >= maxPerSection) return;
-
-    set({ selected: { ...prev, [section]: [...cur, label] } });
+    set({
+      selected: {
+        ...prev,
+        [section]: already ? cur.filter((x) => x !== id) : [...cur, id],
+      },
+    });
   },
 
-  // step2
+  setSingleStep1: (section, id) => {
+    const prev = get().selected;
+    set({ selected: { ...prev, [section]: [id] } });
+  },
+
   step2Selected: EMPTY_STEP2,
-  toggleStep2: (section, label, maxPerSection) => {
+
+  toggleStep2: (section, id) => {
     const prev = get().step2Selected;
     const cur = prev[section];
-    const already = cur.includes(label);
+    const already = cur.includes(id);
 
-    if (already) {
-      set({ step2Selected: { ...prev, [section]: cur.filter((x) => x !== label) } });
-      return;
-    }
-    if (cur.length >= maxPerSection) return;
-
-    set({ step2Selected: { ...prev, [section]: [...cur, label] } });
+    set({
+      step2Selected: {
+        ...prev,
+        [section]: already ? cur.filter((x) => x !== id) : [...cur, id],
+      },
+    });
   },
 
-  heightCm: "",
-  bodyShape: "",
-  topSize: "",
-  bottomSizeIn: "",
+  fashionBody: EMPTY_FASHION_BODY,
 
-  setHeightCm: (v) => set({ heightCm: v }),
-  setBodyShape: (v) => set({ bodyShape: v }),
-  setTopSize: (v) => set({ topSize: v }),
-  setBottomSizeIn: (v) => set({ bottomSizeIn: v }),
-
-  // step3
-  snsUrl: "",
-  setSnsUrl: (v) => set({ snsUrl: v }),
-
-  // ⚠️ 기존 코드 유지: 필요하면 "https://www.instagram.com/" 형태로 고쳐야 정확함
-  isValidInstagramUrl: () => get().snsUrl.startsWith("www.instagram/"),
+  setFashionBody: (key, tagId) => {
+    const prev = get().fashionBody;
+    set({ fashionBody: { ...prev, [key]: tagId } });
+  },
 
   step3Selected: EMPTY_STEP3_SELECTED,
 
-  toggleStep3Select: (key, label, max) => {
-    const prevAll = get().step3Selected;
-    const cur = prevAll[key];
-    const already = cur.includes(label);
+  toggleStep3Select: (key, id) => {
+    const prev = get().step3Selected;
+    const cur = prev[key];
+    const already = cur.includes(id);
 
-    if (already) {
-      set({ step3Selected: { ...prevAll, [key]: cur.filter((x) => x !== label) } });
-      return;
-    }
-    if (cur.length >= max) return;
-
-    set({ step3Selected: { ...prevAll, [key]: [...cur, label] } });
+    set({
+      step3Selected: {
+        ...prev,
+        [key]: already ? cur.filter((x) => x !== id) : [...cur, id],
+      },
+    });
   },
 
-  // 단일 선택(라디오): 무조건 하나만 유지
-  setSingleStep3Select: (key, label) => {
-    const prevAll = get().step3Selected;
-    set({ step3Selected: { ...prevAll, [key]: [label] } });
+  setSingleStep3Select: (key, id) => {
+    const prev = get().step3Selected;
+    set({ step3Selected: { ...prev, [key]: [id] } });
   },
 
   step3Chips: EMPTY_STEP3_CHIPS,
-  toggleStep3Chip: (key, label, max) => {
-    const prevAll = get().step3Chips;
-    const cur = prevAll[key];
-    const already = cur.includes(label);
 
-    if (already) {
-      set({ step3Chips: { ...prevAll, [key]: cur.filter((x) => x !== label) } });
-      return;
-    }
-    if (cur.length >= max) return;
+  toggleStep3Chip: (key, id) => {
+    const prev = get().step3Chips;
+    const cur = prev[key];
+    const already = cur.includes(id);
 
-    set({ step3Chips: { ...prevAll, [key]: [...cur, label] } });
+    set({
+      step3Chips: {
+        ...prev,
+        [key]: already ? cur.filter((x) => x !== id) : [...cur, id],
+      },
+    });
   },
 
-  // 임시 입력값 -> 결과 요약(tags)
-  buildResult: (category) => {
-    const s1 = get().selected;
-    const s2 = get().step2Selected;
-    const s3sel = get().step3Selected;
-    const s3chip = get().step3Chips;
-
-    const flatten = (obj: Record<string, string[]>) => Object.values(obj).flat();
-
-    const tags =
-      category === "beauty"
-        ? [...flatten(s1), ...flatten(s3sel), ...flatten(s3chip)]
-        : [...flatten(s2), ...flatten(s3sel), ...flatten(s3chip)];
-
-    // 중복 제거
-    const uniq = Array.from(new Set(tags));
-
-    return { category, tags: uniq };
-  },
+  snsUrl: "",
+  setSnsUrl: (v) => set({ snsUrl: v }),
 
   resetAll: () =>
     set({
       selected: EMPTY_STEP1,
       step2Selected: EMPTY_STEP2,
-      heightCm: "",
-      bodyShape: "",
-      topSize: "",
-      bottomSizeIn: "",
-      snsUrl: "",
+      fashionBody: EMPTY_FASHION_BODY,
       step3Selected: EMPTY_STEP3_SELECTED,
       step3Chips: EMPTY_STEP3_CHIPS,
+      snsUrl: "",
     }),
 }));

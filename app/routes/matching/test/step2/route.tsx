@@ -1,55 +1,111 @@
-import { useNavigate } from "react-router";
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import MatchingTestStep2Content from "./step2-content";
-import { useMatchingTestStore, type Step2SectionKey } from "../../../../stores/matching-test";
+import {
+  useMatchingTestStore,
+  type Step2SectionKey,
+} from "../../../../stores/matching-test";
+import { useFashionTags } from "../_shared/tags/tags.query";
+import type { TagItem } from "../_shared/tags/tags.types";
+
+const SECTIONS: Array<{ key: Step2SectionKey; title: string }> = [
+  { key: "fashionStyle", title: "관심 스타일" },
+  { key: "interestItem", title: "관심 아이템/분야" },
+  { key: "brandType", title: "관심 브랜드 종류" },
+];
+
+type ItemsBySection = Record<Step2SectionKey, TagItem[]>;
+
+const pickCategory = (
+  categories: Record<string, TagItem[]>,
+  candidates: readonly string[],
+): TagItem[] => {
+  for (const key of candidates) {
+    const v = categories[key];
+    if (Array.isArray(v)) return v;
+  }
+
+  const normalize = (s: string) => s.replace(/\s+/g, "").trim();
+  const keys = Object.keys(categories);
+
+  for (const cand of candidates) {
+    const hit = keys.find((k) => normalize(k) === normalize(cand));
+    if (hit) {
+      const v = categories[hit];
+      if (Array.isArray(v)) return v;
+    }
+  }
+
+  return [];
+};
 
 export default function MatchingTestStep2Page() {
   const navigate = useNavigate();
-  const MAX_PER_SECTION = 5;
+  const { data, isLoading, error } = useFashionTags();
 
   const selected = useMatchingTestStore((s) => s.step2Selected);
   const toggle = useMatchingTestStore((s) => s.toggleStep2);
 
-  const heightCm = useMatchingTestStore((s) => s.heightCm);
-  const bodyShape = useMatchingTestStore((s) => s.bodyShape);
-  const topSize = useMatchingTestStore((s) => s.topSize);
-  const bottomSizeIn = useMatchingTestStore((s) => s.bottomSizeIn);
+  const fashionBody = useMatchingTestStore((s) => s.fashionBody);
+  const setFashionBody = useMatchingTestStore((s) => s.setFashionBody);
 
-  const setHeightCm = useMatchingTestStore((s) => s.setHeightCm);
-  const setBodyShape = useMatchingTestStore((s) => s.setBodyShape);
-  const setTopSize = useMatchingTestStore((s) => s.setTopSize);
-  const setBottomSizeIn = useMatchingTestStore((s) => s.setBottomSizeIn);
+  const categories = data?.categories ?? {};
 
-  const isSelected = (section: Step2SectionKey, label: string) =>
-    selected[section].includes(label);
+  const itemsBySection = useMemo((): ItemsBySection => {
+    return {
+      fashionStyle: pickCategory(categories, [
+        "관심 스타일",
+        "패션 스타일",
+        "스타일",
+      ]),
+      interestItem: pickCategory(categories, [
+        "관심 아이템/분야",
+        "관심 아이템",
+        "아이템/분야",
+        "아이템",
+        "관심 분야",
+        "분야",
+      ]),
+      brandType: pickCategory(categories, [
+        "관심 브랜드 종류",
+        "선호 브랜드 종류",
+        "브랜드 종류",
+        "브랜드 타입",
+        "브랜드",
+      ]),
+    };
+  }, [categories]);
+
+  const computedSections = useMemo(() => {
+    return SECTIONS.filter((s) => (itemsBySection[s.key]?.length ?? 0) > 0);
+  }, [itemsBySection]);
+
+  const isSelected = (section: Step2SectionKey, id: number) =>
+    selected[section].includes(id);
 
   const canGoNext = useMemo(() => {
-    const chipsOk =
-      selected.fashionStyle.length >= 1 &&
-      selected.interestItem.length >= 1 &&
-      selected.brandType.length >= 1;
+    const chipsOk = computedSections.every((s) => selected[s.key].length >= 1);
 
-    const bodyOk = heightCm.trim().length > 0 && bodyShape.trim().length > 0;
-    const sizeOk = topSize.trim().length > 0 && bottomSizeIn.trim().length > 0;
+    const bodyOk =
+      fashionBody.heightTag !== null && fashionBody.bottomSizeTag !== null;
 
-    return chipsOk && bodyOk && sizeOk;
-  }, [selected, heightCm, bodyShape, topSize, bottomSizeIn]);
+    return chipsOk && bodyOk;
+  }, [computedSections, selected, fashionBody]);
+
+  const errorText = error ? error.message : null;
 
   return (
     <MatchingTestStep2Content
-      maxText="*최대 5개까지 선택 가능합니다."
-      maxPerSection={MAX_PER_SECTION}
+      isLoading={isLoading}
+      errorText={errorText}
+      sections={computedSections}
+      itemsBySection={itemsBySection}
       selected={selected}
       isSelected={isSelected}
-      onToggle={(section, label) => toggle(section, label, MAX_PER_SECTION)}
-      heightCm={heightCm}
-      bodyShape={bodyShape}
-      topSize={topSize}
-      bottomSizeIn={bottomSizeIn}
-      onHeightChange={setHeightCm}
-      onBodyShapeChange={setBodyShape}
-      onTopSizeChange={setTopSize}
-      onBottomSizeChange={setBottomSizeIn}
+      onToggle={(section, id) => toggle(section, id)}
+      fashionBody={fashionBody}
+      onSetFashionBody={setFashionBody}
+      fashionCategories={categories}
       canGoNext={canGoNext}
       onBack={() => navigate("/matching/test/step1")}
       onNext={() => navigate("/matching/test/step3")}

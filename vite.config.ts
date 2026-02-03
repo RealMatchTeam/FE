@@ -3,12 +3,23 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
-// https://vite.dev/config/
 export default defineConfig({
   server: {
     port: 5173,
     hmr: {
       overlay: false,
+    },
+    proxy: {
+      "/api": {
+        target: "https://api.realmatch.co.kr",
+        changeOrigin: true,
+        secure: true,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq) => {
+            proxyReq.removeHeader("origin");
+          });
+        },
+      },
     },
   },
   logLevel: "info",
@@ -35,16 +46,8 @@ export default defineConfig({
         start_url: "/",
         orientation: "portrait",
         icons: [
-          {
-            src: "pwa-64x64.png",
-            sizes: "64x64",
-            type: "image/png",
-          },
-          {
-            src: "pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
+          { src: "pwa-64x64.png", sizes: "64x64", type: "image/png" },
+          { src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
           {
             src: "pwa-512x512.png",
             sizes: "512x512",

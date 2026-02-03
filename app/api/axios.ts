@@ -28,7 +28,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response 인터셉터: 401 에러 시 토큰 갱신
@@ -76,7 +76,7 @@ axiosInstance.interceptors.response.use(
               headers: {
                 RefreshToken: `Bearer ${refreshToken}`,
               },
-            }
+            },
           );
 
           const { accessToken, refreshToken: newRefreshToken } =
@@ -117,7 +117,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // apiClient alias for backward compatibility

@@ -1,48 +1,95 @@
-import { useNavigate } from "react-router";
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import MatchingTestContent from "./step1-content";
-import { useMatchingTestStore, type SectionKey } from "../../../../stores/matching-test";
+import { useBeautyTags } from "../_shared/tags/tags.query";
+import {
+  useMatchingTestStore,
+  type SectionKey,
+} from "../../../../stores/matching-test";
+import type { TagItem } from "../_shared/tags/tags.types";
 
-const SECTIONS: Array<{
-  key: SectionKey;
-  title: string;
-  items: readonly string[];
-}> = [
-  { key: "style", title: "관심 스타일", items: ["스킨케어", "메이크업", "향수", "바디", "헤어"] },
-  {
-    key: "function",
-    title: "관심 기능",
-    items: ["트러블", "수분 / 보습", "진정", "미백", "안티에이징", "각질/모공"],
-  },
-  { key: "skinType", title: "피부 타입", items: ["건성", "지성", "복합성", "민감성"] },
-  { key: "skinTone", title: "피부 밝기", items: ["17호 이하", "17-21호", "21-23호", "23호 이상"] },
-  { key: "makeupStyle", title: "메이크업 스타일", items: ["내추럴", "화려한", "글로우", "매트"] },
-] as const;
+const SECTIONS: Array<{ key: SectionKey; title: string }> = [
+  { key: "style", title: "관심 스타일" },
+  { key: "function", title: "관심 기능" },
+  { key: "skinType", title: "피부 타입" },
+  { key: "skinTone", title: "피부 밝기" },
+  { key: "makeupStyle", title: "메이크업 스타일" },
+];
+
+type ItemsBySection = Record<SectionKey, TagItem[]>;
+
+const pickCategory = (
+  categories: Record<string, TagItem[]>,
+  candidates: readonly string[],
+): TagItem[] => {
+  for (const key of candidates) {
+    const v = categories[key];
+    if (Array.isArray(v)) return v;
+  }
+
+  const normalize = (s: string) => s.replace(/\s+/g, "").trim();
+  const keys = Object.keys(categories);
+
+  for (const cand of candidates) {
+    const hit = keys.find((k) => normalize(k) === normalize(cand));
+    if (hit) {
+      const v = categories[hit];
+      if (Array.isArray(v)) return v;
+    }
+  }
+
+  return [];
+};
 
 export default function MatchingTestStep1Page() {
   const navigate = useNavigate();
-  const MAX_PER_SECTION = 5;
+  const { data, isLoading, error } = useBeautyTags();
 
   const selected = useMatchingTestStore((s) => s.selected);
-  const toggleStore = useMatchingTestStore((s) => s.toggleStep1);
+  const toggleStep1 = useMatchingTestStore((s) => s.toggleStep1);
 
-  const isSelected = (section: SectionKey, label: string) =>
-    selected[section].includes(label);
+  const itemsBySection = useMemo((): ItemsBySection => {
+    const categories = data?.categories ?? {};
+
+    return {
+      style: pickCategory(categories, ["관심 스타일"]),
+      function: pickCategory(categories, ["관심 기능"]),
+      skinType: pickCategory(categories, ["피부 타입"]),
+      skinTone: pickCategory(categories, [
+        "피부 밝기",
+        "피부 밝기(톤)",
+        "피부 밝기 (톤)",
+        "피부 톤",
+        "피부톤",
+      ]),
+      makeupStyle: pickCategory(categories, [
+        "메이크업 스타일",
+        "메이크업 스타일(연출)",
+        "메이크업 스타일 (연출)",
+        "메이크업",
+        "메이크업스타일",
+      ]),
+    };
+  }, [data]);
+
+  const isSelected = (section: SectionKey, id: number) =>
+    selected[section].includes(id);
 
   const canGoNext = useMemo(
     () => SECTIONS.every((s) => selected[s.key].length >= 1),
-    [selected]
+    [selected],
   );
+
+  const errorText = error ? error.message : null;
 
   return (
     <MatchingTestContent
-      progressText="1 / 3"
-      maxText="*최대 5개까지 선택 가능합니다."
+      isLoading={isLoading}
+      errorText={errorText}
       sections={SECTIONS}
-      selected={selected}
-      maxPerSection={MAX_PER_SECTION}
+      itemsBySection={itemsBySection}
       isSelected={isSelected}
-      onToggle={(section, label) => toggleStore(section, label, MAX_PER_SECTION)}
+      onToggle={(section, id) => toggleStep1(section, id)}
       canGoNext={canGoNext}
       onBack={() => navigate("/")}
       onNext={() => navigate("/matching/test/step2")}
