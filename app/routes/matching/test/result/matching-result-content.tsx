@@ -12,7 +12,9 @@ type Brand = {
 };
 
 type ApiResult = {
+  username: string;
   userType: string;
+  userTypeImage?: string;
   typeTag: string[];
   highMatchingBrandList: {
     count: number;
@@ -33,21 +35,33 @@ export default function MatchingResultContent() {
   const data = useMemo(() => {
     const apiResult = location.state?.apiResult;
 
-    // userName은 아직 API에 없으므로 기존대로 query/default 사용
-    const userName = searchParams.get("userName") ?? "비비";
-
     if (apiResult) {
+      console.log("[result] apiResult exists:", !!apiResult);
+      console.log(
+        "[result] first brand:",
+        apiResult?.highMatchingBrandList?.brands?.[0],
+      );
+      const userName = apiResult.username;
       const userType = apiResult.userType;
       const tags = apiResult.typeTag.slice(0, 3);
       const brands = [...apiResult.highMatchingBrandList.brands]
         .sort((a, b) => b.matchingRatio - a.matchingRatio)
         .slice(0, 3);
 
-      return { userName, userType, tags, brands };
+      return {
+        userName,
+        userType,
+        tags,
+        brands,
+        userTypeImage: apiResult.userTypeImage,
+      };
     }
 
     // fallback (직접 진입/새로고침으로 state 사라진 경우)
+    const userName =
+      searchParams.get("username") ?? searchParams.get("userName") ?? "비비";
     const userType = searchParams.get("userType") ?? "섬세한 설계자";
+
     const tags = searchParams
       .get("typeTag")
       ?.split(",")
@@ -61,7 +75,7 @@ export default function MatchingResultContent() {
       { brandId: 3, brandName: "ma:nyo", matchingRatio: 91 },
     ];
 
-    return { userName, userType, tags, brands };
+    return { userName, userType, tags, brands, userTypeImage: undefined };
   }, [location.state, searchParams]);
 
   const onStart = () => {

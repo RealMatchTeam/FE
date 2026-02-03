@@ -54,6 +54,7 @@ export type HighMatchingBrandList = {
 };
 
 export type MatchesResponseResult = {
+  userName: string;
   userType: string;
   typeTag: string[];
   highMatchingBrandList: HighMatchingBrandList;

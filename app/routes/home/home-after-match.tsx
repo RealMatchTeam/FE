@@ -7,7 +7,13 @@ import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
 import MatchAnalysisSection from "./components/MatchAnalysisSection";
 import CreatorProfileCard from "./components/CreatorProfileCard";
-import { getMatchingBrands, getMatchingCampaigns, toggleBrandLike, type MatchingBrand, type MatchingCampaign } from "../matching/api/matching";
+import {
+  getMatchingBrands,
+  getMatchingCampaigns,
+  toggleBrandLike,
+  type MatchingBrand,
+  type MatchingCampaign,
+} from "../matching/api/matching";
 import { useMatchResultStore } from "../../stores/matching-result";
 import bannerBeauty from "../../assets/home-banner/banner-beauty.svg";
 import bannerFashion from "../../assets/home-banner/banner-fashion.svg";
@@ -17,7 +23,9 @@ export default function HomeAfterMatchPage() {
   const [category, setCategory] = useState<CategoryKey>("beauty");
   const [brands, setBrands] = useState<MatchingBrand[]>([]);
   const [campaigns, setCampaigns] = useState<MatchingCampaign[]>([]);
-  const [popularCampaigns, setPopularCampaigns] = useState<MatchingCampaign[]>([]);
+  const [popularCampaigns, setPopularCampaigns] = useState<MatchingCampaign[]>(
+    [],
+  );
 
   // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
   const matchResult = useMatchResultStore((s) => s.result);
@@ -28,7 +36,7 @@ export default function HomeAfterMatchPage() {
         const [brandsData, campaignsData, popularData] = await Promise.all([
           getMatchingBrands("MATCH_SCORE", "ALL"),
           getMatchingCampaigns("MATCH_SCORE", "ALL"),
-          getMatchingCampaigns("POPULARITY", "ALL")
+          getMatchingCampaigns("POPULARITY", "ALL"),
         ]);
         setBrands(brandsData.brands);
         setCampaigns(campaignsData.campaigns);
@@ -50,12 +58,14 @@ export default function HomeAfterMatchPage() {
         creatorName: "크리에이터 님",
         creatorType: "creator",
         summary: apiResult.userType || "크리에이터",
-        highlightBrandText: apiResult.highMatchingBrandList?.brands[0]?.brandName || "매칭된 브랜드",
+        highlightBrandText:
+          apiResult.highMatchingBrandList?.brands[0]?.brandName ||
+          "매칭된 브랜드",
         traits: {
           beauty: apiResult.typeTag?.[0] || "특성 1",
           fashion: apiResult.typeTag?.[1] || "특성 2",
           content: apiResult.typeTag?.[2] || "특성 3",
-        }
+        },
       } as CreatorProfileModel;
     } else if (matchResult?.summary) {
       // apiResult가 없으면 summary 사용
@@ -63,12 +73,13 @@ export default function HomeAfterMatchPage() {
         creatorName: "크리에이터 님",
         creatorType: "creator",
         summary: matchResult.summary.userName || "크리에이터",
-        highlightBrandText: matchResult.summary.recommendedBrand || "매칭된 브랜드",
+        highlightBrandText:
+          matchResult.summary.recommendedBrand || "매칭된 브랜드",
         traits: {
           beauty: matchResult.summary.traits.beauty || "특성 1",
           fashion: matchResult.summary.traits.style || "특성 2",
           content: matchResult.summary.traits.content || "특성 3",
-        }
+        },
       } as CreatorProfileModel;
     }
     return null;
@@ -80,9 +91,11 @@ export default function HomeAfterMatchPage() {
       const brandId = Number(id);
       const newLikeStatus = await toggleBrandLike(brandId);
 
-      setBrands(prev => prev.map(brand =>
-        brand.id === brandId ? { ...brand, isLiked: newLikeStatus } : brand
-      ));
+      setBrands((prev) =>
+        prev.map((brand) =>
+          brand.id === brandId ? { ...brand, isLiked: newLikeStatus } : brand,
+        ),
+      );
     } catch (error) {
       console.error("Failed to toggle brand like:", error);
     }
@@ -95,13 +108,21 @@ export default function HomeAfterMatchPage() {
       const newLikeStatus = await toggleBrandLike(campaignId);
 
       // 매칭률 높은 캠페인 업데이트
-      setCampaigns(prev => prev.map(campaign =>
-        campaign.id === campaignId ? { ...campaign, isLiked: newLikeStatus } : campaign
-      ));
+      setCampaigns((prev) =>
+        prev.map((campaign) =>
+          campaign.id === campaignId
+            ? { ...campaign, isLiked: newLikeStatus }
+            : campaign,
+        ),
+      );
       // 인기 캠페인도 업데이트
-      setPopularCampaigns(prev => prev.map(campaign =>
-        campaign.id === campaignId ? { ...campaign, isLiked: newLikeStatus } : campaign
-      ));
+      setPopularCampaigns((prev) =>
+        prev.map((campaign) =>
+          campaign.id === campaignId
+            ? { ...campaign, isLiked: newLikeStatus }
+            : campaign,
+        ),
+      );
     } catch (error) {
       console.error("Failed to toggle campaign like:", error);
     }
@@ -145,7 +166,9 @@ export default function HomeAfterMatchPage() {
                   isLiked: brand.isLiked,
                 }}
                 onClick={() => {
-                  navigate(`/brand?brandId=${brand.id}&domain=${brand.name?.toLowerCase() || ""}`);
+                  navigate(
+                    `/brand?brandId=${brand.id}&domain=${brand.name?.toLowerCase() || ""}`,
+                  );
                 }}
                 onLikeToggle={handleBrandLikeToggle}
               />
@@ -175,7 +198,12 @@ export default function HomeAfterMatchPage() {
                   descText: campaign.name || campaign.title || "",
                   rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
                   startAt: "",
-                  ddayLabel: campaign.dDay !== undefined ? (campaign.dDay === 0 ? "D-DAY" : `D-${campaign.dDay}`) : "",
+                  ddayLabel:
+                    campaign.dDay !== undefined
+                      ? campaign.dDay === 0
+                        ? "D-DAY"
+                        : `D-${campaign.dDay}`
+                      : "",
                   progressText: String(campaign.applicants),
                   isLiked: campaign.isLiked,
                   logoUrl: campaign.logoUrl,
@@ -215,7 +243,12 @@ export default function HomeAfterMatchPage() {
                   descText: campaign.name || campaign.title || "",
                   rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
                   startAt: "",
-                  ddayLabel: campaign.dDay !== undefined ? (campaign.dDay === 0 ? "D-DAY" : `D-${campaign.dDay}`) : "",
+                  ddayLabel:
+                    campaign.dDay !== undefined
+                      ? campaign.dDay === 0
+                        ? "D-DAY"
+                        : `D-${campaign.dDay}`
+                      : "",
                   progressText: String(campaign.applicants),
                   isLiked: campaign.isLiked,
                   logoUrl: campaign.logoUrl,
