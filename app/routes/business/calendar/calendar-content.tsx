@@ -18,7 +18,7 @@ export default function CalendarContent() {
   const navigate = useNavigate();
   const [mainTab, setMainTab] = useState<"collaboration" | "matching">("collaboration");
   const [activeTab, setActiveTab] = useState<"thisMonth" | "today">("thisMonth");
-  const [matchingSubTab, setMatchingSubTab] = useState<"sent" | "received">("sent");
+  const [matchingSubTab, setMatchingSubTab] = useState<"sent" | "received" | "applied">("sent");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("전체");
 
@@ -31,23 +31,19 @@ export default function CalendarContent() {
     const fetchCampaigns = async () => {
       try {
         setIsLoading(true);
-        const data = await getMyCollaborations();
-
-        if (data && data.length > 0) {
-          setCampaigns(data);
-        } /*else {
-          // 실제 데이터가 없으면 우리가 만든 MATCHING_DUMMY_DATA를 사용
-          setCampaigns(MATCHING_DUMMY_DATA);
-        }*/
+        // matchingSubTab 값에 따라 대문자로 변환하여 API 요청
+        const data = await getMyCollaborations({
+          type: matchingSubTab.toUpperCase() as any
+        });
+        setCampaigns(data || []);
       } catch (error) {
-        console.error("데이터 로드 실패, 더미 사용:", error);
-        /*setCampaigns(MATCHING_DUMMY_DATA);*/
+        console.error("로드 실패:", error);
       } finally {
         setIsLoading(false);
       }
     };
     fetchCampaigns();
-  }, []);
+  }, [matchingSubTab]); // 탭 클릭 시마다 API 다시 호출
 
   // [상태 변환 헬퍼 함수]
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
@@ -74,19 +70,20 @@ export default function CalendarContent() {
   // 2. 우측 상단 드롭다운 필터(activeFilter) 적용
   const matchingList = campaigns.filter((item) => {
     const isCorrectSubTab =
-      matchingSubTab === "sent"
-        ? (item.type === "SENT" || item.type === "APPLIED")
-        : item.type === "RECEIVED";
+      matchingSubTab === "sent" ? item.type === "SENT" :
+        matchingSubTab === "received" ? item.type === "RECEIVED" :
+          item.type === "APPLIED";
 
     if (!isCorrectSubTab) return false;
 
+    // activeFilter가 "전체"가 아닐 때 데이터가 사라지는지 확인
     if (activeFilter === "전체") return true;
     return getStatusLabel(item.status) === activeFilter;
   });
 
+  console.log("전체 데이터:", campaigns);
+  console.log("필터된 데이터:", matchingList);
 
-
-  // [필터링 로직]
   const todayStr = new Date().toISOString().split('T')[0];
   const currentMonthStr = todayStr.substring(0, 7);
   const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
@@ -100,17 +97,17 @@ export default function CalendarContent() {
   });
 
   const handleCardClick = (item: CampaignCollaboration) => {
-  // 1. 거절된 상태일 경우 거절 사유 페이지로 이동
-  if (item.status === "REJECTED") {
-    navigate(`/rejection?id=${item.campaignId || item.proposalId}`);
-  } 
-  // 2. 그 외(매칭, 검토 중) 상태일 경우 제안 상세 조회 페이지로 이동
-  else {
-    // API 명세에 따른 campaignProposalId (item의 proposalId 혹은 campaignId)를 경로에 전달
-    const proposalId = item.proposalId || item.campaignId;
-    navigate(`/business/proposal?id=${proposalId}`);
-  }
-};
+    // 1. 거절된 상태일 경우 거절 사유 페이지로 이동
+    if (item.status === "REJECTED") {
+      navigate(`/rejection?id=${item.campaignId || item.proposalId}`);
+    }
+    // 2. 그 외(매칭, 검토 중) 상태일 경우 제안 상세 조회 페이지로 이동
+    else {
+      // API 명세에 따른 campaignProposalId (item의 proposalId 혹은 campaignId)를 경로에 전달
+      const proposalId = item.proposalId || item.campaignId;
+      navigate(`/business/proposal?id=${proposalId}`);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
@@ -181,7 +178,7 @@ export default function CalendarContent() {
                       brand={cp.brandName}
                       title={cp.title}
                       logo={cp.thumbnailUrl}
-                      // 날짜 포맷 변경 (2026-02-01 -> 02.01)
+
                       startDate={cp.startDate.split('-').slice(1).join('.')}
                       endDate={cp.endDate.split('-').slice(1).join('.')}
                     />
@@ -197,7 +194,12 @@ export default function CalendarContent() {
         ) : (
           /* [B] 매칭 현황 */
           <div className="flex flex-col flex-1">
-            <MatchingTabSection subTab={matchingSubTab} setSubTab={setMatchingSubTab} />
+            <MatchingTabSection
+              subTab={matchingSubTab}
+              setSubTab={setMatchingSubTab}
+              // 전체 캠페인 중 RECEIVED 타입인 것의 개수 전달
+              receivedCount={campaigns.filter(c => c.type === "RECEIVED").length}
+            />
 
             <div className="flex flex-col gap-4 px-4 flex-1">
               <div className="flex items-center justify-between mb-1">
