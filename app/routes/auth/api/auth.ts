@@ -1,5 +1,8 @@
-import { apiClient } from "../../../lib/api-client";
+import axios from "axios";
+import { apiClient } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import type {
   SignupCompleteRequest,
   SignupCompleteResponse,
@@ -31,18 +34,18 @@ export const signup = async (
  * Refresh Token을 사용하여 새로운 Access Token을 발급받습니다.
  */
 export const refreshToken = async (): Promise<SignupCompleteResponse> => {
-  const refreshToken = tokenStorage.getRefreshToken();
+  const currentRefreshToken = tokenStorage.getRefreshToken();
 
-  if (!refreshToken) {
+  if (!currentRefreshToken) {
     throw new Error("No refresh token available");
   }
 
-  const response = await apiClient.post<SignupCompleteResponse>(
-    "/api/v1/auth/refresh",
+  const response = await axios.post<SignupCompleteResponse>(
+    `${BASE_URL}/api/v1/auth/refresh`,
     {},
     {
       headers: {
-        RefreshToken: `Bearer ${refreshToken}`,
+        RefreshToken: `Bearer ${currentRefreshToken}`,
       },
     }
   );

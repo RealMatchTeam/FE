@@ -1,5 +1,6 @@
-import { useState, useMemo, useDeferredValue, useEffect } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import FilterButton from "../../../components/common/FilterButton";
 import BrandCard from "./components/BrandCard";
 import { type BrandCategory } from "../../../data/brand";
@@ -7,65 +8,53 @@ import BrandFilterBar from "./components/BrandFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import { apiClient } from "../../../lib/api-client";
-import { tokenStorage } from "../../../lib/token";
 import MainIcon from "../../../assets/MainIcon.svg";
-import MiniLogo from "../../../assets/logo/mini-logo.svg";
-import Button from "../../../components/common/Button";
-
-
-interface MatchingBrand {
-    id: number;
-    name: string;
-    category: string;
-    matchingRatio: number;
-    matchRate: number;
-    tags: string[];
-    isLiked: boolean;
-    logoUrl?: string;
-}
+import { getMatchingBrands, toggleBrandLike, type MatchingBrand } from "../api/matching";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
     const category = (searchParams.get("type") || "BEAUTY") as BrandCategory;
     const navigate = useNavigate();
-    const [brands, setBrands] = useState<MatchingBrand[]>([]);
+    const queryClient = useQueryClient();
+
+    // 필터 상태
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    // 검색 상태
     const [searchKeyword, setSearchKeyword] = useState("");
     const deferredKeyword = useDeferredValue(searchKeyword);
-    const [hasMatchingResult, setHasMatchingResult] = useState<boolean | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchMatchingBrands = async () => {
-            try {
-                const userId = tokenStorage.getUserId();
-                if (!userId) {
-                    setHasMatchingResult(false);
-                    setIsLoading(false);
-                    return;
-                }
+    // 정렬 옵션 매핑
+    const sortByMap: Record<string, string> = {
+        "정렬 필터": "MATCH_SCORE",
+        "매칭률 순": "MATCH_SCORE",
+        "인기 순": "POPULARITY",
+        "신규 순": "NEWEST",
+    };
+    const sortBy = sortByMap[sortOption] || "MATCH_SCORE";
 
-                const response = await apiClient.get(`/api/v1/matches/brands/${userId}`);
+    // 데이터 페칭
+    const {
+        data,
+        isLoading,
+        error
+    } = useInfiniteQuery({
+        queryKey: ["matching-brands", category, sortOption, selectedTags],
+        queryFn: async () => {
+            // 페이지네이션 없이 한 번만 호출 
+            const response = await getMatchingBrands(sortBy, category, selectedTags.length > 0 ? selectedTags : undefined);
+            return response;
+        },
+        initialPageParam: 0,
+        getNextPageParam: () => undefined, // 단일 페이지
+        staleTime: 1000 * 60 * 1, // 1분간 캐시 유지
+    });
 
-                if (response.data.result && response.data.result.brands && response.data.result.brands.length > 0) {
-                    setBrands(response.data.result.brands);
-                    setHasMatchingResult(true);
-                } else {
-                    setHasMatchingResult(false);
-                }
-            } catch (error) {
-                console.error("Failed to fetch matching brands:", error);
-                setHasMatchingResult(false);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchMatchingBrands();
-    }, []);
+    const brands = useMemo(() => {
+        return data?.pages.flatMap(page => page.brands) || [];
+    }, [data]);
 
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
@@ -74,27 +63,59 @@ export default function BrandContent() {
         navigate(`/matching/brand?type=${newCategory}`);
     };
 
-    // 카테고리 + 검색어 필터링
+    // 검색어 필터링
     const filteredBrands = useMemo(() => {
         return brands.filter(brand => {
-            const matchesCategory = brand.category === category;
             const matchesSearch = deferredKeyword === "" ||
                 brand.name.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
-                brand.tags.some((tag: string) => tag.toLowerCase().includes(deferredKeyword.toLowerCase()));
-            return matchesCategory && matchesSearch;
+                (brand.tags && brand.tags.some((tag: string) => tag.toLowerCase().includes(deferredKeyword.toLowerCase())));
+            return matchesSearch;
         });
-    }, [brands, category, deferredKeyword]);
+    }, [brands, deferredKeyword]);
 
-    const toggleLike = (id: number) => {
-        setBrands(prev => prev.map(brand =>
-            brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
-        ));
+    const toggleLike = async (id: number) => {
+        const queryKey = ["matching-brands", category, sortOption, selectedTags];
+
+        // 낙관적 업데이트
+        queryClient.setQueryData(queryKey, (oldData: { pages: { brands: MatchingBrand[] }[] } | undefined) => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pages: oldData.pages.map((page) => ({
+                    ...page,
+                    brands: page.brands.map((brand: MatchingBrand) =>
+                        brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
+                    )
+                }))
+            };
+        });
+
+        try {
+            const newLikeStatus = await toggleBrandLike(id);
+
+            // API 응답으로 상태 확정
+            queryClient.setQueryData(queryKey, (oldData: { pages: { brands: MatchingBrand[] }[] } | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page) => ({
+                        ...page,
+                        brands: page.brands.map((brand: MatchingBrand) =>
+                            brand.id === id ? { ...brand, isLiked: newLikeStatus } : brand
+                        )
+                    }))
+                };
+            });
+        } catch (error) {
+            console.error("Failed to toggle brand like:", error);
+            // 에러 발생 시 롤백
+            queryClient.invalidateQueries({ queryKey });
+        }
     };
 
     const handleFilterApply = (sort: string, tags: string[]) => {
         setSortOption(sort);
         setSelectedTags(tags);
-        // TODO: 정렬 및 태그 필터 적용 로직
     };
 
     const getSortButtonLabel = () => {
@@ -117,26 +138,18 @@ export default function BrandContent() {
         );
     }
 
-    // 매칭 결과가 없을 때
-    if (hasMatchingResult === false) {
+    // 매칭 결과가 없거나 에러
+    if (error || (brands.length === 0 && !isLoading)) {
+        if (error) console.error("Failed to fetch matching brands:", error);
+
         return (
-            <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-[#E8E8F8] to-white px-6">
-                <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
-                <p className="text-title1 text-text-black text-center mb-2">
-                    매칭된 기업이 없어요
-                </p>
-                <p className="text-body2 text-text-gray3 text-center mb-8">
-                    매칭 검사를 먼저 진행해주세요
-                </p>
-                <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => navigate("/matching/test/step1")}
-                    className="w-full max-w-[300px] flex items-center justify-center gap-2"
-                >
-                    <img src={MiniLogo} alt="logo" className="w-5 h-5" />
-                    매칭 검사하기
-                </Button>
+            <div className="flex flex-col h-full bg-core-2">
+                <div className="flex flex-col items-center justify-center flex-1 bg-gradient-to-b from-[#E8E8F8] to-white px-6">
+                    <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
+                    <p className="text-title1 text-text-black text-center mb-2">
+                        매칭된 기업이 없어요
+                    </p>
+                </div>
             </div>
         );
     }
@@ -178,7 +191,7 @@ export default function BrandContent() {
                             key={brand.id}
                             name={brand.name}
                             matchRate={brand.matchingRatio || brand.matchRate}
-                            tags={brand.tags}
+                            tags={brand.tags || []}
                             isLiked={brand.isLiked}
                             onLike={() => toggleLike(brand.id)}
                             logoUrl={brand.logoUrl || `/dummy-logo-${brand.id}.png`}

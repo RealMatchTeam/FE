@@ -5,14 +5,17 @@ import BadgePill from "./BadgePill";
 
 const PRIMARY = "#5B5DEB";
 
-type Props = { item: BrandItem; onClick?: () => void };
+type Props = {
+  item: BrandItem;
+  onClick?: () => void;
+  onLikeToggle?: (id: string, newValue: boolean) => void;
+};
 
-export default function BrandCard({ item, onClick }: Props) {
+export default function BrandCard({ item, onClick, onLikeToggle }: Props) {
   return (
-    <button
-      type="button"
+    <div
       onClick={onClick}
-      className="w-[118px] shrink-0 text-left"
+      className="w-[118px] shrink-0 cursor-pointer text-left"
     >
       <div className="relative aspect-square rounded-2xl border border-black/5 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.06)]">
         {/* 상단: 좌 배지 / 우 하트 */}
@@ -22,10 +25,12 @@ export default function BrandCard({ item, onClick }: Props) {
             {item.badgeText ? <BadgePill text={item.badgeText} /> : null}
           </div>
 
-          <HeartButton
-            defaultPressed={!!item.isLiked}
-            onChange={(v) => console.log("toggle like brand", item.id, v)}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <HeartButton
+              defaultPressed={!!item.isLiked}
+              onChange={(newValue) => onLikeToggle?.(item.id, newValue)}
+            />
+          </div>
         </div>
 
         {/* 중앙 로고 */}
@@ -58,6 +63,6 @@ export default function BrandCard({ item, onClick }: Props) {
           {item.subText ?? ""}
         </div>
       </div>
-    </button>
+    </div>
   );
 }

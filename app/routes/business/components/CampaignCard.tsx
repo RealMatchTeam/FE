@@ -23,6 +23,7 @@ export default function CampaignCard({
   showButton = true,
   campaignId = 1,
 }: CampaignCardProps) {
+  
   const navigate = useNavigate();
 
   // 로고 컴포넌트
