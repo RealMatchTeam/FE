@@ -33,7 +33,7 @@ export default function CalendarContent() {
         setIsLoading(true);
         // matchingSubTab 값에 따라 대문자로 변환하여 API 요청
         const data = await getMyCollaborations({
-          type: matchingSubTab.toUpperCase() as any
+          type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED"
         });
         setCampaigns(data || []);
       } catch (error) {
@@ -45,7 +45,7 @@ export default function CalendarContent() {
     fetchCampaigns();
   }, [matchingSubTab]); // 탭 클릭 시마다 API 다시 호출
 
-  // [상태 변환 헬퍼 함수]
+  // 상태 변환 헬퍼 함수
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {
       case "MATCHED":
@@ -61,13 +61,7 @@ export default function CalendarContent() {
     }
   };
 
-  const getActionLabel = (status: CampaignCollaboration["status"]) => {
-    return status === "REJECTED" ? "거절 사유 보기" : "제안 보기";
-  };
 
-  // [매칭 현황 필터링 로직]
-  // 1. 탭에 따른 필터링 (보낸 제안: SENT/APPLIED, 받은 제안: RECEIVED)
-  // 2. 우측 상단 드롭다운 필터(activeFilter) 적용
   const matchingList = campaigns.filter((item) => {
     const isCorrectSubTab =
       matchingSubTab === "sent" ? item.type === "SENT" :
