@@ -1,7 +1,7 @@
-import { type ChatMessage } from "./TextMessageTypes";
+import { type ChatMessage_UI } from "../types/ChatMessage_UI";
 
 type Props = {
-  message: ChatMessage;
+  message: ChatMessage_UI;
 };
 
 export default function TextMessage ({ message }: Props) {

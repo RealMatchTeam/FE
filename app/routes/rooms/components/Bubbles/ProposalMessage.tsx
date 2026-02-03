@@ -1,8 +1,8 @@
-import { type ChatMessage } from "./TextMessageTypes";
+import { type ChatMessage_UI } from "../types/ChatMessage_UI";
 import { useNavigate } from "react-router";
 
 type Props = {
-  message: ChatMessage;
+  message: ChatMessage_UI;
 };
 
 export default function ProposalMessage({ message }: Props) {

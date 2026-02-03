@@ -14,7 +14,7 @@ export type AuthUser = {
   matchingTestDone?: boolean;
 };
 
-type AuthState = {
+export type AuthState = {
   me: AuthUser | null;
 
   // 로그인 성공 후 유저 세팅

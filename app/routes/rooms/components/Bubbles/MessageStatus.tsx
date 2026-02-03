@@ -1,7 +1,7 @@
-import { type ChatMessage } from "./TextMessageTypes";
+import { type ChatMessage_UI } from "../types/ChatMessage_UI";
 
 type Props = {
-  message: ChatMessage;
+  message: ChatMessage_UI;
   timeText: string;
   onRetry: (messageId: string) => void;
   onDelete: (messageId: string) => void;

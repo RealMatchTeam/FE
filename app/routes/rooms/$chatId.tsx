@@ -3,5 +3,10 @@ import ChattingRoom from "./chatting-room";
 
 export default function ChatRoomRoute() {
   const { chatId } = useParams();
-  return <ChattingRoom chatId={chatId!} />;
+
+  const roomId = Number(chatId);
+  if (!chatId || Number.isNaN(roomId)) {
+    return null;
+  }
+  return <ChattingRoom roomId={roomId} />;
 }

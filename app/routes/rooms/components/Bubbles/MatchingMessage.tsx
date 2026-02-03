@@ -1,9 +1,9 @@
-import { type ChatMessage } from "./TextMessageTypes";
+import { type ChatMessage_UI } from "../types/ChatMessage_UI";
 import { useNavigate } from "react-router";
 import MessageMeta from "./MessageStatus";
 
 type Props = {
-  message: ChatMessage;
+  message: ChatMessage_UI;
 };
 //onRetry: (id: string) => void;
 //onDelete: (id: string) => void;
