@@ -42,6 +42,7 @@ type Props = {
 };
 
 type Sheet = null | "snsUrl" | "gender" | "ageGroup" | "videoLength" | "views";
+const EMPTY_TAGS: TagItem[] = [];
 
 const namesByIds = (ids: number[], options: TagItem[]) =>
   options.filter((o) => ids.includes(o.id)).map((o) => o.name);
@@ -82,15 +83,39 @@ export default function MatchingTestStep3Content({
   const open = (s: Sheet) => setSheet(s);
   const close = () => setSheet(null);
 
-  const genderOptions = contentTags?.viewerGenders ?? [];
-  const ageOptions = contentTags?.viewerAges ?? [];
-  const videoLenOptions = contentTags?.avgVideoLengths ?? [];
-  const viewsOptions = contentTags?.avgVideoViews ?? [];
+  const genderOptions = useMemo(
+    () => contentTags?.viewerGenders ?? EMPTY_TAGS,
+    [contentTags?.viewerGenders],
+  );
+  const ageOptions = useMemo(
+    () => contentTags?.viewerAges ?? EMPTY_TAGS,
+    [contentTags?.viewerAges],
+  );
+  const videoLenOptions = useMemo(
+    () => contentTags?.avgVideoLengths ?? EMPTY_TAGS,
+    [contentTags?.avgVideoLengths],
+  );
+  const viewsOptions = useMemo(
+    () => contentTags?.avgVideoViews ?? EMPTY_TAGS,
+    [contentTags?.avgVideoViews],
+  );
 
-  const typeOptions = contentTags?.categories ?? [];
-  const toneOptions = contentTags?.tones ?? [];
-  const involvementOptions = contentTags?.involvements ?? [];
-  const coverageOptions = contentTags?.usageRanges ?? [];
+  const typeOptions = useMemo(
+    () => contentTags?.categories ?? EMPTY_TAGS,
+    [contentTags?.categories],
+  );
+  const toneOptions = useMemo(
+    () => contentTags?.tones ?? EMPTY_TAGS,
+    [contentTags?.tones],
+  );
+  const involvementOptions = useMemo(
+    () => contentTags?.involvements ?? EMPTY_TAGS,
+    [contentTags?.involvements],
+  );
+  const coverageOptions = useMemo(
+    () => contentTags?.usageRanges ?? EMPTY_TAGS,
+    [contentTags?.usageRanges],
+  );
 
   const genderValue = useMemo(
     () => joinNames(step3Selected.gender, genderOptions),

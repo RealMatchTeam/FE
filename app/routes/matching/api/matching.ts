@@ -422,10 +422,10 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
  * @param category 카테고리 (BEAUTY, FASHION 등)
  * @returns 태그 이름 배열
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getTagNamesByCategory = async (
   _category: string,
 ): Promise<string[]> => {
+  void _category;
   // 카테고리별로 기본 태그를 반환하여 모든 태그 포함
   // 실제로는 API에서 카테고리별 태그를 가져와야 할 수 있음
   return [];
