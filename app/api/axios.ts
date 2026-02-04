@@ -52,7 +52,10 @@ axiosInstance.interceptors.response.use(
     };
 
     // 400 또는 401 에러이고, 재시도하지 않은 요청인 경우
-    if ((error.response?.status === 401 || error.response?.status === 400) && !originalRequest._retry) {
+    if (
+      (error.response?.status === 401 || error.response?.status === 400) &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       if (!isRefreshing) {
