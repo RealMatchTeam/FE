@@ -1,4 +1,4 @@
-import { apiClient } from "../../../api/axios";
+import { axiosInstance } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
 
 // 매칭 분석 결과 조회 응답 타입
@@ -41,13 +41,16 @@ export const getMatchAnalysis = async (): Promise<MatchResult> => {
       throw new MatchingTestRequiredError();
     }
 
-    const response = await apiClient.get<MatchResultResponse>(`/api/v1/matches`);
+    const response =
+      await axiosInstance.get<MatchResultResponse>(`/api/v1/matches`);
 
     if (!response.data.isSuccess) {
       // 매칭 테스트 미완료 에러 체크
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
+      if (
+        response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
         response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
+        response.data.message.includes("테스트")
+      ) {
         throw new MatchingTestRequiredError();
       }
       throw new Error(response.data.message || "매칭 분석 결과 조회 실패");
@@ -201,7 +204,7 @@ export const getMatchingCampaigns = async (
   tags?: string[],
   keyword?: string,
   page: number = 0,
-  size: number = 20
+  size: number = 20,
 ): Promise<{ campaigns: MatchingCampaign[]; count: number }> => {
   try {
     const userId = tokenStorage.getUserId();
@@ -213,7 +216,7 @@ export const getMatchingCampaigns = async (
       sortBy,
       category,
       page,
-      size
+      size,
     };
 
     if (tags && tags.length > 0) {
@@ -224,16 +227,18 @@ export const getMatchingCampaigns = async (
       params.keyword = keyword;
     }
 
-    const response = await apiClient.get<MatchingCampaignResponse>(
+    const response = await axiosInstance.get<MatchingCampaignResponse>(
       `/api/v1/matches/campaigns`,
-      { params }
+      { params },
     );
 
     if (!response.data.isSuccess) {
       // 매칭 테스트 미완료 에러 체크
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
+      if (
+        response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
         response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
+        response.data.message.includes("테스트")
+      ) {
         throw new MatchingTestRequiredError();
       }
       throw new Error(response.data.message || "캠페인 목록 조회 실패");
@@ -254,23 +259,27 @@ export const getMatchingCampaigns = async (
       applicants: item.campaignTotalRecruit || 0,
       isLiked: item.brandIsLiked || false,
       logoUrl: item.brandLogoUrl,
-      dDay: item.campaignDDay
+      dDay: item.campaignDDay,
     }));
 
     return {
       campaigns,
-      count: response.data.result.count || 0
+      count: response.data.result.count || 0,
     };
   } catch (error: unknown) {
     if (error instanceof MatchingTestRequiredError) {
       throw error;
     }
 
-    const axiosError = error as { response?: { status: number; data?: { message?: string } } };
-    if (axiosError.response?.status === 404 ||
+    const axiosError = error as {
+      response?: { status: number; data?: { message?: string } };
+    };
+    if (
+      axiosError.response?.status === 404 ||
       axiosError.response?.status === 400 ||
       axiosError.response?.data?.message?.includes("매칭") ||
-      axiosError.response?.data?.message?.includes("테스트")) {
+      axiosError.response?.data?.message?.includes("테스트")
+    ) {
       throw new MatchingTestRequiredError();
     }
 
@@ -288,7 +297,7 @@ export const getMatchingCampaigns = async (
 export const getMatchingBrands = async (
   sortBy: string = "MATCH_SCORE",
   category: string = "ALL",
-  tags?: string[]
+  tags?: string[],
 ): Promise<{ brands: MatchingBrand[]; count: number }> => {
   try {
     const userId = tokenStorage.getUserId();
@@ -296,20 +305,25 @@ export const getMatchingBrands = async (
       throw new MatchingTestRequiredError();
     }
 
-    const params: Record<string, string | number | string[]> = { sortBy, category };
+    const params: Record<string, string | number | string[]> = {
+      sortBy,
+      category,
+    };
     if (tags && tags.length > 0) {
       params.tags = tags;
     }
 
-    const response = await apiClient.get<MatchingBrandResponse>(
+    const response = await axiosInstance.get<MatchingBrandResponse>(
       `/api/v1/matches/brands`,
-      { params }
+      { params },
     );
 
     if (!response.data.isSuccess) {
-      if (response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
+      if (
+        response.data.code === "MATCH_TEST_NOT_COMPLETED" ||
         response.data.message.includes("매칭") ||
-        response.data.message.includes("테스트")) {
+        response.data.message.includes("테스트")
+      ) {
         throw new MatchingTestRequiredError();
       }
       throw new Error(response.data.message || "브랜드 목록 조회 실패");
@@ -323,23 +337,27 @@ export const getMatchingBrands = async (
       matchingRatio: item.matchingRatio,
       isLiked: item.brandIsLiked || false,
       category: item.category || category,
-      tags: item.tags || []
+      tags: item.tags || [],
     }));
 
     return {
       brands,
-      count: response.data.result.count || 0
+      count: response.data.result.count || 0,
     };
   } catch (error: unknown) {
     if (error instanceof MatchingTestRequiredError) {
       throw error;
     }
 
-    const axiosError = error as { response?: { status: number; data?: { message?: string } } };
-    if (axiosError.response?.status === 404 ||
+    const axiosError = error as {
+      response?: { status: number; data?: { message?: string } };
+    };
+    if (
+      axiosError.response?.status === 404 ||
       axiosError.response?.status === 400 ||
       axiosError.response?.data?.message?.includes("매칭") ||
-      axiosError.response?.data?.message?.includes("테스트")) {
+      axiosError.response?.data?.message?.includes("테스트")
+    ) {
       throw new MatchingTestRequiredError();
     }
 
@@ -353,7 +371,9 @@ export const getMatchingBrands = async (
  */
 export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
   try {
-    const response = await apiClient.get<BrandFilterResponse>('/api/v1/brands/filters');
+    const response = await axiosInstance.get<BrandFilterResponse>(
+      "/api/v1/brands/filters",
+    );
 
     if (!response.data.isSuccess) {
       throw new Error(response.data.message || "브랜드 필터 조회 실패");
@@ -380,9 +400,9 @@ interface BrandLikeResponse {
 
 export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   try {
-    const response = await apiClient.post<BrandLikeResponse>(
+    const response = await axiosInstance.post<BrandLikeResponse>(
       `/api/v1/brands/${brandId}/like`,
-      {} // 빈 객체 body 추가
+      {}, // 빈 객체 body 추가
     );
 
     if (!response.data.isSuccess) {
@@ -403,12 +423,13 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
  * @returns 태그 이름 배열
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getTagNamesByCategory = async (_category: string): Promise<string[]> => {
+export const getTagNamesByCategory = async (
+  _category: string,
+): Promise<string[]> => {
   // 카테고리별로 기본 태그를 반환하여 모든 태그 포함
   // 실제로는 API에서 카테고리별 태그를 가져와야 할 수 있음
   return [];
 };
-
 
 // 캠페인 제안 요청 타입
 export interface CreateCampaignProposalRequest {
@@ -441,11 +462,13 @@ interface CreateCampaignProposalResponse {
 /**
  * 캠페인 제안하기 (역제안)
  */
-export const createCampaignProposal = async (data: CreateCampaignProposalRequest): Promise<number> => {
+export const createCampaignProposal = async (
+  data: CreateCampaignProposalRequest,
+): Promise<number> => {
   try {
-    const response = await apiClient.post<CreateCampaignProposalResponse>(
+    const response = await axiosInstance.post<CreateCampaignProposalResponse>(
       "/api/v1/campaigns/proposal",
-      data
+      data,
     );
 
     if (!response.data.isSuccess) {
@@ -503,11 +526,13 @@ export interface MatchRequestDto {
  * 매칭 테스트 결과 분석 요청
  * POST /api/v1/matches
  */
-export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> => {
+export const analyzeMatch = async (
+  data: MatchRequestDto,
+): Promise<MatchResult> => {
   try {
-    const response = await apiClient.post<MatchResultResponse>(
+    const response = await axiosInstance.post<MatchResultResponse>(
       "/api/v1/matches",
-      data
+      data,
     );
 
     if (!response.data.isSuccess) {
