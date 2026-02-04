@@ -15,6 +15,7 @@ const SECTIONS: Array<{ key: Step2SectionKey; title: string }> = [
 ];
 
 type ItemsBySection = Record<Step2SectionKey, TagItem[]>;
+const EMPTY_CATEGORIES: Record<string, TagItem[]> = {};
 
 const pickCategory = (
   categories: Record<string, TagItem[]>,
@@ -49,7 +50,10 @@ export default function MatchingTestStep2Page() {
   const fashionBody = useMatchingTestStore((s) => s.fashionBody);
   const setFashionBody = useMatchingTestStore((s) => s.setFashionBody);
 
-  const categories = data?.categories ?? {};
+  const categories = useMemo(
+    () => data?.categories ?? EMPTY_CATEGORIES,
+    [data?.categories],
+  );
 
   const itemsBySection = useMemo((): ItemsBySection => {
     return {
