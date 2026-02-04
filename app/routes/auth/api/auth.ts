@@ -1,8 +1,5 @@
-import axios from "axios";
 import { apiClient } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import type {
   SignupCompleteRequest,
   SignupCompleteResponse,
@@ -40,8 +37,8 @@ export const refreshToken = async (): Promise<SignupCompleteResponse> => {
     throw new Error("No refresh token available");
   }
 
-  const response = await axios.post<SignupCompleteResponse>(
-    `${BASE_URL}/api/v1/auth/refresh`,
+  const response = await apiClient.post<SignupCompleteResponse>(
+    "/api/v1/auth/refresh",
     {},
     {
       headers: {

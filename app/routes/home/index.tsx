@@ -25,7 +25,15 @@ export default function Home() {
   }, []);
 
   if (hasMatch === null) {
-    return null;
+    return (
+      <div className="flex items-center justify-center w-full h-full min-h-[50vh]">
+        <div className="flex flex-col items-center gap-2">
+          {/* Simple spinner or just text */}
+          <div className="w-8 h-8 border-4 border-gray-200 border-t-primary rounded-full animate-spin" />
+          <span className="text-gray-400 text-sm">로딩중...</span>
+        </div>
+      </div>
+    );
   }
 
   return hasMatch ? <HomeAfterMatch /> : <PreHome />;
