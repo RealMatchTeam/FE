@@ -93,13 +93,13 @@ export default function CalendarContent() {
   const handleCardClick = (item: CampaignCollaboration) => {
     // 1. 거절된 상태일 경우 거절 사유 페이지로 이동
     if (item.status === "REJECTED") {
-      navigate(`/rejection?id=${item.campaignId || item.proposalId}`);
+      navigate(`/rejection?proposalId=${item.proposalId || item.campaignId}`)
     }
     // 2. 그 외(매칭, 검토 중) 상태일 경우 제안 상세 조회 페이지로 이동
     else {
-      // API 명세에 따른 campaignProposalId (item의 proposalId 혹은 campaignId)를 경로에 전달
+      
       const proposalId = item.proposalId || item.campaignId;
-      navigate(`/business/proposal?id=${proposalId}`);
+      navigate(`/business/proposal?proposalId=${proposalId}`);
     }
   };
 

@@ -33,7 +33,7 @@ export interface ProposalDetail {
 export const getProposalDetail = async (proposalId: string): Promise<ProposalDetail> => {
   try {
     const response = await axiosInstance.get<ApiResponse<ProposalDetail>>(
-      `/api/v1/campaigns/proposal/${proposalId}`
+      `/v1/campaigns/proposal/${proposalId}`
     );
 
     if (response.data.isSuccess) {
