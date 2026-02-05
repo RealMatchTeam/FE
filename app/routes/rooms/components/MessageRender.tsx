@@ -17,7 +17,7 @@ export default function MessageRenderer({
   message,
   timeText,
   avatarSrc,
-  isCollaborating,
+  //isCollaborating,
 }: Props) {
 
   switch (message.messageType) {
@@ -38,16 +38,19 @@ export default function MessageRenderer({
 
     case "IMAGE":
     case "FILE": {
+      const att = message.attachment;
+      if (!att) return null;
+
       return (
         <AttachmentMessage
           avatarSrc={avatarSrc}
           senderId={message.senderId}
           createdAt={timeText ?? message.createdAt}
-          attachmentType={message.attachment?.attachmentType!}
-          contentType={message.attachment?.contentType!}
-          originalName={message.attachment?.originalName!}
-          accessUrl={message.attachment?.accessUrl!}
-          status={message.attachment?.status!}
+          attachmentType={att.attachmentType}
+          contentType={att.contentType}
+          originalName={att.originalName}
+          accessUrl={att.accessUrl}
+          status={att.status}
         />
       );
     }
@@ -94,11 +97,7 @@ export default function MessageRenderer({
         );
 
         case "PROPOSAL_STATUS_NOTICE": {
-          const status = sys.payload?.status ?? sys.payload?.proposalStatus;
-
-          if (isCollaborating) { // 둘 중에 뭘 써야하는지?
-            return <ChatNoticeMessage text={CHAT_NOTICE_TEXT.PROPOSAL_ACCEPTED} />;
-          }
+          const status = sys.payload?.status ?? sys.payload?.status;
 
           if (status === "ACCEPTED") {
             return <ChatNoticeMessage text={CHAT_NOTICE_TEXT.PROPOSAL_ACCEPTED} />;
@@ -116,11 +115,7 @@ export default function MessageRenderer({
         }
 
         case "APPLY_STATUS_NOTICE": {
-          const status = sys.payload?.status ?? sys.payload?.applyStatus;
-
-          if (isCollaborating) {
-            return <ChatNoticeMessage text={CHAT_NOTICE_TEXT.APPLY_ACCEPTED} />;
-          }
+          const status = sys.payload?.status ?? sys.payload?.status;
 
           if (status === "ACCEPTED") {
             return <ChatNoticeMessage text={CHAT_NOTICE_TEXT.APPLY_ACCEPTED} />;

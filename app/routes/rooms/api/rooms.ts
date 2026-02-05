@@ -54,12 +54,87 @@ export interface ChatAttachment {
   status: "UPLOADED" | "READY" | "FAILED"; // READY만 채팅 메시지 첨부 가능
 }
 
-export interface SystemMessage {
+/*export interface SystemMessage {
   schemaVersion: number;
   kind: "PROPOSAL_CARD" | "RE_PROPOSAL_CARD" | "PROPOSAL_STATUS_NOTICE" | "MATCHED_CAMPAIGN_CARD" | "APPLY_CARD" | "APPLY_STATUS_NOTICE";
-  payload: any; // kind에 따라 다른 구조
-}
+  payload: unknown; // kind에 따라 다른 구조
+}*/
 
+export type ProposalStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
+export type ProposalDirection = "NONE" | "BRAND_TO_CREATOR" | "CREATOR_TO_BRAND";
+export type NoticeStatus = "ACCEPTED" | "REJECTED" | "CANCELED" | "EXPIRED";
+
+export type ProposalCardPayload = {
+  proposalId: number;
+  campaignId: number;
+  campaignName: string;
+  campaignSummary: string;
+  proposalStatus: ProposalStatus;
+  proposalDirection: ProposalDirection;
+};
+
+export type ApplyCardPayload = {
+  applyId: number;
+  campaignId: number;
+  campaignName: string;
+  campaignDescription: string;
+  applyReason: string;
+};
+
+export type MatchedCampaignCardPayload = {
+  campaignId: number;
+  campaignName: string;
+  amount: number;
+  currency: string; // 예: "KRW"
+  orderNumber: string;
+  message: string | null;
+};
+
+export type ProposalStatusNoticePayload = {
+  proposalId: number;
+  actorUserId: number;
+  processedAt: string; // ISO string
+  status: NoticeStatus; // 프론트에서 문구 결정용
+};
+
+export type ApplyStatusNoticePayload = {
+  applyId: number;
+  actorUserId: number;
+  processedAt: string; // ISO string
+  status: NoticeStatus;
+};
+
+export type SystemMessage =
+  | {
+      schemaVersion: number;
+      kind: "PROPOSAL_CARD";
+      payload: ProposalCardPayload;
+    }
+  | {
+      schemaVersion: number;
+      kind: "RE_PROPOSAL_CARD";
+      payload: ProposalCardPayload; // 동일 구조 재사용
+    }
+  | {
+      schemaVersion: number;
+      kind: "APPLY_CARD";
+      payload: ApplyCardPayload;
+    }
+  | {
+      schemaVersion: number;
+      kind: "MATCHED_CAMPAIGN_CARD";
+      payload: MatchedCampaignCardPayload;
+    }
+  | {
+      schemaVersion: number;
+      kind: "PROPOSAL_STATUS_NOTICE";
+      payload: ProposalStatusNoticePayload;
+    }
+  | {
+      schemaVersion: number;
+      kind: "APPLY_STATUS_NOTICE";
+      payload: ApplyStatusNoticePayload;
+    };
 
 
 type GetChatMessagesParams = {

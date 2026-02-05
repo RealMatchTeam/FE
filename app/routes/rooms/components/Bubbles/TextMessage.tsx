@@ -20,9 +20,9 @@ export default function TextMessage ({
   createdAt,
   avatarSrc,
 }: Props) {
-  if (messageType !== "TEXT") return null;
-
   const myId = Number(useAuthStore((s) => s.me?.id ?? 0));
+
+  if (messageType !== "TEXT") return null;
 
   const isMe = senderType === "USER" && senderId === myId;
   const isLeft = !isMe;

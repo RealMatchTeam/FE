@@ -5,7 +5,7 @@ type Props = {
   onDelete: (messageId: string) => void;
 };
 
-function MessageStatus({
+/*function MessageStatus({
   onRetry,
   onDelete,
 }: {
@@ -56,27 +56,24 @@ function MessageStatus({
       </button>
     </div>
   );
-}
+}*/
 
-export default function MessageMeta({ timeText, onRetry, onDelete }: Props) {
+export default function MessageMeta({ timeText }: Props) {
   
-  if (0) { //작동 X
+  /*if (!test) { //작동 X
     return (
       <MessageStatus
         onRetry={() => onRetry("")}
         onDelete={() => onDelete("")} 
       />
     );
-  }
-
-  if (1) { // 항상 시간 표시
-    return timeText ? (
-      <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
-        {timeText}
-      </div>
-    ) : null;
-  }
-
+  }*/
+  return timeText ? (
+    <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
+      {timeText}
+    </div>
+  ) : null;
+  
   // sending이면 아무것도 안 보임
   return null;
 }

@@ -22,9 +22,9 @@ export default function AttachmentMessage({
   status,
  }: Props) {
   // IMAGE / FILE
-  if (attachmentType !== "IMAGE" && attachmentType !== "FILE") return null;
-
   const myId = Number(useAuthStore((s) => s.me?.id ?? 0));
+
+  if (attachmentType !== "IMAGE" && attachmentType !== "FILE") return null;
   
   const isMe = senderId === myId;
   const timeText = createdAt ?? "";

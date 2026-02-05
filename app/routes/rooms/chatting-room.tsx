@@ -22,7 +22,7 @@ export default function ChattingRoom( {roomId} : Props ) {
   const sheetHeight = kb > 0 ? kb : 240;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [message, setMessage] = useState<ChatMessage | null>(null);
+  const [message] = useState<ChatMessage | null>(null);
   const [detail, setDetail] = useState<ChatRoomDetailResponse | null>(null);
   const { dateText, timeText } = useMemo(() => {
     if (!message) {
@@ -47,12 +47,8 @@ export default function ChattingRoom( {roomId} : Props ) {
   const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasNext, setHasNext] = useState(false);
-
-  /*const uiMessages = useMemo(() => {
-    return mapChatMessagesToUI(messages, myUserId);
-  }, [messages, myUserId]); */
+  //const [cursor, setCursor] = useState<string | null>(null);
+  //const [hasNext, setHasNext] = useState(false);
 
   useEffect(() => {
     if (!Number.isFinite(roomId)) return;
@@ -77,13 +73,13 @@ export default function ChattingRoom( {roomId} : Props ) {
     try {
       const data = await getChatMessages({ roomId, size: 20 });
       setMessages(data.messages.slice().reverse());
-      setCursor(data.nextCursor);
-      setHasNext(data.hasNext);
+      //setCursor(data.nextCursor);
+      //setHasNext(data.hasNext);
     } catch (e) {
       console.error(e);
       setMessages([]);
-      setCursor(null);
-      setHasNext(false);
+      //setCursor(null);
+      //setHasNext(false);
     }
   };
 
