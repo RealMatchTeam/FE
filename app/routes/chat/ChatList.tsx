@@ -1,49 +1,42 @@
 import { formatKoreanDateTime } from "../../utils/dateTime";
 import { useNavigate } from "react-router";
+import { type ChatRoomCard } from "./api/chat";
 
-export type ChatRoom = {
-  id: string;
-  brandName: string;
-  lastMessage: string;
-  updatedAt: string;
-  unreadCount: number;
-  logoUrl: string; 
-  type: "sent" | "received";
-  isCollaborating: boolean;
-};
+export function ChatList({ rooms }: { rooms: ChatRoomCard[] }) {
 
-export function ChatList({ rooms }: { rooms: ChatRoom[] }) {
+  const safeRooms = Array.isArray(rooms) ? rooms : [];
+  
   return (
     <div className="flex flex-col gap-[10px]">
-      {rooms.map((room) => (
-        <ChatListItem key={room.id} room={room} />
+      {safeRooms.map((room) => (
+        <ChatListItem key={room.roomId} room={room} />
       ))}
     </div>
   );
 }
 
-export function ChatListItem({ room }: { room: ChatRoom }) {
+export function ChatListItem({ room }: { room: ChatRoomCard }) {
 
-  const { dateText, timeText } = formatKoreanDateTime(room.updatedAt);
+  const { dateText, timeText } = formatKoreanDateTime(room.lastMessageAt);
   const navigate = useNavigate();
 
   return (
     <button
       type="button"
       className=" w-full max-w-[420px] rounded-[10px] bg-white px-4 py-[14px] flex items-start gap-[14px] text-left active:bg-[#F2F2F5]"
-      onClick={() => navigate(`/rooms/${room.id}`)}
+      onClick={() => navigate(`/rooms/${room.roomId}`)}
     >
       {/* 왼쪽 로고 */}
       <div className="w-[43px] h-[43px] rounded-[10px] bg-white border border-[#E6E6F3] flex items-center justify-center overflow-hidden shrink-0">
-        {room.logoUrl ? (
+        {room.opponentProfileImageUrl ? (
           <img
-            src={room.logoUrl}
-            alt={`${room.brandName} 로고`}
+            src={room.opponentProfileImageUrl}
+            alt={`${room.opponentName} 로고`}
             className="w-full h-full object-contain"
           />
         ) : (
           <span className="text-callout3 text-text-gray3">
-            {room.brandName.slice(0, 2)}
+            {room.opponentName.slice(0, 2)}
           </span>
         )}
       </div>
@@ -53,7 +46,7 @@ export function ChatListItem({ room }: { room: ChatRoom }) {
         {/* 1줄: 브랜드명 + 상태 뱃지 */}
         <div className="flex items-center gap-2">
           <div className="text-title1 text-text-black font-Pretendard truncate">
-            {room.brandName}
+            {room.opponentName}
           </div>
 
           {room.isCollaborating && (
@@ -74,7 +67,7 @@ export function ChatListItem({ room }: { room: ChatRoom }) {
 
         {/* 2줄 미리보기 */}
         <div className="text-[12px] mt-2.5 text-Medium text-text-gray3 line-clamp-2">
-          {room.lastMessage}
+          {room.lastMessagePreview}
         </div>
       </div>
 

@@ -1,7 +1,13 @@
 export const CHAT_NOTICE_TEXT = {
-  MATCHED: "캠페인이 매칭 되었습니다.\n협업을 시작해 주세요.",
-  ACCEPTED: "제안이 수락 되었습니다.\n협업을 시작해 주세요.",
-  REJECTED: "제안이 수락되지 않았습니다.\n다른 캠페인을 확인해 주세요.",
+  PROPOSAL_ACCEPTED: "제안이 수락되었습니다.\n협업을 시작해 주세요.",
+  PROPOSAL_REJECTED: "제안이 수락되지 않았습니다.\n다른 협업 기회를 확인해보세요.",
+  PROPOSAL_CANCELED: "제안이 취소되었습니다.\n다른 협업 기회를 확인해보세요.",
+
+  APPLY_ACCEPTED: "지원이 수락되었습니다.\n협업을 시작해 주세요.",
+  APPLY_REJECTED: "지원이 수락되지 않았습니다.\n다른 협업 기회를 확인해보세요.",
+  APPLY_CANCELED: "지원이 취소되었습니다.\n다른 협업 기회를 확인해보세요.",
+
+  DEFAULT: "시스템 메시지 오류입니다.",
 } as const;
 
 type Props = {

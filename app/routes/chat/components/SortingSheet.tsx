@@ -28,8 +28,8 @@ export function SortFilterSheet({
       />
 
       {/* 시트 */}
-      <div className="fixed left-1/2 -translate-x-1/2 top-[235px] w-full max-w-[375px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
-        <div className="w-full max-w-[375px] h-[70px] fixed left-1/2 -translate-x-1/2"> 
+      <div className="fixed left-1/2 -translate-x-1/2 top-[235px] w-full max-w-[430px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
+        <div className="w-full max-w-[430px] h-[70px] fixed left-1/2 -translate-x-1/2"> 
           <div className="px-4 text-Medium text-text-black mb-3">정렬 필터</div>
 
           <div className="bg-[#F3F4F8] px-4 py-3">
