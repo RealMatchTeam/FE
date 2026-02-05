@@ -1,6 +1,6 @@
 type Props = {
-  title: string; // 텍스트
-  onBack?: () => void; //onBack={() => history.back()} 뒤로가기
+  title: string;
+  onBack?: () => void;
 };
 
 export default function NavigationHeader({ title, onBack }: Props) {

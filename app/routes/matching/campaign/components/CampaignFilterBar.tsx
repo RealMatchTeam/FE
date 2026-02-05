@@ -1,6 +1,6 @@
 import Button from "../../../../components/common/Button";
 import SearchBar from "../../../../components/common/SearchBar";
-import type { CampaignCategory } from "../../../../data/campaign";
+import type { CampaignCategory } from "../../../../types/campaign";
 import { cn } from "../../../../lib/utils";
 
 interface CampaignFilterBarProps {

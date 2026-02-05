@@ -1,7 +1,9 @@
 import { useSearchParams } from "react-router";
 import BrandDetailContent from "./brand-detail-content";
 import { useBrandDetail } from "./query";
-import type { BrandDomain } from "./types";
+import type { BrandDomain } from "../../types/brand";
+
+import LoadingView from "../../components/common/LoadingView";
 
 export default function BrandDetailPage() {
   const [searchParams] = useSearchParams();
@@ -16,7 +18,7 @@ export default function BrandDetailPage() {
   const { data, isLoading, isError } = useBrandDetail(brandId, domain);
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white px-5 py-6">로딩중…</div>;
+    return <LoadingView message="브랜드 정보를 불러오는 중이에요" />;
   }
 
   if (isError || !data) {

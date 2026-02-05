@@ -5,6 +5,7 @@ import type {
   InternalAxiosRequestConfig,
 } from "axios";
 import { tokenStorage } from "../lib/token";
+import { toast } from "sonner";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -46,13 +47,16 @@ const onTokenRefreshed = (token: string) => {
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
+  async (error: AxiosError<{ message?: string }>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
 
-    // 400 또는 401 에러이고, 재시도하지 않은 요청인 경우
-    if ((error.response?.status === 401 || error.response?.status === 400) && !originalRequest._retry) {
+    // 에러 메시지 추출
+    const errorMessage = error.response?.data?.message || "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+
+    // 401 에러(Unauthorized) 처리
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (!isRefreshing) {
@@ -62,13 +66,11 @@ axiosInstance.interceptors.response.use(
           const refreshToken = tokenStorage.getRefreshToken();
 
           if (!refreshToken) {
-            // Refresh Token이 없으면 로그아웃 처리
             tokenStorage.clearTokens();
             window.location.href = "/auth/login";
             return Promise.reject(error);
           }
 
-          // Refresh Token으로 새 Access Token 발급
           const response = await axios.post(
             `${BASE_URL}/api/v1/auth/refresh`,
             {},
@@ -82,29 +84,23 @@ axiosInstance.interceptors.response.use(
           const { accessToken, refreshToken: newRefreshToken } =
             response.data.result;
 
-          // 새로운 토큰 저장
           tokenStorage.setTokens(accessToken, newRefreshToken);
-
-          // 대기 중인 요청들에 새 토큰 전달
           onTokenRefreshed(accessToken);
 
-          // 원래 요청 재시도
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           }
 
           isRefreshing = false;
-
           return axiosInstance(originalRequest);
         } catch (refreshError) {
-          // Refresh Token도 만료된 경우 로그아웃 처리
           isRefreshing = false;
           tokenStorage.clearTokens();
           window.location.href = "/auth/login";
+          toast.error("세션이 만료되었습니다. 다시 로그인해주세요.");
           return Promise.reject(refreshError);
         }
       } else {
-        // 이미 갱신 중인 경우, 갱신이 완료될 때까지 대기
         return new Promise((resolve) => {
           subscribeTokenRefresh((token: string) => {
             if (originalRequest.headers) {
@@ -114,6 +110,13 @@ axiosInstance.interceptors.response.use(
           });
         });
       }
+    }
+
+    // 400 에러 및 기타 유효성 검사 에러 토스트 노출
+    if (error.response) {
+      toast.error(errorMessage);
+    } else if (error.request) {
+      toast.error("서버와 통신할 수 없습니다. 네트워크 연결을 확인해주세요.");
     }
 
     return Promise.reject(error);

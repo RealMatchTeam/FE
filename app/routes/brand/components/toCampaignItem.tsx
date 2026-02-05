@@ -1,5 +1,5 @@
-import type { CampaignItem } from "../../home/types";
-import type { BrandOngoingCampaign } from "../types";
+import type { CampaignItem } from "../../../types/creator";
+import type { BrandOngoingCampaign } from "../../../types/campaign";
 
 export function toCampaignItem(campaign: BrandOngoingCampaign): CampaignItem {
 

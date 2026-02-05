@@ -14,8 +14,9 @@ import InputSheet from "../components/InputSheet";
 import SelectSheet from "../components/SelectSheet";
 import CheckDropdown from "../components/CheckDropdown";
 import Button from "../../../../components/common/Button";
-
-import type { ContentTags, TagItem } from "../_shared/tags/tags.types";
+import LoadingView from "../../../../components/common/LoadingView";
+import type { ContentTags } from "../../../../types/matching";
+import type { TagItem } from "../../../../types/campaign";
 
 type Props = {
   tagsLoading: boolean;
@@ -238,7 +239,7 @@ export default function MatchingTestStep3Content({
           onClick={onNext}
           disabled={!canGoNext || submitting || tagsLoading || !!tagsError}
         >
-          {submitting ? "제출 중..." : "매칭 결과 보기"}
+          매칭 결과 보기
         </Button>
 
         {submitError ? (
@@ -246,80 +247,91 @@ export default function MatchingTestStep3Content({
         ) : null}
       </div>
 
-      {sheet === "snsUrl" ? (
-        <BottomSheet title="인스타그램 주소 입력" onClose={close}>
-          <InputSheet
-            value={snsUrl}
-            placeholder="https://www.instagram.com/your_id"
-            onChange={onSnsUrlChange}
-            doneDisabled={!isValidInstagramUrl}
-            onDone={close}
-            helperText="예: https://www.instagram.com/your_id"
-            errorText={
-              snsUrl.trim().length > 0 && !isValidInstagramUrl
-                ? "instagram.com/ 으로 시작하는 URL이어야 해요."
-                : undefined
-            }
-          />
-        </BottomSheet>
-      ) : null}
+      {submitting && <LoadingView message="매칭 결과를 분석하는 중이에요" />}
+      {
+        sheet === "snsUrl" ? (
+          <BottomSheet title="인스타그램 주소 입력" onClose={close}>
+            <InputSheet
+              value={snsUrl}
+              placeholder="https://www.instagram.com/your_id"
+              onChange={onSnsUrlChange}
+              doneDisabled={!isValidInstagramUrl}
+              onDone={close}
+              helperText="예: https://www.instagram.com/your_id"
+              errorText={
+                snsUrl.trim().length > 0 && !isValidInstagramUrl
+                  ? "instagram.com/ 으로 시작하는 URL이어야 해요."
+                  : undefined
+              }
+            />
+          </BottomSheet>
+        ) : null
+      }
 
-      {sheet === "gender" ? (
-        <BottomSheet title="성별" onClose={close}>
-          <CheckDropdown
-            options={genderOptions.map((x) => x.name)}
-            values={namesByIds(step3Selected.gender, genderOptions)}
-            onToggle={(name) => {
-              const id = idByName(name, genderOptions);
-              if (id != null) onToggleSelect("gender", id);
-            }}
-            onDone={close}
-          />
-        </BottomSheet>
-      ) : null}
+      {
+        sheet === "gender" ? (
+          <BottomSheet title="성별" onClose={close}>
+            <CheckDropdown
+              options={genderOptions.map((x) => x.name)}
+              values={namesByIds(step3Selected.gender, genderOptions)}
+              onToggle={(name) => {
+                const id = idByName(name, genderOptions);
+                if (id != null) onToggleSelect("gender", id);
+              }}
+              onDone={close}
+            />
+          </BottomSheet>
+        ) : null
+      }
 
-      {sheet === "ageGroup" ? (
-        <BottomSheet title="나이대" onClose={close}>
-          <CheckDropdown
-            options={ageOptions.map((x) => x.name)}
-            values={namesByIds(step3Selected.ageGroup, ageOptions)}
-            onToggle={(name) => {
-              const id = idByName(name, ageOptions);
-              if (id != null) onToggleSelect("ageGroup", id);
-            }}
-            onDone={close}
-          />
-        </BottomSheet>
-      ) : null}
+      {
+        sheet === "ageGroup" ? (
+          <BottomSheet title="나이대" onClose={close}>
+            <CheckDropdown
+              options={ageOptions.map((x) => x.name)}
+              values={namesByIds(step3Selected.ageGroup, ageOptions)}
+              onToggle={(name) => {
+                const id = idByName(name, ageOptions);
+                if (id != null) onToggleSelect("ageGroup", id);
+              }}
+              onDone={close}
+            />
+          </BottomSheet>
+        ) : null
+      }
 
-      {sheet === "videoLength" ? (
-        <BottomSheet title="영상 길이" onClose={close}>
-          <SelectSheet
-            options={videoLenOptions.map((x) => x.name)}
-            value={lenValue}
-            onSelect={(name) => {
-              const id = idByName(name, videoLenOptions);
-              if (id != null) onSelectSingle("videoLength", id);
-              close();
-            }}
-          />
-        </BottomSheet>
-      ) : null}
+      {
+        sheet === "videoLength" ? (
+          <BottomSheet title="영상 길이" onClose={close}>
+            <SelectSheet
+              options={videoLenOptions.map((x) => x.name)}
+              value={lenValue}
+              onSelect={(name) => {
+                const id = idByName(name, videoLenOptions);
+                if (id != null) onSelectSingle("videoLength", id);
+                close();
+              }}
+            />
+          </BottomSheet>
+        ) : null
+      }
 
-      {sheet === "views" ? (
-        <BottomSheet title="조회수" onClose={close}>
-          <SelectSheet
-            options={viewsOptions.map((x) => x.name)}
-            value={viewsValue}
-            onSelect={(name) => {
-              const id = idByName(name, viewsOptions);
-              if (id != null) onSelectSingle("views", id);
-              close();
-            }}
-          />
-        </BottomSheet>
-      ) : null}
-    </div>
+      {
+        sheet === "views" ? (
+          <BottomSheet title="조회수" onClose={close}>
+            <SelectSheet
+              options={viewsOptions.map((x) => x.name)}
+              value={viewsValue}
+              onSelect={(name) => {
+                const id = idByName(name, viewsOptions);
+                if (id != null) onSelectSingle("views", id);
+                close();
+              }}
+            />
+          </BottomSheet>
+        ) : null
+      }
+    </div >
   );
 }
 

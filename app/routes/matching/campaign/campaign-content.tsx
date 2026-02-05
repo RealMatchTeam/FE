@@ -1,16 +1,19 @@
 import { useState, useMemo, useDeferredValue, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import FilterButton from "../../../components/common/FilterButton";
 import CampaignCard from "./components/CampaignCard";
-import { type CampaignCategory } from "../../../data/campaign";
+import { type CampaignCategory } from "../../../types/campaign";
 import CampaignFilterBar from "./components/CampaignFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import MainIcon from "../../../assets/MainIcon.svg";
-import { getMatchingCampaigns, getTagNamesByCategory, type MatchingCampaign } from "../api/matching";
+import { getMatchingCampaigns, getTagNamesByCategory } from "../api/matching";
+import type { MatchingCampaign } from "../../../types/campaign";
+
+import LoadingView from "../../../components/common/LoadingView";
 
 export default function CampaignContent() {
     const [searchParams] = useSearchParams();
@@ -41,12 +44,11 @@ export default function CampaignContent() {
     // 데이터 페칭
     const {
         data,
-        isLoading,
         error,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage
-    } = useInfiniteQuery({
+    } = useSuspenseInfiniteQuery({
         queryKey: ["matching-campaigns", category, sortOption, selectedTags, deferredKeyword],
         queryFn: async ({ pageParam = 0 }) => {
             const tagsToSend = selectedTags.length > 0 ? selectedTags : await getTagNamesByCategory(category);
@@ -122,17 +124,10 @@ export default function CampaignContent() {
         return "콘텐츠 필터";
     };
 
-    // 로딩 중
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-full bg-core-2">
-                <div className="text-lg text-text-gray3">로딩 중...</div>
-            </div>
-        );
-    }
+
 
     // 매칭 결과가 없거나 에러
-    if (error || (campaigns.length === 0 && !isLoading)) {
+    if (error || campaigns.length === 0) {
         if (error) console.error("Failed to fetch matching campaigns:", error);
 
         return (
@@ -195,7 +190,11 @@ export default function CampaignContent() {
 
                     {/* 무한 스크롤 트리거 & 로딩 */}
                     <div ref={ref} className="h-10 flex items-center justify-center">
-                        {isFetchingNextPage && <div className="text-sm text-gray-500">더 불러오는 중...</div>}
+                        {isFetchingNextPage && (
+                            <div className="py-4">
+                                <LoadingView fullscreen={false} message="더 불러오는 중이에요" />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

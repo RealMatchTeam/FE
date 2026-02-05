@@ -1,15 +1,16 @@
 import { useState, useMemo, useDeferredValue } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import FilterButton from "../../../components/common/FilterButton";
 import BrandCard from "./components/BrandCard";
-import { type BrandCategory } from "../../../data/brand";
+import { type BrandCategory } from "../../../types/brand";
 import BrandFilterBar from "./components/BrandFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import MainIcon from "../../../assets/MainIcon.svg";
-import { getMatchingBrands, toggleBrandLike, type MatchingBrand } from "../api/matching";
+import { getMatchingBrands, toggleBrandLike } from "../api/matching";
+import type { MatchingBrand } from "../../../types/brand";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
@@ -38,9 +39,8 @@ export default function BrandContent() {
     // 데이터 페칭
     const {
         data,
-        isLoading,
         error
-    } = useInfiniteQuery({
+    } = useSuspenseInfiniteQuery({
         queryKey: ["matching-brands", category, sortOption, selectedTags],
         queryFn: async () => {
             // 페이지네이션 없이 한 번만 호출 
@@ -129,17 +129,10 @@ export default function BrandContent() {
         return category === "BEAUTY" ? "뷰티 필터" : "패션 필터";
     };
 
-    // 로딩 중
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-full bg-core-2">
-                <div className="text-lg text-text-gray3">로딩 중...</div>
-            </div>
-        );
-    }
+
 
     // 매칭 결과가 없거나 에러
-    if (error || (brands.length === 0 && !isLoading)) {
+    if (error || brands.length === 0) {
         if (error) console.error("Failed to fetch matching brands:", error);
 
         return (

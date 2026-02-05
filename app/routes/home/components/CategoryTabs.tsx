@@ -1,5 +1,5 @@
 // src/routes/_home/components/CategoryTabs.tsx
-import type { CategoryKey } from "../types";
+import type { CategoryKey } from "../../../types/home";
 
 const PRIMARY = "#5B5DEB";
 

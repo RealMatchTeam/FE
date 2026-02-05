@@ -4,6 +4,8 @@ import BottomTab from "../components/layout/BottomTab";
 import { LayoutContext } from "./layout-context";
 import Logo from "../assets/logo/RealMatchLogo_ex.svg";
 import { tokenStorage } from "../lib/token";
+import LoadingView from "../components/common/LoadingView";
+import { Suspense } from "react";
 
 export default function MainLayout() {
   const [hideBottomTab, setHideBottomTab] = useState(false);
@@ -32,7 +34,9 @@ export default function MainLayout() {
         )}
 
         <main className="flex-1 w-full bg-[#FAFAFA] overflow-y-auto">
-          <Outlet />
+          <Suspense fallback={<LoadingView />}>
+            <Outlet />
+          </Suspense>
         </main>
 
         {!hideBottomTab && <BottomTab />}

@@ -6,7 +6,7 @@ import { FlowNavigation } from "../../components/FlowNavigation";
 import { TermsSection } from "./components/TermsSection";
 import { SubTermsSection } from "./components/SubTermsSection";
 import { TermsDetailModal } from "./components/TermsDetailModal";
-import { TERMS_CONTENTS } from "../../../../data/termsData";
+import { TERMS_CONTENTS } from "../../../../data/terms";
 import { useSignupStore } from "../../../../stores/signupStore";
 
 // 약관 동의 상태 타입 정의

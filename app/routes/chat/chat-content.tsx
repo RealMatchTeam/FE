@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { SORT_LABEL, type SortOption } from "./components/SortingSheetConstant";
-import { rooms } from "../../data/chat-room";
+import type { ChatRoom } from "./ChatList";
+// import { rooms } from "./mock"; // 목 데이터 제거
+const rooms: ChatRoom[] = [];
 import { ChatListHeader } from "./components/ChatListHeader";
 import SortFilterSheet from "./components/SortingSheet";
 import ChatList from "./ChatList";

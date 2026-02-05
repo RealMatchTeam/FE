@@ -1,4 +1,4 @@
-import type { CampaignItem } from "../types";
+import type { CampaignItem } from "../../../types/creator";
 import HeartButton from "./HeartButton";
 import BadgePill from "./BadgePill";
 

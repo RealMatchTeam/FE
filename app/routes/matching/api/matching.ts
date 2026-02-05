@@ -1,34 +1,10 @@
 import { apiClient } from "../../../api/axios";
-import { tokenStorage } from "../../../lib/token";
+import type { MatchResult, MatchRequestDto } from "../../../types/matching";
+import type { MatchingBrand, BrandLikeResponseDto } from "../../../types/brand";
+import type { MatchingCampaign, CreateCampaignProposalRequest } from "../../../types/campaign";
+import type { ApiResponse } from "../../../types/common";
 
-// 매칭 분석 결과 조회 응답 타입
-export interface MatchResult {
-  userType: string;
-  typeTag: string[];
-  highMatchingBrandList?: {
-    count: number;
-    brands: MatchingBrand[];
-  };
-}
-
-// 스토어에서 사용하는 타입 (MatchResult와 동일하나 highMatchingBrandList가 필수)
-export interface MatchResponseDto {
-  userType: string;
-  typeTag: string[];
-  highMatchingBrandList: {
-    count: number;
-    brands: { brandId: number; logoUrl?: string; brandName: string }[];
-  };
-}
-
-interface MatchResultResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: MatchResult;
-}
-
-// ... existing imports
+type MatchResultResponse = ApiResponse<MatchResult>;
 
 /**
  * 매칭 분석 결과 조회
@@ -36,10 +12,6 @@ interface MatchResultResponse {
  */
 export const getMatchAnalysis = async (): Promise<MatchResult> => {
   try {
-    const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
 
     const response = await apiClient.get<MatchResultResponse>(`/api/v1/matches`);
 
@@ -63,120 +35,24 @@ export const getMatchAnalysis = async (): Promise<MatchResult> => {
   }
 };
 
-// 매칭 캠페인 응답 타입 (CampaignDto)
-export interface MatchingCampaign {
-  id: number;
-  brandName: string;
-  name?: string;
-  title?: string;
-  campaignName?: string;
-  category: string;
-  manuscriptFee?: number; // reward
-  reward?: number;
-  matchingRatio?: number; // matchRate
-  matchRate?: number;
-  applicants: number;
-  isLiked: boolean;
-  logoUrl?: string; // brandLogoUrl
-  dDay?: number;
-}
+import type {
+  MatchCampaignRawItem,
+  MatchBrandRawItem,
+  BrandFilterResponseDto
+} from "../../../types/matching";
 
-// 매칭 브랜드 응답 타입 (BrandDto)
-export interface MatchingBrand {
-  id: number;
-  name: string;
-  logoUrl?: string;
-  matchRate: number;
-  matchingRatio?: number;
-  isLiked: boolean;
-  category: string;
-  tags?: string[];
-}
+type MatchingCampaignResponse = ApiResponse<{
+  brands: MatchCampaignRawItem[];
+  count: number;
+}>;
 
-interface MatchingCampaignResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: {
-    brands: MatchCampaignRawItem[];
-    count: number;
-  };
-}
+type MatchingBrandResponse = ApiResponse<{
+  brands: MatchBrandRawItem[];
+  count: number;
+}>;
 
-interface MatchingBrandResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: {
-    brands: MatchBrandRawItem[];
-    count: number;
-  };
-}
+type BrandFilterResponse = ApiResponse<BrandFilterResponseDto[]>;
 
-interface MatchCampaignRawItem {
-  brandId: number;
-  campaignId?: number;
-  brandName: string;
-  campaignName: string;
-  category: string;
-  campaignManuscriptFee: number;
-  brandMatchingRatio: number;
-  campaignTotalCurrentRecruit: number;
-  campaignTotalRecruit: number;
-  brandIsLiked: boolean;
-  brandLogoUrl: string;
-  campaignDDay: number;
-  campaignDetail?: string;
-}
-
-interface MatchBrandRawItem {
-  brandId: number;
-  brandName: string;
-  logoUrl: string;
-  matchingRatio: number;
-  brandIsLiked?: boolean;
-  category?: string;
-  tags?: string[];
-}
-
-// 브랜드 필터 타입
-export interface CategoryDto {
-  categoryId: number;
-  categoryName: string;
-}
-
-export interface FunctionDto {
-  functionId: number;
-  functionName: string;
-}
-
-export interface SkinTypeDto {
-  skinTypeId: number;
-  skinTypeName: string;
-}
-
-export interface MakeUpStyleDto {
-  makeUpId: number;
-  makeUpName: string;
-}
-
-export interface BeautyFilterDto {
-  category: CategoryDto[];
-  function: FunctionDto[];
-  skinType: SkinTypeDto[];
-  makeUpStyle: MakeUpStyleDto[];
-}
-
-export interface BrandFilterResponseDto {
-  beautyFilter: BeautyFilterDto;
-}
-
-interface BrandFilterResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: BrandFilterResponseDto[];
-}
 
 // 커스텀 에러 클래스
 export class MatchingTestRequiredError extends Error {
@@ -204,10 +80,6 @@ export const getMatchingCampaigns = async (
   size: number = 20
 ): Promise<{ campaigns: MatchingCampaign[]; count: number }> => {
   try {
-    const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
 
     const params: Record<string, string | number | string[]> = {
       sortBy,
@@ -240,7 +112,7 @@ export const getMatchingCampaigns = async (
     }
 
     // API 응답 필드를 인터페이스 형식으로 변환
-    const campaigns = (response.data.result.brands || []).map((item) => ({
+    const campaigns: MatchingCampaign[] = (response.data.result.brands || []).map((item: MatchCampaignRawItem) => ({
       id: item.brandId || item.campaignId || 0,
       brandName: item.brandName,
       name: item.campaignName || item.campaignDetail,
@@ -256,6 +128,7 @@ export const getMatchingCampaigns = async (
       logoUrl: item.brandLogoUrl,
       dDay: item.campaignDDay
     }));
+
 
     return {
       campaigns,
@@ -291,11 +164,6 @@ export const getMatchingBrands = async (
   tags?: string[]
 ): Promise<{ brands: MatchingBrand[]; count: number }> => {
   try {
-    const userId = tokenStorage.getUserId();
-    if (!userId) {
-      throw new MatchingTestRequiredError();
-    }
-
     const params: Record<string, string | number | string[]> = { sortBy, category };
     if (tags && tags.length > 0) {
       params.tags = tags;
@@ -315,16 +183,17 @@ export const getMatchingBrands = async (
       throw new Error(response.data.message || "브랜드 목록 조회 실패");
     }
 
-    const brands = (response.data.result.brands || []).map((item) => ({
+    const brands: MatchingBrand[] = (response.data.result.brands || []).map((item: MatchBrandRawItem) => ({
       id: item.brandId,
       name: item.brandName,
-      logoUrl: item.logoUrl,
-      matchRate: item.matchingRatio || 0,
-      matchingRatio: item.matchingRatio,
+      logoUrl: item.logoUrl || item.brandLogoUrl,
+      matchRate: item.matchingRatio || item.brandMatchingRatio || 0,
+      matchingRatio: item.matchingRatio || item.brandMatchingRatio,
       isLiked: item.brandIsLiked || false,
       category: item.category || category,
-      tags: item.tags || []
+      tags: item.tags || item.brandTags || []
     }));
+
 
     return {
       brands,
@@ -366,17 +235,8 @@ export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
   }
 };
 
-// 브랜드 좋아요 응답 타입
-export interface BrandLikeResponseDto {
-  brandIsLiked: boolean;
-}
+type BrandLikeResponse = ApiResponse<BrandLikeResponseDto[]>;
 
-interface BrandLikeResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: BrandLikeResponseDto[];
-}
 
 export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   try {
@@ -409,25 +269,6 @@ export const getTagNamesByCategory = async (_category: string): Promise<string[]
   return [];
 };
 
-
-// 캠페인 제안 요청 타입
-export interface CreateCampaignProposalRequest {
-  brandId: number;
-  creatorId: number;
-  campaignId: number | null;
-  campaignName: string;
-  description: string;
-  formats: { id: string }[];
-  categories: { id: string }[];
-  tones: { id: string }[];
-  involvements: { id: string }[];
-  usageRanges: { id: string }[];
-  rewardAmount: number;
-  productId: number;
-  startDate: string;
-  endDate: string;
-}
-
 // 캠페인 제안 응답 타입
 interface CreateCampaignProposalResponse {
   isSuccess: boolean;
@@ -458,46 +299,6 @@ export const createCampaignProposal = async (data: CreateCampaignProposalRequest
     throw error;
   }
 };
-
-// 매칭 테스트 요청 DTO
-export interface MatchRequestDto {
-  userId: string | number;
-  sex: string;
-  age: number;
-  height: number;
-  weight: number;
-  size: {
-    upper: number;
-    bottom: number;
-  };
-  beauty: {
-    interests: string[];
-    functions: string[];
-    skinType: string;
-    skinTone: string;
-    makeupStyle: string;
-  };
-  fashion: {
-    styles: string[];
-    items: string[];
-    preferredBrands: string[];
-  };
-  sns: {
-    url: string;
-    mainAudience: {
-      sex: string[];
-      age: string[];
-    };
-    contentStyle: {
-      avgVideoLength: string;
-      avgViews: string;
-      format: string;
-      type: string;
-      contributionLevel: string;
-      usageCoverage: string;
-    };
-  };
-}
 
 /**
  * 매칭 테스트 결과 분석 요청

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import Button from "../../../../components/common/Button";
+import LoadingView from "../../../../components/common/LoadingView";
 import { FlowNavigation } from "../../components/FlowNavigation";
 import { PurposeSection } from "./components/PurposeSection";
 import { useSignupStore } from "../../../../stores/signupStore";
@@ -122,9 +123,10 @@ function SignUpPurposeContent() {
           onClick={handleNext}
           disabled={isSubmitting || selectedPurposes.length === 0}
         >
-          {isSubmitting ? "가입 중..." : "완료"}
+          완료
         </Button>
       </div>
+      {isSubmitting && <LoadingView message="회원가입 진행 중..." />}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function SuggestHeader({ title, onBack }: SuggestHeaderProps) {
     if (onBack) {
       onBack();
     } else {
-      navigate({ to: "/" });
+      navigate("/");
     }
   };
 

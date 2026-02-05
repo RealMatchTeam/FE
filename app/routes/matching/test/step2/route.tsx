@@ -6,7 +6,7 @@ import {
   type Step2SectionKey,
 } from "../../../../stores/matching-test";
 import { useFashionTags } from "../_shared/tags/tags.query";
-import type { TagItem } from "../_shared/tags/tags.types";
+import type { TagItem } from "../../../../types/campaign";
 
 const SECTIONS: Array<{ key: Step2SectionKey; title: string }> = [
   { key: "fashionStyle", title: "관심 스타일" },

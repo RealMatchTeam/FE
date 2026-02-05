@@ -1,6 +1,6 @@
 // src/routes/_home/components/HeroCarousel.tsx
 import { useState } from "react";
-import type { HeroItem } from "../types";
+import type { HeroItem } from "../../../types/home";
 
 export default function HeroCarousel({ items }: { items: HeroItem[] }) {
   const [idx, setIdx] = useState(0);

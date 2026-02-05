@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProposalDetail, getBrandDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
-import type { BrandDetail } from "../../../data/brand";
+import { getProposalDetail, getBrandDetail } from "./api/proposal"; // 경로 확인 필요
+import type { BrandDetail } from "../../../types/brand";
+import type { ProposalDetail } from "../../../types/campaign";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -12,6 +13,7 @@ import dropupIcon from "../../../assets/arrow-up.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
+import LoadingView from "../../../components/common/LoadingView";
 
 export default function ProposalContent() {
     const [searchParams] = useSearchParams();
@@ -46,7 +48,7 @@ export default function ProposalContent() {
         fetchData();
     }, [proposalId]);
 
-    if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+    if (isLoading) return <LoadingView message="제안 내용을 불러오는 중이에요" />;
     if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
 
     // 태그 배열을 문자열로 변환하는 헬퍼 함수

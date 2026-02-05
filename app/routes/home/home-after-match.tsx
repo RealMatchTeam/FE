@@ -1,48 +1,86 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
-import type { CategoryKey, CreatorProfileModel } from "./types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { CategoryKey } from "../../types/home";
+import type { CreatorProfileModel } from "../../types/creator";
+
 import CategoryTabs from "./components/CategoryTabs";
 import SectionHeader from "./components/SectionHeader";
 import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
 import MatchAnalysisSection from "./components/MatchAnalysisSection";
 import CreatorProfileCard from "./components/CreatorProfileCard";
-import { getMatchingBrands, getMatchingCampaigns, toggleBrandLike, type MatchingBrand, type MatchingCampaign } from "../matching/api/matching";
+import { getMatchingBrands, getMatchingCampaigns, toggleBrandLike } from "../matching/api/matching";
 import { useMatchResultStore } from "../../stores/matching-result";
 import bannerBeauty from "../../assets/home-banner/banner-beauty.svg";
 import bannerFashion from "../../assets/home-banner/banner-fashion.svg";
+import { toast } from "sonner";
 
 export default function HomeAfterMatchPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [category, setCategory] = useState<CategoryKey>("beauty");
-  const [brands, setBrands] = useState<MatchingBrand[]>([]);
-  const [campaigns, setCampaigns] = useState<MatchingCampaign[]>([]);
-  const [popularCampaigns, setPopularCampaigns] = useState<MatchingCampaign[]>([]);
 
-  // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
+  // 매칭 결과 스토어
   const matchResult = useMatchResultStore((s) => s.result);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [brandsData, campaignsData, popularData] = await Promise.all([
-          getMatchingBrands("MATCH_SCORE", "ALL"),
-          getMatchingCampaigns("MATCH_SCORE", "ALL"),
-          getMatchingCampaigns("POPULARITY", "ALL")
-        ]);
-        setBrands(brandsData.brands);
-        setCampaigns(campaignsData.campaigns);
-        setPopularCampaigns(popularData.campaigns);
-      } catch (error) {
-        console.error("Failed to fetch matching data:", error);
-      }
-    };
+  // 데이터 페칭 최적화 (react-query 사용)
+  const { data: brandsData } = useQuery({
+    queryKey: ["matchingBrands", "MATCH_SCORE", "ALL"],
+    queryFn: () => getMatchingBrands("MATCH_SCORE", "ALL"),
+  });
 
-    fetchData();
+  const { data: campaignsData } = useQuery({
+    queryKey: ["matchingCampaigns", "MATCH_SCORE", "ALL"],
+    queryFn: () => getMatchingCampaigns("MATCH_SCORE", "ALL"),
+  });
+
+  const { data: popularCampaignsData } = useQuery({
+    queryKey: ["matchingCampaigns", "POPULARITY", "ALL"],
+    queryFn: () => getMatchingCampaigns("POPULARITY", "ALL"),
+  });
+
+  const brands = useMemo(() => brandsData?.brands || [], [brandsData]);
+  const campaigns = useMemo(() => campaignsData?.campaigns || [], [campaignsData]);
+  const popularCampaigns = useMemo(() => popularCampaignsData?.campaigns || [], [popularCampaignsData]);
+
+  // 이미지 프리로딩 (성능 최적화)
+  useEffect(() => {
+    const images = [bannerBeauty, bannerFashion];
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
   }, []);
 
-  // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
-  // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
+  // 좋아요 토글 Mutation
+  const likeMutation = useMutation({
+    mutationFn: async ({ id }: { id: number; type: "brand" | "campaign" }) => {
+      // 기존 코드에서도 toggleBrandLike를 공용으로 사용함
+      return toggleBrandLike(id);
+    },
+    onSuccess: (newLikeStatus) => {
+      // 캐시 무효화하여 최신 상태 반영
+      queryClient.invalidateQueries({ queryKey: ["matchingBrands"] });
+      queryClient.invalidateQueries({ queryKey: ["matchingCampaigns"] });
+      toast.success(newLikeStatus ? "좋아요 리스트에 추가되었습니다." : "좋아요가 취소되었습니다.");
+    },
+    onError: () => {
+      toast.error("좋아요 처리에 실패했습니다.");
+    }
+  });
+
+  // 브랜드 좋아요 토글 (useCallback)
+  const handleBrandLikeToggle = useCallback((id: string) => {
+    likeMutation.mutate({ id: Number(id), type: "brand" });
+  }, [likeMutation]);
+
+  // 캠페인 좋아요 토글 (useCallback)
+  const handleCampaignLikeToggle = useCallback((id: string) => {
+    likeMutation.mutate({ id: Number(id), type: "campaign" });
+  }, [likeMutation]);
+
+  // 프로필 데이터 가공 (useMemo)
   const profile = useMemo(() => {
     if (matchResult?.apiResult) {
       const apiResult = matchResult.apiResult;
@@ -50,7 +88,7 @@ export default function HomeAfterMatchPage() {
         creatorName: "크리에이터 님",
         creatorType: "creator",
         summary: apiResult.userType || "크리에이터",
-        highlightBrandText: apiResult.highMatchingBrandList?.brands[0]?.brandName || "매칭된 브랜드",
+        highlightBrandText: apiResult.highMatchingBrandList?.brands?.[0]?.brandName || "매칭된 브랜드",
         traits: {
           beauty: apiResult.typeTag?.[0] || "특성 1",
           fashion: apiResult.typeTag?.[1] || "특성 2",
@@ -58,7 +96,6 @@ export default function HomeAfterMatchPage() {
         }
       } as CreatorProfileModel;
     } else if (matchResult?.summary) {
-      // apiResult가 없으면 summary 사용
       return {
         creatorName: "크리에이터 님",
         creatorType: "creator",
@@ -73,39 +110,6 @@ export default function HomeAfterMatchPage() {
     }
     return null;
   }, [matchResult]);
-
-  // 브랜드 좋아요 토글
-  const handleBrandLikeToggle = async (id: string) => {
-    try {
-      const brandId = Number(id);
-      const newLikeStatus = await toggleBrandLike(brandId);
-
-      setBrands(prev => prev.map(brand =>
-        brand.id === brandId ? { ...brand, isLiked: newLikeStatus } : brand
-      ));
-    } catch (error) {
-      console.error("Failed to toggle brand like:", error);
-    }
-  };
-
-  // 캠페인 좋아요 토글
-  const handleCampaignLikeToggle = async (id: string) => {
-    try {
-      const campaignId = Number(id);
-      const newLikeStatus = await toggleBrandLike(campaignId);
-
-      // 매칭률 높은 캠페인 업데이트
-      setCampaigns(prev => prev.map(campaign =>
-        campaign.id === campaignId ? { ...campaign, isLiked: newLikeStatus } : campaign
-      ));
-      // 인기 캠페인도 업데이트
-      setPopularCampaigns(prev => prev.map(campaign =>
-        campaign.id === campaignId ? { ...campaign, isLiked: newLikeStatus } : campaign
-      ));
-    } catch (error) {
-      console.error("Failed to toggle campaign like:", error);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">

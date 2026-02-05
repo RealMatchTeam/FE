@@ -11,6 +11,7 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
+import LoadingView from "../../../components/common/LoadingView";
 
 
 export default function CalendarContent() {
@@ -90,7 +91,7 @@ export default function CalendarContent() {
         {mainTab === "collaboration" ? (
           /* [A] 협업 현황 */
           <div className="flex flex-col gap-6 px-4 py-6">
-              {/* 주간 캘린더 연동 */}
+            {/* 주간 캘린더 연동 */}
             <section className="flex flex-col gap-3">
               <SectionTitle title="진행 중인 협업" />
               <p className="text-title1 font-bold text-text-black">이번주 일정</p>
@@ -120,7 +121,9 @@ export default function CalendarContent() {
               </div>
               <div className="flex flex-col gap-4">
                 {isLoading ? (
-                  <p className="text-center py-10 text-text-gray3">로딩 중...</p>
+                  <div className="py-10">
+                    <LoadingView fullscreen={false} message="일정을 불러오는 중이에요" />
+                  </div>
                 ) : filteredList.length > 0 ? (
                   filteredList.map((cp) => (
                     <CampaignCard
@@ -162,39 +165,39 @@ export default function CalendarContent() {
                 <div className="flex flex-col gap-4">
                   {matchingSubTab === "sent" ? (
                     <>
-                      <MatchingCard 
-                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" 
+                      <MatchingCard
+                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기"
                         onClick={() => handleCardClick("sent")} // 4. 핸들러 연결
                       />
-                      <MatchingCard 
-                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                      <MatchingCard
+                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기"
                         onClick={() => handleCardClick("sent")}
                       />
-                      <MatchingCard 
-                        brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                      <MatchingCard
+                        brand="땡큐파머" status="검토 중" date="12.23.25" actionLabel="제안 보기"
                         onClick={() => handleCardClick("sent")}
                       />
-                      <MatchingCard 
-                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" 
+                      <MatchingCard
+                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기"
                         onClick={() => handleCardClick("sent")}
                       />
                     </>
                   ) : (
                     <>
-                      <MatchingCard 
-                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기" 
+                      <MatchingCard
+                        brand="라운드랩" status="매칭" date="12.23.25" actionLabel="제안 보기"
                         onClick={() => handleCardClick("received")} // 4. 핸들러 연결
                       />
-                      <MatchingCard 
-                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                      <MatchingCard
+                        brand="비플레인" status="검토 중" date="12.23.25" actionLabel="제안 보기"
                         onClick={() => handleCardClick("received")}
                       />
-                      <MatchingCard 
-                        brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기" 
+                      <MatchingCard
+                        brand="그레이스유" status="검토 중" date="12.23.25" actionLabel="제안 보기"
                         onClick={() => handleCardClick("received")}
                       />
-                      <MatchingCard 
-                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기" 
+                      <MatchingCard
+                        brand="이즈트리" status="거절" date="12.23.25" actionLabel="거절 사유 보기"
                         onClick={() => handleCardClick("received")}
                       />
                     </>

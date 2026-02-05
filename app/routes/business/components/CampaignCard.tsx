@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import BrandLogo from "../../../assets/brand-logo.png";
+import BrandLogo from "../../../assets/icon-profile.svg";
 import ArrowRight from "../../../assets/icon/arrow-right.svg";
 import SearchIcon from "../../../assets/icon/search.svg";
 import Card from "../../../components/common/Card";
@@ -40,7 +40,7 @@ export default function CampaignCard({
     <Card image={Logo}>
       {/* 1. 컨테이너: 세로 배치, 간격 10px, 하단 정렬 */}
       <div className="flex flex-col justify-end items-end gap-[10px] w-full self-stretch">
-        
+
         {/* 2. 상단 정보 섹션 */}
         <div className="flex flex-col w-full gap-1">
           {/* 브랜드명 */}

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import LoadingView from "../../../../components/common/LoadingView";
 import { useNavigate, useSearchParams } from "react-router";
 import { jwtDecode } from "jwt-decode";
 import { tokenStorage } from "../../../../lib/token";
@@ -62,8 +63,6 @@ export default function KakaoCallback() {
   }, [code, navigate, searchParams, setMe]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-xl">카카오 로그인 진행중...</div>
-    </div>
+    <LoadingView message="카카오 로그인 진행중..." />
   );
 }

@@ -6,7 +6,7 @@ import {
   useMatchingTestStore,
   type SectionKey,
 } from "../../../../stores/matching-test";
-import type { TagItem } from "../_shared/tags/tags.types";
+import type { TagItem } from "../../../../types/campaign";
 
 const SECTIONS: Array<{ key: SectionKey; title: string }> = [
   { key: "style", title: "관심 스타일" },

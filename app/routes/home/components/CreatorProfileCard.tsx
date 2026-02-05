@@ -1,7 +1,7 @@
 
 
 
- import type { CreatorProfileModel } from "../types";
+import type { CreatorProfileModel } from "../../../types/creator";
 
 import beautyIcon from "../../../assets/beauty-icon.svg";
 import fashionIcon from "../../../assets/fashion-icon.svg";
@@ -33,7 +33,7 @@ export default function CreatorProfileCard({ model }: Props) {
           <span className="font-semibold" style={{ color: PRIMARY }}>
             {model.highlightBrandText}
           </span>
-                      와 잘 어울릴 것으로 보여요.
+          와 잘 어울릴 것으로 보여요.
         </div>
       </div>
 

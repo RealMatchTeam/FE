@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { BrandDomain } from "./types";
+import type { BrandDomain } from "../../types/brand";
 import { fetchBrandDetail } from "./api/api";
 
 export function useBrandDetail(brandId: string, domain?: BrandDomain) {

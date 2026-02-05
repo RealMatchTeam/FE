@@ -1,5 +1,5 @@
 import { apiClient } from "../../../api/axios";
-import type { BrandDomain, BrandDetailData, TagGroup } from "../types";
+import type { BrandDomain, BrandDetailData, TagGroup } from "../../../types/brand";
 
 // API 응답 타입
 interface BrandSkinCareTagDto {

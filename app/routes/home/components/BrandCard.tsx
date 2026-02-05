@@ -1,5 +1,5 @@
 // src/routes/_home/components/BrandCard.tsx
-import type { BrandItem } from "../types";
+import type { BrandItem } from "../../../types/creator";
 import HeartButton from "./HeartButton";
 import BadgePill from "./BadgePill";
 

@@ -8,7 +8,7 @@ import OngoingCampaignSection from "./components/OngoingCampaignSection";
 import ProductMiniCard from "./components/ProductMiniCard";
 import HistoryRow from "./components/HistoryRow";
 
-import type { BrandDetailData } from "./types";
+import type { BrandDetailData } from "../../types/brand";
 
 type Props = {
   data: BrandDetailData;

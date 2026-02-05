@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { createCampaignProposal } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
 import Button from "../../../../components/common/Button";
+import LoadingView from "../../../../components/common/LoadingView";
 import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
 import {
   TextInput,
@@ -17,7 +18,8 @@ import {
 import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
 import { CheckIcon } from "../../../auth/components/CheckIcon";
 import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
-import { existingCampaigns } from "../../../../data/existing-campaigns";
+// import { existingCampaigns } from "./mock"; // 목 데이터 제거
+const existingCampaigns: { id: number; name: string }[] = [];
 import ProfileSelector from "../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
@@ -118,11 +120,11 @@ export default function CreateCampaignContent() {
         campaignId: type === "existing" ? selectedCampaignIds[0] : null,
         campaignName: formData.campaignName || "",
         description: formData.description || "",
-        formats: formData.format ? [{ id: formData.format }] : [],
-        categories: formData.category ? [{ id: formData.category }] : [],
-        tones: formData.tone ? [{ id: formData.tone }] : [],
-        involvements: formData.involvement ? [{ id: formData.involvement }] : [],
-        usageRanges: formData.usageScope ? [{ id: formData.usageScope }] : [],
+        formats: formData.format ? [{ id: Number(formData.format) }] : [],
+        categories: formData.category ? [{ id: Number(formData.category) }] : [],
+        tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
+        involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
+        usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
         rewardAmount: Number(formData.fee) || 0,
         productId: Number(formData.sponsorProduct) || 0,
         startDate: formData.startDate || "",
@@ -144,7 +146,7 @@ export default function CreateCampaignContent() {
 
   // 선택된 캠페인 이름 가져오기
   const selectedCampaignName = existingCampaigns.find(
-    (c) => selectedCampaignIds.includes(c.id)
+    (c: { id: number; name: string }) => selectedCampaignIds.includes(c.id)
   )?.name;
 
   const title =
@@ -332,7 +334,7 @@ export default function CreateCampaignContent() {
 
           {/* 캠페인 목록 */}
           <div className="px-5 pt-2.5 pb-20 flex flex-col gap-2.5">
-            {existingCampaigns.map((campaign) => (
+            {existingCampaigns.map((campaign: { id: number; name: string }) => (
               <label
                 key={campaign.id}
                 className="flex items-center gap-2.5 cursor-pointer"
@@ -470,11 +472,13 @@ export default function CreateCampaignContent() {
               onClick={handleConfirmSubmit}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "제안 중..." : "제안하기"}
+              제안하기
             </Button>
           </div>
         </div>
       </FilterBottomSheet>
+
+      {isSubmitting && <LoadingView message="캠페인 제안을 보내는 중이에요" />}
     </div>
   );
 }

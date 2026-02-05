@@ -1,8 +1,9 @@
 import MatchingTestTopBar from "../components/MatchingTestHeader";
 import SelectChip from "../components/SelectChip";
 import Button from "../../../../components/common/Button";
+import LoadingView from "../../../../components/common/LoadingView";
 import type { SectionKey } from "../../../../stores/matching-test";
-import type { TagItem } from "../_shared/tags/tags.types";
+import type { TagItem } from "../../../../types/campaign";
 
 type Props = {
   isLoading: boolean;
@@ -31,14 +32,9 @@ export default function MatchingTestContent({
   onNext,
 }: Props) {
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
-      </div>
-    );
+    if (isLoading) {
+      return <LoadingView message="태그 정보를 불러오는 중이에요" />;
+    }
   }
 
   if (errorText) {

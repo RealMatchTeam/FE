@@ -1,10 +1,4 @@
-// 공통 응답 타입
-export interface ApiResponse<T> {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: T;
-}
+import type { ApiResponse } from "./common";
 
 // 성별
 export type Gender = "MALE" | "FEMALE" | "NONE";

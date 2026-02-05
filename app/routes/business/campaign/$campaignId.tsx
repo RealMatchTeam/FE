@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
-import { type ProposalDetail, getProposalDetail } from "../../../data/campaign";
+import { type ProposalDetail, getProposalDetail } from "./api/campaign";
 
 import editIcon from "../../../assets/icon-edit.svg";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 import calendarIcon from "../../../assets/icon-calender.svg";
+import LoadingView from "../../../components/common/LoadingView";
 
 export default function CampaignContent() {
   const { campaignId } = useParams();
@@ -37,7 +38,7 @@ export default function CampaignContent() {
   }, [campaignId]);
 
   // 데이터 로딩 전
-  if (!data) return <div className="p-10 text-center">로딩 중...</div>;
+  if (!data) return <LoadingView message="캠페인 정보를 불러오는 중이에요" />;
 
   // 태그들을 예쁘게 합쳐주는 함수 (예: ["릴스", "숏폼"] -> "릴스, 숏폼")
   const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");

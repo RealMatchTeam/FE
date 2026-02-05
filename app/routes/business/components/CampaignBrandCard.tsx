@@ -1,17 +1,17 @@
-import brandLogo from "../../../assets/brand-logo.png";
+import brandLogo from "../../../assets/icon-profile.svg";
 import chatIcon from "../../../assets/chat-icon.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 
 interface CampaignBrandCardProps {
-  showChatSection?: boolean; 
+  showChatSection?: boolean;
   statusText?: string;      // '보낸 제안' 또는 '검토 중'
-  brandName?: string;     
-  brandTags?: string[];   
+  brandName?: string;
+  brandTags?: string[];
 
 }
 
-export default function CampaignBrandCard({ 
-  showChatSection = true, 
+export default function CampaignBrandCard({
+  showChatSection = true,
   statusText = "보낸 제안",
   brandName,
   brandTags
@@ -35,11 +35,11 @@ export default function CampaignBrandCard({
               <h2 className="text-title1 text-text-black">
                 {brandName || "브랜드명"}
               </h2>
-              <img src={arrowRightIcon} alt="arrow"/>
+              <img src={arrowRightIcon} alt="arrow" />
             </div>
             <p className="text-callout1 text-text-gray3 mt-3">
-              {brandTags && brandTags.length > 0 
-                ? brandTags.map(tag => `#${tag}`).join(" ") 
+              {brandTags && brandTags.length > 0
+                ? brandTags.map(tag => `#${tag}`).join(" ")
                 : "#태그정보없음"}
             </p>
           </div>

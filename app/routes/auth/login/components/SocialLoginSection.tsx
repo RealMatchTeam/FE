@@ -12,20 +12,21 @@ const Tooltip = () => (
 );
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const REDIRECT_BASE_URL = import.meta.env.VITE_REDIRECT_BASE_URL;
 
 export function SocialLoginSection({ lastProvider }: SocialLoginSectionProps) {
   const handleKakaoLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/callback/kakao`;
+    const redirectUri = `${REDIRECT_BASE_URL}/auth/callback/kakao`;
     window.location.href = `${BASE_URL}/oauth2/authorization/kakao?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
   const handleNaverLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/callback/naver`;
+    const redirectUri = `${REDIRECT_BASE_URL}/auth/callback/naver`;
     window.location.href = `${BASE_URL}/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
   const handleGoogleLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/callback/google`;
+    const redirectUri = `${REDIRECT_BASE_URL}/auth/callback/google`;
     window.location.href = `${BASE_URL}/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 

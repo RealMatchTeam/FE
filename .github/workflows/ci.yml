@@ -33,8 +33,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    # main 브랜치에서만 빌드 실행
-    if: github.ref == 'refs/heads/main'
     needs: lint
 
     steps:

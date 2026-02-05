@@ -16,10 +16,8 @@ export default function RealMatchHeader({
 
   const handleBack = () => {
     if (onBack) return onBack();
-
-    // 가능하면 라우터 상위로, 실패하면 브라우저 히스토리
     try {
-      navigate({ to: "/matching/test/step3" });
+      navigate("/matching/test/step3");
     } catch {
       window.history.back();
     }
