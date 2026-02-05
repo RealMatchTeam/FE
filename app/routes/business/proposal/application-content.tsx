@@ -25,7 +25,6 @@ export default function ApplicationContent() {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                // 지원하기 상세 조회 API가 별도로 있다면 해당 함수로 교체하세요.
                 const result = await getAppliedCampaignDetail(applicationId as string);
                 setData(result);
             } catch (error) {
