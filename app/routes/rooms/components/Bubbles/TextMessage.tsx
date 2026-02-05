@@ -1,18 +1,32 @@
-import { type ChatMessage_UI } from "../types/ChatMessage_UI";
+import { useAuthStore } from "../../../../stores/auth-store";
 
 type Props = {
-  message: ChatMessage_UI;
+  //messageId: number;
+  //roomId: number;
+  senderId: number | null;
+  senderType: "USER" | "SYSTEM";
+  messageType: "TEXT" | "IMAGE" | "FILE" | "SYSTEM";
+  content: string | null;
+  createdAt: string;
+  avatarSrc?: string;
 };
 
-export default function TextMessage ({ message }: Props) {
-  if (message.type !== "TEXT") return null;
 
-  const isMe = message.side === "me";
-  const isLeft = message.side === "other" || message.side === "system";
+export default function TextMessage ({
+  senderId,
+  senderType,
+  messageType,
+  content,
+  createdAt,
+  avatarSrc,
+}: Props) {
+  if (messageType !== "TEXT") return null;
 
-  const timeText = message.time ?? "";
+  const myId = Number(useAuthStore((s) => s.me?.id ?? 0));
 
-  const avatarSrc = message.avatarSrc; //임시
+  const isMe = senderType === "USER" && senderId === myId;
+  const isLeft = !isMe;
+  const timeText = createdAt ?? "";
 
   if (isMe) {
     return (
@@ -26,7 +40,7 @@ export default function TextMessage ({ message }: Props) {
           }
 
           {<div className="w-fit max-w-[240px] px-[10px] py-[10px] rounded-[10px] bg-[#B7B7F380] text-black text-[12px] leading-[16px] style-black break-words whitespace-pre-line"> 
-            {message.content}
+            {content}
           </div>
           } 
         </div>
@@ -42,7 +56,7 @@ export default function TextMessage ({ message }: Props) {
           {/* avatar */}
           <div
             className="shrink-0 rounded-[10px] bg-white overflow-hidden"
-            style={{ width: message.avatarSize, height: message.avatarSize }}
+            style={{ width: 38, height: 38 }}
           >
             {avatarSrc ? (
               <img
@@ -62,7 +76,7 @@ export default function TextMessage ({ message }: Props) {
           <div className="flex justify-start">
             <div className="flex items-end gap-[8px] max-w-[calc(100%-48px)]">
               <div className="w-fit max-w-[240px] rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-[12px] leading-[16px] text-Medium text-black break-words whitespace-pre-line">
-                {message.content}
+                {content}
               </div>
 
               {timeText ? (

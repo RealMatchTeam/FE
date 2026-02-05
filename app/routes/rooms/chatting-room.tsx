@@ -4,12 +4,11 @@ import ChatComposer from "./components/ChatComposer";
 import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
 import MessageRenderer from "./components/MessageRender";
-//import { formatKoreanDateTime } from "../../utils/dateTime";
+import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
 import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage } from "./api/rooms";
-import { mapChatMessagesToUI } from "./components/types/ChatMessageMapper";
 import { useAuthStore } from "../../stores/auth-store";
 
 type Props = {
@@ -23,8 +22,16 @@ export default function ChattingRoom( {roomId} : Props ) {
   const sheetHeight = kb > 0 ? kb : 240;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [message, setMessage] = useState<ChatMessage | null>(null);
   const [detail, setDetail] = useState<ChatRoomDetailResponse | null>(null);
-  //const { dateText, timeText } = formatKoreanDateTime(messages.createdAt);
+  const { dateText, timeText } = useMemo(() => {
+    if (!message) {
+      return { dateText: "", timeText: "" };
+    }
+    return formatKoreanDateTime(message.createdAt);
+  }, [message]);
+  const createdAt =`${dateText}\n${timeText}`;
+
 
   const myUserId = useAuthStore((s) => Number(s.me?.id ?? 0));
   const partnerName = detail?.opponentName ?? "";
@@ -43,9 +50,9 @@ export default function ChattingRoom( {roomId} : Props ) {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasNext, setHasNext] = useState(false);
 
-  const uiMessages = useMemo(() => {
+  /*const uiMessages = useMemo(() => {
     return mapChatMessagesToUI(messages, myUserId);
-  }, [messages, myUserId]);
+  }, [messages, myUserId]); */
 
   useEffect(() => {
     if (!Number.isFinite(roomId)) return;
@@ -125,7 +132,7 @@ export default function ChattingRoom( {roomId} : Props ) {
     const tempId = -Date.now(); // 임시 messageId (음수)
     const clientId = crypto.randomUUID();
 
-    const generalText: ChatMessage = { // 메시지 전송은 따로있음
+    const generalText: ChatMessage = { 
       messageId: tempId,
       roomId,
       senderId: myUserId, // 내 유저 id
@@ -134,7 +141,7 @@ export default function ChattingRoom( {roomId} : Props ) {
       content: trimmed,
       attachment: null,
       systemMessage: null,
-      createdAt: new Date().toISOString(),
+      createdAt: createdAt,
       clientMessageId: clientId,
     };
 
@@ -169,14 +176,20 @@ export default function ChattingRoom( {roomId} : Props ) {
       >
         <div className="w-full">
           <div className="w-full space-y-2">
-            {uiMessages.map((m) => (
-              <MessageRenderer
-                key={m.id}
-                message={m}
-                avatarSrc= {m.side === "me" ? undefined : partnerAvatarUrl} // 상대방 메시지에만 아바타 표시
-                avatarSize={38}
-              />
-            ))}
+            {messages.map((m) => {
+              const isMe = m.senderType === "USER" && m.senderId === myUserId;
+
+              return (
+                <MessageRenderer
+                  key={m.messageId ?? m.clientMessageId ?? `${m.roomId}-${m.createdAt}`}
+                  message={m}                         
+                  //isMe={isMe}                         
+                  timeText={createdAt}              
+                  avatarSrc={isMe ? undefined : partnerAvatarUrl}
+                  isCollaborating={isCollaborating}
+                />
+              );
+            })}
           </div>
         </div>
       </div>

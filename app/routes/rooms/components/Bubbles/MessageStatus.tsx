@@ -1,7 +1,5 @@
-import { type ChatMessage_UI } from "../types/ChatMessage_UI";
 
 type Props = {
-  message: ChatMessage_UI;
   timeText: string;
   onRetry: (messageId: string) => void;
   onDelete: (messageId: string) => void;
@@ -60,17 +58,18 @@ function MessageStatus({
   );
 }
 
-export default function MessageMeta({ message, timeText, onRetry, onDelete }: Props) {
-  if (message.status === "failed") {
+export default function MessageMeta({ timeText, onRetry, onDelete }: Props) {
+  
+  if (0) { //작동 X
     return (
       <MessageStatus
-        onRetry={() => onRetry(message.id)}
-        onDelete={() => onDelete(message.id)}
+        onRetry={() => onRetry("")}
+        onDelete={() => onDelete("")} 
       />
     );
   }
 
-  if (message.status === "sent") {
+  if (1) { // 항상 시간 표시
     return timeText ? (
       <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
         {timeText}

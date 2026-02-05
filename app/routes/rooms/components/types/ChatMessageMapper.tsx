@@ -21,7 +21,7 @@ function removeExt(name: string): string {
 function mapSystemMessage(api: ChatMessage): Pick<ChatMessage_UI, "type" | "content" | "campaignName" | "campaignContent" | "price" | "orderId"> {
   const sys = api.systemMessage;
   if (!sys) {
-    return { type: "SYSTEM_MATCHED" }; // fallback (원하는 기본값으로 바꿔도 됨)
+    return { type: "SYSTEM_MATCHED" }; // fallback -
   }
 
   switch (sys.kind) {

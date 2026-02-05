@@ -56,9 +56,11 @@ export interface ChatAttachment {
 
 export interface SystemMessage {
   schemaVersion: number;
-  kind: "PROPOSAL_CARD" | "PROPOSAL_STATUS_NOTICE" | "MATCHED_CAMPAIGN_CARD";
+  kind: "PROPOSAL_CARD" | "RE_PROPOSAL_CARD" | "PROPOSAL_STATUS_NOTICE" | "MATCHED_CAMPAIGN_CARD" | "APPLY_CARD" | "APPLY_STATUS_NOTICE";
   payload: any; // kind에 따라 다른 구조
 }
+
+
 
 type GetChatMessagesParams = {
   roomId: number;

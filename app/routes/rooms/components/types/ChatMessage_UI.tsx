@@ -19,7 +19,7 @@ export type ChatMessage_UI = {
 
 export type TextMessageProps = {
   message: ChatMessage_UI;
-  /** 상대 프로필(로고) 이미지. 없으면 플레이스홀더 */
+  /** 상대 프로필 이미지. 없으면 플레이스홀더 */
   avatarSrc?: string;
   /** 상대 프로필 원형 크기(px) */
   avatarSize?: number;
