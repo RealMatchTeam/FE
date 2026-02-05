@@ -1,32 +1,63 @@
-import { type ChatMessage } from "./TextMessageTypes";
+import { useAuthStore } from "../../../../stores/auth-store";
 
 type Props = {
-  message: ChatMessage;
+  avatarSrc?: string;
+  senderId: number | null; // 시스템 메시지는 null
+  createdAt: string;
+  attachmentType: "IMAGE" | "FILE";
+  contentType: string;
+  originalName: string;
+  accessUrl: string | null; // Presigned URL. null이면 에러 토스트 등 처리 필요
+  status: "UPLOADED" | "READY" | "FAILED"; // READY만 채팅 메시지 첨부 가능
 };
 
-export default function AttachmentMessage({ message }: Props) {
+export default function AttachmentMessage({
+  avatarSrc,
+  senderId,
+  createdAt,
+  attachmentType,
+  contentType,
+  originalName,
+  accessUrl,
+  status,
+ }: Props) {
   // IMAGE / FILE
-  if (message.type !== "IMAGE" && message.type !== "FILE") return null;
+  const myId = Number(useAuthStore((s) => s.me?.id ?? 0));
 
-  const isMe = message.side === "me";
-  const isLeft = message.side === "other" || message.side === "system";
-  const timeText = message.time ?? "";
-
-  //  message에서 꺼내 쓰기
-  const avatarSrc = message.avatarSrc; 
-  const avatarSize = message.avatarSize ?? 38;
+  if (attachmentType !== "IMAGE" && attachmentType !== "FILE") return null;
+  
+  const isMe = senderId === myId;
+  const timeText = createdAt ?? "";
 
   // 파일 정보
-  const fileName = message.fileName ?? "IM_1234";
-  const ext = message.ext ?? "png";
+  const fileName = originalName;
+  const ext = contentType;
 
   const handleOpen = () => {
-    // TODO: 파일/이미지 열기
-    console.log("open attachment:", message.type, fileName, ext);
+    if (status !== "READY" || !accessUrl) {
+      // 여기서 토스트 나중에 추가
+      console.warn("Attachment is not ready or accessUrl is missing");
+      return;
+    }
+
+    if (attachmentType === "IMAGE") {
+      window.open(accessUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = accessUrl;
+    link.download = originalName; // 확인 필요
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // 아이콘 SVG 분기
-  const Icon = message.type === "IMAGE" ? ImageIcon : FileIcon;
+  const Icon = attachmentType === "IMAGE" ? ImageIcon : FileIcon;
  
   // 내 채팅
   if (isMe) {
@@ -64,14 +95,14 @@ export default function AttachmentMessage({ message }: Props) {
   }
 
   // 상대 채팅
-  if (isLeft) {
+  if (!isMe) {
     return (
       <div className="flex justify-start">
         <div className="w-fit flex items-start gap-[10px] max-w-full">
           {/* avatar */}
           <div
             className="shrink-0 rounded-[10px] bg-white overflow-hidden"
-            style={{ width: avatarSize, height: avatarSize }}
+            style={{ width: 38, height: 38 }}
           >
             {avatarSrc ? (
               <img

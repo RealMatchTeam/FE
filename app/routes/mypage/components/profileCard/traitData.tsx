@@ -74,7 +74,7 @@ export const TRAITS: Trait[] = [
   },
   {
     id: "content",
-    badge: "향수 특성",
+    badge: "콘텐츠 특성",
     icon: (className = "") => (
       <img src={contentIcon} alt="content" className={className} />
     ),

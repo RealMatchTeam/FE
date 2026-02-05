@@ -1,13 +1,11 @@
-import { type ChatMessage } from "./TextMessageTypes";
 
 type Props = {
-  message: ChatMessage;
   timeText: string;
   onRetry: (messageId: string) => void;
   onDelete: (messageId: string) => void;
 };
 
-function MessageStatus({
+/*function MessageStatus({
   onRetry,
   onDelete,
 }: {
@@ -58,26 +56,24 @@ function MessageStatus({
       </button>
     </div>
   );
-}
+}*/
 
-export default function MessageMeta({ message, timeText, onRetry, onDelete }: Props) {
-  if (message.status === "failed") {
+export default function MessageMeta({ timeText }: Props) {
+  
+  /*if (!test) { //작동 X
     return (
       <MessageStatus
-        onRetry={() => onRetry(message.id)}
-        onDelete={() => onDelete(message.id)}
+        onRetry={() => onRetry("")}
+        onDelete={() => onDelete("")} 
       />
     );
-  }
-
-  if (message.status === "sent") {
-    return timeText ? (
-      <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
-        {timeText}
-      </div>
-    ) : null;
-  }
-
+  }*/
+  return timeText ? (
+    <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
+      {timeText}
+    </div>
+  ) : null;
+  
   // sending이면 아무것도 안 보임
   return null;
 }

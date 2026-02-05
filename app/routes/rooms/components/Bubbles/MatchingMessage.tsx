@@ -1,17 +1,26 @@
-import { type ChatMessage } from "./TextMessageTypes";
 import { useNavigate } from "react-router";
 import MessageMeta from "./MessageStatus";
 
 type Props = {
-  message: ChatMessage;
+  //campaignId: number;
+  campaignName: string;
+  amount: number;
+  orderNumber: string;
+  createdAt?: string;
+  avatarSrc?: string;
 };
 //onRetry: (id: string) => void;
 //onDelete: (id: string) => void;
 
-export default function MatchedCampaignMessage({ message, }: Props) {
-  const timeText = message.time ?? "";
-  const avatarSize = 38;
-  const avatarSrc = undefined;
+export default function MatchedCampaignMessage({ 
+  campaignName,
+  amount,
+  orderNumber,
+  createdAt,
+  avatarSrc,
+ }: Props) {
+
+  const timeText = createdAt ?? "";
   const navigate = useNavigate();
 
   return (
@@ -20,7 +29,7 @@ export default function MatchedCampaignMessage({ message, }: Props) {
         {/* avatar */}
         <div
           className="shrink-0 rounded-[10px] bg-white overflow-hidden"
-          style={{ width: avatarSize, height: avatarSize }}
+          style={{ width: 38, height: 38 }}
         >
           {avatarSrc ? (
             <img
@@ -46,7 +55,7 @@ export default function MatchedCampaignMessage({ message, }: Props) {
 
               <div className="flex items-center">
                 <div className="min-w-0 text-[14px] leading-[20px] style-Medium text-[#404252] truncate">
-                  {message.campaignName}
+                  {campaignName}
                 </div>
 
                 <button
@@ -66,7 +75,7 @@ export default function MatchedCampaignMessage({ message, }: Props) {
                   결제 금액
                 </div>
                 <div className="text-[14px] leading-[20px] style-Medium text-[#6666E5]">
-                  {message.price?.toLocaleString()} 원
+                  {amount.toLocaleString()} 원
                 </div>
                 <div className="text-[10px] leading-[12px] text-[#9B9BA1]">
                   *결제 대금은 캠페인 종료 후 크리에이터에게 전달됩니다
@@ -74,12 +83,11 @@ export default function MatchedCampaignMessage({ message, }: Props) {
               </div>
 
               <div className="text-[12px] leading-[16px] style-Medium text-[#404252]">
-                주문 번호 {message.orderId}
+                주문 번호 {orderNumber}
               </div>
             </div>
           </div>
           <MessageMeta
-            message={message}
             timeText={timeText}
             onRetry={() => {}}//Todo: onRetry
             onDelete={() => {}}// Todo: onDelete

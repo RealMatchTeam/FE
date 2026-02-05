@@ -6,12 +6,9 @@ export function ChatListHeader({
   sortLabel,
   onClickSort,
 }: {
-  activeTab: "sent" | "received";
-  setActiveTab: (tab: "sent" | "received") => void;
   sortLabel: string;
   onClickSort: () => void;
   sortOpen: boolean;
-  
 }) {
   const [query, setQuery] = useState("");
 
