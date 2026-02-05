@@ -13,7 +13,6 @@ import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
 //import { MATCHING_DUMMY_DATA } from "../calendar/api/calendar";
 
-
 export default function CalendarContent() {
   const navigate = useNavigate();
   const [mainTab, setMainTab] = useState<"collaboration" | "matching">("collaboration");
@@ -22,8 +21,6 @@ export default function CalendarContent() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("전체");
 
-  //const hasData = true;
-
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,7 +28,6 @@ export default function CalendarContent() {
     const fetchCampaigns = async () => {
       try {
         setIsLoading(true);
-        // matchingSubTab 값에 따라 대문자로 변환하여 API 요청
         const data = await getMyCollaborations({
           type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED"
         });
@@ -43,7 +39,7 @@ export default function CalendarContent() {
       }
     };
     fetchCampaigns();
-  }, [matchingSubTab]); // 탭 클릭 시마다 API 다시 호출
+  }, [matchingSubTab]);
 
   // 상태 변환 헬퍼 함수
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
@@ -51,16 +47,14 @@ export default function CalendarContent() {
       case "MATCHED":
         return "매칭";
       case "REVIEWING":
-      case "NONE": // NONE 상태도 '검토 중'으로 처리하거나 기획에 맞게 할당
+      case "NONE": 
         return "검토 중";
       case "REJECTED":
         return "거절";
       default:
-        // API에서 예상치 못한 값이 올 경우 기본값으로 "검토 중"을 반환하여 에러 방지
         return "검토 중";
     }
   };
-
 
   const matchingList = campaigns.filter((item) => {
     const isCorrectSubTab =
@@ -70,7 +64,6 @@ export default function CalendarContent() {
 
     if (!isCorrectSubTab) return false;
 
-    // activeFilter가 "전체"가 아닐 때 데이터가 사라지는지 확인
     if (activeFilter === "전체") return true;
     return getStatusLabel(item.status) === activeFilter;
   });
@@ -86,22 +79,27 @@ export default function CalendarContent() {
     if (activeTab === "today") {
       return item.startDate <= todayStr && item.endDate >= todayStr;
     }
-    // 이번달 기준 (시작일이나 종료일이 이번 달에 포함된 경우)
     return item.startDate.includes(currentMonthStr) || item.endDate.includes(currentMonthStr);
   });
 
   const handleCardClick = (item: CampaignCollaboration) => {
-    // 1. 거절된 상태일 경우 거절 사유 페이지로 이동
-    if (item.status === "REJECTED") {
-      navigate(`/rejection?proposalId=${item.proposalId || item.campaignId}`)
-    }
-    // 2. 그 외(매칭, 검토 중) 상태일 경우 제안 상세 조회 페이지로 이동
-    else {
-      
-      const proposalId = item.proposalId || item.campaignId;
-      navigate(`/business/proposal?proposalId=${proposalId}`);
-    }
-  };
+  const proposalId = item.proposalId || item.campaignId;
+
+  // 1. 거절 상태일 때
+  if (item.status === "REJECTED") {
+    navigate(`/rejection?proposalId=${proposalId}`);
+    return;
+  }
+
+  // 2. 지원하기 타입일 때
+  if (item.type === "APPLIED") {
+    navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
+    return;
+  }
+
+  // 3. 그 외 기본
+  navigate(`/business/proposal?proposalId=${proposalId}`);
+};
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
@@ -191,7 +189,7 @@ export default function CalendarContent() {
             <MatchingTabSection
               subTab={matchingSubTab}
               setSubTab={setMatchingSubTab}
-              // 전체 캠페인 중 RECEIVED 타입인 것의 개수 전달
+
               receivedCount={campaigns.filter(c => c.type === "RECEIVED").length}
             />
 
@@ -218,7 +216,6 @@ export default function CalendarContent() {
                       status={getStatusLabel(item.status)}
                       date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)}
                       actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
-                      // [수정된 부분] item 객체 자체를 넘겨서 상태에 따라 분기 처리
                       onClick={() => handleCardClick(item)}
                     />
                   ))

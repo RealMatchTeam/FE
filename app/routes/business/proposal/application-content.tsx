@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProposalDetail } from "./api/proposal"; // API 경로 확인 필요
-import type { ProposalDetail } from "./api/proposal";
+import { getAppliedCampaignDetail, type AppliedCampaignDetail } from "./api/proposal";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -12,9 +11,7 @@ import profileIcon from "../../../assets/icon-profile.svg";
 
 export default function ApplicationContent() {
     const [searchParams] = useSearchParams();
-    
-    // 데이터 상태 관리
-    const [data, setData] = useState<ProposalDetail | null>(null);
+    const [data, setData] = useState<AppliedCampaignDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const applicationId = searchParams.get("applicationId");
@@ -29,7 +26,7 @@ export default function ApplicationContent() {
             try {
                 setIsLoading(true);
                 // 지원하기 상세 조회 API가 별도로 있다면 해당 함수로 교체하세요.
-                const result = await getProposalDetail(applicationId);
+                const result = await getAppliedCampaignDetail(applicationId as string);
                 setData(result);
             } catch (error) {
                 console.error("지원 상세 조회 실패:", error);
@@ -43,25 +40,36 @@ export default function ApplicationContent() {
     if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
     if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
 
+    // 3. 상태값 한글 변환 헬퍼
+    const getStatusLabel = (status: string) => {
+        switch (status) {
+            case "REVIEWING": return "검토 중";
+            case "MATCHED": return "수락됨";
+            case "REJECTED": return "거절됨";
+            case "CANCELED": return "취소됨";
+            default: return "상태 미정";
+        }
+    };
+
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
-            <Header title="제안 보기" />
+            <Header title="지원 상세 보기" />
 
             <main className="flex flex-col pb-24">
                 {/* 상단 브랜드 정보 섹션 */}
                 <div className="px-4 py-6">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText="검토 중" // 이미지 기준 고정 혹은 data.status
-                        brandName={data.brandName || "비플레인"} // 데이터에 따라 조정
-                        brandTags={["#저자극", "#천연재료", "#민감성피부"]} 
+                        statusText={getStatusLabel(data.status)} // 이미지 기준 고정 혹은 data.status
+                        brandName={data.brandName || "브랜드 정보 없음"} // 데이터에 따라 조정
+                        brandTags={["#지원완료"]} 
                     />
 
                     <div className="flex flex-col gap-6 mt-4">
                         {/* 캠페인 제목 */}
                         <div className="flex items-center gap-1 group cursor-pointer">
                             <h2 className="text-title1 text-text-black">
-                                ‘{data.title}’ 신제품 론칭 리뷰
+                                ‘{data.campaignTitle}’
                             </h2>
                             <img src={arrowPurpleIcon} alt="link" className="w-5 h-5 rotate-[-90deg] opacity-60" />
                         </div>
@@ -88,7 +96,7 @@ export default function ApplicationContent() {
                 <div className="bg-bluegray-1 px-4 py-8 flex flex-col gap-6 flex-1">
                     <CampaignInfoGroup label="지원 이유">
                         <div className="w-full p-5 bg-bg-w border border-text-gray5 rounded-xl text-body1 leading-relaxed text-text-gray1 min-h-[160px]">
-                            {data.description || "안녕하세요 크리에이터 비비 입니다! 비플레인의 가치가 제 채널에서 소개하는 뷰티 콘텐츠와 잘 맞당아 있다고 생각되어 협찬을 제안드립니다."}
+                            {data.campaignReason || "작성된 지원 이유가 없습니다."}
                         </div>
                     </CampaignInfoGroup>
                 </div>

@@ -1,7 +1,6 @@
 import { axiosInstance } from "../../../../api/axios";
 import type { BrandDetail } from "../../../../data/brand";
 
-// 1. 응답 데이터의 공통 포맷 정의 (isSuccess 등을 포함)
 export interface ApiResponse<T> {
   isSuccess: boolean;
   code: string;
@@ -51,7 +50,7 @@ export const getProposalDetail = async (proposalId: string): Promise<ProposalDet
 export const getBrandDetail = async (brandId: number | string): Promise<BrandDetail> => {
   try {
     const response = await axiosInstance.get<ApiResponse<BrandDetail[]>>(
-      `/api/v1/brands/${brandId}`
+      `/v1/brands/${brandId}`
     );
 
     if (response.data.isSuccess) {
@@ -63,5 +62,37 @@ export const getBrandDetail = async (brandId: number | string): Promise<BrandDet
   } catch (error) {
     console.error("브랜드 상세 조회 실패:", error);
     throw error;
+  }
+};
+
+// 지원 상세 데이터 인터페이스
+export interface AppliedCampaignDetail {
+  campaignId: number;
+  campaignApplyId: number;
+  campaignTitle: string;
+  campaignReason: string;
+  status: "REVIEWING" | "MATCHED" | "REJECTED" | "CANCELED";
+  brandName?: string; 
+  creatorId?: string;
+}
+
+// 내가 지원한 캠페인 상세 조회 API
+// proposal.ts 수정
+
+export const getAppliedCampaignDetail = async (campaignId: string): Promise<AppliedCampaignDetail> => {
+  try {
+    const response = await axiosInstance.get<AppliedCampaignDetail>(
+      `/v1/campaigns/${campaignId}/apply/me`
+    );
+
+    if (response.data) {
+      return response.data;
+    }
+
+    throw new Error("데이터를 가져오지 못했습니다.");
+  } catch (error: any) {
+    console.error("지원 상세 조회 실패:", error);
+
+    throw new Error(error.response?.data?.message || "지원 상세 데이터 로드 실패");
   }
 };

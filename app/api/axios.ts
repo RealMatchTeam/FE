@@ -121,5 +121,4 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-// apiClient alias for backward compatibility
 export const apiClient = axiosInstance;
