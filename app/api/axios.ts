@@ -18,8 +18,11 @@ type RefreshResponse = {
   result: RefreshResult;
 };
 
-const isProd = import.meta.env.PROD;
-const BASE_URL = isProd ? "https://api.realmatch.co.kr" : "/api";
+const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+
+const BASE_URL =
+  (envBase && envBase.trim().length > 0 ? envBase.trim() : undefined) ??
+  (import.meta.env.PROD ? "https://api.realmatch.co.kr" : "/api");
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -27,27 +30,21 @@ export const axiosInstance: AxiosInstance = axios.create({
   timeout: 10000,
 });
 
-const normalizeUrl = (url: string) => {
-  return url.replace(/^\/api\/api\//, "/api/");
-};
-
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (typeof config.url === "string") {
-      config.url = normalizeUrl(config.url);
-    }
-
     const accessToken = tokenStorage.getAccessToken();
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    console.log("[REQ]", {
-      method: config.method,
-      baseURL: config.baseURL,
-      url: config.url,
-      full: `${config.baseURL ?? ""}${config.url ?? ""}`,
-    });
+    if (import.meta.env.DEV) {
+      console.log("[REQ]", {
+        method: config.method,
+        baseURL: config.baseURL,
+        url: config.url,
+        full: `${config.baseURL ?? ""}${config.url ?? ""}`,
+      });
+    }
 
     return config;
   },
@@ -75,13 +72,10 @@ axiosInstance.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(error);
 
-    if (typeof originalRequest.url === "string") {
-      originalRequest.url = normalizeUrl(originalRequest.url);
-    }
-
-    const status = error.response?.status;
-
-    if ((status === 401 || status === 400) && !originalRequest._retry) {
+    if (
+      (error.response?.status === 401 || error.response?.status === 400) &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -103,8 +97,8 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        const res = await axiosInstance.post<RefreshResponse>(
-          "/api/v1/auth/refresh",
+        const res = await axios.post<RefreshResponse>(
+          `${BASE_URL}/api/v1/auth/refresh`,
           {},
           { headers: { RefreshToken: `Bearer ${refreshToken}` } },
         );
