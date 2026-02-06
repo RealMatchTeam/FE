@@ -105,7 +105,7 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        // ✅ baseURL이 이미 붙으니 /v1로 호출 (절대 /api/v1 쓰지 말기)
+        //baseURL이 이미 붙기 때문에 /v1로 호출 
         const res = await axiosInstance.post<RefreshResponse>(
           "/v1/auth/refresh",
           {},
