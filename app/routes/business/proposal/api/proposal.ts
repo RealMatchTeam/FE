@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { axiosInstance } from "../../../../api/axios";
 import type { BrandDetail } from "../../../../data/brand";
 
@@ -76,8 +77,6 @@ export interface AppliedCampaignDetail {
   creatorId?: string;
 }
 
-// 내가 지원한 캠페인 상세 조회 API
-// proposal.ts 수정
 
 export const getAppliedCampaignDetail = async (campaignId: string): Promise<AppliedCampaignDetail> => {
   try {
@@ -90,9 +89,14 @@ export const getAppliedCampaignDetail = async (campaignId: string): Promise<Appl
     }
 
     throw new Error("데이터를 가져오지 못했습니다.");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("지원 상세 조회 실패:", error);
 
-    throw new Error(error.response?.data?.message || "지원 상세 데이터 로드 실패");
+    if (error instanceof AxiosError) {
+      const errorMessage = error.response?.data?.message || "지원 상세 데이터 로드 실패";
+      throw new Error(errorMessage);
+    }
+    
+    throw new Error("알 수 없는 에러가 발생했습니다.");;
   }
 };

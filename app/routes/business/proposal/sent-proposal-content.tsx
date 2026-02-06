@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProposalDetail, getBrandDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
+import { getProposalDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
 import type { BrandDetail } from "../../../data/brand";
 
 import Header from "../../../components/layout/Header";
@@ -19,7 +19,7 @@ export default function ProposalContent() {
 
     // 데이터 상태 관리
     const [data, setData] = useState<ProposalDetail | null>(null);
-    const [brand, setBrand] = useState<BrandDetail | null>(null);
+    const [brand] = useState<BrandDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const proposalId = searchParams.get("proposalId");
