@@ -2,9 +2,15 @@ import { useEffect, useState } from "react";
 import PreHome from "./home-content";
 import HomeAfterMatch from "./home-after-match";
 import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
+import { useAuthStore } from "../../stores/auth-store";
 
 export default function Home() {
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
+  const hasMatchingTest = useAuthStore((s) => s.me?.matchingTestDone);
+
+  if (hasMatchingTest === false) {
+    return <PreHome />;
+  }
 
   useEffect(() => {
     const checkMatchStatus = async () => {
@@ -36,6 +42,5 @@ export default function Home() {
     );
   }
 
-  return hasMatch ? <HomeAfterMatch /> : <PreHome />;
+  return <HomeAfterMatch />;
 }
-
