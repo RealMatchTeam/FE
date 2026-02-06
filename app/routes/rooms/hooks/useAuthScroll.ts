@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export function useAutoScroll(
   listRef: React.RefObject<HTMLElement | null>,
-  deps: any[]
+  deps: React.DependencyList
 ) {
   useEffect(() => {
     const el = listRef.current;
