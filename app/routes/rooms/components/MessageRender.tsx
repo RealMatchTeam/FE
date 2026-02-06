@@ -10,14 +10,12 @@ type Props = {
   message: ChatMessage;
   timeText?: string;
   avatarSrc?: string;
-  isCollaborating?: boolean;
 };
 
 export default function MessageRenderer({
   message,
   timeText,
   avatarSrc,
-  //isCollaborating,
 }: Props) {
 
   switch (message.messageType) {

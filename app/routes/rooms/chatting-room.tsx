@@ -1,25 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { tokenStorage } from "../../lib/token";
 import NavigationHeader from "../../components/common/NavigateHeader";
 import ChatComposer from "./components/ChatComposer";
-import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
+import AttachmentSheet, {
+  type AttachmentAction,
+} from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
 import MessageRenderer from "./components/MessageRender";
 import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-
 import {
-  createOrGetDirectRoom,
   getChatRoomDetail,
   type ChatRoomDetailResponse,
   getChatMessages,
   type ChatMessage,
+  createOrGetDirectRoom,
 } from "./api/rooms";
-
-import { useAuthStore } from "../../stores/auth-store";
+import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
+import { tokenStorage } from "../../lib/token";
 
 type Props = {
   brandId: number;
@@ -38,11 +38,12 @@ export default function ChattingRoom({ brandId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 
+  const myUserId = Number(tokenStorage.getUserId() ?? 0);
+  const accessToken = tokenStorage.getAccessToken();
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
   useHideBottomTab(true);
   useHideHeader(true);
-
-  const accessToken = tokenStorage.getAccessToken?.();
-  const myUserId = useAuthStore((s) => Number(s.me?.id ?? 0));
 
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
@@ -50,7 +51,8 @@ export default function ChattingRoom({ brandId }: Props) {
 
   const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
   const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
-  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
+  const collabThumb =
+    detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
   const createdAt = useMemo(() => {
@@ -72,7 +74,10 @@ export default function ChattingRoom({ brandId }: Props) {
 
     const run = async () => {
       try {
-        const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
+        const result = await createOrGetDirectRoom({
+          brandId,
+          creatorId: myUserId,
+        });
         setRoomId(result.roomId);
       } catch (e) {
         console.error("createOrGetDirectRoom failed:", e);
@@ -82,6 +87,26 @@ export default function ChattingRoom({ brandId }: Props) {
 
     run();
   }, [accessToken, brandId, myUserId]);
+
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { upload } = useAttachmentUpload({
+    baseUrl,
+    accessToken,
+    defaultUsage: "CHAT",
+  });
+
+  const handleAttachmentAction = (key: "suggest" | "image" | "file") => {
+    if (key === "image") {
+      imageInputRef.current?.click();
+      return;
+    }
+    if (key === "file") {
+      fileInputRef.current?.click();
+      return;
+    }
+  };
 
   useEffect(() => {
     if (!accessToken) return;
@@ -169,6 +194,78 @@ export default function ChattingRoom({ brandId }: Props) {
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
+  const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const uploaded = await upload({ file, attachmentType: "IMAGE" });
+
+      const tempMessage: ChatMessage = {
+        messageId: -Date.now(),
+        roomId,
+        senderId: myUserId,
+        senderType: "USER",
+        messageType: "IMAGE",
+        content: null,
+        attachment: {
+          attachmentId: uploaded.attachmentId,
+          attachmentType: "IMAGE",
+          contentType: uploaded.contentType,
+          originalName: uploaded.originalName,
+          fileSize: uploaded.fileSize,
+          accessUrl: uploaded.accessUrl,
+          status: "READY",
+        },
+        systemMessage: null,
+        createdAt: new Date().toISOString(),
+        clientMessageId: crypto.randomUUID(),
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+      setIsSheetOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const uploaded = await upload({ file, attachmentType: "FILE" });
+
+      const tempMessage: ChatMessage = {
+        messageId: -Date.now(),
+        roomId,
+        senderId: myUserId,
+        senderType: "USER",
+        messageType: "FILE",
+        content: null,
+        attachment: {
+          attachmentId: uploaded.attachmentId,
+          attachmentType: "FILE",
+          contentType: uploaded.contentType,
+          originalName: uploaded.originalName,
+          fileSize: uploaded.fileSize,
+          accessUrl: uploaded.accessUrl,
+          status: "READY",
+        },
+        systemMessage: null,
+        createdAt: new Date().toISOString(),
+        clientMessageId: crypto.randomUUID(),
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+      setIsSheetOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (!accessToken) {
     return (
       <div className="h-screen-full bg-white">
@@ -198,10 +295,29 @@ export default function ChattingRoom({ brandId }: Props) {
 
   return (
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handlePickImage}
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        style={{ display: "none" }}
+        onChange={handlePickFile}
+      />
+
       <NavigationHeader title={partnerName} onBack={() => history.back()} />
 
       {detail?.campaignSummary && (
-        <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />
+        <CollaborationSummaryBar
+          thumbnailUrl={collabThumb}
+          title={collabTitle}
+          subtitle={collabSubtitle}
+        />
       )}
 
       <div
@@ -220,7 +336,6 @@ export default function ChattingRoom({ brandId }: Props) {
                   message={m}
                   timeText={createdAt}
                   avatarSrc={isMe ? undefined : partnerAvatarUrl}
-                  isCollaborating={isCollaborating}
                 />
               );
             })}
@@ -243,6 +358,7 @@ export default function ChattingRoom({ brandId }: Props) {
         actions={actions}
         onClose={handleCloseSheet}
         onAction={(key) => {
+          handleAttachmentAction(key);
           console.log("action:", key);
           setIsSheetOpen(false);
         }}
