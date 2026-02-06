@@ -1,4 +1,6 @@
-import { useEffect, useState, useMemo } from "react";
+// src/routes/_home/home-after-match.tsx
+
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import type { CategoryKey, CreatorProfileModel } from "./types";
 import CategoryTabs from "./components/CategoryTabs";
@@ -14,78 +16,139 @@ import {
   type MatchingBrand,
   type MatchingCampaign,
 } from "../matching/api/matching";
-import { useMatchResultStore } from "../../stores/matching-result";
+import { apiClient } from "../../api/axios";
 import bannerBeauty from "../../assets/home-banner/banner-beauty.svg";
 import bannerFashion from "../../assets/home-banner/banner-fashion.svg";
+
+type ApiCategoryFilter = "ALL" | "FASHION" | "BEAUTY";
+type CampaignSort = "MATCH_SCORE" | "POPULARITY" | "REWARD_AMOUNT" | "D_DAY";
+
+const toApiCategory = (ui: CategoryKey): ApiCategoryFilter =>
+  ui === "beauty" ? "BEAUTY" : "FASHION";
+
+/** ✅ /api/v1/users/me/profile-card (예시 기반) */
+type ProfileCardResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    nickname: string;
+    gender: "MALE" | "FEMALE" | string;
+    age: number;
+    interests: string[];
+    snsAccount: string;
+    matchingResult: {
+      createrType: string; // 백엔드 오타 그대로
+      fitBrand: string;
+    };
+    myType: {
+      beautyType: {
+        skinType: string[];
+        skinBrightness: string;
+        makeupStyle: string[];
+      };
+      fashionType: {
+        height: number;
+        bodyType: string;
+        upperSize: string;
+        bottomSize: number;
+      };
+      contentsType: {
+        gender: string;
+        age: string;
+        averageLength: string;
+        averageView: string;
+      };
+    };
+  };
+};
 
 export default function HomeAfterMatchPage() {
   const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("beauty");
+
   const [brands, setBrands] = useState<MatchingBrand[]>([]);
   const [campaigns, setCampaigns] = useState<MatchingCampaign[]>([]);
   const [popularCampaigns, setPopularCampaigns] = useState<MatchingCampaign[]>(
     [],
   );
 
-  // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
-  const matchResult = useMatchResultStore((s) => s.result);
+  const [profileCard, setProfileCard] =
+    useState<ProfileCardResponse["result"] | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const categoryFilter: ApiCategoryFilter = toApiCategory(category);
+
+        // ✅ 홈 핵심 데이터는 먼저(프로필 API 실패해도 홈은 떠야 함)
         const [brandsData, campaignsData, popularData] = await Promise.all([
-          getMatchingBrands("MATCH_SCORE", "ALL"),
-          getMatchingCampaigns("MATCH_SCORE", "ALL"),
-          getMatchingCampaigns("POPULARITY", "ALL"),
+          getMatchingBrands("MATCH_SCORE", categoryFilter),
+          getMatchingCampaigns("MATCH_SCORE" as CampaignSort, categoryFilter),
+          getMatchingCampaigns("POPULARITY" as CampaignSort, categoryFilter),
         ]);
+
         setBrands(brandsData.brands);
         setCampaigns(campaignsData.campaigns);
         setPopularCampaigns(popularData.campaigns);
+
+        // ✅ 프로필 카드 (경로 수정)
+        try {
+          const res = await apiClient.get<ProfileCardResponse>(
+            "/api/v1/users/me/profile-card",
+          );
+
+          if (res.data?.isSuccess) {
+            setProfileCard(res.data.result);
+          } else {
+            setProfileCard(null);
+          }
+        } catch {
+          setProfileCard(null);
+        }
       } catch (error) {
         console.error("Failed to fetch matching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [category]);
 
-  // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
-  // 스토어에서 매칭 결과 가져오지만 -> api/v1/me/feature로 변경
-  const profile = useMemo(() => {
-    if (matchResult?.apiResult) {
-      const apiResult = matchResult.apiResult;
-      return {
-        creatorName: "크리에이터 님",
-        creatorType: "creator",
-        summary: apiResult.userType || "크리에이터",
-        highlightBrandText:
-          apiResult.highMatchingBrandList?.brands[0]?.brandName ||
-          "매칭된 브랜드",
-        traits: {
-          beauty: apiResult.typeTag?.[0] || "특성 1",
-          fashion: apiResult.typeTag?.[1] || "특성 2",
-          content: apiResult.typeTag?.[2] || "특성 3",
-        },
-      } as CreatorProfileModel;
-    } else if (matchResult?.summary) {
-      // apiResult가 없으면 summary 사용
-      return {
-        creatorName: "크리에이터 님",
-        creatorType: "creator",
-        summary: matchResult.summary.userName || "크리에이터",
-        highlightBrandText:
-          matchResult.summary.recommendedBrand || "매칭된 브랜드",
-        traits: {
-          beauty: matchResult.summary.traits.beauty || "특성 1",
-          fashion: matchResult.summary.traits.style || "특성 2",
-          content: matchResult.summary.traits.content || "특성 3",
-        },
-      } as CreatorProfileModel;
-    }
-    return null;
-  }, [matchResult]);
+  const profile = useMemo<CreatorProfileModel | null>(() => {
+    if (!profileCard) return null;
 
-  // 브랜드 좋아요 토글
+    const nickname = profileCard.nickname || "크리에이터 님";
+    const creatorType =
+      profileCard.matchingResult?.createrType || "크리에이터";
+    const fitBrand = profileCard.matchingResult?.fitBrand || "매칭된 브랜드";
+
+    const beautyTrait =
+      profileCard.myType?.beautyType?.makeupStyle?.[0] ||
+      profileCard.myType?.beautyType?.skinType?.[0] ||
+      "특성 1";
+    const fashionTrait =
+      profileCard.myType?.fashionType?.bodyType ||
+      (profileCard.myType?.fashionType?.upperSize
+        ? `상의 ${profileCard.myType.fashionType.upperSize}`
+        : "특성 2");
+    const contentTrait =
+      profileCard.myType?.contentsType?.averageView ||
+      profileCard.myType?.contentsType?.averageLength ||
+      "특성 3";
+
+    return {
+      creatorName: nickname,
+      creatorType: "creator",
+      summary: creatorType,
+      highlightBrandText: fitBrand,
+      traits: {
+        beauty: beautyTrait,
+        fashion: fashionTrait,
+        content: contentTrait,
+      },
+    };
+  }, [profileCard]);
+
   const handleBrandLikeToggle = async (id: string) => {
     try {
       const brandId = Number(id);
@@ -101,13 +164,11 @@ export default function HomeAfterMatchPage() {
     }
   };
 
-  // 캠페인 좋아요 토글
   const handleCampaignLikeToggle = async (id: string) => {
     try {
       const campaignId = Number(id);
       const newLikeStatus = await toggleBrandLike(campaignId);
 
-      // 매칭률 높은 캠페인 업데이트
       setCampaigns((prev) =>
         prev.map((campaign) =>
           campaign.id === campaignId
@@ -115,7 +176,7 @@ export default function HomeAfterMatchPage() {
             : campaign,
         ),
       );
-      // 인기 캠페인도 업데이트
+
       setPopularCampaigns((prev) =>
         prev.map((campaign) =>
           campaign.id === campaignId
@@ -148,13 +209,13 @@ export default function HomeAfterMatchPage() {
           <SectionHeader
             title="매칭률 높은 브랜드"
             subtitle="이런 브랜드가 매칭률이 가장 높아요!"
-            onMore={() => navigate("/matching/brand")}
+            onMore={() => navigate(`/matching/brand?category=${category}`)}
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {brands.slice(0, 10).map((brand) => (
+            {brands.slice(0, 10).map((brand, i) => (
               <BrandCard
-                key={brand.id}
+                key={`brand-${brand.id ?? "noid"}-${brand.name ?? ""}-${i}`}
                 item={{
                   id: String(brand.id),
                   name: brand.name,
@@ -170,7 +231,9 @@ export default function HomeAfterMatchPage() {
                 }}
                 onClick={() => {
                   navigate(
-                    `/brand?brandId=${brand.id}&domain=${brand.name?.toLowerCase() || ""}`,
+                    `/brand?brandId=${brand.id}&domain=${
+                      brand.name?.toLowerCase() || ""
+                    }`,
                   );
                 }}
                 onLikeToggle={handleBrandLikeToggle}
@@ -187,13 +250,15 @@ export default function HomeAfterMatchPage() {
           <SectionHeader
             title="매칭률 높은 캠페인"
             subtitle="이런 캠페인이 매칭률이 가장 높아요!"
-            onMore={() => navigate("/matching/campaign")}
+            onMore={() => navigate(`/matching/campaign?category=${category}`)}
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {campaigns.slice(0, 10).map((campaign) => (
+            {campaigns.slice(0, 10).map((campaign, i) => (
               <CampaignCard
-                key={campaign.id}
+                key={`match-${campaign.id ?? "noid"}-${campaign.brandName ?? ""}-${
+                  campaign.title ?? campaign.name ?? ""
+                }-${i}`}
                 item={{
                   id: String(campaign.id),
                   brandName: campaign.brandName,
@@ -220,25 +285,33 @@ export default function HomeAfterMatchPage() {
           </div>
         </section>
 
-        {/* 크리에이터 프로필 카드 */}
-        {profile && (
-          <div className="mt-8 px-1">
-            <CreatorProfileCard model={profile} />
-          </div>
-        )}
+{profile && (
+  <div className="mt-8 px-1">
+    <CreatorProfileCard
+      model={profile}
+      onMyProfileClick={() => navigate("/mypage")}
+    />
+  </div>
+)}
 
         {/* 인기 캠페인 */}
         <section className="mt-8 pb-24">
           <SectionHeader
             title="인기 캠페인"
             subtitle="이런 캠페인이 인기가 많아요!"
-            onMore={() => navigate("/matching/campaign?sortBy=POPULARITY")}
+            onMore={() =>
+              navigate(
+                `/matching/campaign?sortBy=POPULARITY&category=${category}`,
+              )
+            }
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {popularCampaigns.slice(0, 10).map((campaign) => (
+            {popularCampaigns.slice(0, 10).map((campaign, i) => (
               <CampaignCard
-                key={campaign.id}
+                key={`popular-${campaign.id ?? "noid"}-${
+                  campaign.brandName ?? ""
+                }-${campaign.title ?? campaign.name ?? ""}-${i}`}
                 item={{
                   id: String(campaign.id),
                   brandName: campaign.brandName,
