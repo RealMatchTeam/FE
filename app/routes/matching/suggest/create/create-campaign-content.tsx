@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -72,6 +72,30 @@ export default function CreateCampaignContent() {
     resolver: zodResolver(campaignFormSchema),
     defaultValues: defaultCampaignFormValues,
   });
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (type === "existing" && location.state?.campaign) {
+      const campaign = location.state.campaign;
+
+      // 캠페인 데이터 매핑
+      setValue("campaignName", campaign.title || "");
+      setValue("description", campaign.description || "");
+
+      // 태그 매핑 (단일 선택으로 가정하거나 첫 번째 항목 사용)
+      if (campaign.contentTags?.formats?.length > 0) setValue("format", campaign.contentTags.formats[0].name); // name 또는 id 매핑 필요 (현재는 name으로 가정)
+      if (campaign.contentTags?.categories?.length > 0) setValue("category", campaign.contentTags.categories[0].name);
+      if (campaign.contentTags?.tones?.length > 0) setValue("tone", campaign.contentTags.tones[0].name);
+      if (campaign.contentTags?.involvements?.length > 0) setValue("involvement", campaign.contentTags.involvements[0].name);
+      if (campaign.contentTags?.usageRanges?.length > 0) setValue("usageScope", campaign.contentTags.usageRanges[0].name);
+
+      setValue("fee", campaign.rewardAmount?.toString() || "");
+      setValue("sponsorProduct", campaign.productId?.toString() || ""); // productId로 매핑
+      setValue("startDate", campaign.startDate || "");
+      setValue("endDate", campaign.endDate || "");
+    }
+  }, [type, location.state, setValue]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
@@ -159,7 +183,10 @@ export default function CreateCampaignContent() {
       {/* 스크롤 영역 */}
       <form
         className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide px-5"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, (errors) => {
+          console.log(errors);
+          toast.error("모두 입력해주세요");
+        })}
       >
         {/* 제목 */}
         <h2 className="text-title7 text-text-black mt-4 mb-2">{title}</h2>
@@ -308,7 +335,7 @@ export default function CreateCampaignContent() {
 
       {/* 하단 버튼 */}
       <div className="sticky bottom-0 left-0 right-0 p-5 bg-white">
-        <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit)} className="shadow-none">
+        <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit, () => toast.error("모두 입력해주세요"))} className="shadow-none">
           캠페인 제안하기
         </Button>
       </div>

@@ -139,7 +139,7 @@
         "tags": [
           "Match"
         ],
-        "summary": "크리에이터 매칭 분석",
+        "summary": "크리에이터 매칭 분석 by 정윤철",
         "description": "크리에이터 정보를 기반으로 매칭 분석 결과와 추천 브랜드 목록을 반환합니다.\nuserType, typeTag, highMatchingBrandList를 포함합니다.\n",
         "operationId": "match",
         "requestBody": {
@@ -568,12 +568,144 @@
         }
       }
     },
+    "/api/v1/brands": {
+      "get": {
+        "tags": [
+          "Brand"
+        ],
+        "summary": "브랜드 전체 목록 조회 (페이징) by 이예림",
+        "description": "등록된 모든 브랜드의 리스트를 페이징하여 반환합니다.",
+        "operationId": "getAllBrands",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponsePageBrandListResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Brand"
+        ],
+        "summary": "브랜드 생성 by 이예림",
+        "description": "새로운 브랜드를 등록합니다.",
+        "operationId": "createBrand",
+        "requestBody": {
+          "description": "생성할 브랜드 정보",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrandCreateRequestDto"
+              },
+              "example": {
+                "brandName": "비플레인",
+                "industryType": "BEAUTY",
+                "logoUrl": "https://cdn.your-service.com/brands/beplain/logo.png",
+                "simpleIntro": "천연 유래 성분으로 민감 피부를 위한 저자극 스킨케어 브랜드",
+                "detailIntro": "티끌없는 순수 히알루론산™으로 피부속부터 촉촉한 #수분세럼\n민감성 피부도 부담 없이 사용할 수 있는 저자극·천연재료 기반의 뷰티 브랜드입니다.",
+                "homepageUrl": "https://www.beplain.co.kr",
+                "brandCategory": [
+                  "스킨케어",
+                  "메이크업"
+                ],
+                "brandSkinCareTag": {
+                  "skinType": [
+                    "건성",
+                    "지성",
+                    "복합성"
+                  ],
+                  "mainFunction": [
+                    "수분/보습",
+                    "진정"
+                  ]
+                },
+                "brandMakeUpTag": {
+                  "skinType": [
+                    "건성",
+                    "민감성"
+                  ],
+                  "brandMakeUpStyle": [
+                    "내추럴",
+                    "글로우"
+                  ]
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "생성 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseBrandCreateResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/brands/{brandId}/like": {
       "post": {
         "tags": [
           "Brand"
         ],
-        "summary": "브랜드 좋아요 토글",
+        "summary": "브랜드 좋아요 토글 by 이예림",
         "description": "브랜드 ID로 좋아요를 추가하거나 취소합니다.",
         "operationId": "likeBrand",
         "parameters": [
@@ -888,6 +1020,164 @@
         }
       }
     },
+    "/api/v1/campaigns/proposal/{campaignProposalId}/approve": {
+      "patch": {
+        "tags": [
+          "Business"
+        ],
+        "summary": "받은 캠페인 제안 수락 API by 박지영",
+        "description": "제안 받은 사람이 제안을 수락하는 API입니다.\n/api/v1/campaigns/proposal/{campaignProposalId}에서 status가 MATCH로 변경되었다면 성공입니다.\n",
+        "operationId": "approveCampaignProposal",
+        "parameters": [
+          {
+            "name": "campaignProposalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/brands/{brandId}": {
+      "get": {
+        "tags": [
+          "Brand"
+        ],
+        "summary": "브랜드 상세 조회 by 이예림",
+        "description": "브랜드 ID로 상세 정보를 조회합니다.",
+        "operationId": "getBrandDetail",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "description": "조회할 브랜드의 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseListBrandDetailResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "존재하지 않는 브랜드",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Brand"
+        ],
+        "summary": "브랜드 삭제 by 이예림",
+        "description": "브랜드 ID로 브랜드를 삭제합니다. (소프트 삭제)",
+        "operationId": "deleteBrand",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "description": "삭제할 브랜드의 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제 성공"
+          },
+          "404": {
+            "description": "존재하지 않는 브랜드",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Brand"
+        ],
+        "summary": "브랜드 정보 수정 by 이예림",
+        "description": "특정 브랜드의 정보를 수정합니다.",
+        "operationId": "updateBrand",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "description": "수정할 브랜드의 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "수정할 브랜드 정보",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrandUpdateRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "수정 성공"
+          },
+          "404": {
+            "description": "존재하지 않는 브랜드",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/users/me": {
       "get": {
         "tags": [
@@ -1004,7 +1294,7 @@
         "tags": [
           "Tag"
         ],
-        "summary": "태그 타입별 조회",
+        "summary": "태그 타입별 조회 by 정윤철",
         "description": "지정된 태그 타입의 목록을 카테고리별로 조회합니다.",
         "operationId": "getTagsByType",
         "parameters": [
@@ -1036,7 +1326,7 @@
         "tags": [
           "Tag"
         ],
-        "summary": "패션 태그 조회",
+        "summary": "패션 태그 조회 by 정윤철",
         "description": "패션 태그 목록을 카테고리별로 조회합니다.",
         "operationId": "getFashionTags",
         "responses": {
@@ -1058,7 +1348,7 @@
         "tags": [
           "Tag"
         ],
-        "summary": "컨텐츠 태그 조회",
+        "summary": "컨텐츠 태그 조회 by 정윤철",
         "description": "컨텐츠 태그 목록을 조회합니다.",
         "operationId": "getContentTags",
         "responses": {
@@ -1080,7 +1370,7 @@
         "tags": [
           "Tag"
         ],
-        "summary": "뷰티 태그 조회",
+        "summary": "뷰티 태그 조회 by 정윤철",
         "description": "뷰티 태그 목록을 카테고리별로 조회합니다.",
         "operationId": "getBeautyTags",
         "responses": {
@@ -1102,7 +1392,7 @@
         "tags": [
           "Match"
         ],
-        "summary": "매칭 캠페인 목록 조회 및 검색",
+        "summary": "매칭 캠페인 목록 조회 및 검색 by 정윤철",
         "description": "JWT 토큰의 사용자 ID를 기반으로 매칭 캠페인 목록을 검색하거나 매칭 캠페인 목록을 조회합니다.\n\n**검색**: keyword를 입력하면 캠페인명(title)만 검색합니다. (브랜드명, 설명 등은 검색 대상 제외)\n\n**정렬 옵션**:\n- MATCH_SCORE: 매칭률 순 (동점 시 인기순 우선)\n- POPULARITY: 인기 순 (좋아요 수)\n- REWARD_AMOUNT: 금액 순 (원고료 높은 순)\n- D_DAY: 마감 순 (마감 임박순)\n\n**카테고리 필터**: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n\n**페이지네이션**: page(0부터 시작), size(기본 20)\n",
         "operationId": "getMatchingCampaigns",
         "parameters": [
@@ -1200,7 +1490,7 @@
         "tags": [
           "Match"
         ],
-        "summary": "매칭 브랜드 목록 조회",
+        "summary": "매칭 브랜드 목록 조회 by 정윤철",
         "description": "JWT 토큰의 사용자 ID를 기반으로 매칭률이 높은 브랜드 목록을 조회합니다.\n정렬 옵션: MATCH_SCORE(매칭률 순), POPULARITY(인기순), NEWEST(신규순)\n카테고리 필터: ALL(전체), FASHION(패션), BEAUTY(뷰티)\n태그 필터: 뷰티/패션 관련 태그로 필터링\n",
         "operationId": "getMatchingBrands",
         "parameters": [
@@ -1605,56 +1895,12 @@
         }
       }
     },
-    "/api/v1/brands/{brandId}": {
-      "get": {
-        "tags": [
-          "Brand"
-        ],
-        "summary": "브랜드 상세 조회",
-        "description": "브랜드 ID로 상세 정보를 조회합니다.",
-        "operationId": "getBrandDetail",
-        "parameters": [
-          {
-            "name": "brandId",
-            "in": "path",
-            "description": "조회할 브랜드의 ID",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "조회 성공",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomResponseListBrandDetailResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "존재하지 않는 브랜드",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/brands/{brandId}/sponsor-products": {
       "get": {
         "tags": [
           "Brand"
         ],
-        "summary": "브랜드 협찬 가능 제품 리스트 조회",
+        "summary": "브랜드 협찬 가능 제품 리스트 조회 by 이예림",
         "description": "특정 브랜드의 협찬 가능 제품 목록을 조회합니다.",
         "operationId": "getSponsorProducts",
         "parameters": [
@@ -1688,7 +1934,7 @@
         "tags": [
           "Brand"
         ],
-        "summary": "협찬 가능 제품 상세 조회",
+        "summary": "협찬 가능 제품 상세 조회 by 이예림",
         "description": "브랜드의 특정 협찬 가능 제품 상세 정보를 조회합니다.",
         "operationId": "getSponsorProductDetail",
         "parameters": [
@@ -1871,12 +2117,57 @@
         }
       }
     },
+    "/api/v1/brands/user/{userId}": {
+      "get": {
+        "tags": [
+          "Brand"
+        ],
+        "summary": "유저 ID로 브랜드 ID 조회 by 이예림",
+        "description": "유저 ID에 해당하는 브랜드 ID를 조회합니다.",
+        "operationId": "getBrandIdByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "조회할 유저의 ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "존재하지 않는 유저 또는 브랜드",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/brands/filters": {
       "get": {
         "tags": [
           "Brand"
         ],
-        "summary": "브랜드 필터 옵션 조회",
+        "summary": "브랜드 필터 옵션 조회 by 이예림",
         "description": "브랜드 필터링에 사용될 옵션들을 조회합니다.",
         "operationId": "getBrandFilters",
         "responses": {
@@ -2278,7 +2569,13 @@
       "MatchResponseDto": {
         "type": "object",
         "properties": {
+          "username": {
+            "type": "string"
+          },
           "userType": {
+            "type": "string"
+          },
+          "userTypeImage": {
             "type": "string"
           },
           "typeTag": {
@@ -2478,6 +2775,99 @@
           "usageRanges"
         ]
       },
+      "BrandClothingTagDto": {
+        "type": "object",
+        "properties": {
+          "brandType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "brandStyle": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BrandCreateRequestDto": {
+        "type": "object",
+        "properties": {
+          "brandName": {
+            "type": "string"
+          },
+          "industryType": {
+            "type": "string",
+            "enum": [
+              "BEAUTY",
+              "FASHION"
+            ]
+          },
+          "logoUrl": {
+            "type": "string"
+          },
+          "simpleIntro": {
+            "type": "string"
+          },
+          "detailIntro": {
+            "type": "string"
+          },
+          "homepageUrl": {
+            "type": "string"
+          },
+          "brandCategory": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "brandSkinCareTag": {
+            "$ref": "#/components/schemas/BrandSkinCareTagDto"
+          },
+          "brandMakeUpTag": {
+            "$ref": "#/components/schemas/BrandMakeUpTagDto"
+          },
+          "brandClothingTag": {
+            "$ref": "#/components/schemas/BrandClothingTagDto"
+          }
+        }
+      },
+      "BrandMakeUpTagDto": {
+        "type": "object",
+        "properties": {
+          "skinType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "brandMakeUpStyle": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BrandSkinCareTagDto": {
+        "type": "object",
+        "properties": {
+          "skinType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mainFunction": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "CustomResponse": {
         "type": "object",
         "properties": {
@@ -2492,6 +2882,32 @@
           },
           "result": {
 
+          }
+        }
+      },
+      "BrandCreateResponseDto": {
+        "type": "object",
+        "properties": {
+          "brandId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CustomResponseBrandCreateResponseDto": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/BrandCreateResponseDto"
           }
         }
       },
@@ -2723,7 +3139,10 @@
             }
           },
           "skinBrightness": {
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "makeupStyle": {
             "type": "array",
@@ -2748,6 +3167,9 @@
       "ContentsTypeUpdate": {
         "type": "object",
         "properties": {
+          "snsUrl": {
+            "type": "string"
+          },
           "viewerGender": {
             "type": "array",
             "items": {
@@ -2795,7 +3217,7 @@
       "FashionTypeUpdate": {
         "type": "object",
         "properties": {
-          "bodyStats": {
+          "height": {
             "type": "string"
           },
           "bodyShape": {
@@ -2838,6 +3260,41 @@
           },
           "contentsType": {
             "$ref": "#/components/schemas/ContentsTypeUpdate"
+          }
+        }
+      },
+      "BrandUpdateRequestDto": {
+        "type": "object",
+        "properties": {
+          "brandName": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string"
+          },
+          "simpleIntro": {
+            "type": "string"
+          },
+          "detailIntro": {
+            "type": "string"
+          },
+          "homepageUrl": {
+            "type": "string"
+          },
+          "brandCategory": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "brandSkinCareTag": {
+            "$ref": "#/components/schemas/BrandSkinCareTagDto"
+          },
+          "brandMakeUpTag": {
+            "$ref": "#/components/schemas/BrandMakeUpTagDto"
+          },
+          "brandClothingTag": {
+            "$ref": "#/components/schemas/BrandClothingTagDto"
           }
         }
       },
@@ -3180,6 +3637,9 @@
       "MyFeatureResponseDto": {
         "type": "object",
         "properties": {
+          "creatorType": {
+            "type": "string"
+          },
           "beautyType": {
             "$ref": "#/components/schemas/BeautyType"
           },
@@ -3280,6 +3740,30 @@
       "ContentTagResponse": {
         "type": "object",
         "properties": {
+          "viewerGenders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "viewerAges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "avgVideoLengths": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "avgVideoViews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
           "formats": {
             "type": "array",
             "items": {
@@ -3536,13 +4020,28 @@
             "type": "integer",
             "format": "int64"
           },
-          "campaignImageUrl": {
-            "type": "string"
-          },
-          "brandName": {
-            "type": "string"
-          },
           "campaignTitle": {
+            "type": "string"
+          },
+          "sponsorProducts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignSummarySponsorProductResponse"
+            }
+          }
+        }
+      },
+      "CampaignSummarySponsorProductResponse": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "thumbnailImageUrl": {
             "type": "string"
           }
         }
@@ -3828,6 +4327,41 @@
           }
         }
       },
+      "CampaignContentTagResponse": {
+        "type": "object",
+        "properties": {
+          "formats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "tones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "involvements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          },
+          "usageRanges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItemResponse"
+            }
+          }
+        }
+      },
       "CampaignProposalDetailResponse": {
         "type": "object",
         "properties": {
@@ -3876,7 +4410,7 @@
             "format": "date-time"
           },
           "contentTags": {
-            "$ref": "#/components/schemas/ContentTagResponse"
+            "$ref": "#/components/schemas/CampaignContentTagResponse"
           }
         }
       },
@@ -3964,32 +4498,134 @@
           }
         }
       },
-      "AvailableSponsorProdDto": {
+      "BrandListResponseDto": {
         "type": "object",
         "properties": {
-          "productId": {
+          "brandId": {
             "type": "integer",
             "format": "int64"
           },
-          "productName": {
+          "brandName": {
             "type": "string"
           },
-          "availableType": {
+          "logoUrl": {
             "type": "string"
           },
-          "availableQuantity": {
+          "industryType": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomResponsePageBrandListResponseDto": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/PageBrandListResponseDto"
+          }
+        }
+      },
+      "PageBrandListResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
             "type": "integer",
             "format": "int32"
           },
-          "availableSize": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "numberOfElements": {
             "type": "integer",
             "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrandListResponseDto"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "unsorted": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
           }
         }
       },
       "BrandDetailResponseDto": {
         "type": "object",
         "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "brandName": {
             "type": "string"
           },
@@ -4020,102 +4656,6 @@
           },
           "brandMakeUpTag": {
             "$ref": "#/components/schemas/BrandMakeUpTagDto"
-          },
-          "brandOnGoingCampaign": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BrandOnGoingCampaignDto"
-            }
-          },
-          "availableSponsorProd": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AvailableSponsorProdDto"
-            }
-          },
-          "campaignHistory": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CampaignHistoryDto"
-            }
-          }
-        }
-      },
-      "BrandMakeUpTagDto": {
-        "type": "object",
-        "properties": {
-          "brandSkinType": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "brandMakeUpStyle": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "BrandOnGoingCampaignDto": {
-        "type": "object",
-        "properties": {
-          "brandId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "brandName": {
-            "type": "string"
-          },
-          "recruitingTotalNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "recruitedNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "campaginDescription": {
-            "type": "string"
-          },
-          "campaginManuscriptFee": {
-            "type": "string"
-          }
-        }
-      },
-      "BrandSkinCareTagDto": {
-        "type": "object",
-        "properties": {
-          "brandSkinType": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "brandMainFunction": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "CampaignHistoryDto": {
-        "type": "object",
-        "properties": {
-          "campaignId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "campaignTitle": {
-            "type": "string"
-          },
-          "startDate": {
-            "type": "string"
-          },
-          "endDate": {
-            "type": "string"
           }
         }
       },

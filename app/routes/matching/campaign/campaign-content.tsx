@@ -189,6 +189,7 @@ export default function CampaignContent() {
                             applicants={campaign.applicants}
                             isLiked={campaign.isLiked}
                             onLike={() => toggleLike(campaign.id)}
+                            onClick={() => navigate(`/business/campaign/${campaign.id}`)}
                             logoUrl={campaign.logoUrl || `/dummy-logo-${campaign.id}.png`}
                         />
                     ))}
