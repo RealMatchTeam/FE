@@ -9,7 +9,8 @@ import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
 import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage } from "./api/rooms";
-import { useAuthStore } from "../../stores/auth-store";
+import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
+import { tokenStorage } from "../../lib/token";
 
 type Props = {
   roomId: number;
@@ -32,8 +33,6 @@ export default function ChattingRoom( {roomId} : Props ) {
   }, [message]);
   const createdAt =`${dateText}\n${timeText}`;
 
-
-  const myUserId = useAuthStore((s) => Number(s.me?.id ?? 0));
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
   const isCollaborating = detail?.isCollaborating ?? false;
@@ -49,6 +48,30 @@ export default function ChattingRoom( {roomId} : Props ) {
 
   //const [cursor, setCursor] = useState<string | null>(null);
   //const [hasNext, setHasNext] = useState(false);
+
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
+  const token = tokenStorage.getAccessToken();
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+  const { upload } = useAttachmentUpload({
+    baseUrl,
+    token,
+    defaultUsage: "CHAT",
+  });
+
+  const handleAttachmentAction = (key: "suggest" | "image" | "file") => {
+    if (key === "image") {
+      imageInputRef.current?.click();
+      return;
+    }
+    if (key === "file") {
+      fileInputRef.current?.click();
+      return;
+    }
+  };
 
   useEffect(() => {
     if (!Number.isFinite(roomId)) return;
@@ -149,8 +172,100 @@ export default function ChattingRoom( {roomId} : Props ) {
     requestAnimationFrame(() => inputRef.current?.focus()); // 한 프레임 뒤 focus 복귀
   };
 
+  // 1. 이미지 선택 핸들러
+  const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const uploaded = await upload({ file, attachmentType: "IMAGE" });
+
+      const tempMessage: ChatMessage = {
+        messageId: -Date.now(),
+        roomId,
+        senderId: myUserId,
+        senderType: "USER",
+        messageType: "IMAGE", // 또는 "FILE" (백엔드 스펙에 맞게)
+        content: null,
+        attachment: {
+          attachmentId: uploaded.attachmentId,
+          attachmentType: "IMAGE",
+          contentType: uploaded.contentType,
+          originalName: uploaded.originalName,
+          fileSize: uploaded.fileSize, 
+          accessUrl: uploaded.accessUrl,
+          status: "READY", 
+        },
+        systemMessage: null,
+        createdAt: new Date().toISOString(),
+        clientMessageId: crypto.randomUUID(),
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+      setIsSheetOpen(false);
+
+    } catch (err) {
+      console.error(err);
+      // 에러 토스트 처리 등을 여기에 추가
+    }
+  };
+
+  // 2. 파일 선택 핸들러
+  const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const uploaded = await upload({ file, attachmentType: "FILE" });
+
+      const tempMessage: ChatMessage = {
+        messageId: -Date.now(),
+        roomId,
+        senderId: myUserId,
+        senderType: "USER",
+        messageType: "FILE",
+        content: null,
+        attachment: {
+          attachmentId: uploaded.attachmentId,
+          attachmentType: "FILE",
+          contentType: uploaded.contentType,
+          originalName: uploaded.originalName,
+          fileSize: uploaded.fileSize,
+          accessUrl: uploaded.accessUrl,
+          status: "READY", 
+        },
+        systemMessage: null,
+        createdAt: new Date().toISOString(),
+        clientMessageId: crypto.randomUUID(),
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+      setIsSheetOpen(false);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handlePickImage}
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        style={{ display: "none" }}
+        onChange={handlePickFile}
+      />
+
       <NavigationHeader
         title={partnerName}
         onBack={() => history.back()}
@@ -182,7 +297,6 @@ export default function ChattingRoom( {roomId} : Props ) {
                   //isMe={isMe}                         
                   timeText={createdAt}              
                   avatarSrc={isMe ? undefined : partnerAvatarUrl}
-                  isCollaborating={isCollaborating}
                 />
               );
             })}
@@ -207,7 +321,7 @@ export default function ChattingRoom( {roomId} : Props ) {
         actions={actions}
         onClose={handleCloseSheet}
         onAction={(key) => {
-          // TODO: 여기서 업로드/기능 연결
+          handleAttachmentAction(key);
           console.log("action:", key);
           setIsSheetOpen(false);
         }}
