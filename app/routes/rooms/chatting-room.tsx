@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { tokenStorage } from "../../lib/token";
+
 import NavigationHeader from "../../components/common/NavigateHeader";
 import ChatComposer from "./components/ChatComposer";
 import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
@@ -9,8 +9,15 @@ import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage, createOrGetDirectRoom } from "./api/rooms";
+import {
+  getChatRoomDetail,
+  type ChatRoomDetailResponse,
+  getChatMessages,
+  type ChatMessage,
+  createOrGetDirectRoom,
+} from "./api/rooms";
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
+import { tokenStorage } from "../../lib/token";
 
 type Props = {
   brandId: number;
@@ -29,13 +36,13 @@ export default function ChattingRoom({ brandId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 
-  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
-  const token = tokenStorage.getAccessToken();
+  const myUserId = Number(tokenStorage.getUserId() ?? 0);
+  const accessToken = tokenStorage.getAccessToken();
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  
+
   useHideBottomTab(true);
   useHideHeader(true);
-  
+
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
   const isCollaborating = detail?.isCollaborating ?? false;
@@ -52,13 +59,13 @@ export default function ChattingRoom({ brandId }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!token) {
+    if (!accessToken) {
       window.location.href = "/auth/login";
     }
-  }, [token]);
+  }, [accessToken]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!accessToken) return;
     if (!Number.isFinite(brandId) || brandId <= 0) return;
     if (!Number.isFinite(myUserId) || myUserId <= 0) return;
 
@@ -73,14 +80,14 @@ export default function ChattingRoom({ brandId }: Props) {
     };
 
     run();
-  }, [token, brandId, myUserId]);
+  }, [accessToken, brandId, myUserId]);
 
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { upload } = useAttachmentUpload({
     baseUrl,
-    token,
+    accessToken,
     defaultUsage: "CHAT",
   });
 
@@ -96,7 +103,7 @@ export default function ChattingRoom({ brandId }: Props) {
   };
 
   useEffect(() => {
-    if (!token) return;
+    if (!accessToken) return;
     if (!roomId) return;
 
     const run = async () => {
@@ -110,10 +117,10 @@ export default function ChattingRoom({ brandId }: Props) {
     };
 
     run();
-  }, [token, roomId]);
+  }, [accessToken, roomId]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!accessToken) return;
     if (!roomId) return;
 
     const run = async () => {
@@ -127,7 +134,7 @@ export default function ChattingRoom({ brandId }: Props) {
     };
 
     run();
-  }, [token, roomId]);
+  }, [accessToken, roomId]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -181,7 +188,6 @@ export default function ChattingRoom({ brandId }: Props) {
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
-  // 1. 이미지 선택 핸들러
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!roomId) return;
     const file = e.target.files?.[0];
@@ -196,16 +202,16 @@ export default function ChattingRoom({ brandId }: Props) {
         roomId,
         senderId: myUserId,
         senderType: "USER",
-        messageType: "IMAGE", // 또는 "FILE" (백엔드 스펙에 맞게)
+        messageType: "IMAGE",
         content: null,
         attachment: {
           attachmentId: uploaded.attachmentId,
           attachmentType: "IMAGE",
           contentType: uploaded.contentType,
           originalName: uploaded.originalName,
-          fileSize: uploaded.fileSize, 
+          fileSize: uploaded.fileSize,
           accessUrl: uploaded.accessUrl,
-          status: "READY", 
+          status: "READY",
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
@@ -214,14 +220,11 @@ export default function ChattingRoom({ brandId }: Props) {
 
       setMessages((prev) => [...prev, tempMessage]);
       setIsSheetOpen(false);
-
     } catch (err) {
       console.error(err);
-      // 에러 토스트 처리 등을 여기에 추가
     }
   };
 
-  // 2. 파일 선택 핸들러
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!roomId) return;
     const file = e.target.files?.[0];
@@ -245,7 +248,7 @@ export default function ChattingRoom({ brandId }: Props) {
           originalName: uploaded.originalName,
           fileSize: uploaded.fileSize,
           accessUrl: uploaded.accessUrl,
-          status: "READY", 
+          status: "READY",
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
@@ -254,13 +257,12 @@ export default function ChattingRoom({ brandId }: Props) {
 
       setMessages((prev) => [...prev, tempMessage]);
       setIsSheetOpen(false);
-
     } catch (err) {
       console.error(err);
     }
   };
-  
-  if (!token) {
+
+  if (!accessToken) {
     return (
       <div className="h-screen-full bg-white">
         <NavigationHeader title="채팅" onBack={() => history.back()} />
@@ -269,7 +271,7 @@ export default function ChattingRoom({ brandId }: Props) {
     );
   }
 
-  if (token && (!myUserId || myUserId <= 0)) {
+  if (accessToken && (!myUserId || myUserId <= 0)) {
     return (
       <div className="h-screen-full bg-white">
         <NavigationHeader title="채팅" onBack={() => history.back()} />
@@ -304,10 +306,7 @@ export default function ChattingRoom({ brandId }: Props) {
         onChange={handlePickFile}
       />
 
-      <NavigationHeader
-        title={partnerName}
-        onBack={() => history.back()}
-      />
+      <NavigationHeader title={partnerName} onBack={() => history.back()} />
 
       {detail?.campaignSummary && (
         <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />

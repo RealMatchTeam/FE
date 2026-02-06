@@ -49,7 +49,6 @@ export async function uploadAttachment(params: {
     body: form,
   });
 
-  // 실패시 throw
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`Attachment upload failed: ${res.status} ${text}`);
