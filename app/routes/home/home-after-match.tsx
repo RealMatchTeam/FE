@@ -95,7 +95,7 @@ export default function HomeAfterMatchPage() {
         // ✅ 프로필 카드 (경로 수정)
         try {
           const res = await apiClient.get<ProfileCardResponse>(
-            "/api/v1/users/me/profile-card",
+            "/v1/users/me/profile-card",
           );
 
           if (res.data?.isSuccess) {
