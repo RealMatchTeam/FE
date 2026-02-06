@@ -5,7 +5,7 @@ import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
 
-import { getProposalDetail, getBrandDetail, approveCampaignProposal, type ProposalDetail } from "./api/proposal";
+import { getProposalDetail, getBrandDetail, approveCampaignProposal, rejectCampaignProposal, type ProposalDetail } from "./api/proposal";
 import type { BrandDetail } from "../../../data/brand";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
@@ -73,6 +73,34 @@ export default function ReceivedProposalContent() {
     };
     const closeModal = () => setModalType("none");
 
+    // 거절 처리 로직
+    const handleRejectClick = async () => {
+        if (!proposalId) return;
+
+        // 실제 서비스라면 여기서 거절 사유 입력 모달을 띄워야 합니다.
+        // 우선은 확인 창으로 대체합니다.
+        const reason = window.prompt("거절 사유를 입력해주세요.", "일정이 맞지 않습니다.");
+        
+        if (reason === null) return; // 취소 버튼 클릭 시
+
+        try {
+            setIsProcessing(true);
+            const response = await rejectCampaignProposal(proposalId, reason);
+
+            if (response.isSuccess) {
+                alert("제안을 거절했습니다.");
+                // 거절 성공 후 리스트로 이동하거나 데이터를 새로고침합니다.
+                window.location.reload(); 
+            } else {
+                alert(response.message || "거절 처리 중 오류가 발생했습니다.");
+            }
+        } catch (error) {
+            console.error("거절 연동 에러:", error);
+            alert("서버와 통신 중 에러가 발생했습니다.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
     // 태그 배열을 문자열로 변환하는 헬퍼 함수
     const formatTags = (tags: { name: string }[] | undefined | null) => {
         if (!tags || tags.length === 0) return "정보 없음"; 
@@ -175,8 +203,12 @@ export default function ReceivedProposalContent() {
 
             {/* 하단 고정 버튼 영역 */}
             <div className="px-4 py-5 flex gap-3 bg-[var(--color-bg-w)] sticky bottom-0 border-t border-[var(--color-text-gray5)]">
-                <button className="flex-1 h-[52px] bg-[var(--color-bg-w)] border border-[var(--color-core-3)] rounded-xl text-core-1 text-title3 active:bg-gray-50 transition-colors">
-                    거절하기
+                <button 
+                    onClick={handleRejectClick} // 클릭 이벤트 연결
+                    disabled={isProcessing}
+                    className="flex-1 h-[52px] bg-[var(--color-bg-w)] border border-[var(--color-core-3)] rounded-xl text-core-1 text-title3 active:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                    {isProcessing ? "처리 중" : "거절하기"}
                 </button>
                 <button
                     onClick={handleAcceptClick}

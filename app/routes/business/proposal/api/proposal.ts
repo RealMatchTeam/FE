@@ -111,3 +111,22 @@ export const approveCampaignProposal = async (campaignProposalId: string | numbe
     throw error;
   }
 };
+
+// 받은 캠페인 제안 거절 API
+
+export const rejectCampaignProposal = async (
+  campaignProposalId: string | number,
+  rejectReason: string
+): Promise<ApiResponse<string>> => {
+  try {
+    
+    const response = await axiosInstance.patch<ApiResponse<string>>(
+      `/v1/campaigns/proposal/${campaignProposalId}/reject`,
+      { rejectReason } 
+    );
+    return response.data;
+  } catch (error) {
+    console.error("제안 거절 실패:", error);
+    throw error;
+  }
+};
