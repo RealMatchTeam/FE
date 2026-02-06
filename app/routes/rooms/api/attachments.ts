@@ -21,11 +21,9 @@ export interface ChatAttachment {
   accessUrl: string; // 서버가 메시지 응답에 주는 경우에만
 }
 
-/**
- * 주의:
- * - fetch를 쓸 때 Content-Type을 직접 multipart/form-data로 세팅하지 마세요.
- *   브라우저가 boundary 포함해서 자동으로 잡아줘야 합니다.
- */
+/* fetch를 쓸 때 Content-Type을 직접 multipart/form-data로 세팅 X
+브라우저가 boundary 포함해서 자동으로 잡아줌 */
+
 export async function uploadAttachment(params: {
   token: string;
   file: File;
