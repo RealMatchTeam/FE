@@ -12,6 +12,15 @@ export interface ChatAttachmentUploadResponse {
   createdAt: string;
 }
 
+export interface ChatAttachment {
+  attachmentId: number;
+  attachmentType: "IMAGE" | "FILE";
+  contentType: string;
+  originalName: string;
+  fileSize: number;
+  accessUrl: string; // 서버가 메시지 응답에 주는 경우에만
+}
+
 /**
  * 주의:
  * - fetch를 쓸 때 Content-Type을 직접 multipart/form-data로 세팅하지 마세요.

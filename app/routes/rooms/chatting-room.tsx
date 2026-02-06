@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { tokenStorage } from "../../lib/token";
 import NavigationHeader from "../../components/common/NavigateHeader";
 import ChatComposer from "./components/ChatComposer";
 import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
@@ -8,53 +9,74 @@ import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage } from "./api/rooms";
+import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage, createOrGetDirectRoom } from "./api/rooms";
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
-import { tokenStorage } from "../../lib/token";
 
 type Props = {
-  roomId: number;
+  brandId: number;
 };
 
-export default function ChattingRoom( {roomId} : Props ) {
+export default function ChattingRoom({ brandId }: Props) {
   const kb = useKeyboardOffset();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const sheetHeight = kb > 0 ? kb : 240;
 
+  const [roomId, setRoomId] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [message] = useState<ChatMessage | null>(null);
   const [detail, setDetail] = useState<ChatRoomDetailResponse | null>(null);
-  const { dateText, timeText } = useMemo(() => {
-    if (!message) {
-      return { dateText: "", timeText: "" };
-    }
-    return formatKoreanDateTime(message.createdAt);
-  }, [message]);
-  const createdAt =`${dateText}\n${timeText}`;
 
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
+  const token = tokenStorage.getAccessToken();
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  
+  useHideBottomTab(true);
+  useHideHeader(true);
+  
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
   const isCollaborating = detail?.isCollaborating ?? false;
 
   const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
   const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
-  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl; // 콜라보 상품 이미지
-
+  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
-  const listRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const createdAt = useMemo(() => {
+    const now = new Date().toISOString();
+    const { dateText, timeText } = formatKoreanDateTime(now);
+    return `${dateText}\n${timeText}`;
+  }, []);
 
-  //const [cursor, setCursor] = useState<string | null>(null);
-  //const [hasNext, setHasNext] = useState(false);
+  useEffect(() => {
+    if (!token) {
+      window.location.href = "/auth/login";
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!Number.isFinite(myUserId) || myUserId <= 0) return;
+
+    const run = async () => {
+      try {
+        const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
+        setRoomId(result.roomId);
+      } catch (e) {
+        console.error("createOrGetDirectRoom failed:", e);
+        setRoomId(null);
+      }
+    };
+
+    run();
+  }, [token, brandId, myUserId]);
 
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
-  const token = tokenStorage.getAccessToken();
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const { upload } = useAttachmentUpload({
     baseUrl,
@@ -74,7 +96,8 @@ export default function ChattingRoom( {roomId} : Props ) {
   };
 
   useEffect(() => {
-    if (!Number.isFinite(roomId)) return;
+    if (!token) return;
+    if (!roomId) return;
 
     const run = async () => {
       try {
@@ -87,30 +110,30 @@ export default function ChattingRoom( {roomId} : Props ) {
     };
 
     run();
-  }, [roomId]);
+  }, [token, roomId]);
 
   useEffect(() => {
-  if (!Number.isFinite(roomId)) return;
+    if (!token) return;
+    if (!roomId) return;
 
-  const run = async () => {
-    try {
-      const data = await getChatMessages({ roomId, size: 20 });
-      setMessages(data.messages.slice().reverse());
-      //setCursor(data.nextCursor);
-      //setHasNext(data.hasNext);
-    } catch (e) {
-      console.error(e);
-      setMessages([]);
-      //setCursor(null);
-      //setHasNext(false);
-    }
-  };
+    const run = async () => {
+      try {
+        const data = await getChatMessages({ roomId, size: 20 });
+        setMessages(data.messages.slice().reverse());
+      } catch (e) {
+        console.error(e);
+        setMessages([]);
+      }
+    };
 
-  run();
-}, [roomId]);
+    run();
+  }, [token, roomId]);
 
-  useHideBottomTab(true);
-  useHideHeader(true);
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages.length]);
 
   const actions: AttachmentAction[] = useMemo(
     () => [
@@ -121,23 +144,10 @@ export default function ChattingRoom( {roomId} : Props ) {
     []
   );
 
-  const scrollToBottom = () => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages.length]);
-
   const handleToggleSheet = () => {
     setIsSheetOpen((prev) => {
       const next = !prev;
-      if (next) {
-        // 시트 열릴 때 키보드 내려감
-        inputRef.current?.blur();
-      }
+      if (next) inputRef.current?.blur();
       return next;
     });
   };
@@ -147,33 +157,33 @@ export default function ChattingRoom( {roomId} : Props ) {
   const handleSend = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    if (!roomId) return;
 
-    const tempId = -Date.now(); // 임시 messageId (음수)
+    const tempId = -Date.now();
     const clientId = crypto.randomUUID();
 
-    const generalText: ChatMessage = { 
+    const generalText: ChatMessage = {
       messageId: tempId,
       roomId,
-      senderId: myUserId, // 내 유저 id
+      senderId: myUserId,
       senderType: "USER",
       messageType: "TEXT",
       content: trimmed,
       attachment: null,
       systemMessage: null,
-      createdAt: createdAt,
+      createdAt,
       clientMessageId: clientId,
     };
 
-    //일반 메시지 전송
-    setMessages((prev) => [ ...prev, generalText]);
-
-    setText(""); // 입력창 비우기
+    setMessages((prev) => [...prev, generalText]);
+    setText("");
     setIsSheetOpen(false);
-    requestAnimationFrame(() => inputRef.current?.focus()); // 한 프레임 뒤 focus 복귀
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   // 1. 이미지 선택 핸들러
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!roomId) return;
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -213,6 +223,7 @@ export default function ChattingRoom( {roomId} : Props ) {
 
   // 2. 파일 선택 핸들러
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!roomId) return;
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -248,6 +259,33 @@ export default function ChattingRoom( {roomId} : Props ) {
       console.error(err);
     }
   };
+  
+  if (!token) {
+    return (
+      <div className="h-screen-full bg-white">
+        <NavigationHeader title="채팅" onBack={() => history.back()} />
+        <div className="p-6 text-text-gray3">로그인이 필요합니다.</div>
+      </div>
+    );
+  }
+
+  if (token && (!myUserId || myUserId <= 0)) {
+    return (
+      <div className="h-screen-full bg-white">
+        <NavigationHeader title="채팅" onBack={() => history.back()} />
+        <div className="p-6 text-text-gray3">로그인 정보 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (!roomId) {
+    return (
+      <div className="h-screen-full bg-white">
+        <NavigationHeader title="채팅" onBack={() => history.back()} />
+        <div className="p-6 text-text-gray3">채팅방을 여는 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
@@ -272,14 +310,9 @@ export default function ChattingRoom( {roomId} : Props ) {
       />
 
       {detail?.campaignSummary && (
-        <CollaborationSummaryBar
-          thumbnailUrl={collabThumb}
-          title={collabTitle}
-          subtitle={collabSubtitle}
-        />
+        <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />
       )}
 
-      {/* 메시지 영역 */}
       <div
         ref={listRef}
         className="overflow-y-auto px-4 py-5"
@@ -293,9 +326,8 @@ export default function ChattingRoom( {roomId} : Props ) {
               return (
                 <MessageRenderer
                   key={m.messageId ?? m.clientMessageId ?? `${m.roomId}-${m.createdAt}`}
-                  message={m}                         
-                  //isMe={isMe}                         
-                  timeText={createdAt}              
+                  message={m}
+                  timeText={createdAt}
                   avatarSrc={isMe ? undefined : partnerAvatarUrl}
                 />
               );
@@ -304,7 +336,6 @@ export default function ChattingRoom( {roomId} : Props ) {
         </div>
       </div>
 
-      {/* 입력창 */}
       <ChatComposer
         inputRef={inputRef}
         value={text}
@@ -315,7 +346,6 @@ export default function ChattingRoom( {roomId} : Props ) {
         sheetHeight={sheetHeight}
       />
 
-      {/* 첨부/기능 시트 */}
       <AttachmentSheet
         open={isSheetOpen}
         actions={actions}
