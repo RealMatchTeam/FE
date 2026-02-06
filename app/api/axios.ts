@@ -6,6 +6,13 @@ import type {
 } from "axios";
 import { tokenStorage } from "../lib/token";
 
+type RefreshResponse = {
+  result?: {
+    accessToken: string;
+    refreshToken: string;
+  };
+};
+
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: "/api",
   headers: {
@@ -16,13 +23,13 @@ export const axiosInstance: AxiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-
     console.log("[REQ]", {
-  method: config.method,
-  baseURL: config.baseURL,
-  url: config.url,
-  full: `${config.baseURL ?? ""}${config.url ?? ""}`,
-});
+      method: config.method,
+      baseURL: config.baseURL,
+      url: config.url,
+      full: `${config.baseURL ?? ""}${config.url ?? ""}`,
+    });
+
     if (typeof config.url === "string") {
       config.url = config.url.replace(/^\/api\/v1\//, "/v1/");
       config.url = config.url.replace(/^\/api\/api\//, "/api/");
@@ -35,7 +42,6 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error),
-
 );
 
 let isRefreshing = false;
@@ -80,7 +86,7 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
           }
 
-          const response = await axios.post(
+          const response = await axios.post<RefreshResponse>(
             `/api/v1/auth/refresh`,
             {},
             {
@@ -90,8 +96,8 @@ axiosInstance.interceptors.response.use(
             },
           );
 
-          const { accessToken, refreshToken: newRefreshToken } =
-            (response.data as any).result ?? {};
+          const accessToken = response.data.result?.accessToken;
+          const newRefreshToken = response.data.result?.refreshToken;
 
           if (!accessToken || !newRefreshToken) {
             isRefreshing = false;
@@ -109,7 +115,6 @@ axiosInstance.interceptors.response.use(
           }
 
           isRefreshing = false;
-
           return axiosInstance(originalRequest);
         } catch (refreshError) {
           isRefreshing = false;
