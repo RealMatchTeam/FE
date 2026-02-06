@@ -9,7 +9,7 @@ export async function postMatches(
   payload: MatchesRequest,
 ): Promise<ApiResponse<MatchesResponseResult>> {
   const res = await axiosInstance.post<ApiResponse<MatchesResponseResult>>(
-    "/api/v1/matches",
+    "v1/matches",
     payload,
   );
 

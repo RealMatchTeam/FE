@@ -1,7 +1,6 @@
 import { apiClient } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
 
-
 type ApiErrorData = { code?: string; message?: string };
 type ApiErrorResponse = { status: number; data?: ApiErrorData };
 type ApiThrown = { response?: ApiErrorResponse };
@@ -18,8 +17,6 @@ export class MatchingTestRequiredError extends Error {
     this.name = "MatchingTestRequiredError";
   }
 }
-
-/* 매칭 결과  */
 
 export interface MatchResult {
   userType: string;
@@ -51,7 +48,7 @@ export const getMatchAnalysis = async (): Promise<MatchResult> => {
     const userId = tokenStorage.getUserId();
     if (!userId) throw new MatchingTestRequiredError();
 
-    const response = await apiClient.get<MatchResultResponse>(`/api/v1/matches`);
+    const response = await apiClient.get<MatchResultResponse>(`/v1/matches`);
 
     if (!response.data.isSuccess) {
       if (isMatchTestNotCompleted(response.data.code, response.data.message)) {
@@ -75,8 +72,6 @@ export const getMatchAnalysis = async (): Promise<MatchResult> => {
     throw error;
   }
 };
-
-/*  매칭 리스트 types  */
 
 export interface MatchingCampaign {
   id: number;
@@ -172,8 +167,6 @@ interface MatchBrandRawItem {
   tags?: string[];
 }
 
-/*  브랜드 필터 DTOs */
-
 export interface CategoryDto {
   categoryId: number;
   categoryName: string;
@@ -212,8 +205,6 @@ interface BrandFilterResponse {
   result: BrandFilterResponseDto[];
 }
 
-/*  매칭 캠페인 */
-
 export const getMatchingCampaigns = async (
   sortBy: string = "MATCH_SCORE",
   category: string = "ALL",
@@ -236,7 +227,7 @@ export const getMatchingCampaigns = async (
     if (keyword) params.keyword = keyword;
 
     const response = await apiClient.get<MatchingCampaignResponse>(
-      `/api/v1/matches/campaigns`,
+      `/v1/matches/campaigns`,
       { params },
     );
 
@@ -295,8 +286,6 @@ export const getMatchingCampaigns = async (
   }
 };
 
-/*  매칭 브랜드  */
-
 export const getMatchingBrands = async (
   sortBy: string = "MATCH_SCORE",
   category: string = "ALL",
@@ -313,7 +302,7 @@ export const getMatchingBrands = async (
     if (tags && tags.length > 0) params.tags = tags;
 
     const response = await apiClient.get<MatchingBrandResponse>(
-      `/api/v1/matches/brands`,
+      `/v1/matches/brands`,
       { params },
     );
 
@@ -330,18 +319,13 @@ export const getMatchingBrands = async (
       return {
         id: item.brandId,
         name: item.brandName,
-
         logoUrl: item.brandLogoUrl ?? item.logoUrl,
-
         matchRate: matchingRatio,
         matchingRatio,
-
         isLiked: item.brandIsLike ?? item.brandIsLiked ?? false,
-
         category: item.category || category,
-
         tags: item.brandTags ?? item.tags ?? [],
-        isRecruiting: item.brandIsRecruiting ?? item.brandIsRecruiting ?? false,
+        isRecruiting: item.brandIsRecruiting ?? false,
       };
     });
 
@@ -375,12 +359,10 @@ export const getMatchingBrands = async (
   }
 };
 
-/* 브랜드 필터 */
-
 export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
   try {
     const response = await apiClient.get<BrandFilterResponse>(
-      "/api/v1/brands/filters",
+      "/v1/brands/filters",
     );
 
     if (!response.data.isSuccess) {
@@ -393,8 +375,6 @@ export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
     throw error;
   }
 };
-
-/*  브랜드 좋아요 */
 
 export interface BrandLikeResponseDto {
   brandIsLiked: boolean;
@@ -410,7 +390,7 @@ interface BrandLikeResponse {
 export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   try {
     const response = await apiClient.post<BrandLikeResponse>(
-      `/api/v1/brands/${brandId}/like`,
+      `/v1/brands/${brandId}/like`,
       {},
     );
 
@@ -425,13 +405,9 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   }
 };
 
-/* Tag names (stub) */
-
 export const getTagNamesByCategory = async (): Promise<string[]> => {
   return [];
 };
-
-/* 캠페인 제안하기 */
 
 export interface CreateCampaignProposalRequest {
   brandId: number;
@@ -464,7 +440,7 @@ export const createCampaignProposal = async (
 ): Promise<number> => {
   try {
     const response = await apiClient.post<CreateCampaignProposalResponse>(
-      "/api/v1/campaigns/proposal",
+      "/v1/campaigns/proposal",
       data,
     );
 
@@ -478,8 +454,6 @@ export const createCampaignProposal = async (
     throw error;
   }
 };
-
-/* 매칭 테스트 request */
 
 export interface MatchRequestDto {
   userId: string | number;
@@ -523,7 +497,7 @@ export interface MatchRequestDto {
 export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> => {
   try {
     const response = await apiClient.post<MatchResultResponse>(
-      "/api/v1/matches",
+      "/v1/matches",
       data,
     );
 
