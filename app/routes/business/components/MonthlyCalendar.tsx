@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import type { CampaignCollaboration } from "../calendar/api/calendar";
+import { parseISO, startOfDay } from "date-fns";
 import ArrowLeftIcon from "../../../assets/icon/arrow-left.svg";
 import ArrowRightIcon from "../../../assets/icon/arrow-right.svg";
 
@@ -48,6 +49,16 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
   // 날짜 문자열 비교를 위한 헬퍼 함수
   const getTime = (dateStr: string) => new Date(dateStr).setHours(0, 0, 0, 0);
 
+  // 특정 날짜의 총 이벤트 개수를 구하는 함수 (+N 표시용)
+  const getEventsForDate = (day: number) => {
+    const targetDate = startOfDay(new Date(year, month - 1, day));
+    return matchedEvents.filter(event => {
+      const start = startOfDay(parseISO(event.startDate));
+      const end = startOfDay(parseISO(event.endDate));
+      return targetDate >= start && targetDate <= end;
+    });
+  };
+
   return (
     <div className="flex flex-col gap-6 p-4 bg-white rounded-xl shadow-sm overflow-hidden">
       {/* 상단 컨트롤 */}
@@ -59,76 +70,89 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
 
       <div className="flex flex-col">
         {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 mb-2 text-center text-[13px] text-text-gray3">
+        <div className="grid grid-cols-7 mb-2 text-center text-[13px] text-text-gray3 font-medium">
           {WEEK_DAYS.map(day => <div key={day}>{day}</div>)}
         </div>
 
         {/* 주차별 렌더링 */}
-        {weeks.map((week, weekIdx) => (
-          <div key={weekIdx} className="grid grid-cols-7 relative border-t border-gray-50 min-h-[85px]">
-            {/* 배경 날짜 숫자 */}
-            {week.map((day, dayIdx) => {
-              const isToday = day === new Date().getDate() && month === (new Date().getMonth() + 1) && year === new Date().getFullYear();
-              return (
-                <div key={dayIdx} className="pt-2 flex flex-col items-center">
-                  {day && (
-                    <span className={`text-[14px] w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-core-1 text-white font-bold" : "text-text-black"}`}>
-                      {day}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+        {weeks.map((week, weekIdx) => {
+          const weekDates = week.filter((d) => d !== null) as number[];
+          if (weekDates.length === 0) return null;
 
-            {/* 이벤트 바 레이어 */}
-            <div className="absolute top-10 w-full flex flex-col gap-1.5 px-1">
-              {matchedEvents.map((event, eventIdx) => {
-                const weekDates = week.filter((d) => d !== null) as number[];
-                if (weekDates.length === 0) return null;
+          // 이번 주 범위 계산
+          const weekStartTs = new Date(year, month - 1, weekDates[0]).setHours(0, 0, 0, 0);
+          const weekEndTs = new Date(year, month - 1, weekDates[weekDates.length - 1]).setHours(23, 59, 59, 999);
 
-                const weekStart = new Date(year, month - 1, weekDates[0]).setHours(0, 0, 0, 0);
-                const weekEnd = new Date(year, month - 1, weekDates[weekDates.length - 1]).setHours(23, 59, 59, 999);
-                const eventStart = getTime(event.startDate);
-                const eventEnd = getTime(event.endDate);
+          // 이번 주에 포함되는 이벤트 필터링
+          const eventsInThisWeek = matchedEvents.filter(event => {
+            const eventStart = getTime(event.startDate);
+            const eventEnd = getTime(event.endDate);
+            return eventEnd >= weekStartTs && eventStart <= weekEndTs;
+          });
 
-                if (eventEnd < weekStart || eventStart > weekEnd) return null;
-
-                const startIdx = week.findIndex((d) => d !== null && getTime(`${year}-${month}-${d}`) >= eventStart);
-                const actualStartIdx = startIdx === -1 ? 0 : startIdx;
-
-                const reversedIdx = [...week].reverse().findIndex((d) => d !== null && getTime(`${year}-${month}-${d}`) <= eventEnd);
-                const endIdx = reversedIdx === -1 ? -1 : week.length - 1 - reversedIdx;
-                const actualEndIdx = endIdx === -1 ? 6 : endIdx;
-
-                const colStart = actualStartIdx + 1;
-                const colSpan = actualEndIdx - actualStartIdx + 1;
-                
-                const isRealStart = eventStart >= weekStart && eventStart <= weekEnd;
-                const isRealEnd = eventEnd >= weekStart && eventEnd <= weekEnd;
+          return (
+            <div key={weekIdx} className="grid grid-cols-7 relative border-t border-gray-50 min-h-[90px]">
+              {/* 1. 배경 날짜 및 +N 표시 */}
+              {week.map((day, dayIdx) => {
+                const isToday = day === new Date().getDate() && 
+                                month === (new Date().getMonth() + 1) && 
+                                year === new Date().getFullYear();
+                const dayEvents = day ? getEventsForDate(day) : [];
+                const hasMore = dayEvents.length > 2;
 
                 return (
-                  <div
-                    key={`${event.campaignId || event.proposalId}-${weekIdx}`}
-                    style={{ gridColumn: `${colStart} / span ${colSpan}` }}
-                    className={`
-          h-6 text-[11px] text-white flex items-center justify-center px-2 transition-all
-          ${isRealStart ? "rounded-l-full" : ""} 
-          ${isRealEnd ? "rounded-r-full" : ""}
-          ${eventIdx % 2 === 0
-                        ? "bg-gradient-to-r from-[#BFC8F5] to-[#6366F1]" 
-                        : "bg-gradient-to-r from-[#D8B4FE] to-[#818CF8]"
-                      }
-        `}
-                  >
-                    <span className="truncate font-bold tracking-tight">
-                      {event.brandName}
-                    </span>
+                  <div key={dayIdx} className="pt-2 flex flex-col items-center relative h-full">
+                    {day && (
+                      <>
+                        <span className={`z-10 text-[14px] w-6 h-6 flex items-center justify-center rounded-full mb-1 ${
+                          isToday ? "bg-core-1 text-white font-bold" : "text-text-black"
+                        }`}>
+                          {day}
+                        </span>
+                        {hasMore && (
+                          <span className="absolute bottom-1 text-[10px] text-core-1 font-bold">
+                            +{dayEvents.length - 2}
+                          </span>
+                        )}
+                      </>
+                    )}
                   </div>
                 );
               })}
+
+              {/* 2. 이벤트 바 레이어 (주차 내부로 이동) */}
+              <div className="absolute top-10 w-full flex flex-col gap-1 px-0.5">
+                {eventsInThisWeek.slice(0, 2).map((event) => {
+                  const eventStart = getTime(event.startDate);
+                  const eventEnd = getTime(event.endDate);
+
+                  // 주차 내 시작/종료 칸 계산
+                  const startIdx = week.findIndex((d) => d !== null && getTime(`${year}-${month}-${d}`) >= eventStart);
+                  const actualStartIdx = startIdx === -1 ? 0 : startIdx;
+
+                  const reversedIdx = [...week].reverse().findIndex((d) => d !== null && getTime(`${year}-${month}-${d}`) <= eventEnd);
+                  const endIdx = reversedIdx === -1 ? -1 : week.length - 1 - reversedIdx;
+                  const actualEndIdx = endIdx === -1 ? 6 : endIdx;
+
+                  return (
+                    <div
+                      key={`${event.campaignId}-${weekIdx}`}
+                      style={{ gridColumn: `${actualStartIdx + 1} / span ${actualEndIdx - actualStartIdx + 1}` }}
+                      className={`
+                        h-[18px] text-[9px] text-white flex items-center justify-center px-2 font-bold transition-all
+                        ${eventStart >= weekStartTs ? "rounded-l-full ml-0.5" : ""} 
+                        ${eventEnd <= weekEndTs ? "rounded-r-full mr-0.5" : ""}
+                        bg-gradient-to-r from-[#747BFF] to-[#A2A7FF] shadow-sm
+                      `}
+                    >
+                      <span className="truncate">{event.brandName}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
