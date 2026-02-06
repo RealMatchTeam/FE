@@ -18,8 +18,10 @@ type RefreshResponse = {
   result: RefreshResult;
 };
 
-const isProd = import.meta.env.PROD;
-const BASE_URL = isProd ? "https://api.realmatch.co.kr" : "/api";
+const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const BASE_URL =
+  (envBase && envBase.trim().length > 0 ? envBase.trim() : undefined) ??
+  (import.meta.env.PROD ? "https://api.realmatch.co.kr" : "/api");
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -28,7 +30,20 @@ export const axiosInstance: AxiosInstance = axios.create({
 });
 
 const normalizeUrl = (url: string) => {
-  return url.replace(/^\/api\/api\//, "/api/");
+  let next = url;
+
+  next = next.replace(/^\/api\/api\//, "/api/");
+
+  const isDevProxy = BASE_URL === "/api";
+
+  if (isDevProxy) {
+    next = next.replace(/^\/api\/v1\//, "/v1/");
+    next = next.replace(/^\/api\/api\/v1\//, "/v1/");
+  } else {
+    next = next.replace(/^\/v1\//, "/api/v1/");
+  }
+
+  return next;
 };
 
 axiosInstance.interceptors.request.use(
@@ -79,9 +94,10 @@ axiosInstance.interceptors.response.use(
       originalRequest.url = normalizeUrl(originalRequest.url);
     }
 
-    const status = error.response?.status;
-
-    if ((status === 401 || status === 400) && !originalRequest._retry) {
+    if (
+      (error.response?.status === 401 || error.response?.status === 400) &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -103,8 +119,11 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(error);
         }
 
+        const refreshPath =
+          BASE_URL === "/api" ? "/v1/auth/refresh" : "/api/v1/auth/refresh";
+
         const res = await axiosInstance.post<RefreshResponse>(
-          "/api/v1/auth/refresh",
+          refreshPath,
           {},
           { headers: { RefreshToken: `Bearer ${refreshToken}` } },
         );
