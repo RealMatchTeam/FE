@@ -5,7 +5,7 @@ import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
 
-import { getProposalDetail, getBrandDetail, type ProposalDetail } from "./api/proposal";
+import { getProposalDetail, getBrandDetail, approveCampaignProposal, type ProposalDetail } from "./api/proposal";
 import type { BrandDetail } from "../../../data/brand";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
@@ -24,8 +24,8 @@ export default function ReceivedProposalContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [modalType, setModalType] = useState<"none" | "confirm" | "success">("none");
     const [isContentOpen, setIsContentOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false); 
 
-    // 1. 데이터 패칭 로직
     useEffect(() => {
         const fetchData = async () => {
             if (!proposalId || typeof proposalId !== "string") return;
@@ -50,12 +50,32 @@ export default function ReceivedProposalContent() {
     }, [proposalId])
 
     const handleAcceptClick = () => setModalType("confirm");
-    const handleConfirm = () => setModalType("success");
+    const handleConfirm = async () => {
+        if (!proposalId) return;
+
+        try {
+            setIsProcessing(true);
+            
+            const response = await approveCampaignProposal(proposalId);
+
+            if (response.isSuccess) {
+                setModalType("success");
+                
+            } else {
+                alert(response.message || "수락 처리 중 오류가 발생했습니다.");
+            }
+        } catch (error) {
+            console.error("수락 연동 에러:", error);
+            alert("서버와 통신 중 에러가 발생했습니다.");
+        } finally {
+            setIsProcessing(false); 
+        }
+    };
     const closeModal = () => setModalType("none");
 
     // 태그 배열을 문자열로 변환하는 헬퍼 함수
     const formatTags = (tags: { name: string }[] | undefined | null) => {
-        if (!tags || tags.length === 0) return "정보 없음"; // 데이터가 없을 경우 처리
+        if (!tags || tags.length === 0) return "정보 없음"; 
         return tags.map(t => t.name).join(", ");
     };
 
@@ -138,7 +158,7 @@ export default function ReceivedProposalContent() {
                         </CampaignInfoGroup>
                     </div>
 
-                    {/* 제작 기간: 36px 및 pl-4 통일 */}
+                    {/* 제작 기간 */}
                     <CampaignInfoGroup label="제작 기간">
                         <div className="flex items-center gap-2">
                             <div className="flex-1 h-[36px] flex items-center pl-[16px] bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-[6px] text-callout1 text-[var(--color-text-gray1)]">
@@ -181,15 +201,17 @@ export default function ReceivedProposalContent() {
                         <div className="flex w-full gap-[10px] justify-center items-center">
                             <button
                                 onClick={closeModal}
+                                disabled={isProcessing}
                                 className="w-[76px] h-[44px] flex items-center justify-center border border-core-3 rounded-[10px] bg-bg-w text-core-1 text-title3"
                             >
                                 취소
                             </button>
                             <button
                                 onClick={handleConfirm}
+                                disabled={isProcessing}
                                 className="flex-1 h-[44px] flex items-center justify-center bg-core-1 rounded-[10px] text-white text-title3 font-medium"
                             >
-                                수락하기
+                                {isProcessing ? "처리 중..." : "수락하기"}
                             </button>
                         </div>
                     </div>

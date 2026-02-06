@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProposalDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
+import { getProposalDetail, type ProposalDetail} from "./api/proposal";
 import type { BrandDetail } from "../../../data/brand";
 
 import Header from "../../../components/layout/Header";

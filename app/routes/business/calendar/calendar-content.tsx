@@ -91,14 +91,20 @@ export default function CalendarContent() {
     return;
   }
 
-  // 2. 지원하기 타입일 때
+  // 2. 지원 현황 탭에서 온 경우 (내가 지원한 캠페인)
   if (item.type === "APPLIED") {
     navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
     return;
   }
 
-  // 3. 그 외 기본
-  navigate(`/business/proposal?proposalId=${proposalId}`);
+  // 3. 받은 제안 탭에서 온 경우 (브랜드가 나에게 제안)
+  if (item.type === "RECEIVED") {
+    navigate(`/business/proposal?type=received&proposalId=${proposalId}`);
+    return;
+  }
+
+  // 4. 보낸 제안 (기본값)
+  navigate(`/business/proposal?type=sent&proposalId=${proposalId}`);
 };
 
   return (
@@ -129,7 +135,7 @@ export default function CalendarContent() {
 
       <main className="flex flex-col flex-1">
         {mainTab === "collaboration" ? (
-          /* [A] 협업 현황 */
+          /* 협업 현황 */
           <div className="flex flex-col gap-6 px-4 py-6">
             {/* 주간 캘린더 연동 */}
             <section className="flex flex-col gap-3">
@@ -184,7 +190,7 @@ export default function CalendarContent() {
             </section>
           </div>
         ) : (
-          /* [B] 매칭 현황 */
+          /* 매칭 현황 */
           <div className="flex flex-col flex-1">
             <MatchingTabSection
               subTab={matchingSubTab}

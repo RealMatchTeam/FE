@@ -55,7 +55,6 @@ export const getBrandDetail = async (brandId: number | string): Promise<BrandDet
     );
 
     if (response.data.isSuccess) {
-      // 스웨거 응답 구조상 result가 배열이므로 첫 번째 요소를 반환
       return response.data.result[0];
     }
 
@@ -98,5 +97,17 @@ export const getAppliedCampaignDetail = async (campaignId: string): Promise<Appl
     }
     
     throw new Error("알 수 없는 에러가 발생했습니다.");;
+  }
+};
+
+export const approveCampaignProposal = async (campaignProposalId: string | number): Promise<ApiResponse<string>> => {
+  try {
+    const response = await axiosInstance.patch<ApiResponse<string>>(
+      `/v1/campaigns/proposal/${campaignProposalId}/approve`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("제안 수락 실패:", error);
+    throw error;
   }
 };
