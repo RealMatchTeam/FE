@@ -19,7 +19,6 @@ type RefreshResponse = {
 };
 
 const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
-
 const BASE_URL =
   (envBase && envBase.trim().length > 0 ? envBase.trim() : undefined) ??
   (import.meta.env.PROD ? "https://api.realmatch.co.kr" : "/api");
@@ -30,21 +29,40 @@ export const axiosInstance: AxiosInstance = axios.create({
   timeout: 10000,
 });
 
+const normalizeUrl = (url: string) => {
+  let next = url;
+
+  next = next.replace(/^\/api\/api\//, "/api/");
+
+  const isDevProxy = BASE_URL === "/api";
+
+  if (isDevProxy) {
+    next = next.replace(/^\/api\/v1\//, "/v1/");
+    next = next.replace(/^\/api\/api\/v1\//, "/v1/");
+  } else {
+    next = next.replace(/^\/v1\//, "/api/v1/");
+  }
+
+  return next;
+};
+
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    if (typeof config.url === "string") {
+      config.url = normalizeUrl(config.url);
+    }
+
     const accessToken = tokenStorage.getAccessToken();
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    if (import.meta.env.DEV) {
-      console.log("[REQ]", {
-        method: config.method,
-        baseURL: config.baseURL,
-        url: config.url,
-        full: `${config.baseURL ?? ""}${config.url ?? ""}`,
-      });
-    }
+    console.log("[REQ]", {
+      method: config.method,
+      baseURL: config.baseURL,
+      url: config.url,
+      full: `${config.baseURL ?? ""}${config.url ?? ""}`,
+    });
 
     return config;
   },
@@ -72,6 +90,10 @@ axiosInstance.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(error);
 
+    if (typeof originalRequest.url === "string") {
+      originalRequest.url = normalizeUrl(originalRequest.url);
+    }
+
     if (
       (error.response?.status === 401 || error.response?.status === 400) &&
       !originalRequest._retry
@@ -97,8 +119,11 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        const res = await axios.post<RefreshResponse>(
-          `${BASE_URL}/api/v1/auth/refresh`,
+        const refreshPath =
+          BASE_URL === "/api" ? "/v1/auth/refresh" : "/api/v1/auth/refresh";
+
+        const res = await axiosInstance.post<RefreshResponse>(
+          refreshPath,
           {},
           { headers: { RefreshToken: `Bearer ${refreshToken}` } },
         );
