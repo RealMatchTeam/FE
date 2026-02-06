@@ -1,16 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { tokenStorage } from "../../lib/token";
 import NavigationHeader from "../../components/common/NavigateHeader";
 import ChatComposer from "./components/ChatComposer";
-import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
+import AttachmentSheet, {
+  type AttachmentAction,
+} from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
 import MessageRenderer from "./components/MessageRender";
 import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage, createOrGetDirectRoom } from "./api/rooms";
+import {
+  getChatRoomDetail,
+  type ChatRoomDetailResponse,
+  getChatMessages,
+  type ChatMessage,
+  createOrGetDirectRoom,
+} from "./api/rooms";
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
 import { tokenStorage } from "../../lib/token";
 
@@ -31,20 +38,21 @@ export default function ChattingRoom({ brandId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 
-  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
+  const myUserId = Number(tokenStorage.getUserId() ?? 0);
   const accessToken = tokenStorage.getAccessToken();
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  
+
   useHideBottomTab(true);
   useHideHeader(true);
-  
+
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
   const isCollaborating = detail?.isCollaborating ?? false;
 
   const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
   const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
-  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
+  const collabThumb =
+    detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
   const createdAt = useMemo(() => {
@@ -66,7 +74,10 @@ export default function ChattingRoom({ brandId }: Props) {
 
     const run = async () => {
       try {
-        const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
+        const result = await createOrGetDirectRoom({
+          brandId,
+          creatorId: myUserId,
+        });
         setRoomId(result.roomId);
       } catch (e) {
         console.error("createOrGetDirectRoom failed:", e);
@@ -183,7 +194,6 @@ export default function ChattingRoom({ brandId }: Props) {
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
-  // 1. 이미지 선택 핸들러
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -197,16 +207,16 @@ export default function ChattingRoom({ brandId }: Props) {
         roomId,
         senderId: myUserId,
         senderType: "USER",
-        messageType: "IMAGE", // 또는 "FILE" (백엔드 스펙에 맞게)
+        messageType: "IMAGE",
         content: null,
         attachment: {
           attachmentId: uploaded.attachmentId,
           attachmentType: "IMAGE",
           contentType: uploaded.contentType,
           originalName: uploaded.originalName,
-          fileSize: uploaded.fileSize, 
+          fileSize: uploaded.fileSize,
           accessUrl: uploaded.accessUrl,
-          status: "READY", 
+          status: "READY",
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
@@ -215,14 +225,11 @@ export default function ChattingRoom({ brandId }: Props) {
 
       setMessages((prev) => [...prev, tempMessage]);
       setIsSheetOpen(false);
-
     } catch (err) {
       console.error(err);
-      // 에러 토스트 처리 등을 여기에 추가
     }
   };
 
-  // 2. 파일 선택 핸들러
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -245,7 +252,7 @@ export default function ChattingRoom({ brandId }: Props) {
           originalName: uploaded.originalName,
           fileSize: uploaded.fileSize,
           accessUrl: uploaded.accessUrl,
-          status: "READY", 
+          status: "READY",
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
@@ -254,12 +261,11 @@ export default function ChattingRoom({ brandId }: Props) {
 
       setMessages((prev) => [...prev, tempMessage]);
       setIsSheetOpen(false);
-
     } catch (err) {
       console.error(err);
     }
   };
-  
+
   if (!accessToken) {
     return (
       <div className="h-screen-full bg-white">
@@ -304,13 +310,14 @@ export default function ChattingRoom({ brandId }: Props) {
         onChange={handlePickFile}
       />
 
-      <NavigationHeader
-        title={partnerName}
-        onBack={() => history.back()}
-      />
+      <NavigationHeader title={partnerName} onBack={() => history.back()} />
 
       {detail?.campaignSummary && (
-        <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />
+        <CollaborationSummaryBar
+          thumbnailUrl={collabThumb}
+          title={collabTitle}
+          subtitle={collabSubtitle}
+        />
       )}
 
       <div
