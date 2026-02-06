@@ -7,5 +7,6 @@ export function useBrandDetail(brandId: string, domain?: BrandDomain) {
     queryKey: ["brandDetail", brandId, domain],
     queryFn: () => fetchBrandDetail({ brandId, domain }),
     staleTime: 60_000,
+    enabled: Boolean(brandId),
   });
 }

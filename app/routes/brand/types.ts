@@ -9,8 +9,8 @@ export type BrandOngoingCampaign = {
   campaignId: number;
   brandName: string;
   title: string;
-  recruitQuota: number; // 총 모집 인원
-  rewardAmount: number; // 원고료
+  recruitQuota: number;
+  rewardAmount: number;
   imageUrl?: string;
   dday: number;
   isLiked?: boolean;
@@ -31,6 +31,7 @@ export type HistoryRowItem = {
 
 export type BrandDetailData = {
   id: string;
+  userId: number;
   domain: BrandDomain;
 
   name: string;

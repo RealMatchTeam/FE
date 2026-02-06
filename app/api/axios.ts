@@ -6,116 +6,129 @@ import type {
 } from "axios";
 import { tokenStorage } from "../lib/token";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+type RefreshResult = {
+  accessToken: string;
+  refreshToken: string;
+};
 
-// Axios 인스턴스 생성
+type RefreshResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: RefreshResult;
+};
+
+const isProd = import.meta.env.PROD;
+const BASE_URL = isProd ? "https://api.realmatch.co.kr" : "/api";
+
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
   timeout: 10000,
 });
 
-// Request 인터셉터: Access Token 자동 추가
+const normalizeUrl = (url: string) => {
+  return url.replace(/^\/api\/api\//, "/api/");
+};
+
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    if (typeof config.url === "string") {
+      config.url = normalizeUrl(config.url);
+    }
+
     const accessToken = tokenStorage.getAccessToken();
-    if (accessToken && config.headers) {
+    if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
+    console.log("[REQ]", {
+      method: config.method,
+      baseURL: config.baseURL,
+      url: config.url,
+      full: `${config.baseURL ?? ""}${config.url ?? ""}`,
+    });
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
-// Response 인터셉터: 401 에러 시 토큰 갱신
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: Array<(token: string) => void> = [];
 
 const subscribeTokenRefresh = (callback: (token: string) => void) => {
   refreshSubscribers.push(callback);
 };
 
 const onTokenRefreshed = (token: string) => {
-  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
 };
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
 
-    // 400 또는 401 에러이고, 재시도하지 않은 요청인 경우
-    if (
-      (error.response?.status === 401 || error.response?.status === 400) &&
-      !originalRequest._retry
-    ) {
+    if (!originalRequest) return Promise.reject(error);
+
+    if (typeof originalRequest.url === "string") {
+      originalRequest.url = normalizeUrl(originalRequest.url);
+    }
+
+    const status = error.response?.status;
+
+    if ((status === 401 || status === 400) && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-
-        try {
-          const refreshToken = tokenStorage.getRefreshToken();
-
-          if (!refreshToken) {
-            // Refresh Token이 없으면 로그아웃 처리
-            tokenStorage.clearTokens();
-            window.location.href = "/auth/login";
-            return Promise.reject(error);
-          }
-
-          // Refresh Token으로 새 Access Token 발급
-          const response = await axios.post(
-            `${BASE_URL}/api/v1/auth/refresh`,
-            {},
-            {
-              headers: {
-                RefreshToken: `Bearer ${refreshToken}`,
-              },
-            },
-          );
-
-          const { accessToken, refreshToken: newRefreshToken } =
-            response.data.result;
-
-          // 새로운 토큰 저장
-          tokenStorage.setTokens(accessToken, newRefreshToken);
-
-          // 대기 중인 요청들에 새 토큰 전달
-          onTokenRefreshed(accessToken);
-
-          // 원래 요청 재시도
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          }
-
-          isRefreshing = false;
-
-          return axiosInstance(originalRequest);
-        } catch (refreshError) {
-          // Refresh Token도 만료된 경우 로그아웃 처리
-          isRefreshing = false;
-          tokenStorage.clearTokens();
-          window.location.href = "/auth/login";
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // 이미 갱신 중인 경우, 갱신이 완료될 때까지 대기
+      if (isRefreshing) {
         return new Promise((resolve) => {
           subscribeTokenRefresh((token: string) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
+            originalRequest.headers.Authorization = `Bearer ${token}`;
             resolve(axiosInstance(originalRequest));
           });
         });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const refreshToken = tokenStorage.getRefreshToken();
+        if (!refreshToken) {
+          tokenStorage.clearTokens();
+          window.location.href = "/auth/login";
+          return Promise.reject(error);
+        }
+
+        const res = await axiosInstance.post<RefreshResponse>(
+          "/api/v1/auth/refresh",
+          {},
+          { headers: { RefreshToken: `Bearer ${refreshToken}` } },
+        );
+
+        const accessToken = res.data.result?.accessToken;
+        const newRefreshToken = res.data.result?.refreshToken;
+
+        if (!accessToken || !newRefreshToken) {
+          tokenStorage.clearTokens();
+          window.location.href = "/auth/login";
+          return Promise.reject(error);
+        }
+
+        tokenStorage.setTokens(accessToken, newRefreshToken);
+        onTokenRefreshed(accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (e) {
+        tokenStorage.clearTokens();
+        window.location.href = "/auth/login";
+        return Promise.reject(e);
+      } finally {
+        isRefreshing = false;
       }
     }
 
@@ -123,5 +136,4 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-// apiClient alias for backward compatibility
 export const apiClient = axiosInstance;

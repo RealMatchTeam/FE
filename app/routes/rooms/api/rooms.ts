@@ -1,5 +1,35 @@
 import { axiosInstance } from "../../../api/axios";
 
+
+type CreateOrGetDirectRoomResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    roomId: number;
+    roomKey: string;
+    createdAt: string;
+  };
+};
+
+export async function createOrGetDirectRoom(body: {
+  brandId: number;
+  creatorId: number;
+}): Promise<CreateOrGetDirectRoomResponse["result"]> {
+  const res = await axiosInstance.post<CreateOrGetDirectRoomResponse>(
+    "/api/v1/chat/rooms",
+    body
+  );
+
+  const data = res.data;
+  if (!data?.isSuccess) {
+    throw new Error(data?.message ?? "채팅방 생성/조회 실패");
+  }
+
+  return data.result;
+}
+
+
 //채팅룸 상세조회
 
 export interface ChatRoomDetailResponse {

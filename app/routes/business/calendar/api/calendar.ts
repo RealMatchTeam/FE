@@ -28,7 +28,7 @@ export const getMyCollaborations = async (params?: {
 }) => {
   // axios -> axiosInstance로 수정
   const response = await axiosInstance.get<CollaborationResponse>(
-    "/api/v1/campaigns/collaborations/me",
+    "/v1/campaigns/collaborations/me",
     { params }
   );
   return response.data.result;
