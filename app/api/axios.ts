@@ -18,11 +18,8 @@ type RefreshResponse = {
   result: RefreshResult;
 };
 
-const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
-
-const BASE_URL =
-  (envBase && envBase.trim().length > 0 ? envBase.trim() : undefined) ??
-  (import.meta.env.PROD ? "https://api.realmatch.co.kr" : "/api");
+const isProd = import.meta.env.PROD;
+const BASE_URL = isProd ? "https://api.realmatch.co.kr" : "/api";
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -30,7 +27,9 @@ export const axiosInstance: AxiosInstance = axios.create({
   timeout: 10000,
 });
 
-const normalizeUrl = (url: string) => url.replace(/^\/api\/v1\//, "/v1/");
+const normalizeUrl = (url: string) => {
+  return url.replace(/^\/api\/api\//, "/api/");
+};
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -80,10 +79,9 @@ axiosInstance.interceptors.response.use(
       originalRequest.url = normalizeUrl(originalRequest.url);
     }
 
-    if (
-      (error.response?.status === 401 || error.response?.status === 400) &&
-      !originalRequest._retry
-    ) {
+    const status = error.response?.status;
+
+    if ((status === 401 || status === 400) && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -105,9 +103,8 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        //baseURL이 이미 붙기 때문에 /v1로 호출 
         const res = await axiosInstance.post<RefreshResponse>(
-          "/v1/auth/refresh",
+          "/api/v1/auth/refresh",
           {},
           { headers: { RefreshToken: `Bearer ${refreshToken}` } },
         );
