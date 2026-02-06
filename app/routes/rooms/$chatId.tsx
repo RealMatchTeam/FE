@@ -1,12 +1,9 @@
 import { useParams } from "react-router";
 import ChattingRoom from "./chatting-room";
 
-export default function ChatRoomRoute() {
+export default function RoomEntry() {
   const { chatId } = useParams();
-
-  const roomId = Number(chatId);
-  if (!chatId || Number.isNaN(roomId)) {
-    return null;
-  }
-  return <ChattingRoom roomId={roomId} />;
+  const brandId = Number(chatId);
+  if (!Number.isFinite(brandId)) return null;
+  return <ChattingRoom brandId={brandId} />;
 }
