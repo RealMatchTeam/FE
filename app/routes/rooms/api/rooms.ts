@@ -1,6 +1,6 @@
 import { axiosInstance } from "../../../api/axios";
 
-
+//채팅룸 생성 및 조회
 type CreateOrGetDirectRoomResponse = {
   isSuccess: boolean;
   code: string;

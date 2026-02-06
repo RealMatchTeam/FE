@@ -2,9 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import NavigationHeader from "../../components/common/NavigateHeader";
 import ChatComposer from "./components/ChatComposer";
-import AttachmentSheet, {
-  type AttachmentAction,
-} from "./components/AttachmentSheet";
+import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
 import MessageRenderer from "./components/MessageRender";
 import { formatKoreanDateTime } from "../../utils/dateTime";
@@ -51,8 +49,7 @@ export default function ChattingRoom({ brandId }: Props) {
 
   const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
   const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
-  const collabThumb =
-    detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
+  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
   const createdAt = useMemo(() => {
@@ -74,10 +71,7 @@ export default function ChattingRoom({ brandId }: Props) {
 
     const run = async () => {
       try {
-        const result = await createOrGetDirectRoom({
-          brandId,
-          creatorId: myUserId,
-        });
+        const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
         setRoomId(result.roomId);
       } catch (e) {
         console.error("createOrGetDirectRoom failed:", e);
@@ -195,6 +189,7 @@ export default function ChattingRoom({ brandId }: Props) {
   };
 
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!roomId) return;
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -231,6 +226,7 @@ export default function ChattingRoom({ brandId }: Props) {
   };
 
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!roomId) return;
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -313,11 +309,7 @@ export default function ChattingRoom({ brandId }: Props) {
       <NavigationHeader title={partnerName} onBack={() => history.back()} />
 
       {detail?.campaignSummary && (
-        <CollaborationSummaryBar
-          thumbnailUrl={collabThumb}
-          title={collabTitle}
-          subtitle={collabSubtitle}
-        />
+        <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />
       )}
 
       <div
