@@ -9,6 +9,7 @@ interface CampaignCardProps {
     isLiked?: boolean;
     logoUrl?: string;
     onLike?: () => void;
+    onClick?: () => void;
 }
 
 export default function CampaignCard({
@@ -19,7 +20,8 @@ export default function CampaignCard({
     applicants,
     isLiked = false,
     logoUrl,
-    onLike
+    onLike,
+    onClick
 }: CampaignCardProps) {
     // 금액 포맷팅
     const formatReward = (amount: number) => {
@@ -27,7 +29,7 @@ export default function CampaignCard({
     };
 
     return (
-        <div className="flex w-full p-2.5 bg-white border border-bluegray-2 rounded-2xl shadow-sm">
+        <div onClick={onClick} className="flex w-full p-2.5 bg-white border border-bluegray-2 rounded-2xl shadow-sm cursor-pointer">
             {/* 왼쪽: 이미지 + 배지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
                 <BrandLogo src={logoUrl} alt={brandName} />

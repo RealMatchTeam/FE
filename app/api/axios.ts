@@ -6,11 +6,9 @@ import type {
 } from "axios";
 import { tokenStorage } from "../lib/token";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 // Axios 인스턴스 생성
 export const axiosInstance: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -73,7 +71,7 @@ axiosInstance.interceptors.response.use(
 
           // Refresh Token으로 새 Access Token 발급
           const response = await axios.post(
-            `${BASE_URL}/api/v1/auth/refresh`,
+            `/api/v1/auth/refresh`,
             {},
             {
               headers: {

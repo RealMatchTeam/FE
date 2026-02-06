@@ -15,17 +15,17 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export function SocialLoginSection({ lastProvider }: SocialLoginSectionProps) {
   const handleKakaoLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/callback/kakao`;
+    const redirectUri = import.meta.env.VITE_KAKAO_REDIRECT_URI || `${window.location.origin}/auth/callback/kakao`;
     window.location.href = `${BASE_URL}/oauth2/authorization/kakao?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
   const handleNaverLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/callback/naver`;
+    const redirectUri = import.meta.env.VITE_NAVER_REDIRECT_URI || `${window.location.origin}/auth/callback/naver`;
     window.location.href = `${BASE_URL}/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
   const handleGoogleLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/callback/google`;
+    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/callback/google`;
     window.location.href = `${BASE_URL}/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 

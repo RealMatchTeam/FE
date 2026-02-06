@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
+import Button from "../../../components/common/Button";
 
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
@@ -159,7 +160,18 @@ export default function CampaignContent() {
           </CampaignInfoGroup>
         </div>
       </main>
-    </div>
+
+      <div className="sticky bottom-0 left-0 right-0 p-5 bg-white border-t border-bluegray-2">
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onClick={() => navigate("/matching/suggest/create?type=existing", { state: { campaign: data } })}
+        >
+          제안하기
+        </Button>
+      </div>
+    </div >
   );
 }
 
