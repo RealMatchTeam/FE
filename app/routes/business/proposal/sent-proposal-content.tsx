@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProposalDetail, getBrandDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
+import { getProposalDetail, type ProposalDetail} from "./api/proposal"; // 경로 확인 필요
 import type { BrandDetail } from "../../../data/brand";
 
 import Header from "../../../components/layout/Header";
@@ -19,23 +19,25 @@ export default function ProposalContent() {
 
     // 데이터 상태 관리
     const [data, setData] = useState<ProposalDetail | null>(null);
-    const [brand, setBrand] = useState<BrandDetail | null>(null);
+    const [brand] = useState<BrandDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const proposalId = searchParams.get("proposalId") || "29";
+    const proposalId = searchParams.get("proposalId");
 
     useEffect(() => {
+        if (!proposalId) {
+        setIsLoading(false);
+        return;
+    }
+
         const fetchData = async () => {
+            console.log("실제 넘길 ID:", proposalId);
             try {
                 setIsLoading(true);
                 const proposalResult = await getProposalDetail(proposalId);
                 setData(proposalResult);
 
-                // 브랜드 상세 정보
-                if (proposalResult.brandId) {
-                    const brandResult = await getBrandDetail(proposalResult.brandId);
-                    setBrand(brandResult);
-                }
+
 
             } catch (error) {
                 console.error("제안 상세 조회 실패:", error);

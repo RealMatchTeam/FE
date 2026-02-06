@@ -44,7 +44,7 @@ export default function MatchingCard({
           </span>
         </div>
 
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-2 gap-2">
           <span className="text-title1 font-bold text-text-black truncate">
             {brand}
           </span>
@@ -54,13 +54,13 @@ export default function MatchingCard({
         </div>
 
         <div className="flex gap-2 items-center">
-          {/* 제안 보기 버튼 */}
+          {/* 액션 버튼 (제안 보기 / 지원 보기 / 거절 사유 보기) */}
           <button 
             onClick={onClick} 
-            className="flex-2 py-2 flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-lg transition-opacity hover:opacity-90 active:scale-[0.98]"
+            className="flex-1 py-2 flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-lg transition-all hover:bg-bluegray-3 active:scale-[0.98]"
           >
             <img src={searchIcon} alt="조회" className="w-3.5 h-3.5" />
-            <span className="text-title7 text-text-gray2">{actionLabel}</span>
+            <span className="text-caption1 font-medium text-text-gray2">{actionLabel}</span>
           </button>
 
           {/* 채팅 버튼 */}

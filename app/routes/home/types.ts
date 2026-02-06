@@ -1,5 +1,3 @@
-// src/routes/_home/types.ts
-
 export type CategoryKey = "beauty" | "fashion";
 
 export interface HeroItem {
@@ -23,19 +21,12 @@ export interface CampaignItem {
   id: string;
   brandName: string;
   logoUrl?: string;
-
-  // 카드 상단 배지용
-  startAt?: string; // top 캠페인에서는 날짜 배지로 쓸 수 있음(예: 7/10)
-  ddayLabel?: string; // D-3, D-DAY 등
-
-  // 카드 아래 오른쪽 텍스트
-  matchRate?: number; // top 캠페인: 98%
-  progressText?: string; // 인기 캠페인: 7/10, 1/5 등
-
-  // 카드 아래 텍스트
+  startAt?: string;
+  ddayLabel?: string;
+  matchRate?: number;
+  progressText?: string;
   descText?: string;
   rewardText?: string;
-
   isLiked?: boolean;
 }
 
@@ -58,16 +49,65 @@ export interface CreatorProfileModel {
 export interface HomeAfterMatchCategoryData {
   category: CategoryKey;
   hero: HeroItem[];
-
   topBrands: BrandItem[];
   topCampaigns: CampaignItem[];
-
   creatorProfile: CreatorProfileModel;
-
   popularCampaigns: CampaignItem[];
 }
 
 export interface HomeAfterMatchResponse {
   beauty: HomeAfterMatchCategoryData;
   fashion: HomeAfterMatchCategoryData;
+}
+
+/* ===== /api/v1/me/feature ===== */
+
+export type Gender = "MALE" | "FEMALE" | string;
+
+export interface MeMatchingResult {
+  createrType: string;
+  fitBrand: string;
+}
+
+export interface BeautyType {
+  skinType: string[];
+  skinBrightness: string;
+  makeupStyle: string[];
+}
+
+export interface FashionType {
+  height: number;
+  bodyType: string;
+  upperSize: string;
+  bottomSize: number;
+}
+
+export interface ContentsType {
+  gender: string;
+  age: string;
+  averageLength: string;
+  averageView: string;
+}
+
+export interface MyType {
+  beautyType: BeautyType;
+  fashionType: FashionType;
+  contentsType: ContentsType;
+}
+
+export interface MeFeatureResult {
+  nickname: string;
+  gender: Gender;
+  age: number;
+  interests: string[];
+  snsAccount: string;
+  matchingResult: MeMatchingResult;
+  myType: MyType;
+}
+
+export interface MeFeatureResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: MeFeatureResult;
 }
