@@ -59,7 +59,7 @@ export default function MyPageContent() {
       onOpenProfileCard={() => navigate( "/mypage/profileCard")}
       onOpenLikes={() => navigate( "/mypage/likes")}
       onOpenEditProfile={() => navigate("/mypage/edit")}
-      onOpenNotifications={() => navigate("/mypage/notifications")}
+      onOpenNotifications={() => navigate("/mypage/notification")}
       onOpenInquiry={() => navigate("/mypage/inquiry")}
       onOpenTerms={() => navigate("/mypage/terms")} // policy/terms
       onOpenPrivacy={() => navigate("/mypage/privacy")} // policy/privacy
