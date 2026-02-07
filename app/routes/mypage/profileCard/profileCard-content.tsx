@@ -7,6 +7,7 @@ import ProfileSection from "../components/profileCard/ProfileSection";
 import SnsSection from "../components/profileCard/SnsSection";
 import MatchingSection from "../components/profileCard/MatchingSection";
 import TraitsSection from "../components/profileCard/TraitsSection";
+import CampaignsSection from "../components/profileCard/CampaignsSection";
 import { axiosInstance } from "../../../api/axios";
 
 export default function ProfileCard() {
@@ -97,6 +98,7 @@ export default function ProfileCard() {
               creatorType={creatorType}
             />
             <TraitsSection feature={feature} />
+            <CampaignsSection />
 
           </div>
           
