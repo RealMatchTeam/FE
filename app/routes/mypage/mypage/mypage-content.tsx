@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import MyPageHome from "../components/MyPageHome";
 import { useAuthStore } from "../../../stores/auth-store";
 import { getMyPage } from "../api/mypage";
+import mypageDefault from "../../../assets/mypage-default.svg";
 
 export default function MyPageContent() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ export default function MyPageContent() {
         name: me?.name ?? "비비",
         roleText: me?.roleText ?? "홍길동",
         email: me?.email ?? "example@gmail.com",
-        avatarUrl: me?.avatarUrl ?? "/images/default-avatar.png",
+        avatarUrl: me?.avatarUrl ?? mypageDefault,
       }}
       onGoMatchingTest={() => navigate("/matching/test/step1")}
       onOpenProfileCard={() => navigate( "/mypage/profileCard")}
