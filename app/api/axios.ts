@@ -59,7 +59,9 @@ axiosInstance.interceptors.request.use(
 
     // refresh 요청에는 만료 accessToken이 붙으면 refresh 자체가 실패할 수 있음
     if (isRefreshRequest(url)) {
-      delete (config.headers as any).Authorization;
+      if (config.headers && "Authorization" in config.headers) {
+        delete config.headers.Authorization;
+      }
     } else {
       const accessToken = tokenStorage.getAccessToken();
       if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
@@ -165,7 +167,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }, 
+  },
 );
 
 export const apiClient = axiosInstance;

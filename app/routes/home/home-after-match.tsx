@@ -182,7 +182,7 @@ export default function HomeAfterMatchPage() {
           b.id === brandId ? { ...b, isLiked: serverStatus } : b,
         ),
       );
-    } catch (e: any) {
+    } catch (e: unknown) {
       setBrands((prev) =>
         prev.map((b) => (b.id === brandId ? { ...b, isLiked: current } : b)),
       );
@@ -230,7 +230,7 @@ export default function HomeAfterMatchPage() {
 
     try {
       await toggleCampaignLike(campaignId);
-    } catch (e: any) {
+    } catch (e: unknown) {
       apply(current);
       console.error("campaign like toggle failed:", e);
     } finally {

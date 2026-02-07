@@ -397,21 +397,32 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
     throw new Error(response.data?.message || "브랜드 좋아요 토글 실패");
   }
 
-  const r: any = response.data.result;
+  const r: unknown = response.data.result;
 
-  // result 형태가 다양한 경우를 모두 커버
   if (typeof r === "boolean") return r;
-  if (r && typeof r.brandIsLiked === "boolean") return r.brandIsLiked;
-  if (r && typeof r.isLiked === "boolean") return r.isLiked;
-  if (Array.isArray(r) && r[0] && typeof r[0].brandIsLiked === "boolean") {
-    return r[0].brandIsLiked;
+
+  if (typeof r === "object" && r !== null) {
+    if ("brandIsLiked" in r && typeof (r as { brandIsLiked?: unknown }).brandIsLiked === "boolean") {
+      return (r as { brandIsLiked: boolean }).brandIsLiked;
+    }
+    if ("isLiked" in r && typeof (r as { isLiked?: unknown }).isLiked === "boolean") {
+      return (r as { isLiked: boolean }).isLiked;
+    }
   }
 
-  // 스펙 미일치 시 false로 두되, 디버깅 가능하게 로그
+  if (
+    Array.isArray(r) &&
+    r[0] &&
+    typeof r[0] === "object" &&
+    "brandIsLiked" in (r[0] as object) &&
+    typeof (r[0] as { brandIsLiked?: unknown }).brandIsLiked === "boolean"
+  ) {
+    return (r[0] as { brandIsLiked: boolean }).brandIsLiked;
+  }
+
   console.warn("Unexpected toggleBrandLike result shape:", r);
   return false;
 };
-
 
 export const getTagNamesByCategory = async (): Promise<string[]> => {
   return [];
@@ -519,7 +530,6 @@ export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> 
     throw error;
   }
 };
-
 
 interface CampaignLikeResponse {
   isSuccess: boolean;
