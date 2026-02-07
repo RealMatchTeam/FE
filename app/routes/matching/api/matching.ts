@@ -388,21 +388,40 @@ interface BrandLikeResponse {
 }
 
 export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
-  try {
-    const response = await apiClient.post<BrandLikeResponse>(
-      `/v1/brands/${brandId}/like`,
-      {},
-    );
+  const response = await apiClient.post<BrandLikeResponse>(
+    `/v1/brands/${brandId}/like`,
+    {},
+  );
 
-    if (!response.data.isSuccess) {
-      throw new Error(response.data.message || "브랜드 좋아요 토글 실패");
-    }
-
-    return response.data.result[0]?.brandIsLiked || false;
-  } catch (error: unknown) {
-    console.error("브랜드 좋아요 토글 실패:", error);
-    throw error;
+  if (!response.data?.isSuccess) {
+    throw new Error(response.data?.message || "브랜드 좋아요 토글 실패");
   }
+
+  const r: unknown = response.data.result;
+
+  if (typeof r === "boolean") return r;
+
+  if (typeof r === "object" && r !== null) {
+    if ("brandIsLiked" in r && typeof (r as { brandIsLiked?: unknown }).brandIsLiked === "boolean") {
+      return (r as { brandIsLiked: boolean }).brandIsLiked;
+    }
+    if ("isLiked" in r && typeof (r as { isLiked?: unknown }).isLiked === "boolean") {
+      return (r as { isLiked: boolean }).isLiked;
+    }
+  }
+
+  if (
+    Array.isArray(r) &&
+    r[0] &&
+    typeof r[0] === "object" &&
+    "brandIsLiked" in (r[0] as object) &&
+    typeof (r[0] as { brandIsLiked?: unknown }).brandIsLiked === "boolean"
+  ) {
+    return (r[0] as { brandIsLiked: boolean }).brandIsLiked;
+  }
+
+  console.warn("Unexpected toggleBrandLike result shape:", r);
+  return false;
 };
 
 export const getTagNamesByCategory = async (): Promise<string[]> => {
@@ -510,4 +529,24 @@ export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> 
     console.error("매칭 분석 요청 실패:", error);
     throw error;
   }
+};
+
+interface CampaignLikeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}
+
+export const toggleCampaignLike = async (campaignId: number): Promise<string> => {
+  const response = await apiClient.post<CampaignLikeResponse>(
+    `/v1/campaigns/${campaignId}/like`,
+    {},
+  );
+
+  if (!response.data?.isSuccess) {
+    throw new Error(response.data?.message || "캠페인 좋아요 토글 실패");
+  }
+
+  return response.data.result;
 };

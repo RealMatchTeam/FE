@@ -12,13 +12,18 @@ import HistoryRow from "./components/HistoryRow";
 
 import { tokenStorage } from "../../lib/token";
 import { createOrGetDirectRoom } from "../rooms/api/rooms";
+import { toggleBrandLike } from "../matching/api/matching";
 
 import type { BrandDetailData } from "./types";
 
 type Props = { data: BrandDetailData };
 
 export default function BrandDetailContent({ data }: Props) {
+  const heroUrl = data.brandImages?.[0] ?? data.heroImageUrl;
+
   const [historyLimit, setHistoryLimit] = useState(4);
+  const [isHearted, setIsHearted] = useState<boolean>(data.isLiked ?? false);
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -49,11 +54,28 @@ export default function BrandDetailContent({ data }: Props) {
     }
   };
 
+  const handleToggleHeart = async () => {
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
+
+    const prev = isHearted;
+    const next = !prev;
+
+    setIsHearted(next);
+
+    try {
+      const serverStatus = await toggleBrandLike(brandId);
+      setIsHearted(serverStatus);
+    } catch (e) {
+      setIsHearted(prev);
+      console.error("brand like toggle failed:", e);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto min-h-screen max-w-[430px] bg-white">
-        <BrandHero heroImageUrl={data.heroImageUrl} logoText={data.logoText ?? ""} />
 
+<BrandHero heroImageUrl={heroUrl} logoText={data.logoText ?? ""} />
         <div className="px-5 pb-10">
           <BrandInfo
             name={data.name}
@@ -63,13 +85,13 @@ export default function BrandDetailContent({ data }: Props) {
           />
 
           <BrandActionBar
-            isHearted={false}
+            isHearted={isHearted}
             onChat={handleChat}
             onSuggest={() => console.log("제안하기")}
-            onToggleHeart={() => console.log("하트")}
+            onToggleHeart={handleToggleHeart}
           />
 
-          <DividerBlock />
+          <div className="my-4 h-[1px] w-full bg-gray-200" />
 
           <section className="py-5">
             <div className="text-title7 text-text-black">카테고리</div>
