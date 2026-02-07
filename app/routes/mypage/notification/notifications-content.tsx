@@ -21,7 +21,7 @@ export default function MyPageNotifications() {
           className="overflow-y-auto"
           style={{ height: "calc(100vh - 60px)" }}
         >
-          <div className="bg-gradient-to-b from-[#F2F3FF] to-white px-4 py-6">
+          <div className="bg-white px-4 py-6">
             {/* 혜택 푸시 */}
             <div className="mb-6">
               <div className="text-[16px] font-semibold text-[#171718] mb-2">
@@ -103,11 +103,15 @@ export default function MyPageNotifications() {
               <div className="h-px w-full bg-[#E8E8FB]" />
 
               <div className="text-[12px] text-[#9B9BA1] mt-3">
-                *알림을 통해 이벤트, 캠페인, 브랜드 등 다양한 정보를
-                받아보세요
+                *알림을 통해 이벤트, 켐페인, 브랜드에 등에 관한 정보를 드려요
+                알림 허용을 통해 다양한 정보들을 받아 보세요
               </div>
             </div>
 
+            <div className="h-4" />
+          </div>
+
+          <div className="sticky bottom-0 bg-white px-4 pt-3 pb-[calc(1.5rem+66px+env(safe-area-inset-bottom))]">
             <button
               type="button"
               className="w-full h-[52px] rounded-[14px] bg-[#6666E5] text-white text-[15px] font-semibold"
