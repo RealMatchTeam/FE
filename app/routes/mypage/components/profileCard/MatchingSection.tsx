@@ -5,18 +5,15 @@ interface MatchingSectionProps {
   onOpenReMatch: () => void;
   nickname?: string | null;
   creatorType?: string | null;
-  fitBrand?: string | null;
 }
 
 export default function MatchingSection({
   onOpenReMatch,
   nickname,
   creatorType,
-  fitBrand,
 }: MatchingSectionProps) {
   const displayName = nickname || "크리에이터";
   const displayCreatorType = creatorType || "OO한 크리에이터";
-  const displayBrand = fitBrand || "OO한 브랜드";
   return (
     <Section title="매칭검사 결과">
       <button

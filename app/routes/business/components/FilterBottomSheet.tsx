@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface FilterBottomSheetProps {
   isOpen: boolean;
@@ -21,12 +21,6 @@ export default function FilterBottomSheet({
 }: FilterBottomSheetProps) {
   const [selected, setSelected] = useState(currentFilter);
   const filterOptions = filters ?? DEFAULT_FILTERS;
-
-  useEffect(() => {
-    if (isOpen) {
-      setSelected(currentFilter);
-    }
-  }, [currentFilter, isOpen]);
 
   if (!isOpen) return null;
 

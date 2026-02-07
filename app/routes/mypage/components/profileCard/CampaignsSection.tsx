@@ -78,10 +78,6 @@ export default function CampaignsSection() {
     return items.slice(start, start + PAGE_SIZE);
   }, [items, safePage]);
 
-  useEffect(() => {
-    if (page !== safePage) setPage(safePage);
-  }, [page, safePage]);
-
   const pageNumbers = useMemo(() => {
     if (totalPages <= 4) return Array.from({ length: totalPages }, (_, i) => i + 1);
     const start = Math.max(1, Math.min(safePage - 1, totalPages - 3));

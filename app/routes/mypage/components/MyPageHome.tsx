@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ConfirmModal from "./mypage/ConfirmModal";
 import GateModal from "./mypage/GateModal";
 import MenuButton from "./mypage/MenuButton";
@@ -16,7 +16,6 @@ type Props = {
   onOpenLikes: () => void;
   onOpenEditProfile: () => void;
   onOpenNotifications: () => void;
-  onOpenInquiry: () => void;
   onOpenTerms: () => void;
   onOpenPrivacy: () => void;
   onLogout: () => void;
@@ -31,22 +30,16 @@ export default function MyPageHome({
   onOpenLikes,
   onOpenEditProfile,
   onOpenNotifications,
-  onOpenInquiry,
   onOpenTerms,
   onOpenPrivacy,
   onLogout,
   onWithdraw,
 }: Props) {
-  const [openGate, setOpenGate] = useState(false);
+  const [gateDismissed, setGateDismissed] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
 
-  useEffect(() => {
-    if (hasMatchingTest === null) return;
-    setOpenGate(hasMatchingTest === false);
-  }, [hasMatchingTest]);
-
-  //const actionsDisabled = useMemo(() => !hasMatchingTest, [hasMatchingTest]); 매칭검사 안했을 시
+  const openGate = hasMatchingTest === false && !gateDismissed;
 
   return (
     <div className="min-h-screen bg-white">
@@ -213,7 +206,7 @@ export default function MyPageHome({
       {/* gate modal */}
       {openGate ? (
         <GateModal
-          onClose={() => setOpenGate(false)}
+          onClose={() => setGateDismissed(true)}
           onGoTest={onGoMatchingTest}
         />
       ) : null}
