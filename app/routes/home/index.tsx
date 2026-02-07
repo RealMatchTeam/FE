@@ -12,10 +12,7 @@ export default function Home() {
   const hasMatchingTest = useAuthStore((s) => s.me?.matchingTestDone);
 
   useEffect(() => {
-    if (hasMatchingTest === false) {
-      setHasMatch(false);
-      return;
-    }
+    if (hasMatchingTest !== true) return;
 
     const checkMatchStatus = async () => {
       try {
