@@ -1,5 +1,6 @@
 // stores/auth-store.ts
 import { create } from "zustand";
+import { tokenStorage } from "../lib/token";
 
 export type AuthUser = {
   // optional로 둠
@@ -33,6 +34,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     set({ me: null });
-    // localStorage.removeItem("accessToken");
+    tokenStorage.clearTokens();
   },
 }));
