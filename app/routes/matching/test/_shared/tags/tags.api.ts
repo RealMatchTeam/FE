@@ -10,6 +10,7 @@ export async function fetchBeautyTags(): Promise<BeautyTags> {
     throw new Error(res.data.message || "beauty 태그 조회 실패");
   return res.data.result;
 }
+
 export async function fetchFashionTags(): Promise<FashionTags> {
   const res = await axiosInstance.get<ApiResponse<FashionTags>>(
     "/api/v1/tags/fashion",
@@ -18,6 +19,7 @@ export async function fetchFashionTags(): Promise<FashionTags> {
     throw new Error(res.data.message || "fashion 태그 조회 실패");
   return res.data.result;
 }
+
 export async function fetchContentTags(): Promise<ContentTags> {
   const res = await axiosInstance.get<ApiResponse<ContentTags>>(
     "/api/v1/tags/content",

@@ -6,114 +6,163 @@ import type {
 } from "axios";
 import { tokenStorage } from "../lib/token";
 
-// Axios 인스턴스 생성
+type RefreshResult = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+type RefreshResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: RefreshResult;
+};
+
+const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const BASE_URL =
+  (envBase && envBase.trim().length > 0 ? envBase.trim() : undefined) ??
+  (import.meta.env.PROD ? "https://api.realmatch.co.kr" : "/api");
+
 export const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
   timeout: 10000,
 });
 
-// Request 인터셉터: Access Token 자동 추가
+const normalizeUrl = (url: string) => {
+  let next = url;
+
+  next = next.replace(/^\/api\/api\//, "/api/");
+
+  const isDevProxy = BASE_URL === "/api";
+
+  if (isDevProxy) {
+    next = next.replace(/^\/api\/v1\//, "/v1/");
+    next = next.replace(/^\/api\/api\/v1\//, "/v1/");
+  } else {
+    next = next.replace(/^\/v1\//, "/api/v1/");
+  }
+
+  return next;
+};
+
+const isRefreshRequest = (url?: string) =>
+  typeof url === "string" && url.includes("/auth/refresh");
+
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const accessToken = tokenStorage.getAccessToken();
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const url = typeof config.url === "string" ? config.url : "";
+
+    if (!isRefreshRequest(url) && typeof config.url === "string") {
+      config.url = normalizeUrl(config.url);
     }
+
+    // refresh 요청에는 만료 accessToken이 붙으면 refresh 자체가 실패할 수 있음
+    if (isRefreshRequest(url)) {
+      if (config.headers && "Authorization" in config.headers) {
+        delete config.headers.Authorization;
+      }
+    } else {
+      const accessToken = tokenStorage.getAccessToken();
+      if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
-// Response 인터셉터: 401 에러 시 토큰 갱신
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: Array<(token: string) => void> = [];
 
 const subscribeTokenRefresh = (callback: (token: string) => void) => {
   refreshSubscribers.push(callback);
 };
 
 const onTokenRefreshed = (token: string) => {
-  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
 };
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
 
-    // 400 또는 401 에러이고, 재시도하지 않은 요청인 경우
-    if (
-      (error.response?.status === 401 || error.response?.status === 400) &&
-      !originalRequest._retry
-    ) {
+    if (!originalRequest) return Promise.reject(error);
+
+    const status = error.response?.status;
+
+    // refresh 자체가 실패하면 루프 돌지 말고 즉시 로그인
+    if (isRefreshRequest(originalRequest.url)) {
+      tokenStorage.clearTokens();
+      window.location.href = "/auth/login";
+      return Promise.reject(error);
+    }
+
+    if (typeof originalRequest.url === "string") {
+      originalRequest.url = normalizeUrl(originalRequest.url);
+    }
+
+    if ((status === 401 || status === 400) && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-
-        try {
-          const refreshToken = tokenStorage.getRefreshToken();
-
-          if (!refreshToken) {
-            // Refresh Token이 없으면 로그아웃 처리
-            tokenStorage.clearTokens();
-            window.location.href = "/auth/login";
-            return Promise.reject(error);
-          }
-
-          // Refresh Token으로 새 Access Token 발급
-          const response = await axios.post(
-            `/api/v1/auth/refresh`,
-            {},
-            {
-              headers: {
-                RefreshToken: `Bearer ${refreshToken}`,
-              },
-            },
-          );
-
-          const { accessToken, refreshToken: newRefreshToken } =
-            response.data.result;
-
-          // 새로운 토큰 저장
-          tokenStorage.setTokens(accessToken, newRefreshToken);
-
-          // 대기 중인 요청들에 새 토큰 전달
-          onTokenRefreshed(accessToken);
-
-          // 원래 요청 재시도
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          }
-
-          isRefreshing = false;
-
-          return axiosInstance(originalRequest);
-        } catch (refreshError) {
-          // Refresh Token도 만료된 경우 로그아웃 처리
-          isRefreshing = false;
-          tokenStorage.clearTokens();
-          window.location.href = "/auth/login";
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // 이미 갱신 중인 경우, 갱신이 완료될 때까지 대기
+      if (isRefreshing) {
         return new Promise((resolve) => {
           subscribeTokenRefresh((token: string) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
+            originalRequest.headers.Authorization = `Bearer ${token}`;
             resolve(axiosInstance(originalRequest));
           });
         });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const refreshToken = tokenStorage.getRefreshToken();
+        if (!refreshToken) {
+          tokenStorage.clearTokens();
+          window.location.href = "/auth/login";
+          return Promise.reject(error);
+        }
+
+        const refreshPath =
+          BASE_URL === "/api" ? "/v1/auth/refresh" : "/api/v1/auth/refresh";
+
+        // refresh 요청은 Authorization 없이 RefreshToken 헤더만
+        const res = await axiosInstance.post<RefreshResponse>(
+          refreshPath,
+          {},
+          {
+            headers: {
+              RefreshToken: `Bearer ${refreshToken}`,
+              Authorization: "",
+            },
+          },
+        );
+
+        const accessToken = res.data?.result?.accessToken;
+        const newRefreshToken = res.data?.result?.refreshToken;
+
+        if (!accessToken || !newRefreshToken) {
+          tokenStorage.clearTokens();
+          window.location.href = "/auth/login";
+          return Promise.reject(error);
+        }
+
+        tokenStorage.setTokens(accessToken, newRefreshToken);
+        onTokenRefreshed(accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (e) {
+        tokenStorage.clearTokens();
+        window.location.href = "/auth/login";
+        return Promise.reject(e);
+      } finally {
+        isRefreshing = false;
       }
     }
 

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 
 type Props = {
-  heroImageUrl: string;
+  heroImageUrl?: string;
   logoText: string;
 };
 
@@ -9,14 +9,17 @@ export default function BrandHero({ heroImageUrl, logoText }: Props) {
   const navigate = useNavigate();
 
   return (
-    //   overflow-hidden 제거 (로고가 잘리지 않게)
     <div className="relative h-[210px] w-full bg-bluegray-2">
-      {/* 이미지만 overflow 처리 */}
       <div className="h-full w-full overflow-hidden">
-        <img src={heroImageUrl} alt="" className="h-full w-full object-cover" />
+        {heroImageUrl ? (
+          <img
+            src={heroImageUrl}
+            alt="brand hero"
+            className="h-full w-full object-cover"
+          />
+        ) : null}
       </div>
 
-      {/* back */}
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -26,7 +29,6 @@ export default function BrandHero({ heroImageUrl, logoText }: Props) {
         ‹
       </button>
 
-      {/* 로고: 배너 밖으로 내려와도 안 잘림 */}
       <div className="absolute -bottom-8 left-5 z-10">
         <div className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-[0_8px_18px_rgba(0,0,0,0.12)]">
           <span className="text-[14px] font-semibold">{logoText}</span>

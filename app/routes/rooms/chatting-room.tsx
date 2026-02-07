@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { tokenStorage } from "../../lib/token";
 import NavigationHeader from "../../components/common/NavigateHeader";
-import { type ChatMessage } from "./components/Bubbles/TextMessageTypes";
 import ChatComposer from "./components/ChatComposer";
 import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
@@ -9,116 +9,131 @@ import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
+import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage, createOrGetDirectRoom } from "./api/rooms";
+import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
 
 type Props = {
-  chatId: string;
+  brandId: number;
 };
 
-export default function ChattingRoom( {chatId} : Props ) {
-
-  const [messages, setMessages] = useState<ChatMessage[]>(() => [
-    {
-      id: "p1",
-      side: "other", // me -> 인플루언서 other -> 브랜드 test
-      type: "PROPOSAL",
-      campaignName: "글로우 쿠션 신제품 론칭 리뷰",
-      campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
-      time: "26.01.22\n00:10",
-      status: "sent",
-      avatarSize: 38,
-    },
-    {
-      id: "p1",
-      side: "me", // me -> 인플루언서 other -> 브랜드 test
-      type: "PROPOSAL",
-      campaignName: "글로우 쿠션 신제품 론칭 리뷰",
-      campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
-      time: "26.01.22\n00:10",
-      status: "sent",
-    },
-    {
-      id: "p1",
-      side: "other", 
-      type: "MATCHED_CAMPAIGN",
-      campaignName: "글로우 쿠션 신제품 론칭 리뷰",
-      campaignContent: "안녕하세요 크리에이터 비비 입니다! 이번에 글로우에서 신제품 쿠션이 출시되어 리뷰를 진행하고자 합니다. 자연스러운 커버력과 촉촉한 사용감이 특징인 이번 제품은 봄철 메이크업에 딱 맞는 아이템입니다. 리뷰를 통해 많은 분들께 소개하고 싶습니다. 긍정적인 검토 부탁드립니다!",
-      time: "26.01.22\n00:10",
-      status: "failed",
-      price: 500000,
-      orderId: "ORD1234567890",
-    },
-    {
-      id: "m1",
-      side: "other",
-      type: "TEXT",
-      content: "안녕하세요 캠페인 문의 드립니다.\n협업 가능하신지 확인 부탁드립니다.",
-      time: "26.01.21\n09:40",
-      avatarSize: 38,
-    },
-    {
-      id: "m4",
-      side: "system",
-      type: "SYSTEM_MATCHED",
-    },
-    {
-      id: "img1",
-      side: "other",
-      type: "IMAGE",
-      fileName: "IM_1234",
-      ext: "png",
-      time: "26.01.22\n10:11",
-      avatarSize: 38,
-      avatarSrc: "/brand.png",
-    },
-    {
-      id: "file1",
-      side: "me",
-      type: "FILE",
-      fileName: "계약서_v2",
-      ext: "pdf",
-      time: "26.01.22\n10:12",
-    }
-  ]);
-
+export default function ChattingRoom({ brandId }: Props) {
   const kb = useKeyboardOffset();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const sheetHeight = kb > 0 ? kb : 240;
-  const { dateText, timeText } = formatKoreanDateTime(new Date().toISOString());
 
-  useEffect(() => {
-    // TODO: chatId로 메시지 불러오기
-    console.log("fetch messages for chatId:", chatId);
-  }, [chatId]);
+  const [roomId, setRoomId] = useState<number | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [detail, setDetail] = useState<ChatRoomDetailResponse | null>(null);
 
-  const partnerName = "민주"; // TODO: API/route loader에서 받아오기
-  const partnerAvatarUrl = ""; // TODO: 프로필/카드에서 받아오기
-
-  const isCollaborating = messages.some((m) => m.type === "MATCHED_CAMPAIGN");
-  // 임시 로직: MATCHED_CAMPAIGN 메시지가 있으면 협업중이라고 가정
-  // 실제로는 chatRoom.isCollaborating
-
-  // 협업 요약바에 넣을 데이터(임시: 매칭 캠페인 메시지에서 뽑음)
-  const matchedCampaignMessage = useMemo(() => {
-    return messages.find((m) => m.type === "MATCHED_CAMPAIGN");
-  }, [messages]);
-
-  // 대화 시작 여부
-  //const hasStartedChat = messages.some((m) => m.side === "me" || m.side === "other");
-  // 전송 중 상태
-  //const [isSending, setIsSending] = useState(false);
-
-  const collabTitle = matchedCampaignMessage?.campaignName ?? "";
-  const collabSubtitle = matchedCampaignMessage ? "일주일 챌린지" : "";
-  const collabThumb = partnerAvatarUrl; // 콜라보 상품 이미지. 임시로 브랜드 프로필로 설정
-
-  const summaryBarHeight = isCollaborating ? 64 : 0;
-
-  const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
+  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
+  const token = tokenStorage.getAccessToken();
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  
   useHideBottomTab(true);
   useHideHeader(true);
+  
+  const partnerName = detail?.opponentName ?? "";
+  const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
+  const isCollaborating = detail?.isCollaborating ?? false;
+
+  const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
+  const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
+  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
+  const summaryBarHeight = isCollaborating ? 64 : 0;
+
+  const createdAt = useMemo(() => {
+    const now = new Date().toISOString();
+    const { dateText, timeText } = formatKoreanDateTime(now);
+    return `${dateText}\n${timeText}`;
+  }, []);
+
+  useEffect(() => {
+    if (!token) {
+      window.location.href = "/auth/login";
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!Number.isFinite(myUserId) || myUserId <= 0) return;
+
+    const run = async () => {
+      try {
+        const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
+        setRoomId(result.roomId);
+      } catch (e) {
+        console.error("createOrGetDirectRoom failed:", e);
+        setRoomId(null);
+      }
+    };
+
+    run();
+  }, [token, brandId, myUserId]);
+
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { upload } = useAttachmentUpload({
+    baseUrl,
+    token,
+    defaultUsage: "CHAT",
+  });
+
+  const handleAttachmentAction = (key: "suggest" | "image" | "file") => {
+    if (key === "image") {
+      imageInputRef.current?.click();
+      return;
+    }
+    if (key === "file") {
+      fileInputRef.current?.click();
+      return;
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    if (!roomId) return;
+
+    const run = async () => {
+      try {
+        const data = await getChatRoomDetail(roomId);
+        setDetail(data);
+      } catch (e) {
+        console.error("getChatRoomDetail failed:", e);
+        setDetail(null);
+      }
+    };
+
+    run();
+  }, [token, roomId]);
+
+  useEffect(() => {
+    if (!token) return;
+    if (!roomId) return;
+
+    const run = async () => {
+      try {
+        const data = await getChatMessages({ roomId, size: 20 });
+        setMessages(data.messages.slice().reverse());
+      } catch (e) {
+        console.error(e);
+        setMessages([]);
+      }
+    };
+
+    run();
+  }, [token, roomId]);
+
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages.length]);
 
   const actions: AttachmentAction[] = useMemo(
     () => [
@@ -129,23 +144,10 @@ export default function ChattingRoom( {chatId} : Props ) {
     []
   );
 
-  const scrollToBottom = () => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages.length]);
-
   const handleToggleSheet = () => {
     setIsSheetOpen((prev) => {
       const next = !prev;
-      if (next) {
-        // 시트 열릴 때 키보드 내려감
-        inputRef.current?.blur();
-      }
+      if (next) inputRef.current?.blur();
       return next;
     });
   };
@@ -155,49 +157,162 @@ export default function ChattingRoom( {chatId} : Props ) {
   const handleSend = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    if (!roomId) return;
 
-    //일반 메시지 전송
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        side: "me",
-        content: trimmed,
-        time: `${dateText}\n${timeText}`,
-        type: "TEXT",
-        status: "sent", 
-      },
-    ]);
-    setText(""); // 입력창 비우기
+    const tempId = -Date.now();
+    const clientId = crypto.randomUUID();
+
+    const generalText: ChatMessage = {
+      messageId: tempId,
+      roomId,
+      senderId: myUserId,
+      senderType: "USER",
+      messageType: "TEXT",
+      content: trimmed,
+      attachment: null,
+      systemMessage: null,
+      createdAt,
+      clientMessageId: clientId,
+    };
+
+    setMessages((prev) => [...prev, generalText]);
+    setText("");
     setIsSheetOpen(false);
-    requestAnimationFrame(() => inputRef.current?.focus()); // 한 프레임 뒤 focus 복귀
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
-  /*const handleDeleteMessage = (id: string) => {
-    setMessages((prev) => prev.filter((m) => m.id !== id));
+  // 1. 이미지 선택 핸들러
+  const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!roomId) return;
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const uploaded = await upload({ file, attachmentType: "IMAGE" });
+
+      const tempMessage: ChatMessage = {
+        messageId: -Date.now(),
+        roomId,
+        senderId: myUserId,
+        senderType: "USER",
+        messageType: "IMAGE", // 또는 "FILE" (백엔드 스펙에 맞게)
+        content: null,
+        attachment: {
+          attachmentId: uploaded.attachmentId,
+          attachmentType: "IMAGE",
+          contentType: uploaded.contentType,
+          originalName: uploaded.originalName,
+          fileSize: uploaded.fileSize, 
+          accessUrl: uploaded.accessUrl,
+          status: "READY", 
+        },
+        systemMessage: null,
+        createdAt: new Date().toISOString(),
+        clientMessageId: crypto.randomUUID(),
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+      setIsSheetOpen(false);
+
+    } catch (err) {
+      console.error(err);
+      // 에러 토스트 처리 등을 여기에 추가
+    }
   };
 
-  const handleRetryMessage = (id: string) => {
-    setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: "sending" } : m)));
-    // TODO: API 재전송 후 성공/실패에 따라 status 갱신
-  };*/
+  // 2. 파일 선택 핸들러
+  const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!roomId) return;
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const uploaded = await upload({ file, attachmentType: "FILE" });
+
+      const tempMessage: ChatMessage = {
+        messageId: -Date.now(),
+        roomId,
+        senderId: myUserId,
+        senderType: "USER",
+        messageType: "FILE",
+        content: null,
+        attachment: {
+          attachmentId: uploaded.attachmentId,
+          attachmentType: "FILE",
+          contentType: uploaded.contentType,
+          originalName: uploaded.originalName,
+          fileSize: uploaded.fileSize,
+          accessUrl: uploaded.accessUrl,
+          status: "READY", 
+        },
+        systemMessage: null,
+        createdAt: new Date().toISOString(),
+        clientMessageId: crypto.randomUUID(),
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+      setIsSheetOpen(false);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  if (!token) {
+    return (
+      <div className="h-screen-full bg-white">
+        <NavigationHeader title="채팅" onBack={() => history.back()} />
+        <div className="p-6 text-text-gray3">로그인이 필요합니다.</div>
+      </div>
+    );
+  }
+
+  if (token && (!myUserId || myUserId <= 0)) {
+    return (
+      <div className="h-screen-full bg-white">
+        <NavigationHeader title="채팅" onBack={() => history.back()} />
+        <div className="p-6 text-text-gray3">로그인 정보 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (!roomId) {
+    return (
+      <div className="h-screen-full bg-white">
+        <NavigationHeader title="채팅" onBack={() => history.back()} />
+        <div className="p-6 text-text-gray3">채팅방을 여는 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handlePickImage}
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        style={{ display: "none" }}
+        onChange={handlePickFile}
+      />
+
       <NavigationHeader
         title={partnerName}
         onBack={() => history.back()}
       />
 
-      {isCollaborating && (
-      <CollaborationSummaryBar
-        thumbnailUrl= {collabThumb}
-        title={collabTitle}
-        subtitle={collabSubtitle}
-      />
+      {detail?.campaignSummary && (
+        <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />
       )}
 
-      {/* 메시지 영역 */}
       <div
         ref={listRef}
         className="overflow-y-auto px-4 py-5"
@@ -205,19 +320,22 @@ export default function ChattingRoom( {chatId} : Props ) {
       >
         <div className="w-full">
           <div className="w-full space-y-2">
-            {messages.map((m) => (
-              <MessageRenderer
-                key={m.id}
-                message={m}
-                avatarSrc= {m.side === "me" ? undefined : partnerAvatarUrl} // 상대방 메시지에만 아바타 표시
-                avatarSize={38}
-              />
-            ))}
+            {messages.map((m) => {
+              const isMe = m.senderType === "USER" && m.senderId === myUserId;
+
+              return (
+                <MessageRenderer
+                  key={m.messageId ?? m.clientMessageId ?? `${m.roomId}-${m.createdAt}`}
+                  message={m}
+                  timeText={createdAt}
+                  avatarSrc={isMe ? undefined : partnerAvatarUrl}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* 입력창 */}
       <ChatComposer
         inputRef={inputRef}
         value={text}
@@ -228,13 +346,12 @@ export default function ChattingRoom( {chatId} : Props ) {
         sheetHeight={sheetHeight}
       />
 
-      {/* 첨부/기능 시트 */}
       <AttachmentSheet
         open={isSheetOpen}
         actions={actions}
         onClose={handleCloseSheet}
         onAction={(key) => {
-          // TODO: 여기서 업로드/기능 연결
+          handleAttachmentAction(key);
           console.log("action:", key);
           setIsSheetOpen(false);
         }}

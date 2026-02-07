@@ -23,19 +23,12 @@ export interface CampaignItem {
   id: string;
   brandName: string;
   logoUrl?: string;
-
-  // 카드 상단 배지용
-  startAt?: string; // top 캠페인에서는 날짜 배지로 쓸 수 있음(예: 7/10)
-  ddayLabel?: string; // D-3, D-DAY 등
-
-  // 카드 아래 오른쪽 텍스트
-  matchRate?: number; // top 캠페인: 98%
-  progressText?: string; // 인기 캠페인: 7/10, 1/5 등
-
-  // 카드 아래 텍스트
+  startAt?: string;
+  ddayLabel?: string;
+  matchRate?: number;
+  progressText?: string;
   descText?: string;
   rewardText?: string;
-
   isLiked?: boolean;
 }
 
@@ -55,19 +48,67 @@ export interface CreatorProfileModel {
   traits: CreatorTraits;
 }
 
-export interface HomeAfterMatchCategoryData {
-  category: CategoryKey;
-  hero: HeroItem[];
+export type Gender = "MALE" | "FEMALE" | string;
 
-  topBrands: BrandItem[];
-  topCampaigns: CampaignItem[];
-
-  creatorProfile: CreatorProfileModel;
-
-  popularCampaigns: CampaignItem[];
+export interface MeFeatureBeautyType {
+  skinType: string[];
+  skinBrightness: string;
+  makeupStyle: string[];
+  interestCategories: string[];
+  interestFunctions: string[];
 }
 
-export interface HomeAfterMatchResponse {
-  beauty: HomeAfterMatchCategoryData;
-  fashion: HomeAfterMatchCategoryData;
+export interface MeFeatureFashionType {
+  height: string;
+  bodyShape: string;
+  topSize: string;
+  bottomSize: string;
+  interestFields: string[];
+  interestStyles: string[];
+  interestBrands: string[];
+}
+
+export interface MeFeatureContentsType {
+  viewerGender: string[];
+  viewerAge: string[];
+  avgVideoLength: string;
+  avgViews: string;
+  contentFormats: string[];
+  contentTones: string[];
+  desiredInvolvement: string[];
+  desiredUsageScope: string[];
+}
+
+export interface MeFeatureResult {
+  beautyType: MeFeatureBeautyType;
+  fashionType: MeFeatureFashionType;
+  contentsType: MeFeatureContentsType;
+}
+
+export interface MeFeatureResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: MeFeatureResult;
+}
+
+export interface ProfileCardMatchingResult {
+  creatorType: string;
+}
+
+export interface ProfileCardResult {
+  nickname: string;
+  profileImageUrl?: string;
+  gender: Gender;
+  age: number;
+  snsAccount: string;
+  interestFields: string[];
+  matchingResult: ProfileCardMatchingResult;
+}
+
+export interface ProfileCardResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: ProfileCardResult;
 }

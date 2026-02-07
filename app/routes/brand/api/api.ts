@@ -1,31 +1,43 @@
 import { apiClient } from "../../../api/axios";
 import type { BrandDomain, BrandDetailData, TagGroup } from "../types";
 
-// API 응답 타입
-interface BrandSkinCareTagDto {
-  brandSkinType?: string[];
-  brandMainFunction?: string[];
-}
+type BeautyResponseDto = {
+  categories: string[];
+  skinType: string[];
+  mainFunction: string[];
+  makeUpStyle: string[];
+};
 
-interface BrandMakeUpTagDto {
-  brandMakeUpStyle?: string[];
-  brandMakeUpColor?: string[];
-}
+type FashionResponseDto = {
+  categories: string[];
+  brandType: string[];
+  brandStyle: string[];
+};
 
-interface BrandOnGoingCampaignDto {
-  brandId: number;
+type BrandDetailItemDto = {
+  userId: number;
   brandName: string;
-  recruitingTotalNumber: number;
-  recruitedNumber: number;
-  campaginDescription: string;
-  campaginManuscriptFee: string;
-  campaignDDay?: number;
   logoUrl?: string;
-  isLiked?: boolean;
-}
+  simpleIntro?: string;
+  homepageUrl?: string;
 
-// 진행 중인 캠페인 API 응답 (api.md 1839줄)
-interface RecruitingCampaignCardDto {
+  brandTag: string | null;
+  brandMatchingRatio: number;
+  brandIsLiked: boolean;
+  brandDescriptionTags: string[];
+
+  beautyResponse: BeautyResponseDto | null;
+  fashionResponse: FashionResponseDto | null;
+};
+
+type BrandDetailApiResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: BrandDetailItemDto[];
+};
+
+type RecruitingCampaignCardDto = {
   campaignId: number;
   brandName: string;
   title: string;
@@ -33,201 +45,218 @@ interface RecruitingCampaignCardDto {
   rewardAmount: number;
   imageUrl?: string;
   dday: number;
-}
+};
 
-interface RecruitingCampaignsApiResponse {
+type RecruitingCampaignsApiResponse = {
   isSuccess: boolean;
   code: string;
   message: string;
-  result: {
-    campaigns: RecruitingCampaignCardDto[];
-  };
-}
+  result: { campaigns: RecruitingCampaignCardDto[] };
+};
 
-interface AvailableSponsorProdDto {
-  productId: number;
-  productName: string;
-  productImageUrl?: string;
-  availableType?: string;
-  availableQuantity?: number;
-  availableSize?: number;
-}
-
-interface BrandDetailResponseDto {
-  brandName: string;
-  brandTag?: string[];
-  brandDescription?: string;
-  brandMatchingRatio?: number;
-  brandIsLiked?: boolean;
-  brandCategory?: string[];
-  brandSkinCareTag?: BrandSkinCareTagDto;
-  brandMakeUpTag?: BrandMakeUpTagDto;
-  brandOnGoingCampaign?: BrandOnGoingCampaignDto[];
-  availableSponsorProd?: AvailableSponsorProdDto[];
-}
-
-interface BrandDetailApiResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: BrandDetailResponseDto[];
-}
-
-interface SponsorProductListResponseDto {
+type SponsorProductListResponseDto = {
   id: number;
   name: string;
   thumbnailImageUrl: string;
   totalCount: number;
   currentCount: number;
-}
+};
 
-interface SponsorProductListApiResponse {
+type SponsorProductListApiResponse = {
   isSuccess: boolean;
   code: string;
   message: string;
   result: SponsorProductListResponseDto[];
-}
+};
 
-interface BrandCampaignResponseDto {
+type BrandCampaignResponseDto = {
   campaignId: number;
   title: string;
   recruitStartDate: string;
   recruitEndDate: string;
   status: "UPCOMING" | "RECRUITING" | "CLOSED";
-}
+};
 
-interface BrandCampaignSliceResponse {
+type BrandCampaignSliceResponse = {
   campaigns: BrandCampaignResponseDto[];
   nextCursor?: number;
-}
+};
 
-interface BrandCampaignApiResponse {
+type BrandCampaignApiResponse = {
   isSuccess: boolean;
   code: string;
   message: string;
   result: BrandCampaignSliceResponse;
+};
+
+function formatHistoryDate(c: BrandCampaignResponseDto): { text: string; highlight: boolean } {
+  if (c.status === "UPCOMING" || c.status === "RECRUITING") {
+    const d = new Date(c.recruitStartDate);
+    return { text: `${d.getMonth() + 1}월 ${d.getDate()}일 진행예정`, highlight: true };
+  }
+  const d = new Date(c.recruitEndDate);
+  const yy = d.getFullYear().toString().slice(2);
+  return { text: `${d.getMonth() + 1}/${d.getDate()}/${yy} 완료`, highlight: false };
 }
 
-// 날짜 포맷팅 헬퍼
-function formatHistoryDate(campaign: BrandCampaignResponseDto): { text: string; highlight: boolean } {
-  if (campaign.status === "UPCOMING" || campaign.status === "RECRUITING") {
-    const date = new Date(campaign.recruitStartDate);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return {
-      text: `${month}월 ${day}일 진행예정`,
-      highlight: true
-    };
-  } else {
-    const date = new Date(campaign.recruitEndDate);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const year = date.getFullYear().toString().slice(2);
-    return {
-      text: `${month}/${day}/${year} 완료`,
-      highlight: false
-    };
+function stripHash(values: string[] | undefined | null): string[] {
+  if (!values?.length) return [];
+  return values
+    .map((v) => (v ?? "").toString().trim())
+    .filter(Boolean)
+    .map((v) => (v.startsWith("#") ? v.slice(1).trim() : v));
+}
+
+function unique(values: string[]): string[] {
+  return Array.from(new Set(values));
+}
+
+function inferDomain(item: BrandDetailItemDto): BrandDomain {
+  return item.fashionResponse ? "fashion" : "beauty";
+}
+
+function buildCategories(domain: BrandDomain, item: BrandDetailItemDto): string[] {
+  if (domain === "fashion") {
+    const cats = unique(stripHash(item.fashionResponse?.categories));
+    return cats.length ? cats : ["의류", "가방", "신발", "주얼리", "패션 소품"];
+  }
+  const cats = unique(stripHash(item.beautyResponse?.categories));
+  return cats.length ? cats : ["스킨케어", "메이크업", "바디"];
+}
+
+function buildTagSections(
+  domain: BrandDomain,
+  item: BrandDetailItemDto
+): Array<{ title: string; groups: TagGroup[] }> {
+  if (domain === "fashion") {
+    const f = item.fashionResponse;
+    if (!f) return [];
+
+    const brandType = unique(stripHash(f.brandType));
+    const brandStyle = unique(stripHash(f.brandStyle));
+
+    const groups: TagGroup[] = [];
+    if (brandType.length) groups.push({ label: "브랜드 종류", chips: brandType });
+    if (brandStyle.length) groups.push({ label: "브랜드 스타일", chips: brandStyle });
+
+    return groups.length ? [{ title: "의류 태그", groups }] : [];
+  }
+
+  const b = item.beautyResponse;
+  if (!b) return [];
+
+  const cats = unique(stripHash(b.categories));
+  const skinType = unique(stripHash(b.skinType));
+  const mainFunction = unique(stripHash(b.mainFunction));
+  const makeUpStyle = unique(stripHash(b.makeUpStyle));
+
+  const sections: Array<{ title: string; groups: TagGroup[] }> = [];
+
+  if (cats.includes("스킨케어") || cats.includes("바디")) {
+    const groups: TagGroup[] = [];
+    if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
+    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
+    if (groups.length) sections.push({ title: "스킨케어 태그", groups });
+  }
+
+  if (cats.includes("메이크업")) {
+    const groups: TagGroup[] = [];
+    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (groups.length) sections.push({ title: "메이크업 태그", groups });
+  }
+
+  if (!sections.length) {
+    const groups: TagGroup[] = [];
+    if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
+    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
+    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    return groups.length ? [{ title: "태그", groups }] : [];
+  }
+
+  return sections;
+}
+
+async function safeGet<T>(p: Promise<T>): Promise<T | null> {
+  try {
+    return await p;
+  } catch (e) {
+    console.error(e);
+    return null;
   }
 }
 
-
-export async function fetchBrandDetail(params: {
-  brandId: string;
-  domain?: BrandDomain;
-}): Promise<BrandDetailData> {
+export async function fetchBrandDetail(params: { brandId: string; domain?: BrandDomain }): Promise<BrandDetailData> {
   const { brandId, domain } = params;
 
-  // 네 API 병렬 호출 (상세, 협찬제품, 캠페인 내역, 진행중인 캠페인)
-  const [detailResponse, productsResponse, campaignsResponse, recruitingResponse] = await Promise.all([
-    apiClient.get<BrandDetailApiResponse>(`/api/v1/brands/${brandId}`),
-    // 협찬 가능 제품 리스트 별도 호출 (api.md line 1652)
-    apiClient.get<SponsorProductListApiResponse>(`/api/v1/brands/${brandId}/sponsor-products`),
-    // 캠페인 내역 호출 (api.md line 1785)
-    apiClient.get<BrandCampaignApiResponse>(`/api/v1/brands/${brandId}/campaigns`),
-    // 진행 중인 캠페인 호출 (api.md line 1839)
-    apiClient.get<RecruitingCampaignsApiResponse>(`/api/v1/brands/${brandId}/campaigns/recruiting`)
-  ]);
+  const detailRes = await apiClient.get<BrandDetailApiResponse>(`/api/v1/brands/${brandId}`);
+  const detail = detailRes.data;
 
-  if (!detailResponse.data.isSuccess || !detailResponse.data.result?.length) {
+  if (!detail.isSuccess || !detail.result?.length) {
     throw new Error("브랜드 상세 조회 실패");
   }
 
-  const data = detailResponse.data.result[0];
+  const item = detail.result[0];
+  const resolvedDomain = domain ?? inferDomain(item);
 
-  // 협찬 제품 리스트
-  const productList = productsResponse.data.isSuccess ? productsResponse.data.result : [];
+  const safeDomain: BrandDomain =
+    resolvedDomain === "fashion" && !item.fashionResponse
+      ? "beauty"
+      : resolvedDomain === "beauty" && !item.beautyResponse
+      ? "fashion"
+      : resolvedDomain;
 
-  // 캠페인 내역 리스트
-  const historyList = campaignsResponse.data.isSuccess ? campaignsResponse.data.result.campaigns : [];
+  const productsRes = await safeGet(
+    apiClient.get<SponsorProductListApiResponse>(`/api/v1/brands/${brandId}/sponsor-products`)
+  );
+  const campaignsRes = await safeGet(
+    apiClient.get<BrandCampaignApiResponse>(`/api/v1/brands/${brandId}/campaigns`)
+  );
+  const recruitingRes = await safeGet(
+    apiClient.get<RecruitingCampaignsApiResponse>(`/api/v1/brands/${brandId}/campaigns/recruiting`)
+  );
 
-  // 진행 중인 캠페인 리스트
-  const recruitingList = recruitingResponse.data.isSuccess ? recruitingResponse.data.result.campaigns : [];
-
-
-  // 태그 섹션 구성
-  const tagSections: Array<{ title: string; groups: TagGroup[] }> = [];
-
-  if (data.brandSkinCareTag) {
-    const groups: TagGroup[] = [];
-    if (data.brandSkinCareTag.brandSkinType?.length) {
-      groups.push({ label: "피부타입", chips: data.brandSkinCareTag.brandSkinType });
-    }
-    if (data.brandSkinCareTag.brandMainFunction?.length) {
-      groups.push({ label: "주요기능", chips: data.brandSkinCareTag.brandMainFunction });
-    }
-    if (groups.length) {
-      tagSections.push({ title: "스킨케어 태그", groups });
-    }
-  }
-
-  if (data.brandMakeUpTag) {
-    const groups: TagGroup[] = [];
-    if (data.brandMakeUpTag.brandMakeUpStyle?.length) {
-      groups.push({ label: "메이크업 스타일", chips: data.brandMakeUpTag.brandMakeUpStyle });
-    }
-    if (data.brandMakeUpTag.brandMakeUpColor?.length) {
-      groups.push({ label: "컬러", chips: data.brandMakeUpTag.brandMakeUpColor });
-    }
-    if (groups.length) {
-      tagSections.push({ title: "메이크업 태그", groups });
-    }
-  }
+  const productList = productsRes?.data?.isSuccess ? productsRes.data.result : [];
+  const historyList = campaignsRes?.data?.isSuccess ? campaignsRes.data.result.campaigns : [];
+  const recruitingList = recruitingRes?.data?.isSuccess ? recruitingRes.data.result.campaigns : [];
 
   return {
     id: brandId,
-    domain: domain || "beauty",
-    name: data.brandName,
-    matchRate: data.brandMatchingRatio || 0,
-    heroImageUrl: "", // API에 없으면 빈 값
-    logoText: data.brandName,
-    hashtags: data.brandTag || [],
-    description: data.brandDescription || "",
-    categories: data.brandCategory || [],
-    tagSections,
-    ongoingCampaigns: recruitingList.map((campaign) => ({
-      campaignId: campaign.campaignId,
-      brandName: campaign.brandName,
-      title: campaign.title,
-      recruitQuota: campaign.recruitQuota,
-      rewardAmount: campaign.rewardAmount,
-      imageUrl: campaign.imageUrl,
-      dday: campaign.dday,
+    userId: item.userId,
+    domain: safeDomain,
+
+    name: item.brandName,
+    matchRate: item.brandMatchingRatio ?? 0,
+
+    heroImageUrl: "",
+    logoText: item.brandName,
+    logoImageUrl: item.logoUrl,
+
+    hashtags: unique(stripHash(item.brandDescriptionTags)),
+    description: item.simpleIntro ?? "",
+
+    categories: buildCategories(safeDomain, item),
+    tagSections: buildTagSections(safeDomain, item),
+
+    ongoingCampaigns: recruitingList.map((c) => ({
+      campaignId: c.campaignId,
+      brandName: c.brandName,
+      title: c.title,
+      recruitQuota: c.recruitQuota,
+      rewardAmount: c.rewardAmount,
+      imageUrl: c.imageUrl,
+      dday: c.dday,
       isLiked: false,
     })),
-    products: productList.map((product) => ({
-      id: String(product.id),
-      title: product.name,
-      imageUrl: product.thumbnailImageUrl || "",
+
+    products: productList.map((p) => ({
+      id: String(p.id),
+      title: p.name,
+      imageUrl: p.thumbnailImageUrl || "",
     })),
-    // 캠페인 내역 매핑
-    histories: historyList.map(campaign => {
-      const { text, highlight } = formatHistoryDate(campaign);
-      return {
-        id: String(campaign.campaignId),
-        title: campaign.title,
-        rightText: text,
-        highlight
-      };
+
+    histories: historyList.map((c) => {
+      const { text, highlight } = formatHistoryDate(c);
+      return { id: String(c.campaignId), title: c.title, rightText: text, highlight };
     }),
   };
 }
