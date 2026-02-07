@@ -20,10 +20,8 @@ export default function FilterBottomSheet({
   if (!isOpen) return null;
 
   return (
-    /* 최상위 컨테이너 */
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-end">
-      
-      {/* 배경 오버레이 */}
+
       <div 
         className="absolute inset-0 bg-black/40" 
         onClick={onClose} 
@@ -33,14 +31,14 @@ export default function FilterBottomSheet({
       <div 
         className="relative bg-[var(--color-bg-w)] rounded-t-[24px] overflow-hidden animate-slide-up w-full max-w-[430px] h-[530px] flex flex-col"
       >
-        {/* 1. 헤더 영역 */}
+        {/* 헤더 영역 */}
         <div className="px-4 pt-8 pb-4">
           <div className="inline-block border-b-2 border-[var(--color-core-1)] pb-1">
             <span className="text-title7 text-[var(--color-text-black)]">정렬 필터</span>
           </div>
         </div>
         
-        {/* 2. 필터 옵션 영역 */}
+        {/* 필터 옵션 영역 */}
         <div className="w-full bg-[var(--color-bluegray-1)] py-4">
           <div className="flex items-center justify-start gap-8 px-4">
             {FILTERS.map((filter) => (
@@ -59,7 +57,7 @@ export default function FilterBottomSheet({
           </div>
         </div>
 
-        {/* 3. 하단 적용하기 버튼 */}
+        {/* 하단 적용하기 버튼 */}
         <div className="mt-auto px-4 pb-10">
           <button
             onClick={() => {

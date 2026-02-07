@@ -11,7 +11,6 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
-//import { MATCHING_DUMMY_DATA } from "../calendar/api/calendar";
 
 export default function CalendarContent() {
   const navigate = useNavigate();
@@ -41,7 +40,6 @@ export default function CalendarContent() {
     fetchCampaigns();
   }, [matchingSubTab]);
 
-  // 상태 변환 헬퍼 함수
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {
       case "MATCHED":
@@ -71,57 +69,46 @@ export default function CalendarContent() {
   console.log("전체 데이터:", campaigns);
   console.log("필터된 데이터:", matchingList);
 
-  // 1. 오늘 날짜 및 현재 달 정보 준비
-const todayStr = new Date().toISOString().split('T')[0];
-const currentMonthStr = todayStr.substring(0, 7);
+  const todayStr = new Date().toISOString().split('T')[0];
+  const currentMonthStr = todayStr.substring(0, 7);
 
-// 2. 캘린더(주간/월간)에 표시할 매칭된 모든 이벤트
-const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
+  const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
 
-// 3. 하단 리스트에 표시할 필터링된 이벤트 (MATCHED + 날짜 조건)
-const filteredList = campaigns.filter((item) => {
-  // 매칭된 상태가 아니면 리스트에서 제외
-  if (item.status !== "MATCHED") return false;
+  const filteredList = campaigns.filter((item) => {
+    if (item.status !== "MATCHED") return false;
 
-  if (activeTab === "today") {
-    // 오늘 날짜가 시작일과 종료일 사이에 있는지 확인
-    return item.startDate <= todayStr && item.endDate >= todayStr;
-  } else {
-    // 해당 월에 걸쳐 있는 모든 일정 확인
-    const startMonth = item.startDate.substring(0, 7);
-    const endMonth = item.endDate.substring(0, 7);
-    return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
-  }
-});
+    if (activeTab === "today") {
+      return item.startDate <= todayStr && item.endDate >= todayStr;
+    } else {
+      const startMonth = item.startDate.substring(0, 7);
+      const endMonth = item.endDate.substring(0, 7);
+      return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
+    }
+  });
 
   const handleCardClick = (item: CampaignCollaboration) => {
     const proposalId = item.proposalId || item.campaignId;
 
-    // 1. 거절 상태일 때
     if (item.status === "REJECTED") {
       navigate(`/rejection?proposalId=${proposalId}`);
       return;
     }
 
-    // 2. 지원 현황 탭에서 온 경우
     if (item.type === "APPLIED") {
       navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
       return;
     }
 
-    // 3. 받은 제안 탭에서 온 경우
     if (item.type === "RECEIVED") {
       navigate(`/business/proposal?type=received&proposalId=${proposalId}`);
       return;
     }
 
-    // 4. 보낸 제안
     navigate(`/business/proposal?type=sent&proposalId=${proposalId}`);
   };
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
-      {/* 탭 네비게이션 */}
       <div className="flex w-full bg-bg-w border-b border-text-gray5">
         <button
           onClick={() => setMainTab("collaboration")}
@@ -160,7 +147,6 @@ const filteredList = campaigns.filter((item) => {
               <MonthlyCalendar events={calendarEvents} />
             </section>
 
-            {/* 하단 리스트 섹션 */}
             <section className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <button
@@ -185,10 +171,11 @@ const filteredList = campaigns.filter((item) => {
                     <CampaignCard
                       key={cp.campaignId || cp.proposalId}
                       campaignId={cp.campaignId}
+                      proposalId={cp.proposalId ?? undefined}
+                      type={cp.type}
                       brand={cp.brandName}
                       title={cp.title}
                       logo={cp.thumbnailUrl}
-
                       startDate={cp.startDate.split('-').slice(1).join('.')}
                       endDate={cp.endDate.split('-').slice(1).join('.')}
                     />
@@ -234,6 +221,7 @@ const filteredList = campaigns.filter((item) => {
                       status={getStatusLabel(item.status)}
                       date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)}
                       actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
+                      logo={item.thumbnailUrl}
                       onClick={() => handleCardClick(item)}
                     />
                   ))
