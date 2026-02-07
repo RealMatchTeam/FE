@@ -10,7 +10,7 @@ export default function TraitCard({ trait, onClick }: { trait: Trait; onClick: (
     <button 
       type="button"
       onClick={onClick}
-      className="w-[136px] h-[216px] rounded-[6px] bg-white shadow-[0_1px_3px_0_#D4D4D9] px-[8px] py-[10px] flex flex-col items-center gap-[10px] active:scale-[0.99] transition-transform"
+      className="w-[136px] h-[216px] rounded-[6px] bg-white drop-shadow-[0_1px_3px_#D4D4D9] px-[8px] py-[10px] flex flex-col items-center gap-[10px] active:scale-[0.99] transition-transform"
     >
       {/* badge */}
       <div className="inline-flex items-center rounded-full h-[20px] bg-[#B7B7F3] px-[6px] py-[2px] text-[12px] font-Medium text-white">

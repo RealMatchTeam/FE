@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import Section from "./CommonSection";
 import TraitCard from "./TraitCard";
 import TraitModal from "./TraitModal";
-import { TRAITS } from "./traitData"; 
+import { TRAITS } from "./traitData";
 type FeatureData = {
   beautyType?: {
     skinType?: string[] | null;
@@ -37,7 +37,9 @@ type TraitsSectionProps = {
 };
 
 export default function TraitsSection({ feature }: TraitsSectionProps) {
-  const [selectedTrait, setSelectedTrait] = useState<typeof TRAITS[0] | null>(null);
+  const [selectedTrait, setSelectedTrait] = useState<(typeof TRAITS)[0] | null>(
+    null,
+  );
   const traits = useMemo(() => {
     if (!feature) return TRAITS;
 
@@ -52,12 +54,18 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
           previewLines: [
             { label: "피부 타입", value: (beauty?.skinType ?? []).join(", ") },
             { label: "피부 밝기", value: beauty?.skinBrightness ?? "" },
-            { label: "메이크업 \n스타일", value: (beauty?.makeupStyle ?? []).join(", ") },
+            {
+              label: "메이크업 \n스타일",
+              value: (beauty?.makeupStyle ?? []).join(", "),
+            },
           ],
           topSummary: [
             { label: "피부타입", value: (beauty?.skinType ?? []).join(", ") },
             { label: "피부 밝기", value: beauty?.skinBrightness ?? "" },
-            { label: "메이크업 스타일", value: (beauty?.makeupStyle ?? []).join(", ") },
+            {
+              label: "메이크업 스타일",
+              value: (beauty?.makeupStyle ?? []).join(", "),
+            },
           ],
           sections: [
             {
@@ -114,8 +122,14 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
             { label: "평균 조회수", value: content?.avgViews ?? "" },
           ],
           topSummary: [
-            { label: "주 시청자 성별", value: (content?.viewerGender ?? []).join(", ") },
-            { label: "주 시청자 나이대", value: (content?.viewerAge ?? []).join(", ") },
+            {
+              label: "주 시청자 성별",
+              value: (content?.viewerGender ?? []).join(", "),
+            },
+            {
+              label: "주 시청자 나이대",
+              value: (content?.viewerAge ?? []).join(", "),
+            },
             { label: "평균 영상 길이", value: content?.avgVideoLength ?? "" },
             { label: "평균 조회수", value: content?.avgViews ?? "" },
           ],
@@ -151,16 +165,28 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
         right={
           <button type="button" className="text-[20px] text-black/30">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18L15 12L9 6" stroke="#9B9BA1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="#9B9BA1"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         }
       >
-        <div className="overflow-x-auto snap-x snap-mandatory">
-          <div className="flex px-2 py-2 gap-2">
+        <div className="overflow-x-auto overflow-y-visible snap-x snap-mandatory px-4 -my-4">
+          <div className="flex p-4">
             {traits.map((trait) => (
-              <div key={trait.id} className="min-w-[136px] shrink-0 snap-start">
-                <TraitCard trait={trait} onClick={() => setSelectedTrait(trait)} />
+              <div
+                key={trait.id}
+                className="min-w-[136px] shrink-0 snap-start p-1"
+              >
+                <TraitCard
+                  trait={trait}
+                  onClick={() => setSelectedTrait(trait)}
+                />
               </div>
             ))}
           </div>
@@ -168,7 +194,10 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
       </Section>
 
       {selectedTrait && (
-        <TraitModal trait={selectedTrait} onClose={() => setSelectedTrait(null)} />
+        <TraitModal
+          trait={selectedTrait}
+          onClose={() => setSelectedTrait(null)}
+        />
       )}
     </>
   );

@@ -87,7 +87,7 @@ export default function ProfileCard() {
           />
           <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
 
-          <div className="h-[96px] px-4">
+          <div className="px-4">
             
             <SnsSection snsAccount={profileCard?.snsAccount ?? null} />
             <div className="w-full max-w-[430px] h-[1px] bg-[#F3F3FA]"></div>
