@@ -168,8 +168,9 @@ export default function MyPageLikes() {
         if (activeTab === "brand") setBrandLikesApi([]);
         if (activeTab === "campaign") setCampaignLikesApi([]);
       } finally {
-        if (!isMounted) return;
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 

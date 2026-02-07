@@ -8,5 +8,5 @@ export function useAutoScroll(
     const el = listRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [listRef, ...deps]);
+  }, [listRef, deps]);
 }
