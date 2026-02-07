@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import Section from "./CommonSection";
 import TraitCard from "./TraitCard";
 import TraitModal from "./TraitModal";
@@ -37,6 +38,7 @@ type TraitsSectionProps = {
 };
 
 export default function TraitsSection({ feature }: TraitsSectionProps) {
+  const navigate = useNavigate();
   const [selectedTrait, setSelectedTrait] = useState<(typeof TRAITS)[0] | null>(
     null,
   );
@@ -163,7 +165,12 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
       <Section
         title="내 특성"
         right={
-          <button type="button" className="text-[20px] text-black/30">
+          <button
+            type="button"
+            className="text-[20px] text-black/30"
+            onClick={() => navigate("/mypage/traits")}
+            aria-label="내 특성 보기"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path
                 d="M9 18L15 12L9 6"
