@@ -160,7 +160,13 @@ export default function MyPageHome({
         <MenuButton
           title="고객센터"
           label="문의하기"
-          onClick={onOpenInquiry}
+          onClick={() =>
+            window.open(
+              "https://open.kakao.com/o/sPvvelfi",
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
           py={11}
         />
         <Divider />
