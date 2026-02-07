@@ -83,7 +83,7 @@ export default function ProfileCard() {
             nickname={profileCard?.nickname}
             gender={profileCard?.gender}
             age={profileCard?.age ?? null}
-            interestFields={profileCard?.interestFields ?? null}
+            contentCategories={profileCard?.contentCategories ?? null}
           />
           <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
 
@@ -140,7 +140,7 @@ type ProfileCardResult = {
   gender?: string;
   age?: number | null;
   snsAccount?: string | null;
-  interestFields?: string[] | null;
+  contentCategories?: string[] | null;
   matchingResult?: {
     creatorType?: string | null;
   } | null;

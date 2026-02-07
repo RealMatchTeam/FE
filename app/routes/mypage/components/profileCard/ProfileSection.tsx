@@ -6,7 +6,7 @@ type ProfileSectionProps = {
   nickname?: string | null;
   gender?: string | null;
   age?: number | null;
-  interestFields?: string[] | null;
+  contentCategories?: string[] | null;
 };
 
 export default function ProfileSection({
@@ -14,7 +14,7 @@ export default function ProfileSection({
   nickname,
   gender,
   age,
-  interestFields,
+  contentCategories,
 }: ProfileSectionProps) {
   const profileImage = profileImageUrl ?? mypageDefault;
   const displayName = nickname || "비비";
@@ -28,8 +28,8 @@ export default function ProfileSection({
     age != null && Number.isFinite(age)
       ? `${age}세`
       : "나이";
-  const interestLabel = interestFields?.length
-    ? interestFields.join(", ")
+  const interestLabel = contentCategories?.length
+    ? contentCategories.join(", ")
     : "";
 
   return (
@@ -80,8 +80,9 @@ export default function ProfileSection({
             {genderLabel} {ageLabel}
           </div>
           {interestLabel ? (
-            <div className="text-[12px] text-[#6D6AFE] leading-[16px] mt-[2px]">
-              관심분야: {interestLabel}
+            <div className="text-[12px] leading-[16px] mt-[2px]">
+              <span className="text-black/50">관심분야: </span>
+              <span className="text-[#6D6AFE]">{interestLabel}</span>
             </div>
           ) : null}
         </div>
