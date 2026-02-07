@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { axiosInstance } from "../../../../api/axios";
 
 type Collaboration = {
@@ -43,6 +44,7 @@ const formatDate = (date?: string | null) => {
 };
 
 export default function CampaignsSection() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Collaboration[]>([]);
   const [page, setPage] = useState(1);
   const [isOpen, setIsOpen] = useState(true);
@@ -125,8 +127,22 @@ export default function CampaignsSection() {
               const title = item.title ?? "";
               const brand = item.brandName ? `${item.brandName} - ` : "";
 
+              const campaignId = item.campaignId ?? null;
               return (
-                <div key={`${item.proposalId ?? item.campaignId ?? idx}`} className="flex items-center gap-3 py-3">
+                <div
+                  key={`${item.proposalId ?? item.campaignId ?? idx}`}
+                  className={[
+                    "flex items-center gap-3 py-3",
+                    campaignId ? "cursor-pointer" : "",
+                  ].join(" ")}
+                  onClick={
+                    campaignId
+                      ? () => navigate(`/business/campaign/${campaignId}`)
+                      : undefined
+                  }
+                  role={campaignId ? "button" : undefined}
+                  tabIndex={campaignId ? 0 : -1}
+                >
                   <div className="min-w-[72px] text-[#4A4DFF] underline underline-offset-2 text-[12px] font-semibold">
                     {typeLabel}
                   </div>
