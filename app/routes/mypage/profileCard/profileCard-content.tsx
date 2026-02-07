@@ -1,12 +1,13 @@
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import ConfirmModal from "../components/mypage/ConfirmModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import ProfileSection from "../components/profileCard/ProfileSection";
 import SnsSection from "../components/profileCard/SnsSection";
 import MatchingSection from "../components/profileCard/MatchingSection";
 import TraitsSection from "../components/profileCard/TraitsSection";
+import { axiosInstance } from "../../../api/axios";
 
 export default function ProfileCard() {
 
@@ -14,6 +15,10 @@ export default function ProfileCard() {
 
   const [openReMatchModal, setOpenReMatchModal] = useState(false);
   const navigate = useNavigate();
+  const [profileCard, setProfileCard] = useState<ProfileCardResult | null>(
+    null,
+  );
+  const [feature, setFeature] = useState<FeatureResult | null>(null);
 
   const onOpenReMatch = () => {
     setOpenReMatchModal(true);
@@ -28,6 +33,38 @@ export default function ProfileCard() {
     navigate("/matching/test/step1")
   }
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const [profileRes, featureRes] = await Promise.all([
+          axiosInstance.get<ProfileCardResponse>("/api/v1/users/me/profile-card"),
+          axiosInstance.get<FeatureResponse>("/api/v1/users/me/feature"),
+        ]);
+
+        if (!isMounted) return;
+
+        setProfileCard(profileRes.data?.isSuccess ? profileRes.data.result : null);
+        setFeature(featureRes.data?.isSuccess ? featureRes.data.result : null);
+      } catch (error) {
+        console.error("프로필 카드 조회 실패:", error);
+        if (!isMounted) return;
+        setProfileCard(null);
+        setFeature(null);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const nickname = profileCard?.nickname ?? null;
+  const creatorType = profileCard?.matchingResult?.creatorType ?? null;
+
   return (
     <div className="h-screen-full">
       <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
@@ -41,15 +78,25 @@ export default function ProfileCard() {
 
         <div className="overflow-y-auto" style={{ height: `calc(100vh - 60px - 67px)` }}>
           
-          <ProfileSection/>
+          <ProfileSection
+            profileImageUrl={profileCard?.profileImageUrl}
+            nickname={profileCard?.nickname}
+            gender={profileCard?.gender}
+            age={profileCard?.age ?? null}
+            interestFields={profileCard?.interestFields ?? null}
+          />
           <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
 
           <div className="h-[96px] px-4">
             
-            <SnsSection />
+            <SnsSection snsAccount={profileCard?.snsAccount ?? null} />
             <div className="w-full max-w-[430px] h-[1px] bg-[#F3F3FA]"></div>
-            <MatchingSection onOpenReMatch={onOpenReMatch} />
-            <TraitsSection />
+            <MatchingSection
+              onOpenReMatch={onOpenReMatch}
+              nickname={nickname}
+              creatorType={creatorType}
+            />
+            <TraitsSection feature={feature} />
 
           </div>
           
@@ -86,3 +133,58 @@ export default function ProfileCard() {
     </div>
   );
 }
+
+type ProfileCardResult = {
+  nickname?: string;
+  profileImageUrl?: string | null;
+  gender?: string;
+  age?: number | null;
+  snsAccount?: string | null;
+  interestFields?: string[] | null;
+  matchingResult?: {
+    creatorType?: string | null;
+  } | null;
+};
+
+type ProfileCardResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: ProfileCardResult;
+};
+
+type FeatureResult = {
+  beautyType?: {
+    skinType?: string[] | null;
+    skinBrightness?: string | null;
+    makeupStyle?: string[] | null;
+    interestCategories?: string[] | null;
+    interestFunctions?: string[] | null;
+  } | null;
+  fashionType?: {
+    height?: string | null;
+    bodyShape?: string | null;
+    topSize?: string | null;
+    bottomSize?: string | null;
+    interestFields?: string[] | null;
+    interestStyles?: string[] | null;
+    interestBrands?: string[] | null;
+  } | null;
+  contentsType?: {
+    viewerGender?: string[] | null;
+    viewerAge?: string[] | null;
+    avgVideoLength?: string | null;
+    avgViews?: string | null;
+    contentFormats?: string[] | null;
+    contentTones?: string[] | null;
+    desiredInvolvement?: string[] | null;
+    desiredUsageScope?: string[] | null;
+  } | null;
+};
+
+type FeatureResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: FeatureResult;
+};

@@ -1,6 +1,36 @@
-export default function ProfileSection() {
+import { useMemo } from "react";
+import mypageDefault from "../../../../assets/mypage-default.svg";
 
-  const profileImage = "";
+type ProfileSectionProps = {
+  profileImageUrl?: string | null;
+  nickname?: string | null;
+  gender?: string | null;
+  age?: number | null;
+  interestFields?: string[] | null;
+};
+
+export default function ProfileSection({
+  profileImageUrl,
+  nickname,
+  gender,
+  age,
+  interestFields,
+}: ProfileSectionProps) {
+  const profileImage = profileImageUrl ?? mypageDefault;
+  const displayName = nickname || "비비";
+  const genderLabel = useMemo(() => {
+    if (gender === "MALE") return "남성";
+    if (gender === "FEMALE") return "여성";
+    if (!gender) return "성별";
+    return gender;
+  }, [gender]);
+  const ageLabel =
+    age != null && Number.isFinite(age)
+      ? `${age}세`
+      : "나이";
+  const interestLabel = interestFields?.length
+    ? interestFields.join(", ")
+    : "";
 
   return (
     <div className="px-4 py-6">
@@ -40,14 +70,20 @@ export default function ProfileSection() {
               />
             </svg>
           </button>
-        </div>  
+        </div>
 
         <div className="flex-1 gap-[6px]">
-          <div className="text-[16px] font-Semibold leading-[20px]">비비</div>
-          <div className="text-[12px] text-black/50 leading-[16px] mt-[2px]">여성 22세</div>
-          <div className="text-[12px] text-[#6D6AFE] leading-[16px] mt-[2px]">
-            관심분야: 뷰티, 패션
+          <div className="text-[16px] font-Semibold leading-[20px]">
+            {displayName}
           </div>
+          <div className="text-[12px] text-black/50 leading-[16px] mt-[2px]">
+            {genderLabel} {ageLabel}
+          </div>
+          {interestLabel ? (
+            <div className="text-[12px] text-[#6D6AFE] leading-[16px] mt-[2px]">
+              관심분야: {interestLabel}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
