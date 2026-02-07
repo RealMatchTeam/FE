@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmModal from "./mypage/ConfirmModal";
 import GateModal from "./mypage/GateModal";
 import MenuButton from "./mypage/MenuButton";
 
 type Props = {
-  hasMatchingTest: boolean;
+  hasMatchingTest: boolean | null;
   user: {
     name: string;
     roleText?: string;
@@ -37,9 +37,14 @@ export default function MyPageHome({
   onLogout,
   onWithdraw,
 }: Props) {
-  const [openGate, setOpenGate] = useState(!hasMatchingTest);
+  const [openGate, setOpenGate] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
+
+  useEffect(() => {
+    if (hasMatchingTest === null) return;
+    setOpenGate(hasMatchingTest === false);
+  }, [hasMatchingTest]);
 
   //const actionsDisabled = useMemo(() => !hasMatchingTest, [hasMatchingTest]); 매칭검사 안했을 시
 

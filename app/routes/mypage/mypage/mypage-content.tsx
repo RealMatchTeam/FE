@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import MyPageHome from "../components/MyPageHome";
 import { useAuthStore } from "../../../stores/auth-store";
@@ -8,6 +8,7 @@ export default function MyPageContent() {
   const navigate = useNavigate();
   const me = useAuthStore((s) => s.me);
   const setMe = useAuthStore((s) => s.setMe);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -28,8 +29,10 @@ export default function MyPageContent() {
           avatarUrl: result.profileImageUrl ?? undefined,
           matchingTestDone: Boolean(result.hasMatchingTest),
         });
+        setLoaded(true);
       } catch (error) {
         console.error("마이페이지 정보 조회 실패:", error);
+        setLoaded(true);
       }
     };
 
@@ -40,7 +43,7 @@ export default function MyPageContent() {
     };
   }, [setMe]);
 
-  const hasMatchingTest = Boolean(me?.matchingTestDone);
+  const hasMatchingTest = loaded ? Boolean(me?.matchingTestDone) : null;
 
   return (
     <MyPageHome
