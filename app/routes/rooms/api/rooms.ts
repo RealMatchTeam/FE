@@ -92,7 +92,7 @@ export interface ChatAttachment {
 
 export type ProposalStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
 export type ProposalDirection = "NONE" | "BRAND_TO_CREATOR" | "CREATOR_TO_BRAND";
-export type NoticeStatus = "ACCEPTED" | "REJECTED" | "CANCELED" | "EXPIRED";
+export type NoticeStatus = "CANCELED" | "MATCHED" | "REVIEWING" | "REJECTED" | "NONE" ;
 
 export type ProposalCardPayload = {
   proposalId: number;
@@ -124,14 +124,14 @@ export type ProposalStatusNoticePayload = {
   proposalId: number;
   actorUserId: number;
   processedAt: string; // ISO string
-  status: NoticeStatus; // 프론트에서 문구 결정용
+  proposalStatus: NoticeStatus; 
 };
 
 export type ApplyStatusNoticePayload = {
   applyId: number;
   actorUserId: number;
   processedAt: string; // ISO string
-  status: NoticeStatus;
+  applyStatus: NoticeStatus;
 };
 
 export type SystemMessage =
@@ -143,7 +143,7 @@ export type SystemMessage =
   | {
       schemaVersion: number;
       kind: "RE_PROPOSAL_CARD";
-      payload: ProposalCardPayload; // 동일 구조 재사용
+      payload: ProposalCardPayload; 
     }
   | {
       schemaVersion: number;
