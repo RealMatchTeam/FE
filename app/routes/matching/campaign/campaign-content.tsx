@@ -49,7 +49,7 @@ export default function CampaignContent() {
     } = useInfiniteQuery({
         queryKey: ["matching-campaigns", category, sortOption, selectedTags, deferredKeyword],
         queryFn: async ({ pageParam = 0 }) => {
-            const tagsToSend = selectedTags.length > 0 ? selectedTags : await getTagNamesByCategory(category);
+            const tagsToSend = selectedTags.length > 0 ? selectedTags : await getTagNamesByCategory();
             const response = await getMatchingCampaigns(
                 sortBy,
                 category,

@@ -388,22 +388,30 @@ interface BrandLikeResponse {
 }
 
 export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
-  try {
-    const response = await apiClient.post<BrandLikeResponse>(
-      `/v1/brands/${brandId}/like`,
-      {},
-    );
+  const response = await apiClient.post<BrandLikeResponse>(
+    `/v1/brands/${brandId}/like`,
+    {},
+  );
 
-    if (!response.data.isSuccess) {
-      throw new Error(response.data.message || "브랜드 좋아요 토글 실패");
-    }
-
-    return response.data.result[0]?.brandIsLiked || false;
-  } catch (error: unknown) {
-    console.error("브랜드 좋아요 토글 실패:", error);
-    throw error;
+  if (!response.data?.isSuccess) {
+    throw new Error(response.data?.message || "브랜드 좋아요 토글 실패");
   }
+
+  const r: any = response.data.result;
+
+  // result 형태가 다양한 경우를 모두 커버
+  if (typeof r === "boolean") return r;
+  if (r && typeof r.brandIsLiked === "boolean") return r.brandIsLiked;
+  if (r && typeof r.isLiked === "boolean") return r.isLiked;
+  if (Array.isArray(r) && r[0] && typeof r[0].brandIsLiked === "boolean") {
+    return r[0].brandIsLiked;
+  }
+
+  // 스펙 미일치 시 false로 두되, 디버깅 가능하게 로그
+  console.warn("Unexpected toggleBrandLike result shape:", r);
+  return false;
 };
+
 
 export const getTagNamesByCategory = async (): Promise<string[]> => {
   return [];
@@ -510,4 +518,25 @@ export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> 
     console.error("매칭 분석 요청 실패:", error);
     throw error;
   }
+};
+
+
+interface CampaignLikeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}
+
+export const toggleCampaignLike = async (campaignId: number): Promise<string> => {
+  const response = await apiClient.post<CampaignLikeResponse>(
+    `/v1/campaigns/${campaignId}/like`,
+    {},
+  );
+
+  if (!response.data?.isSuccess) {
+    throw new Error(response.data?.message || "캠페인 좋아요 토글 실패");
+  }
+
+  return response.data.result;
 };

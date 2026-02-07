@@ -1,3 +1,5 @@
+// src/routes/_home/types.ts
+
 export type CategoryKey = "beauty" | "fashion";
 
 export interface HeroItem {
@@ -46,63 +48,41 @@ export interface CreatorProfileModel {
   traits: CreatorTraits;
 }
 
-export interface HomeAfterMatchCategoryData {
-  category: CategoryKey;
-  hero: HeroItem[];
-  topBrands: BrandItem[];
-  topCampaigns: CampaignItem[];
-  creatorProfile: CreatorProfileModel;
-  popularCampaigns: CampaignItem[];
-}
-
-export interface HomeAfterMatchResponse {
-  beauty: HomeAfterMatchCategoryData;
-  fashion: HomeAfterMatchCategoryData;
-}
-
-/* ===== /api/v1/me/feature ===== */
-
 export type Gender = "MALE" | "FEMALE" | string;
 
-export interface MeMatchingResult {
-  createrType: string;
-  fitBrand: string;
-}
-
-export interface BeautyType {
+export interface MeFeatureBeautyType {
   skinType: string[];
   skinBrightness: string;
   makeupStyle: string[];
+  interestCategories: string[];
+  interestFunctions: string[];
 }
 
-export interface FashionType {
-  height: number;
-  bodyType: string;
-  upperSize: string;
-  bottomSize: number;
+export interface MeFeatureFashionType {
+  height: string;
+  bodyShape: string;
+  topSize: string;
+  bottomSize: string;
+  interestFields: string[];
+  interestStyles: string[];
+  interestBrands: string[];
 }
 
-export interface ContentsType {
-  gender: string;
-  age: string;
-  averageLength: string;
-  averageView: string;
-}
-
-export interface MyType {
-  beautyType: BeautyType;
-  fashionType: FashionType;
-  contentsType: ContentsType;
+export interface MeFeatureContentsType {
+  viewerGender: string[];
+  viewerAge: string[];
+  avgVideoLength: string;
+  avgViews: string;
+  contentFormats: string[];
+  contentTones: string[];
+  desiredInvolvement: string[];
+  desiredUsageScope: string[];
 }
 
 export interface MeFeatureResult {
-  nickname: string;
-  gender: Gender;
-  age: number;
-  interests: string[];
-  snsAccount: string;
-  matchingResult: MeMatchingResult;
-  myType: MyType;
+  beautyType: MeFeatureBeautyType;
+  fashionType: MeFeatureFashionType;
+  contentsType: MeFeatureContentsType;
 }
 
 export interface MeFeatureResponse {
@@ -110,4 +90,25 @@ export interface MeFeatureResponse {
   code: string;
   message: string;
   result: MeFeatureResult;
+}
+
+export interface ProfileCardMatchingResult {
+  creatorType: string;
+}
+
+export interface ProfileCardResult {
+  nickname: string;
+  profileImageUrl?: string;
+  gender: Gender;
+  age: number;
+  snsAccount: string;
+  interestFields: string[];
+  matchingResult: ProfileCardMatchingResult;
+}
+
+export interface ProfileCardResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: ProfileCardResult;
 }

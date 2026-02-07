@@ -6,12 +6,22 @@ import type { BrandDomain } from "./types";
 export default function BrandDetailPage() {
   const [searchParams] = useSearchParams();
 
-  const brandId = searchParams.get("brandId") || "beplain";
+  const brandIdParam = searchParams.get("brandId");
+  const brandId = brandIdParam && brandIdParam.trim().length > 0 ? brandIdParam : undefined;
+
   const domainParam = searchParams.get("domain");
   const domain: BrandDomain | undefined =
     domainParam === "beauty" || domainParam === "fashion"
       ? (domainParam as BrandDomain)
       : undefined;
+
+  if (!brandId) {
+    return (
+      <div className="min-h-screen bg-white px-5 py-6">
+        brandId가 없어요.
+      </div>
+    );
+  }
 
   const { data, isLoading, isError } = useBrandDetail(brandId, domain);
 

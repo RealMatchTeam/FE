@@ -46,23 +46,24 @@ const normalizeUrl = (url: string) => {
   return next;
 };
 
+const isRefreshRequest = (url?: string) =>
+  typeof url === "string" && url.includes("/auth/refresh");
+
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (typeof config.url === "string") {
+    const url = typeof config.url === "string" ? config.url : "";
+
+    if (!isRefreshRequest(url) && typeof config.url === "string") {
       config.url = normalizeUrl(config.url);
     }
 
-    const accessToken = tokenStorage.getAccessToken();
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    // refresh 요청에는 만료 accessToken이 붙으면 refresh 자체가 실패할 수 있음
+    if (isRefreshRequest(url)) {
+      delete (config.headers as any).Authorization;
+    } else {
+      const accessToken = tokenStorage.getAccessToken();
+      if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
-    console.log("[REQ]", {
-      method: config.method,
-      baseURL: config.baseURL,
-      url: config.url,
-      full: `${config.baseURL ?? ""}${config.url ?? ""}`,
-    });
 
     return config;
   },
@@ -90,14 +91,20 @@ axiosInstance.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(error);
 
+    const status = error.response?.status;
+
+    // refresh 자체가 실패하면 루프 돌지 말고 즉시 로그인
+    if (isRefreshRequest(originalRequest.url)) {
+      tokenStorage.clearTokens();
+      window.location.href = "/auth/login";
+      return Promise.reject(error);
+    }
+
     if (typeof originalRequest.url === "string") {
       originalRequest.url = normalizeUrl(originalRequest.url);
     }
 
-    if (
-      (error.response?.status === 401 || error.response?.status === 400) &&
-      !originalRequest._retry
-    ) {
+    if ((status === 401 || status === 400) && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -122,14 +129,20 @@ axiosInstance.interceptors.response.use(
         const refreshPath =
           BASE_URL === "/api" ? "/v1/auth/refresh" : "/api/v1/auth/refresh";
 
+        // refresh 요청은 Authorization 없이 RefreshToken 헤더만
         const res = await axiosInstance.post<RefreshResponse>(
           refreshPath,
           {},
-          { headers: { RefreshToken: `Bearer ${refreshToken}` } },
+          {
+            headers: {
+              RefreshToken: `Bearer ${refreshToken}`,
+              Authorization: "",
+            },
+          },
         );
 
-        const accessToken = res.data.result?.accessToken;
-        const newRefreshToken = res.data.result?.refreshToken;
+        const accessToken = res.data?.result?.accessToken;
+        const newRefreshToken = res.data?.result?.refreshToken;
 
         if (!accessToken || !newRefreshToken) {
           tokenStorage.clearTokens();
@@ -152,7 +165,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }, 
 );
 
 export const apiClient = axiosInstance;

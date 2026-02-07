@@ -29,6 +29,42 @@ export type HistoryRowItem = {
   highlight?: boolean;
 };
 
+export type BrandDetailApiBeautyResponse = {
+  categories: string[];
+  skinType: string[];
+  mainFunction: string[];
+  makeUpStyle: string[];
+};
+
+export type BrandDetailApiFashionResponse = {
+  categories: string[];
+  brandType: string[];
+  brandStyle: string[];
+};
+
+export type BrandDetailApiResult = {
+  userId: number;
+  brandName: string;
+  brandImages: string[];
+  logoUrl: string;
+  simpleIntro: string;
+  detailIntro: string;
+  homepageUrl: string;
+  brandTag: string[] | null;
+  brandMatchingRatio: number;
+  brandIsLiked: boolean;
+  brandDescriptionTags: string[];
+  beautyResponse?: BrandDetailApiBeautyResponse | null;
+  fashionResponse?: BrandDetailApiFashionResponse | null;
+};
+
+export type BrandDetailResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: BrandDetailApiResult[]; 
+};
+
 export type BrandDetailData = {
   id: string;
   userId: number;
@@ -37,9 +73,14 @@ export type BrandDetailData = {
   name: string;
   matchRate: number;
 
-  heroImageUrl: string;
+  heroImageUrl?: string; 
+  brandImages?: string[];
+
   logoText?: string;
   logoImageUrl?: string;
+
+  homepageUrl?: string;
+  simpleIntro?: string;
 
   hashtags: string[];
   description: string;
@@ -50,6 +91,8 @@ export type BrandDetailData = {
     title: string;
     groups: TagGroup[];
   }>;
+
+  isLiked?: boolean;
 
   ongoingCampaigns: BrandOngoingCampaign[];
   products: ProductMiniCardItem[];
