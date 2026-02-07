@@ -51,8 +51,9 @@ export default function TraitsPage() {
 
     const fetchData = async () => {
       try {
-        const featureRes =
-          await axiosInstance.get<FeatureResponse>("/api/v1/users/me/feature");
+        const featureRes = await axiosInstance.get<FeatureResponse>(
+          "/api/v1/users/me/feature",
+        );
         if (!isMounted) return;
         setFeature(featureRes.data?.isSuccess ? featureRes.data.result : null);
       } catch (error) {
@@ -83,12 +84,18 @@ export default function TraitsPage() {
           previewLines: [
             { label: "피부 타입", value: (beauty?.skinType ?? []).join(", ") },
             { label: "피부 밝기", value: beauty?.skinBrightness ?? "" },
-            { label: "메이크업 \n스타일", value: (beauty?.makeupStyle ?? []).join(", ") },
+            {
+              label: "메이크업 \n스타일",
+              value: (beauty?.makeupStyle ?? []).join(", "),
+            },
           ],
           topSummary: [
             { label: "피부타입", value: (beauty?.skinType ?? []).join(", ") },
             { label: "피부 밝기", value: beauty?.skinBrightness ?? "" },
-            { label: "메이크업 스타일", value: (beauty?.makeupStyle ?? []).join(", ") },
+            {
+              label: "메이크업 스타일",
+              value: (beauty?.makeupStyle ?? []).join(", "),
+            },
           ],
           sections: [
             {
@@ -145,8 +152,14 @@ export default function TraitsPage() {
             { label: "평균 조회수", value: content?.avgViews ?? "" },
           ],
           topSummary: [
-            { label: "주 시청자 성별", value: (content?.viewerGender ?? []).join(", ") },
-            { label: "주 시청자 나이대", value: (content?.viewerAge ?? []).join(", ") },
+            {
+              label: "주 시청자 성별",
+              value: (content?.viewerGender ?? []).join(", "),
+            },
+            {
+              label: "주 시청자 나이대",
+              value: (content?.viewerAge ?? []).join(", "),
+            },
             { label: "평균 영상 길이", value: content?.avgVideoLength ?? "" },
             { label: "평균 조회수", value: content?.avgViews ?? "" },
           ],
@@ -176,26 +189,26 @@ export default function TraitsPage() {
   }, [feature]);
 
   return (
-    <div className="h-screen-full">
+    <div className="h-screen-full bg-[#404252]">
       <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader title="내 특성" onBack={() => navigate(-1)} />
         </div>
 
         <div
-          className="overflow-y-auto"
+          className="overflow-y-auto "
           style={{ height: `calc(100vh - 60px)` }}
         >
           <div className="px-4 py-4 space-y-6">
             {traits.map((trait) => {
               const cols = trait.topSummary.length;
               return (
-                <section key={trait.id} className="space-y-3">
+                <section key={trait.id} className="space-y-3 bg-white">
                   <div className="flex items-center justify-center gap-2">
                     <div className="flex items-center justify-center">
                       {trait.icon("w-[46px] h-[47px]")}
                     </div>
-                    <div className="text-[16px] leading-[20px] font-SemiBold text-[#4A4DFF]">
+                    <div className="text-title1 font-SemiBold text-[#4A4DFF]">
                       {trait.badge}
                     </div>
                     <button
@@ -203,7 +216,12 @@ export default function TraitsPage() {
                       className="ml-1 text-[#9B9BA1] active:opacity-70"
                       aria-label="edit"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
                         <path
                           d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25Z"
                           stroke="currentColor"
@@ -238,10 +256,10 @@ export default function TraitsPage() {
                             i === 0 ? "" : "border-l border-[#E8E8FB]",
                           ].join(" ")}
                         >
-                          <div className="text-[10px] leading-[12px] text-[#6666E5] font-SemiBold">
+                          <div className="text-callout2 text-[#6666E5] font-SemiBold">
                             {item.label}
                           </div>
-                          <div className="mt-1 text-[12px] leading-[16px] text-[#5B5D6B] font-Pretendard">
+                          <div className="mt-1 text-callout1 text-[#5B5D6B] font-Pretendard">
                             {item.value}
                           </div>
                         </div>
@@ -252,15 +270,16 @@ export default function TraitsPage() {
                   <div className="space-y-[10px]">
                     {trait.sections.map((section, i) => (
                       <div key={i}>
-                        <div className="text-[12px] leading-[16px] font-Medium text-[#6666E5]">
+                        <div className="text-callout1 font-Medium text-[#6666E5]">
                           {section.title}
                         </div>
-                        <div className="text-[12px] leading-[16px] font-Medium text-[#404252]">
+                        <div className="text-callout1 font-Medium text-[#404252]">
                           {section.items.join(", ")}
                         </div>
                       </div>
                     ))}
                   </div>
+                  <div className="h-[10px] bg-[#F3F3FA] -mx-4"></div>
                 </section>
               );
             })}
