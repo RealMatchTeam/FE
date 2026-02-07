@@ -24,25 +24,17 @@ export default function MatchingSection({
         onClick={onOpenReMatch}
         className="w-full items-center justify-between text-center rounded-[12px] bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB] px-7 py-4 flex active:opacity-95"
       >
-        <div>
-          <div className="text-[14px] font-Medium text-[#171718] leading-[20px]">
-            {displayName} 님은
+        <div className="flex h-full flex-col items-start justify-center gap-2 text-left">
+          <div className="text-title3 text-[#171718]">{displayName} 님은</div>
+          <div className="flex items-center gap-2">
+            <span className="text-[16px] leading-[20px] bg-gradient-to-r from-[#382FE4] via-[#5D5DFF] to-[#3915DA] bg-clip-text text-transparent font-semibold">
+              {displayCreatorType}
+            </span>
+            <div className="text-title3 text-[#171718]"> 입니다.</div>
           </div>
-          <span className="text-[16px] leading-[20px] bg-gradient-to-r from-[#382FE4] via-[#5D5DFF] to-[#3915DA] bg-clip-text text-transparent font-SemiBold">
-            {displayCreatorType}
-          </span>
-          <span className="text-[14px]  text-[#171718] font-Medium">
-            {" "}
-            입니다.
-          </span>
-          <br />
-          <span className="text-[16px] leading-[20px] bg-gradient-to-r from-[#382FE4] via-[#5D5DFF] to-[#3915DA] bg-clip-text text-transparent font-SemiBold">
-            {displayBrand}와
-          </span>
-          <span className="text-[14px]  text-[#171718] font-Medium">
-            {" "}
-            잘 어울려요.
-          </span>
+          <div className="text-callout1 text-[#B7B7F3] underline underline-offset-2">
+            재검사하기
+          </div>
         </div>
 
         <div className="w-[80px] h-[80px] grid place-items-center">
