@@ -13,7 +13,7 @@ const WEEK_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // 1. MATCHED 상태인 이벤트만 필터링
+  // MATCHED 상태인 이벤트만 필터링
   const matchedEvents = useMemo(() =>
     events.filter(event => event.status === "MATCHED"),
     [events]
@@ -76,13 +76,10 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
 
         {/* 주차별 렌더링 */}
         {weeks.map((week, weekIdx) => {
-          // 해당 주차의 실제 시작일과 종료일 (타임스탬프)
           const validDays = week.filter(d => d !== null) as number[];
           const weekStartTs = new Date(year, month - 1, validDays[0]).setHours(0, 0, 0, 0);
           const weekEndTs = new Date(year, month - 1, validDays[validDays.length - 1]).setHours(23, 59, 59, 999);
 
-          // 이번 주 범위 계산
-          // 이 주차에 걸쳐있는 이벤트 필터링
           const eventsInWeek = matchedEvents.filter(event => {
             const s = getTimestamp(event.startDate);
             const e = getTimestamp(event.endDate);
@@ -119,7 +116,7 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
                 );
               })}
 
-              {/* 2. 이벤트 바 레이어 (주차 내부로 이동) */}
+              {/* 2. 이벤트 바 레이어 */}
               <div className="absolute top-10 w-full flex flex-col gap-1 px-0.5">
                 {eventsInWeek.slice(0, 2).map((event) => {
                   const sTs = getTimestamp(event.startDate);
