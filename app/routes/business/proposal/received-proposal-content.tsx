@@ -5,8 +5,8 @@ import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
 
-import { getProposalDetail, getBrandDetail, approveCampaignProposal, rejectCampaignProposal, type ProposalDetail } from "./api/proposal";
-import type { BrandDetail } from "../../../data/brand";
+import { getProposalDetail, approveCampaignProposal, rejectCampaignProposal, type ProposalDetail } from "./api/proposal";
+import { getBrandSummary, type BrandSummary } from "./api/brand";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
@@ -20,7 +20,8 @@ export default function ReceivedProposalContent() {
     const proposalId = searchParams.get("id") || searchParams.get("proposalId");
 
     const [proposal, setProposal] = useState<ProposalDetail | null>(null);
-    const [brand, setBrand] = useState<BrandDetail | null>(null);
+    const [brand, setBrand] = useState<BrandSummary | null>(null);
+
     const [isLoading, setIsLoading] = useState(true);
     const [modalType, setModalType] = useState<"none" | "confirm" | "success">("none");
     const [isContentOpen, setIsContentOpen] = useState(false);
@@ -31,13 +32,12 @@ export default function ReceivedProposalContent() {
             if (!proposalId || typeof proposalId !== "string") return;
             try {
                 setIsLoading(true);
-                // 1. 제안 상세 정보 가져오기
+
                 const proposalResult = await getProposalDetail(proposalId);
                 setProposal(proposalResult);
 
-                // 2. 제안 정보에 있는 brandId로 브랜드 상세 정보 가져오기
                 if (proposalResult.brandId) {
-                    const brandResult = await getBrandDetail(proposalResult.brandId);
+                    const brandResult = await getBrandSummary(proposalResult.brandId);
                     setBrand(brandResult);
                 }
             } catch (error) {
@@ -77,11 +77,9 @@ export default function ReceivedProposalContent() {
     const handleRejectClick = async () => {
         if (!proposalId) return;
 
-        // 실제 서비스라면 여기서 거절 사유 입력 모달을 띄워야 합니다.
-        // 우선은 확인 창으로 대체합니다.
         const reason = window.prompt("거절 사유를 입력해주세요.", "일정이 맞지 않습니다.");
         
-        if (reason === null) return; // 취소 버튼 클릭 시
+        if (reason === null) return;
 
         try {
             setIsProcessing(true);
@@ -89,7 +87,6 @@ export default function ReceivedProposalContent() {
 
             if (response.isSuccess) {
                 alert("제안을 거절했습니다.");
-                // 거절 성공 후 리스트로 이동하거나 데이터를 새로고침합니다.
                 window.location.reload(); 
             } else {
                 alert(response.message || "거절 처리 중 오류가 발생했습니다.");
@@ -123,7 +120,9 @@ export default function ReceivedProposalContent() {
                         showChatSection={false}
                         statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"}
                         brandName={brand?.brandName}
-                        brandTags={brand?.brandTag}
+                        brandTags={brand?.brandTags}      
+                        brandImageUrl={brand?.brandImageUrl} 
+                        matchingRate={brand?.matchingRate} 
                     />
                     <div>
                         <h2 className="text-title1 text-text-black">{proposal.title}</h2>
@@ -204,7 +203,7 @@ export default function ReceivedProposalContent() {
             {/* 하단 고정 버튼 영역 */}
             <div className="px-4 py-5 flex gap-3 bg-[var(--color-bg-w)] sticky bottom-0 border-t border-[var(--color-text-gray5)]">
                 <button 
-                    onClick={handleRejectClick} // 클릭 이벤트 연결
+                    onClick={handleRejectClick} 
                     disabled={isProcessing}
                     className="flex-1 h-[52px] bg-[var(--color-bg-w)] border border-[var(--color-core-3)] rounded-xl text-core-1 text-title3 active:bg-gray-50 transition-colors disabled:opacity-50"
                 >

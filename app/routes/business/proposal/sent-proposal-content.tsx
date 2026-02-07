@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getProposalDetail, type ProposalDetail} from "./api/proposal";
-import type { BrandDetail } from "../../../data/brand";
+import { getBrandSummary, type BrandSummary } from "./api/brand";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -19,7 +19,7 @@ export default function ProposalContent() {
 
     // 데이터 상태 관리
     const [data, setData] = useState<ProposalDetail | null>(null);
-    const [brand] = useState<BrandDetail | null>(null);
+    const [brand, setBrand] = useState<BrandSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const proposalId = searchParams.get("proposalId");
@@ -37,7 +37,11 @@ export default function ProposalContent() {
                 const proposalResult = await getProposalDetail(proposalId);
                 setData(proposalResult);
 
-
+                // 2. 제안 정보에 brandId가 있다면 브랜드 요약 정보 조회
+                if (proposalResult.brandId) {
+                    const brandResult = await getBrandSummary(proposalResult.brandId);
+                    setBrand(brandResult);
+                }
 
             } catch (error) {
                 console.error("제안 상세 조회 실패:", error);
@@ -64,8 +68,9 @@ export default function ProposalContent() {
                     <CampaignBrandCard
                         showChatSection={false}
                         statusText={data.status}
-                        brandName={brand?.brandName}
-                        brandTags={brand?.brandTag}
+                        brandName={brand?.brandName || "브랜드명 로딩 중..."}
+                        brandTags={brand?.brandTags || []}
+                        brandImageUrl={brand?.brandImageUrl}
                     />
 
                     <div className="flex flex-col gap-4">
