@@ -1,21 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FilterBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onApply: (filter: string) => void;
   currentFilter: string;
+  filters?: string[];
+  title?: string;
 }
 
-const FILTERS = ["전체", "검토 중", "매칭", "거절"];
+const DEFAULT_FILTERS = ["전체", "검토 중", "매칭", "거절"];
 
 export default function FilterBottomSheet({
   isOpen,
   onClose,
   onApply,
   currentFilter,
+  filters,
+  title = "정렬 필터",
 }: FilterBottomSheetProps) {
   const [selected, setSelected] = useState(currentFilter);
+  const filterOptions = filters ?? DEFAULT_FILTERS;
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelected(currentFilter);
+    }
+  }, [currentFilter, isOpen]);
 
   if (!isOpen) return null;
 
@@ -36,14 +47,14 @@ export default function FilterBottomSheet({
         {/* 1. 헤더 영역 */}
         <div className="px-4 pt-8 pb-4">
           <div className="inline-block border-b-2 border-[var(--color-core-1)] pb-1">
-            <span className="text-title7 text-[var(--color-text-black)]">정렬 필터</span>
+            <span className="text-title7 text-[var(--color-text-black)]">{title}</span>
           </div>
         </div>
         
         {/* 2. 필터 옵션 영역 */}
         <div className="w-full bg-[var(--color-bluegray-1)] py-4">
           <div className="flex items-center justify-start gap-8 px-4">
-            {FILTERS.map((filter) => (
+            {filterOptions.map((filter) => (
               <button
                 key={filter}
                 onClick={() => setSelected(filter)}
