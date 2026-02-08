@@ -113,7 +113,6 @@ export const approveCampaignProposal = async (campaignProposalId: string | numbe
 };
 
 // 받은 캠페인 제안 거절 API
-
 export const rejectCampaignProposal = async (
   campaignProposalId: string | number,
   rejectReason: string
@@ -127,6 +126,45 @@ export const rejectCampaignProposal = async (
     return response.data;
   } catch (error) {
     console.error("제안 거절 실패:", error);
+    throw error;
+  }
+};
+
+// 보낸 캠페인 제안 취소 API
+export const cancelCampaignProposal = async (
+  campaignProposalId: string | number
+): Promise<ApiResponse<string>> => {
+  try {
+    const response = await axiosInstance.patch<ApiResponse<string>>(
+      `/v1/campaigns/proposal/${campaignProposalId}/cancel`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("제안 취소 실패:", error);
+    if (error instanceof AxiosError) {
+      const errorMessage = error.response?.data?.message || "제안 취소에 실패했습니다.";
+      throw new Error(errorMessage);
+    }
+    throw error;
+  }
+};
+
+// 캠페인 지원 취소 API
+
+export const cancelCampaignApply = async (
+  campaignApplyId: string | number
+): Promise<ApiResponse<string>> => {
+  try {
+    const response = await axiosInstance.patch<ApiResponse<string>>(
+      `/v1/campaigns/apply/${campaignApplyId}/cancel`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("지원 취소 실패:", error);
+    if (error instanceof AxiosError) {
+      const errorMessage = error.response?.data?.message || "지원 취소에 실패했습니다.";
+      throw new Error(errorMessage);
+    }
     throw error;
   }
 };

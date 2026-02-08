@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-import { getAppliedCampaignDetail, type AppliedCampaignDetail } from "./api/proposal";
+import { getAppliedCampaignDetail, cancelCampaignApply, type AppliedCampaignDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import Modal from "../../../components/common/Modal";
 
@@ -58,12 +59,40 @@ export default function ApplicationContent() {
     }, [applicationId]);
 
     const handleCancelSubmit = async () => {
-        try {
-            console.log("지원 취소 프로세스 시작");
+    if (!applicationId || !data) return;
+
+    if (data.status !== "REVIEWING") {
+        alert("검토 중인 상태에서만 취소가 가능합니다.");
+        setIsModalOpen(false);
+        return;
+    }
+
+    try {
+        const response = await cancelCampaignApply(applicationId);
+        if (response.isSuccess) {
             setModalStep("COMPLETE");
-        } catch (error) {
-            console.error("취소 실패:", error);
         }
+    } catch (error: unknown) {
+            console.error("취소 실패:", error);
+            
+            let errorMessage = "지원 취소 권한이 없거나 오류가 발생했습니다.";
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === "string") {
+                errorMessage = error;
+            }
+
+            alert(errorMessage);
+            setIsModalOpen(false);
+        }
+};
+
+    const navigate = useNavigate();
+
+    const handleComplete = () => {
+        setIsModalOpen(false);
+        navigate(-1); 
     };
 
     if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
@@ -132,6 +161,7 @@ export default function ApplicationContent() {
                 </div>
 
                 {/* 하단 버튼 영역 */}
+                {data.status !== "CANCELED" && (
                 <div className="px-4 py-5 flex justify-end bg-bg-w border-t border-bluegray-2">
                     <button
                         onClick={() => setIsModalOpen(true)} 
@@ -140,6 +170,7 @@ export default function ApplicationContent() {
                         취소하기
                     </button>
                 </div>
+            )}
             </main>
 
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
@@ -181,7 +212,7 @@ export default function ApplicationContent() {
                                 브랜드에게 보낸<br />제안이 취소되었습니다
                             </p>
                             <button
-                                onClick={handleCloseModal}
+                                onClick={handleComplete}
                                 className="w-full py-4 bg-[#6366f1] text-white rounded-[16px] font-bold text-[18px]"
                             >
                                 완료하기

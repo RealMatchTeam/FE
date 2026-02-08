@@ -122,7 +122,6 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
                   const sTs = getTimestamp(event.startDate);
                   const eTs = getTimestamp(event.endDate);
 
-                  // 주차 내에서 시작 요일(0~6) 찾기
                   let startCol = 0;
                   for (let i = 0; i < 7; i++) {
                     if (week[i] !== null) {
@@ -131,7 +130,6 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
                     }
                   }
 
-                  // 주차 내에서 종료 요일(0~6) 찾기
                   let endCol = 6;
                   for (let i = 6; i >= 0; i--) {
                     if (week[i] !== null) {
