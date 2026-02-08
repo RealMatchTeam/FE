@@ -11,7 +11,6 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
-//import { MATCHING_DUMMY_DATA } from "../calendar/api/calendar";
 
 export default function CalendarContent() {
   const navigate = useNavigate();
@@ -41,13 +40,12 @@ export default function CalendarContent() {
     fetchCampaigns();
   }, [matchingSubTab]);
 
-  // 상태 변환 헬퍼 함수
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {
       case "MATCHED":
         return "매칭";
       case "REVIEWING":
-      case "NONE": 
+      case "NONE":
         return "검토 중";
       case "REJECTED":
         return "거절";
@@ -73,37 +71,44 @@ export default function CalendarContent() {
 
   const todayStr = new Date().toISOString().split('T')[0];
   const currentMonthStr = todayStr.substring(0, 7);
+
   const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
 
   const filteredList = campaigns.filter((item) => {
+    if (item.status !== "MATCHED") return false;
+
     if (activeTab === "today") {
       return item.startDate <= todayStr && item.endDate >= todayStr;
+    } else {
+      const startMonth = item.startDate.substring(0, 7);
+      const endMonth = item.endDate.substring(0, 7);
+      return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
     }
-    return item.startDate.includes(currentMonthStr) || item.endDate.includes(currentMonthStr);
   });
 
   const handleCardClick = (item: CampaignCollaboration) => {
-  const proposalId = item.proposalId || item.campaignId;
+    const proposalId = item.proposalId || item.campaignId;
 
-  // 1. 거절 상태일 때
-  if (item.status === "REJECTED") {
-    navigate(`/rejection?proposalId=${proposalId}`);
-    return;
-  }
+    if (item.status === "REJECTED") {
+      navigate(`/rejection?proposalId=${proposalId}`);
+      return;
+    }
 
-  // 2. 지원하기 타입일 때
-  if (item.type === "APPLIED") {
-    navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
-    return;
-  }
+    if (item.type === "APPLIED") {
+      navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
+      return;
+    }
 
-  // 3. 그 외 기본
-  navigate(`/business/proposal?proposalId=${proposalId}`);
-};
+    if (item.type === "RECEIVED") {
+      navigate(`/business/proposal?type=received&proposalId=${proposalId}`);
+      return;
+    }
+
+    navigate(`/business/proposal?type=sent&proposalId=${proposalId}`);
+  };
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
-      {/* 탭 네비게이션 */}
       <div className="flex w-full bg-bg-w border-b border-text-gray5">
         <button
           onClick={() => setMainTab("collaboration")}
@@ -129,7 +134,7 @@ export default function CalendarContent() {
 
       <main className="flex flex-col flex-1">
         {mainTab === "collaboration" ? (
-          /* [A] 협업 현황 */
+          /* 협업 현황 */
           <div className="flex flex-col gap-6 px-4 py-6">
             {/* 주간 캘린더 연동 */}
             <section className="flex flex-col gap-3">
@@ -142,7 +147,6 @@ export default function CalendarContent() {
               <MonthlyCalendar events={calendarEvents} />
             </section>
 
-            {/* 하단 리스트 섹션 */}
             <section className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <button
@@ -167,10 +171,11 @@ export default function CalendarContent() {
                     <CampaignCard
                       key={cp.campaignId || cp.proposalId}
                       campaignId={cp.campaignId}
+                      proposalId={cp.proposalId ?? undefined}
+                      type={cp.type}
                       brand={cp.brandName}
                       title={cp.title}
                       logo={cp.thumbnailUrl}
-
                       startDate={cp.startDate.split('-').slice(1).join('.')}
                       endDate={cp.endDate.split('-').slice(1).join('.')}
                     />
@@ -184,7 +189,7 @@ export default function CalendarContent() {
             </section>
           </div>
         ) : (
-          /* [B] 매칭 현황 */
+          /* 매칭 현황 */
           <div className="flex flex-col flex-1">
             <MatchingTabSection
               subTab={matchingSubTab}
@@ -216,6 +221,7 @@ export default function CalendarContent() {
                       status={getStatusLabel(item.status)}
                       date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)}
                       actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
+                      logo={item.thumbnailUrl}
                       onClick={() => handleCardClick(item)}
                     />
                   ))

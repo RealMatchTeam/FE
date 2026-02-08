@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getAppliedCampaignDetail, type AppliedCampaignDetail } from "./api/proposal";
-
+import { getBrandSummary, type BrandSummary } from "./api/brand";
 import Modal from "../../../components/common/Modal";
 
 import Header from "../../../components/layout/Header";
@@ -17,6 +17,8 @@ import closeIcon from "../../../assets/icon/icon-close.svg";
 export default function ApplicationContent() {
     const [searchParams] = useSearchParams();
     const [data, setData] = useState<AppliedCampaignDetail | null>(null);
+
+    const [brand, setBrand] = useState<BrandSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,8 +42,14 @@ export default function ApplicationContent() {
                 setIsLoading(true);
                 const result = await getAppliedCampaignDetail(applicationId as string);
                 setData(result);
+
+        
+                if (result.campaignId) { 
+                    const brandResult = await getBrandSummary(result.campaignId); 
+                    setBrand(brandResult);
+                }
             } catch (error) {
-                console.error("지원 상세 조회 실패:", error);
+                console.error("데이터 로드 실패:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -81,8 +89,10 @@ export default function ApplicationContent() {
                     <CampaignBrandCard
                         showChatSection={false}
                         statusText={getStatusLabel(data.status)} 
-                        brandName={data.brandName || "브랜드 정보 없음"}
-                        brandTags={["#지원완료"]}
+                        brandName={brand?.brandName || data.brandName} 
+                        brandTags={brand?.brandTags || ["지원완료"]} 
+                        brandImageUrl={brand?.brandImageUrl} 
+                        matchingRate={brand?.matchingRate} 
                     />
 
                     <div className="flex flex-col gap-6">

@@ -6,6 +6,7 @@ interface MatchingCardProps {
   status: "매칭" | "검토 중" | "거절";
   date: string;
   actionLabel: string;
+  logo?: string;
   onClick?: () => void;
 }
 
@@ -14,9 +15,10 @@ export default function MatchingCard({
   status,
   date,
   actionLabel,
+  logo,
   onClick,
 }: MatchingCardProps) {
-  // 상태에 따른 텍스트 컬러
+
   const getStatusStyle = () => {
     switch (status) {
       case "매칭":
@@ -33,7 +35,13 @@ export default function MatchingCard({
     <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-bluegray-1">
       {/* 브랜드 로고 박스 */}
       <div className="w-16 h-16 flex items-center justify-center border border-text-gray5 rounded-lg bg-white overflow-hidden flex-shrink-0">
-        <span className="text-title5 text-text-gray3 text-center">{brand}</span>
+        {logo ? (
+          <img src={logo} alt={brand} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-title5 text-text-gray3 text-center px-1 break-all">
+            {brand}
+          </span>
+        )}
       </div>
 
       {/* 정보 및 버튼 영역 */}
@@ -54,7 +62,7 @@ export default function MatchingCard({
         </div>
 
         <div className="flex gap-2 items-center">
-          {/* 액션 버튼 (제안 보기 / 지원 보기 / 거절 사유 보기) */}
+          {/* 제안 보기 / 지원 보기 / 거절 사유 보기 */}
           <button 
             onClick={onClick} 
             className="flex-1 py-2 flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-lg transition-all hover:bg-bluegray-3 active:scale-[0.98]"

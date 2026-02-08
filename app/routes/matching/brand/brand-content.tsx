@@ -48,7 +48,7 @@ export default function BrandContent() {
             return response;
         },
         initialPageParam: 0,
-        getNextPageParam: () => undefined, // 단일 페이지
+        getNextPageParam: () => undefined, 
         staleTime: 1000 * 60 * 1, // 1분간 캐시 유지
     });
 
