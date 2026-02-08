@@ -4,32 +4,33 @@ import Section from "./CommonSection";
 import TraitCard from "./TraitCard";
 import TraitModal from "./TraitModal";
 import { TRAITS } from "./traitData";
+import { tagName } from "../../../../constants/tagNameById";
 type FeatureData = {
   beautyType?: {
-    skinType?: string[] | null;
-    skinBrightness?: string | null;
-    makeupStyle?: string[] | null;
-    interestCategories?: string[] | null;
-    interestFunctions?: string[] | null;
+    skinType?: number[] | null;
+    skinBrightness?: number[] | null;
+    makeupStyle?: number[] | null;
+    interestCategories?: number[] | null;
+    interestFunctions?: number[] | null;
   } | null;
   fashionType?: {
-    height?: string | null;
-    bodyShape?: string | null;
-    topSize?: string | null;
-    bottomSize?: string | null;
-    interestFields?: string[] | null;
-    interestStyles?: string[] | null;
-    interestBrands?: string[] | null;
+    height?: number[] | null;
+    bodyShape?: number[] | null;
+    topSize?: number[] | null;
+    bottomSize?: number[] | null;
+    interestFields?: number[] | null;
+    interestStyles?: number[] | null;
+    interestBrands?: number[] | null;
   } | null;
   contentsType?: {
-    viewerGender?: string[] | null;
-    viewerAge?: string[] | null;
-    avgVideoLength?: string | null;
-    avgViews?: string | null;
-    contentFormats?: string[] | null;
-    contentTones?: string[] | null;
-    desiredInvolvement?: string[] | null;
-    desiredUsageScope?: string[] | null;
+    viewerGender?: number[] | null;
+    viewerAge?: number[] | null;
+    avgVideoLength?: number[] | null;
+    avgViews?: number[] | null;
+    contentFormats?: number[] | null;
+    contentTones?: number[] | null;
+    desiredInvolvement?: number[] | null;
+    desiredUsageScope?: number[] | null;
   } | null;
 };
 
@@ -49,34 +50,39 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
     const fashion = feature.fashionType;
     const content = feature.contentsType;
 
+    const names = (ids?: number[] | null) =>
+      (ids ?? [])
+        .map((id) => tagName(id))
+        .filter((value): value is string => Boolean(value));
+
     return TRAITS.map((trait) => {
       if (trait.id === "beauty") {
         return {
           ...trait,
           previewLines: [
-            { label: "피부 타입", value: (beauty?.skinType ?? []).join(", ") },
-            { label: "피부 밝기", value: beauty?.skinBrightness ?? "" },
+            { label: "피부 타입", value: names(beauty?.skinType).join(", ") },
+            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
             {
               label: "메이크업 \n스타일",
-              value: (beauty?.makeupStyle ?? []).join(", "),
+              value: names(beauty?.makeupStyle).join(", "),
             },
           ],
           topSummary: [
-            { label: "피부타입", value: (beauty?.skinType ?? []).join(", ") },
-            { label: "피부 밝기", value: beauty?.skinBrightness ?? "" },
+            { label: "피부타입", value: names(beauty?.skinType).join(", ") },
+            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
             {
               label: "메이크업 스타일",
-              value: (beauty?.makeupStyle ?? []).join(", "),
+              value: names(beauty?.makeupStyle).join(", "),
             },
           ],
           sections: [
             {
               title: "관심 카테고리",
-              items: beauty?.interestCategories ?? [],
+              items: names(beauty?.interestCategories),
             },
             {
               title: "관심 기능",
-              items: beauty?.interestFunctions ?? [],
+              items: names(beauty?.interestFunctions),
             },
           ],
         };
@@ -86,29 +92,29 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
         return {
           ...trait,
           previewLines: [
-            { label: "키", value: fashion?.height ?? "" },
-            { label: "체형", value: fashion?.bodyShape ?? "" },
-            { label: "상의", value: fashion?.topSize ?? "" },
-            { label: "하의", value: fashion?.bottomSize ?? "" },
+            { label: "키", value: names(fashion?.height).join(", ") },
+            { label: "체형", value: names(fashion?.bodyShape).join(", ") },
+            { label: "상의", value: names(fashion?.topSize).join(", ") },
+            { label: "하의", value: names(fashion?.bottomSize).join(", ") },
           ],
           topSummary: [
-            { label: "키/몸무게", value: fashion?.height ?? "" },
-            { label: "체형", value: fashion?.bodyShape ?? "" },
-            { label: "상의 사이즈", value: fashion?.topSize ?? "" },
-            { label: "하의 사이즈", value: fashion?.bottomSize ?? "" },
+            { label: "키/몸무게", value: names(fashion?.height).join(", ") },
+            { label: "체형", value: names(fashion?.bodyShape).join(", ") },
+            { label: "상의 사이즈", value: names(fashion?.topSize).join(", ") },
+            { label: "하의 사이즈", value: names(fashion?.bottomSize).join(", ") },
           ],
           sections: [
             {
               title: "관심 분야",
-              items: fashion?.interestFields ?? [],
+              items: names(fashion?.interestFields),
             },
             {
               title: "관심 스타일",
-              items: fashion?.interestStyles ?? [],
+              items: names(fashion?.interestStyles),
             },
             {
               title: "관심 브랜드",
-              items: fashion?.interestBrands ?? [],
+              items: names(fashion?.interestBrands),
             },
           ],
         };
@@ -118,39 +124,45 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
         return {
           ...trait,
           previewLines: [
-            { label: "성별", value: (content?.viewerGender ?? []).join(", ") },
-            { label: "나이대", value: (content?.viewerAge ?? []).join(", ") },
-            { label: "평균 길이", value: content?.avgVideoLength ?? "" },
-            { label: "평균 조회수", value: content?.avgViews ?? "" },
+            { label: "성별", value: names(content?.viewerGender).join(", ") },
+            { label: "나이대", value: names(content?.viewerAge).join(", ") },
+            {
+              label: "평균 길이",
+              value: names(content?.avgVideoLength).join(", "),
+            },
+            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
           ],
           topSummary: [
             {
               label: "주 시청자 성별",
-              value: (content?.viewerGender ?? []).join(", "),
+              value: names(content?.viewerGender).join(", "),
             },
             {
               label: "주 시청자 나이대",
-              value: (content?.viewerAge ?? []).join(", "),
+              value: names(content?.viewerAge).join(", "),
             },
-            { label: "평균 영상 길이", value: content?.avgVideoLength ?? "" },
-            { label: "평균 조회수", value: content?.avgViews ?? "" },
+            {
+              label: "평균 영상 길이",
+              value: names(content?.avgVideoLength).join(", "),
+            },
+            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
           ],
           sections: [
             {
               title: "콘텐츠 형식",
-              items: content?.contentFormats ?? [],
+              items: names(content?.contentFormats),
             },
             {
               title: "브랜드 톤",
-              items: content?.contentTones ?? [],
+              items: names(content?.contentTones),
             },
             {
               title: "희망 관여도",
-              items: content?.desiredInvolvement ?? [],
+              items: names(content?.desiredInvolvement),
             },
             {
               title: "희망 활용 범위",
-              items: content?.desiredUsageScope ?? [],
+              items: names(content?.desiredUsageScope),
             },
           ],
         };
