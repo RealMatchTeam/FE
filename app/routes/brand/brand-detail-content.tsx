@@ -11,7 +11,6 @@ import ProductMiniCard from "./components/ProductMiniCard";
 import HistoryRow from "./components/HistoryRow";
 
 import { tokenStorage } from "../../lib/token";
-import { createOrGetDirectRoom } from "../rooms/api/rooms";
 import { toggleBrandLike } from "../matching/api/matching";
 
 import type { BrandDetailData } from "./types";
@@ -31,7 +30,9 @@ export default function BrandDetailContent({ data }: Props) {
 
   const handleLoadMoreHistory = () => setHistoryLimit((prev) => prev + 4);
 
-  const handleChat = async () => {
+  const handleChat = () => {
+    console.log("go:", `/rooms/brand/${brandId}`);
+
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
       navigate("/auth/login");
@@ -40,18 +41,7 @@ export default function BrandDetailContent({ data }: Props) {
 
     if (!Number.isFinite(brandId) || brandId <= 0) return;
 
-    const creatorId = Number(data.userId);
-    if (!Number.isFinite(creatorId) || creatorId <= 0) return;
-
-    try {
-      const result = await createOrGetDirectRoom({ brandId, creatorId });
-
-      navigate(`/rooms/${result.roomId}`, {
-        state: { creatorId, brandId },
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    navigate(`/rooms/brand/${brandId}`);
   };
 
   const handleToggleHeart = async () => {
@@ -74,8 +64,7 @@ export default function BrandDetailContent({ data }: Props) {
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto min-h-screen max-w-[430px] bg-white">
-
-<BrandHero heroImageUrl={heroUrl} logoText={data.logoText ?? ""} />
+        <BrandHero heroImageUrl={heroUrl} logoText={data.logoText ?? ""} />
         <div className="px-5 pb-10">
           <BrandInfo
             name={data.name}
@@ -108,11 +97,18 @@ export default function BrandDetailContent({ data }: Props) {
 
           <section className="py-5">
             {(data.tagSections ?? []).map((sec, idx) => (
-              <div key={`${sec.title}-${idx}`} className={idx === 0 ? "" : "mt-6"}>
+              <div
+                key={`${sec.title}-${idx}`}
+                className={idx === 0 ? "" : "mt-6"}
+              >
                 <div className="text-title7 text-text-black">{sec.title}</div>
                 <div className="mt-4 space-y-4">
                   {sec.groups.map((g) => (
-                    <TagGroup key={`${sec.title}-${g.label}`} label={g.label} chips={g.chips} />
+                    <TagGroup
+                      key={`${sec.title}-${g.label}`}
+                      label={g.label}
+                      chips={g.chips}
+                    />
                   ))}
                 </div>
               </div>
@@ -121,14 +117,21 @@ export default function BrandDetailContent({ data }: Props) {
 
           <DividerBlock />
 
-          <OngoingCampaignSection campaigns={data.ongoingCampaigns} onMore={() => console.log("캠페인 더보기")} />
+          <OngoingCampaignSection
+            campaigns={data.ongoingCampaigns}
+            onMore={() => console.log("캠페인 더보기")}
+          />
 
           <DividerBlock />
 
           <section className="py-5">
             <div className="flex items-center justify-between">
               <div className="text-title7 text-text-black">협찬 가능 제품</div>
-              <button type="button" className="text-[18px] text-text-gray3" aria-label="more">
+              <button
+                type="button"
+                className="text-[18px] text-text-gray3"
+                aria-label="more"
+              >
                 ›
               </button>
             </div>
@@ -176,5 +179,7 @@ export default function BrandDetailContent({ data }: Props) {
 }
 
 function DividerBlock() {
-  return <div className="relative left-1/2 mt-5 h-2 w-screen -translate-x-1/2 bg-bluegray-1" />;
+  return (
+    <div className="relative left-1/2 mt-5 h-2 w-screen -translate-x-1/2 bg-bluegray-1" />
+  );
 }
