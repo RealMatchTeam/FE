@@ -28,6 +28,7 @@ export interface MatchResult {
 }
 
 export interface MatchResponseDto {
+  userName: string;
   userType: string;
   typeTag: string[];
   highMatchingBrandList: {
@@ -361,9 +362,8 @@ export const getMatchingBrands = async (
 
 export const getBrandFilters = async (): Promise<BrandFilterResponseDto[]> => {
   try {
-    const response = await apiClient.get<BrandFilterResponse>(
-      "/v1/brands/filters",
-    );
+    const response =
+      await apiClient.get<BrandFilterResponse>("/v1/brands/filters");
 
     if (!response.data.isSuccess) {
       throw new Error(response.data.message || "브랜드 필터 조회 실패");
@@ -402,10 +402,16 @@ export const toggleBrandLike = async (brandId: number): Promise<boolean> => {
   if (typeof r === "boolean") return r;
 
   if (typeof r === "object" && r !== null) {
-    if ("brandIsLiked" in r && typeof (r as { brandIsLiked?: unknown }).brandIsLiked === "boolean") {
+    if (
+      "brandIsLiked" in r &&
+      typeof (r as { brandIsLiked?: unknown }).brandIsLiked === "boolean"
+    ) {
       return (r as { brandIsLiked: boolean }).brandIsLiked;
     }
-    if ("isLiked" in r && typeof (r as { isLiked?: unknown }).isLiked === "boolean") {
+    if (
+      "isLiked" in r &&
+      typeof (r as { isLiked?: unknown }).isLiked === "boolean"
+    ) {
       return (r as { isLiked: boolean }).isLiked;
     }
   }
@@ -513,7 +519,9 @@ export interface MatchRequestDto {
   };
 }
 
-export const analyzeMatch = async (data: MatchRequestDto): Promise<MatchResult> => {
+export const analyzeMatch = async (
+  data: MatchRequestDto,
+): Promise<MatchResult> => {
   try {
     const response = await apiClient.post<MatchResultResponse>(
       "/v1/matches",
@@ -538,7 +546,9 @@ interface CampaignLikeResponse {
   result: string;
 }
 
-export const toggleCampaignLike = async (campaignId: number): Promise<string> => {
+export const toggleCampaignLike = async (
+  campaignId: number,
+): Promise<string> => {
   const response = await apiClient.post<CampaignLikeResponse>(
     `/v1/campaigns/${campaignId}/like`,
     {},

@@ -14,6 +14,9 @@ import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
 import MatchAnalysisSection from "./components/MatchAnalysisSection";
 import CreatorProfileCard from "./components/CreatorProfileCard";
+
+import { useMatchResultStore } from "../../stores/matching-result";
+
 import {
   getMatchingBrands,
   getMatchingCampaigns,
@@ -32,7 +35,8 @@ type CampaignSort = "MATCH_SCORE" | "POPULARITY" | "REWARD_AMOUNT" | "D_DAY";
 const toApiCategory = (ui: CategoryKey): ApiCategoryFilter =>
   ui === "beauty" ? "BEAUTY" : "FASHION";
 
-const toTypeParam = (ui: CategoryKey) => (ui === "beauty" ? "BEAUTY" : "FASHION");
+const toTypeParam = (ui: CategoryKey) =>
+  ui === "beauty" ? "BEAUTY" : "FASHION";
 
 const pickFirst = (arr?: string[]) => (Array.isArray(arr) ? arr[0] : undefined);
 
@@ -51,11 +55,15 @@ export default function HomeAfterMatchPage() {
     [],
   );
 
-  const [profileCard, setProfileCard] = useState<ProfileCardResult | null>(null);
+  const [profileCard, setProfileCard] = useState<ProfileCardResult | null>(
+    null,
+  );
   const [feature, setFeature] = useState<MeFeatureResult | null>(null);
 
   const brandLikeInFlight = useRef<Set<number>>(new Set());
   const campaignLikeInFlight = useRef<Set<number>>(new Set());
+
+  const matchResult = useMatchResultStore((s) => s.result);
 
   useEffect(() => {
     let alive = true;
@@ -79,7 +87,7 @@ export default function HomeAfterMatchPage() {
     const fetchCreatorExtra = async () => {
       const [profileRes, featureRes] = await Promise.allSettled([
         apiClient.get<ProfileCardResponse>("/v1/users/me/profile-card"),
-        apiClient.get<MeFeatureResponse>("/v1/me/feature"),
+        apiClient.get<MeFeatureResponse>("/v1/users/me/feature"),
       ]);
 
       if (!alive) return;
@@ -93,7 +101,10 @@ export default function HomeAfterMatchPage() {
         setProfileCard(null);
       }
 
-      if (featureRes.status === "fulfilled" && featureRes.value.data?.isSuccess) {
+      if (
+        featureRes.status === "fulfilled" &&
+        featureRes.value.data?.isSuccess
+      ) {
         setFeature(featureRes.value.data.result);
       } else {
         setFeature(null);
@@ -161,6 +172,24 @@ export default function HomeAfterMatchPage() {
     };
   }, [profileCard, feature]);
 
+  const profileModel = useMemo<CreatorProfileModel | null>(() => {
+    if (profile) return profile;
+
+    if (!matchResult) return null;
+
+    return {
+      creatorName: matchResult.summary.userName,
+      creatorType: "creator",
+      summary: matchResult.summary.userType,
+      highlightBrandText: matchResult.summary.recommendedBrand,
+      traits: {
+        beauty: matchResult.summary.traits.beauty,
+        fashion: matchResult.summary.traits.style,
+        content: matchResult.summary.traits.content,
+      },
+    };
+  }, [profile, matchResult]);
+
   const handleBrandLikeToggle = async (id: string) => {
     const brandId = Number(id);
     if (!Number.isFinite(brandId) || brandId <= 0) return;
@@ -201,7 +230,6 @@ export default function HomeAfterMatchPage() {
 
     const currentCampaign =
       findCurrent(campaigns) ?? findCurrent(popularCampaigns);
-
     if (!currentCampaign) return;
 
     const campaignId = getCampaignIdForLike(currentCampaign);
@@ -285,9 +313,7 @@ export default function HomeAfterMatchPage() {
                 }}
                 onClick={() =>
                   navigate(
-                    `/brand?brandId=${brand.id}&domain=${
-                      brand.name?.toLowerCase() || ""
-                    }`,
+                    `/brand?brandId=${brand.id}&domain=${brand.name?.toLowerCase() || ""}`,
                   )
                 }
                 onLikeToggle={handleBrandLikeToggle}
@@ -335,10 +361,10 @@ export default function HomeAfterMatchPage() {
           </div>
         </section>
 
-        {profile && (
+        {profileModel && (
           <div className="mt-8 px-1">
             <CreatorProfileCard
-              model={profile}
+              model={profileModel}
               onMyProfileClick={() => navigate("/mypage")}
             />
           </div>
