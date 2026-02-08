@@ -27,7 +27,7 @@ export default function BrandEntry() {
           creatorId: myUserId,
         });
         console.log(roomId);
-        navigate(`/rooms/room/${roomId}`, { replace: true });
+        navigate(`/rooms/${roomId}`, { replace: true });
       } catch (e) {
         console.error(e);
       }
