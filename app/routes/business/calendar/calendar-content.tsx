@@ -20,6 +20,8 @@ export default function CalendarContent() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("전체");
 
+  const [keyword, setKeyword] = useState("");
+
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,8 +30,9 @@ export default function CalendarContent() {
       try {
         setIsLoading(true);
         const data = await getMyCollaborations({
-          type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED"
-        });
+          type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
+          keyword: keyword || undefined,
+        } as any);
         setCampaigns(data || []);
       } catch (error) {
         console.error("로드 실패:", error);
@@ -38,7 +41,7 @@ export default function CalendarContent() {
       }
     };
     fetchCampaigns();
-  }, [matchingSubTab]);
+  }, [matchingSubTab, keyword]);
 
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {
@@ -194,8 +197,9 @@ export default function CalendarContent() {
             <MatchingTabSection
               subTab={matchingSubTab}
               setSubTab={setMatchingSubTab}
-
               receivedCount={campaigns.filter(c => c.type === "RECEIVED").length}
+              keyword={keyword}
+              setKeyword={setKeyword}
             />
 
             <div className="flex flex-col gap-4 px-4 flex-1">

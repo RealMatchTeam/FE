@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { getProposalDetail, type ProposalDetail} from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
+import { cancelCampaignProposal } from "./api/proposal";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -16,8 +17,8 @@ import profileIcon from "../../../assets/icon-profile.svg";
 export default function ProposalContent() {
     const [searchParams] = useSearchParams();
     const [isContentOpen, setIsContentOpen] = useState(false);
+    const navigate = useNavigate();
 
-    // 데이터 상태 관리
     const [data, setData] = useState<ProposalDetail | null>(null);
     const [brand, setBrand] = useState<BrandSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +38,6 @@ export default function ProposalContent() {
                 const proposalResult = await getProposalDetail(proposalId);
                 setData(proposalResult);
 
-                // 2. 제안 정보에 brandId가 있다면 브랜드 요약 정보 조회
                 if (proposalResult.brandId) {
                     const brandResult = await getBrandSummary(proposalResult.brandId);
                     setBrand(brandResult);
@@ -55,8 +55,24 @@ export default function ProposalContent() {
     if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
     if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
 
-    // 태그 배열을 문자열로 변환하는 헬퍼 함수
     const getTagNames = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
+
+    const handleCancel = async () => {
+        if (!proposalId) return;
+        
+        if (!window.confirm("제안을 취소하시겠습니까?")) return;
+
+        try {
+            const response = await cancelCampaignProposal(proposalId);
+            
+            if (response.isSuccess) {
+                alert("캠페인 제안을 취소했습니다.");
+                navigate(-1); 
+            }
+        } catch (error: any) {
+            alert(error.message || "취소 중 오류가 발생했습니다.");
+        }
+    };
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
@@ -143,7 +159,7 @@ export default function ProposalContent() {
                     <div className="grid grid-cols-2 gap-4">
                         <CampaignInfoGroup label="협찬품">
                             <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 flex justify-between items-center text-text-gray1">
-                                <span className="truncate">상품 ID: {data.productId}</span>
+                                <span className="truncate">{data.productId}</span>
                                 <img src={arrowRightIcon} alt="arrow" className="w-4 h-4 opacity-30" />
                             </div>
                         </CampaignInfoGroup>
@@ -170,10 +186,16 @@ export default function ProposalContent() {
                 </div>
 
                 <div className="px-4 py-5 flex justify-end bg-bg-w">
-                    <button className="px-4 py-2 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors">
-                        취소하기
-                    </button>
-                </div>
+            {/* 상태가 REVIEWING일 때만 취소 버튼 */}
+            {data.status === "REVIEWING" && (
+                <button 
+                    onClick={handleCancel} 
+                    className="px-4 py-2 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
+                >
+                    취소하기
+                </button>
+            )}
+        </div>
             </main>
         </div>
     );

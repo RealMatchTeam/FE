@@ -1,5 +1,3 @@
-// updatedAt을 "25.01.06", "14:00" 형태로 만들기
-// (updatedAt이 ISO 문자열이라고 가정)
 
 export function formatKoreanDateTime(updatedAt: string) {
   const d = new Date(updatedAt);

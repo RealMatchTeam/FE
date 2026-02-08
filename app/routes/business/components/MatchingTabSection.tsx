@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { searchCollaborations, type CampaignCollaboration} from "../calendar/api/calendar"; 
 import searchIcon from "../../../assets/search2.svg";
 import closeIcon from "../../../assets/cancel.svg"; 
+
 
 interface Props {
   subTab: "sent" | "received" | "applied";
   setSubTab: (tab: "sent" | "received" | "applied") => void;
-  receivedCount?: number; // 받은 제안 개수를 동적으로 표시하기 위한 옵션
+  receivedCount?: number; 
+  keyword: string; 
+  setKeyword: (keyword: string) => void;
 }
 
 function TabButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
@@ -27,30 +31,70 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
 export default function MatchingTabSection({ subTab, setSubTab, receivedCount }: Props) {
   const [isSearching, setIsSearching] = useState(false);
   const [query, setQuery] = useState("");
+  const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      if (!query.trim()) return;
+      setIsLoading(true);
+      try {
+        const data = await searchCollaborations({
+          keyword: query,
+          type: subTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
+        });
+        setCampaigns(data || []);
+      } catch (error) {
+        console.error("검색 실패:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isSearching) {
+      fetchCampaigns();
+    } else {
+      setCampaigns([]); 
+    }
+  }, [isSearching, query, subTab]);
 
   if (isSearching) {
     return (
-      <div className="flex items-center w-full px-4 py-3 animate-slide-up">
-        {/* 검색창 컨테이너 */}
-        <div className="flex items-center w-full relative bg-bg-w border border-core-2 rounded-[8px] px-3 py-2">
-          {/* 돋보기 아이콘 */}
-          <img src={searchIcon} alt="search" className="w-4 h-4 opacity-40 flex-shrink-0" />
-          
-          {/* 입력창 */}
-          <input
-            autoFocus
-            className="flex-1 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
-            placeholder="검색어 입력"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          
-          <button 
-            onClick={() => { setIsSearching(false); setQuery(""); }}
-            className="flex-shrink-0"
-          >
-            <img src={closeIcon} alt="close" />
-          </button>
+      <div className="flex flex-col w-full animate-slide-up"> 
+        {/* 검색바 섹션 */}
+        <div className="flex items-center w-full px-4 py-3">
+          <div className="flex items-center w-full relative bg-bg-w border border-core-2 rounded-[8px] px-3 py-2">
+            <img src={searchIcon} alt="search" className="w-4 h-4 opacity-40 flex-shrink-0" />
+            <input
+              autoFocus
+              className="flex-1 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
+              placeholder="검색어 입력"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button 
+              onClick={() => { setIsSearching(false); setQuery(""); }}
+              className="flex-shrink-0"
+            >
+              <img src={closeIcon} alt="close" />
+            </button>
+          </div>
+        </div>
+
+        {/* 로딩 표시 */}
+        {isLoading && <div className="text-center py-4 text-text-gray3">로딩 중...</div>}
+
+        {/* 검색 결과 리스트 */}
+        <div className="px-4 overflow-y-auto">
+          {!isLoading && campaigns.length > 0 ? (
+            campaigns.map((item) => (
+              <div key={item.campaignId} className="py-3 border-b border-text-gray5 text-[14px]">
+                {item.title}
+              </div>
+            ))
+          ) : (
+            !isLoading && query && <div className="text-center py-10 text-text-gray4">검색 결과가 없습니다.</div>
+          )}
         </div>
       </div>
     );
