@@ -157,30 +157,30 @@ type ProfileCardResponse = {
 
 type FeatureResult = {
   beautyType?: {
-    skinType?: string[] | null;
-    skinBrightness?: string | null;
-    makeupStyle?: string[] | null;
-    interestCategories?: string[] | null;
-    interestFunctions?: string[] | null;
+    skinType?: number[] | null;
+    skinBrightness?: number[] | null;
+    makeupStyle?: number[] | null;
+    interestCategories?: number[] | null;
+    interestFunctions?: number[] | null;
   } | null;
   fashionType?: {
-    height?: string | null;
-    bodyShape?: string | null;
-    topSize?: string | null;
-    bottomSize?: string | null;
-    interestFields?: string[] | null;
-    interestStyles?: string[] | null;
-    interestBrands?: string[] | null;
+    height?: number[] | null;
+    bodyShape?: number[] | null;
+    topSize?: number[] | null;
+    bottomSize?: number[] | null;
+    interestFields?: number[] | null;
+    interestStyles?: number[] | null;
+    interestBrands?: number[] | null;
   } | null;
   contentsType?: {
-    viewerGender?: string[] | null;
-    viewerAge?: string[] | null;
-    avgVideoLength?: string | null;
-    avgViews?: string | null;
-    contentFormats?: string[] | null;
-    contentTones?: string[] | null;
-    desiredInvolvement?: string[] | null;
-    desiredUsageScope?: string[] | null;
+    viewerGender?: number[] | null;
+    viewerAge?: number[] | null;
+    avgVideoLength?: number[] | null;
+    avgViews?: number[] | null;
+    contentFormats?: number[] | null;
+    contentTones?: number[] | null;
+    desiredInvolvement?: number[] | null;
+    desiredUsageScope?: number[] | null;
   } | null;
 };
 
