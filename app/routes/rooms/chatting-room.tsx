@@ -21,6 +21,7 @@ import {
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { toast } from "sonner";
 
 type Props = {
   roomId: number;
@@ -115,11 +116,22 @@ export default function ChattingRoom({ roomId }: Props) {
   useEffect(() => {
     const el = listRef.current;
     if (!el) return;
-    // 수정
     requestAnimationFrame(() => {
-    el.scrollTop = el.scrollHeight;
-  });
+      el.scrollTop = el.scrollHeight;
+    });
   }, [messages.length]);
+
+  // 시트가 열리면 스크롤을 맨 아래로 (높이 전환 후)
+  useEffect(() => {
+    if (isSheetOpen) {
+      const el = listRef.current;
+      if (!el) return;
+      // 높이 transition 완료 후 스크롤
+      setTimeout(() => {
+        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+      }, 250);
+    }
+  }, [isSheetOpen]);
 
   useEffect(() => {
     // 방이 바뀔 때 이전 방 데이터 정리
@@ -173,12 +185,19 @@ export default function ChattingRoom({ roomId }: Props) {
         });
       });
 
-      // 2. 전송 ACK 구독 
+      // 2. 전송 ACK 구독
       client.subscribe(`/user/queue/v1/chat.ack`, (message) => {
         const ack = JSON.parse(message.body);
         if (ack.status === "FAILED") {
           console.error("Message send failed:", ack.errorMessage);
-          // 실패 시 UI 로직 
+          toast.error(ack.errorMessage || "메시지 전송에 실패했습니다.");
+
+          // 실패한 메시지를 UI에서 제거
+          if (ack.clientMessageId) {
+            setMessages((prev) =>
+              prev.filter((m) => m.clientMessageId !== ack.clientMessageId)
+            );
+          }
         }
       });
     };
@@ -299,7 +318,12 @@ export default function ChattingRoom({ roomId }: Props) {
       setIsSheetOpen(false);
     } catch (err) {
       console.error(err);
-      // 에러 토스트 처리 
+      const message = err instanceof Error ? err.message : "이미지 업로드에 실패했습니다.";
+      if (message.includes("지원하지 않는")) {
+        toast.error("지원하지 않는 파일 형식입니다.");
+      } else {
+        toast.error("이미지 업로드에 실패했습니다.");
+      }
     }
   };
 
@@ -353,6 +377,12 @@ export default function ChattingRoom({ roomId }: Props) {
       setIsSheetOpen(false);
     } catch (err) {
       console.error(err);
+      const message = err instanceof Error ? err.message : "파일 업로드에 실패했습니다.";
+      if (message.includes("지원하지 않는")) {
+        toast.error("지원하지 않는 파일 형식입니다.");
+      } else {
+        toast.error("파일 업로드에 실패했습니다.");
+      }
     }
   };
 
@@ -402,8 +432,10 @@ export default function ChattingRoom({ roomId }: Props) {
 
       <div
         ref={listRef}
-        className="overflow-y-auto px-4 py-5"
-        style={{ height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px)` }}
+        className="overflow-y-auto px-4 py-5 transition-all duration-300"
+        style={{
+          height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px - ${isSheetOpen ? sheetHeight : 0}px)`
+        }}
       >
         <div className="w-full">
           <div className="w-full space-y-2">
