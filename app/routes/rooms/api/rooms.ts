@@ -1,5 +1,12 @@
 import { axiosInstance } from "../../../api/axios";
 
+type ApiResponse<T> = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: T;
+};
+
 //채팅룸 생성 및 조회
 type CreateOrGetDirectRoomResponse = {
   isSuccess: boolean;
@@ -92,7 +99,7 @@ export interface ChatAttachment {
 
 export type ProposalStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
 export type ProposalDirection = "NONE" | "BRAND_TO_CREATOR" | "CREATOR_TO_BRAND";
-export type NoticeStatus = "ACCEPTED" | "REJECTED" | "CANCELED" | "EXPIRED";
+export type NoticeStatus = "CANCELED" | "MATCHED" | "REVIEWING" | "REJECTED" | "NONE" ;
 
 export type ProposalCardPayload = {
   proposalId: number;
@@ -124,14 +131,14 @@ export type ProposalStatusNoticePayload = {
   proposalId: number;
   actorUserId: number;
   processedAt: string; // ISO string
-  status: NoticeStatus; // 프론트에서 문구 결정용
+  proposalStatus: NoticeStatus; 
 };
 
 export type ApplyStatusNoticePayload = {
   applyId: number;
   actorUserId: number;
   processedAt: string; // ISO string
-  status: NoticeStatus;
+  applyStatus: NoticeStatus;
 };
 
 export type SystemMessage =
@@ -143,7 +150,7 @@ export type SystemMessage =
   | {
       schemaVersion: number;
       kind: "RE_PROPOSAL_CARD";
-      payload: ProposalCardPayload; // 동일 구조 재사용
+      payload: ProposalCardPayload; 
     }
   | {
       schemaVersion: number;
@@ -178,14 +185,17 @@ export async function getChatMessages({
   cursor,
   size = 20,
 }: GetChatMessagesParams): Promise<ChatMessageListResponse> {
-  const res = await axiosInstance.get<ChatMessageListResponse>(
+  const res = await axiosInstance.get<ApiResponse<ChatMessageListResponse>>(
     `/api/v1/chat/rooms/${roomId}/messages`,
     {
-      params: {
-        cursor,
-        size,
-      },
+      params: { cursor, size },
     }
   );
-  return res.data;
+
+  const data = res.data;
+  if (!data?.isSuccess) {
+    throw new Error(data?.message ?? "채팅 메시지 조회 실패");
+  }
+
+  return data.result;
 }

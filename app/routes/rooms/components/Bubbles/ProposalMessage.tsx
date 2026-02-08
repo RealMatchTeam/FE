@@ -1,14 +1,24 @@
 import { useNavigate } from "react-router";
 
-type Props = {
-  kind: "PROPOSAL_CARD" | "RE_PROPOSAL_CARD" | "APPLY_CARD";
+type BaseProps = {
   createdAt?: string;
   avatarSrc?: string;
   campaignName: string;
   bodyText: string;
-  //proposalStatus: "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED"; // not used yet
   proposalDirection: "NONE" | "BRAND_TO_CREATOR" | "CREATOR_TO_BRAND";
 };
+
+type ProposalCardProps = BaseProps & {
+  kind: "PROPOSAL_CARD" | "RE_PROPOSAL_CARD";
+  proposalId: string;
+};
+
+type ApplyCardProps = BaseProps & {
+  kind: "APPLY_CARD";
+  applyId: string;
+};
+
+type Props = ProposalCardProps | ApplyCardProps;
 
 export default function ProposalMessage({
   kind,

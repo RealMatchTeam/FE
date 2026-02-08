@@ -1,14 +1,12 @@
 import { formatKoreanDateTime } from "../../utils/dateTime";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { type ChatRoomCard } from "./api/chat";
 
 export function ChatList({ rooms }: { rooms: ChatRoomCard[] }) {
-
-  const safeRooms = Array.isArray(rooms) ? rooms : [];
   
   return (
     <div className="flex flex-col gap-[10px]">
-      {safeRooms.map((room) => (
+      {rooms.map((room) => (
         <ChatListItem key={room.roomId} room={room} />
       ))}
     </div>
@@ -16,7 +14,6 @@ export function ChatList({ rooms }: { rooms: ChatRoomCard[] }) {
 }
 
 export function ChatListItem({ room }: { room: ChatRoomCard }) {
-
   const { dateText, timeText } = formatKoreanDateTime(room.lastMessageAt);
   const navigate = useNavigate();
 
