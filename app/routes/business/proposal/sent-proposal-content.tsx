@@ -69,8 +69,18 @@ export default function ProposalContent() {
                 alert("캠페인 제안을 취소했습니다.");
                 navigate(-1); 
             }
-        } catch (error: any) {
-            alert(error.message || "취소 중 오류가 발생했습니다.");
+        } catch (error: unknown) {
+            console.error("제안 취소 실패:", error);
+            
+            let errorMessage = "취소 중 오류가 발생했습니다.";
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === "string") {
+                errorMessage = error;
+            }
+
+            alert(errorMessage);
         }
     };
 

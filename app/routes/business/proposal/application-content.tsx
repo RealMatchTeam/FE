@@ -72,11 +72,20 @@ export default function ApplicationContent() {
         if (response.isSuccess) {
             setModalStep("COMPLETE");
         }
-    } catch (error: any) {
-        console.error("취소 실패:", error);
-        alert(error.message || "지원 취소 권한이 없거나 오류가 발생했습니다.");
-        setIsModalOpen(false);
-    }
+    } catch (error: unknown) {
+            console.error("취소 실패:", error);
+            
+            let errorMessage = "지원 취소 권한이 없거나 오류가 발생했습니다.";
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === "string") {
+                errorMessage = error;
+            }
+
+            alert(errorMessage);
+            setIsModalOpen(false);
+        }
 };
 
     const navigate = useNavigate();

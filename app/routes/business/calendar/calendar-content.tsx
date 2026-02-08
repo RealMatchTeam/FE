@@ -31,8 +31,8 @@ export default function CalendarContent() {
         setIsLoading(true);
         const data = await getMyCollaborations({
           type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
-          keyword: keyword || undefined,
-        } as any);
+          keyword: keyword.trim() || undefined, 
+        });
         setCampaigns(data || []);
       } catch (error) {
         console.error("로드 실패:", error);

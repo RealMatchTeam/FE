@@ -26,6 +26,7 @@ export const getMyCollaborations = async (params?: {
   status?: "NONE" | "REVIEWING" | "MATCHED" | "REJECTED";
   startDate?: string;
   endDate?: string;
+  keyword?: string;
 }) => {
 
   const response = await axiosInstance.get<CollaborationResponse>(
