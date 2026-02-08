@@ -55,6 +55,11 @@ export default [
     route("mypage", "routes/mypage/route.tsx", [
       index("routes/mypage/mypage/route.tsx"),
       route("profileCard", "routes/mypage/profileCard/route.tsx"),
+      route("traits", "routes/mypage/traits/route.tsx"),
+      route("notification", "routes/mypage/notification/route.tsx", [
+        index("routes/mypage/notification/index.tsx"),
+        route("marketing", "routes/mypage/notification/marketing/route.tsx"),
+      ]),
       route("edit", "routes/mypage/edit/route.tsx"),
       route("likes", "routes/mypage/likes/route.tsx"),
       route("privacy", "routes/mypage/privacy/route.tsx"),

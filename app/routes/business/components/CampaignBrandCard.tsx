@@ -1,20 +1,22 @@
-import brandLogo from "../../../assets/brand-logo.png";
 import chatIcon from "../../../assets/chat-icon.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 
 interface CampaignBrandCardProps {
   showChatSection?: boolean; 
-  statusText?: string;      // '보낸 제안' 또는 '검토 중'
+  statusText?: string;     
   brandName?: string;     
-  brandTags?: string[];   
-
+  brandTags?: string[]; 
+  brandImageUrl?: string; 
+  matchingRate?: number;
 }
 
 export default function CampaignBrandCard({ 
-  showChatSection = true, 
-  statusText = "보낸 제안",
+  showChatSection, 
+  statusText,
   brandName,
-  brandTags
+  brandTags,
+  brandImageUrl,
+  matchingRate // Props 
 }: CampaignBrandCardProps) {
   return (
     <section className="bg-bg-w p-5 flex flex-col gap-4 -mx-4 -mt-6">
@@ -23,11 +25,7 @@ export default function CampaignBrandCard({
         <div className="flex gap-4">
           {/* 브랜드 로고 박스 */}
           <div className="w-[64px] h-[64px] flex items-center justify-center overflow-hidden border border-text-gray5 rounded-lg">
-            <img
-              src={brandLogo}
-              alt="beplain"
-              className="w-full h-full object-contain"
-            />
+            <img src={brandImageUrl} alt={brandName} className="w-full h-full object-cover" />
           </div>
 
           <div className="flex flex-col gap-1">
@@ -48,7 +46,7 @@ export default function CampaignBrandCard({
         <div className="flex flex-col items-end gap-1">
           <div className="flex items-baseline gap-1">
             <span className="text-title5 text-core-1">매칭률</span>
-            <span className="text-title6 text-core-1">99%</span>
+            <span className="text-title6 text-core-1">{matchingRate || 0}%</span>
           </div>
           <span className="text-callout1 text-core-1 mt-3">{statusText}</span>
         </div>

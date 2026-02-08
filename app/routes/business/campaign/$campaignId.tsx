@@ -37,10 +37,8 @@ export default function CampaignContent() {
     loadData();
   }, [campaignId]);
 
-  // 데이터 로딩 전
   if (!data) return <div className="p-10 text-center">로딩 중...</div>;
 
-  // 태그들을 예쁘게 합쳐주는 함수 (예: ["릴스", "숏폼"] -> "릴스, 숏폼")
   const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
 
   return (

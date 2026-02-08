@@ -44,7 +44,7 @@ export default function FilterBottomSheet({ isOpen, onClose, children, className
             <div
                 onAnimationEnd={handleAnimationEnd}
                 className={cn(
-                    "relative w-full max-w-[375px] bg-white rounded-t-3xl",
+                    "relative w-full max-w-[430px] bg-white rounded-t-3xl",
                     "flex flex-col",
                     animateClass,
                     className || "h-[60%]"

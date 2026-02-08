@@ -1,21 +1,39 @@
-import { type SortOption } from "./SortingSheetConstant";
+import { SORT_LABEL, type SortOption } from "./SortingSheetConstant";
 
 // 정렬, 필터 옵션 (최신순/협업 중)
 
-export function SortFilterSheet({
+type SortOptionItem<T extends string> = {
+  label: string;
+  value: T;
+};
+
+const DEFAULT_OPTIONS: SortOptionItem<SortOption>[] = [
+  { label: SORT_LABEL.latest, value: "latest" },
+  { label: SORT_LABEL.collaborating, value: "collaborating" },
+];
+
+export function SortFilterSheet<T extends string = SortOption>({
   open,
   value,
   onChange,
   onClose,
   onApply,
+  options,
+  title = "정렬 필터",
+  applyLabel = "적용하기",
 }: {
   open: boolean;
-  value: SortOption;
-  onChange: (v: SortOption) => void;
+  value: T;
+  onChange: (v: T) => void;
   onClose: () => void;
   onApply: () => void;
+  options?: SortOptionItem<T>[];
+  title?: string;
+  applyLabel?: string;
 }) {
   if (!open) return null;
+
+  const sheetOptions = (options ?? DEFAULT_OPTIONS) as SortOptionItem<T>[];
 
   return (
     <div className="fixed inset-0 z-50">
@@ -29,21 +47,19 @@ export function SortFilterSheet({
 
       {/* 시트 */}
       <div className="fixed left-1/2 -translate-x-1/2 top-[235px] w-full max-w-[430px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
-        <div className="w-full max-w-[430px] h-[70px] fixed left-1/2 -translate-x-1/2"> 
-          <div className="px-4 text-Medium text-text-black mb-3">정렬 필터</div>
+        <div className="w-full max-w-[430px] h-[70px] fixed left-1/2 -translate-x-1/2">
+          <div className="px-4 text-Medium text-text-black mb-3">{title}</div>
 
           <div className="bg-[#F3F4F8] px-4 py-3">
             <div className="flex gap-6">
-              <SortOptionButton
-                label="최신순"
-                active={value === "latest"}
-                onClick={() => onChange("latest")}
-              />
-              <SortOptionButton
-                label="협업 중"
-                active={value === "collaborating"}
-                onClick={() => onChange("collaborating")}
-              />
+              {sheetOptions.map((option) => (
+                <SortOptionButton
+                  key={option.value}
+                  label={option.label}
+                  active={value === option.value}
+                  onClick={() => onChange(option.value)}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -54,7 +70,7 @@ export function SortFilterSheet({
             onClick={onApply}
             className="w-full max-w-[327px] h-11 rounded-[12px] bg-[#6666E5] text-white text-SemiBold"
           >
-            적용하기
+            {applyLabel}
           </button>
         </div>
       </div>
