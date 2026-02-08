@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getAppliedCampaignDetail, cancelCampaignApply, type AppliedCampaignDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import Modal from "../../../components/common/Modal";
@@ -12,7 +13,7 @@ import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
 
-import checkIcon from "../../../assets/icon/icon-check-circle.svg"; 
+import checkIcon from "../../../assets/icon/icon-check-circle.svg";
 import closeIcon from "../../../assets/icon/icon-close.svg";
 
 export default function ApplicationContent() {
@@ -27,56 +28,71 @@ export default function ApplicationContent() {
 
     const applicationId = searchParams.get("applicationId");
 
+    const location = useLocation();
+    const brandIdFromList = location.state?.brandId;
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setTimeout(() => setModalStep("CONFIRM"), 300);
     };
 
     useEffect(() => {
-        if (!applicationId) {
-            setIsLoading(false);
-            return;
-        }
-
         const fetchData = async () => {
+            if (!applicationId) {
+                console.error("applicationId가 없습니다.");
+                setIsLoading(false);
+                return;
+            }
+
             try {
                 setIsLoading(true);
+
+                // 1. 지원 상세 정보 조회
                 const result = await getAppliedCampaignDetail(applicationId as string);
+                if (!result) throw new Error("데이터가 비어있습니다.");
                 setData(result);
 
-        
-                if (result.campaignId) { 
-                    const brandResult = await getBrandSummary(result.campaignId); 
+                // 2. 브랜드 ID 결정 로직 (고칠 부분!)
+                // 상세 API 응답에 brandId가 있으면 쓰고, 없으면 목록에서 넘겨받은 brandIdFromList를 사용합니다.
+                const finalBrandId = result.brandId || brandIdFromList;
+
+                if (finalBrandId) {
+                    console.log("브랜드 상세 조회 요청 ID:", finalBrandId);
+                    const brandResult = await getBrandSummary(Number(finalBrandId));
                     setBrand(brandResult);
+                } else {
+                    console.warn("데이터에 brandId가 없습니다.");
                 }
-            } catch (error) {
-                console.error("데이터 로드 실패:", error);
+            } catch (error: any) {
+                console.error("최종 데이터 로드 실패:", error);
+                alert(error.message || "상세 정보를 불러오는 중 에러가 발생했습니다.");
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchData();
-    }, [applicationId]);
+    }, [applicationId, brandIdFromList]);
 
     const handleCancelSubmit = async () => {
-    if (!applicationId || !data) return;
+        if (!applicationId || !data) return;
 
-    if (data.status !== "REVIEWING") {
-        alert("검토 중인 상태에서만 취소가 가능합니다.");
-        setIsModalOpen(false);
-        return;
-    }
-
-    try {
-        const response = await cancelCampaignApply(applicationId);
-        if (response.isSuccess) {
-            setModalStep("COMPLETE");
+        if (data.status !== "REVIEWING") {
+            alert("검토 중인 상태에서만 취소가 가능합니다.");
+            setIsModalOpen(false);
+            return;
         }
-    } catch (error: unknown) {
+
+        try {
+            const response = await cancelCampaignApply(applicationId);
+            if (response.isSuccess) {
+                setModalStep("COMPLETE");
+            }
+        } catch (error: unknown) {
             console.error("취소 실패:", error);
-            
+
             let errorMessage = "지원 취소 권한이 없거나 오류가 발생했습니다.";
-            
+
             if (error instanceof Error) {
                 errorMessage = error.message;
             } else if (typeof error === "string") {
@@ -86,13 +102,13 @@ export default function ApplicationContent() {
             alert(errorMessage);
             setIsModalOpen(false);
         }
-};
+    };
 
     const navigate = useNavigate();
 
     const handleComplete = () => {
         setIsModalOpen(false);
-        navigate(-1); 
+        navigate(-1);
     };
 
     if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
@@ -117,11 +133,11 @@ export default function ApplicationContent() {
                 <div className="px-4 py-6">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText={getStatusLabel(data.status)} 
-                        brandName={brand?.brandName || data.brandName} 
-                        brandTags={brand?.brandTags || ["지원완료"]} 
-                        brandImageUrl={brand?.brandImageUrl} 
-                        matchingRate={brand?.matchingRate} 
+                        statusText={getStatusLabel(data.status)}
+                        brandName={brand?.brandName || "브랜드 정보 로딩 중..."}
+                        brandTags={brand?.brandTags || ["지원완료"]}
+                        brandImageUrl={brand?.brandImageUrl}
+                        matchingRate={brand?.matchingRate}
                     />
 
                     <div className="flex flex-col gap-6">
@@ -162,15 +178,15 @@ export default function ApplicationContent() {
 
                 {/* 하단 버튼 영역 */}
                 {data.status !== "CANCELED" && (
-                <div className="px-4 py-5 flex justify-end bg-bg-w border-t border-bluegray-2">
-                    <button
-                        onClick={() => setIsModalOpen(true)} 
-                        className="px-6 py-2.5 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
-                    >
-                        취소하기
-                    </button>
-                </div>
-            )}
+                    <div className="px-4 py-5 flex justify-end bg-bg-w border-t border-bluegray-2">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="px-6 py-2.5 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
+                        >
+                            취소하기
+                        </button>
+                    </div>
+                )}
             </main>
 
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>

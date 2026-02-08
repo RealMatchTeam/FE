@@ -73,7 +73,6 @@ export default function ReceivedProposalContent() {
     };
     const closeModal = () => setModalType("none");
 
-    // 거절 처리 로직
     const handleRejectClick = async () => {
         if (!proposalId) return;
 
@@ -98,13 +97,11 @@ export default function ReceivedProposalContent() {
             setIsProcessing(false);
         }
     };
-    // 태그 배열을 문자열로 변환하는 헬퍼 함수
     const formatTags = (tags: { name: string }[] | undefined | null) => {
         if (!tags || tags.length === 0) return "정보 없음"; 
         return tags.map(t => t.name).join(", ");
     };
 
-    // 날짜 포맷 변경 함수
     const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
 
     if (isLoading) return <div className="p-10 text-center text-text-gray3 font-pretendard">로딩 중...</div>;

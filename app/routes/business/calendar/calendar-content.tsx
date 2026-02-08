@@ -31,7 +31,7 @@ export default function CalendarContent() {
         setIsLoading(true);
         const data = await getMyCollaborations({
           type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
-          keyword: keyword.trim() || undefined, 
+          keyword: keyword.trim() || undefined,
         });
         setCampaigns(data || []);
       } catch (error) {
@@ -90,25 +90,33 @@ export default function CalendarContent() {
   });
 
   const handleCardClick = (item: CampaignCollaboration) => {
-    const proposalId = item.proposalId || item.campaignId;
+  // 1. proposalId나 campaignId 중 유효한 값을 ID로 사용
+  const proposalId = item.proposalId || item.campaignId;
 
-    if (item.status === "REJECTED") {
-      navigate(`/rejection?proposalId=${proposalId}`);
-      return;
-    }
+  // 2. 공통적으로 넘길 state 정의 (브랜드 ID 포함)
+  const navigationState = { state: { brandId: item.brandId } };
 
-    if (item.type === "APPLIED") {
-      navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
-      return;
-    }
+  // 거절 상태인 경우
+  if (item.status === "REJECTED") {
+    navigate(`/rejection?proposalId=${proposalId}`, navigationState);
+    return;
+  }
 
-    if (item.type === "RECEIVED") {
-      navigate(`/business/proposal?type=received&proposalId=${proposalId}`);
-      return;
-    }
+  // 지원한 캠페인인 경우 (type: APPLIED)
+  if (item.type === "APPLIED") {
+    navigate(`/business/proposal?type=applied&applicationId=${proposalId}`, navigationState);
+    return;
+  }
 
-    navigate(`/business/proposal?type=sent&proposalId=${proposalId}`);
-  };
+  // 받은 제안인 경우 (type: RECEIVED)
+  if (item.type === "RECEIVED") {
+    navigate(`/business/proposal?type=received&proposalId=${proposalId}`, navigationState);
+    return;
+  }
+
+  // 보낸 제안인 경우 (type: SENT)
+  navigate(`/business/proposal?type=sent&proposalId=${proposalId}`, navigationState);
+};
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
@@ -220,11 +228,17 @@ export default function CalendarContent() {
                 ) : matchingList.length > 0 ? (
                   matchingList.map((item) => (
                     <MatchingCard
-                      key={item.campaignId || item.proposalId}
+                      key={item.proposalId || `campaign-${item.campaignId}`}
                       brand={item.brandName}
                       status={getStatusLabel(item.status)}
                       date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)}
-                      actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
+                      actionLabel={
+                        item.status === "REJECTED"
+                          ? "거절 사유 보기"
+                          : item.type === "APPLIED"
+                            ? "지원 보기"
+                            : "제안 보기"
+                      }
                       logo={item.thumbnailUrl}
                       onClick={() => handleCardClick(item)}
                     />
