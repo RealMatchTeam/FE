@@ -1,4 +1,9 @@
-import { type RouteConfig, route, layout, index } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  route,
+  layout,
+  index,
+} from "@react-router/dev/routes";
 
 export default [
   // Auth routes
@@ -49,7 +54,8 @@ export default [
     route("chat", "routes/chat/route.tsx"),
 
     route("rooms", "routes/rooms/route.tsx", [
-      route(":chatId", "routes/rooms/$chatId.tsx"),
+      route("brand/:brandId", "routes/rooms/$brandId.tsx"),
+      route("room/:roomId", "routes/rooms/$roomId.tsx"),
     ]),
 
     route("mypage", "routes/mypage/route.tsx", [
@@ -63,15 +69,17 @@ export default [
       route("edit", "routes/mypage/edit/route.tsx"),
       route("likes", "routes/mypage/likes/route.tsx"),
       route("privacy", "routes/mypage/privacy/route.tsx"),
-      route("terms", "routes/mypage/terms/route.tsx")
+      route("terms", "routes/mypage/terms/route.tsx"),
     ]),
-
 
     route("brand", "routes/brand/route.tsx"),
   ]),
 
   // Campaign detail route (without main layout)
-  route("business/campaign/:campaignId", "routes/business/campaign/$campaignId.tsx"),
+  route(
+    "business/campaign/:campaignId",
+    "routes/business/campaign/$campaignId.tsx",
+  ),
 
   // 404 Catch-all
   route("*", "routes/not-found.tsx"),

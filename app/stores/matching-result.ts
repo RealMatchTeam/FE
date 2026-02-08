@@ -4,6 +4,7 @@ import type { MatchResponseDto } from "../routes/matching/api/matching";
 
 export type MatchingResultSummary = {
   userName: string;
+  userType: string;
   traits: {
     beauty: string;
     style: string;
@@ -39,7 +40,8 @@ export const useMatchResultStore = create<State>()(
             completed: true,
             updatedAt: Date.now(),
             summary: {
-              userName: apiResult.userType,
+              userName: apiResult.userName,
+              userType: apiResult.userType,
               traits: {
                 beauty: apiResult.typeTag[0] || "",
                 style: apiResult.typeTag[1] || "",

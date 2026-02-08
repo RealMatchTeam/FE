@@ -1,49 +1,60 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { tokenStorage } from "../../lib/token";
 import NavigationHeader from "../../components/common/NavigateHeader";
 import ChatComposer from "./components/ChatComposer";
-import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
+import AttachmentSheet, {
+  type AttachmentAction,
+} from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
 import MessageRenderer from "./components/MessageRender";
 import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage, createOrGetDirectRoom } from "./api/rooms";
+import {
+  getChatRoomDetail,
+  type ChatRoomDetailResponse,
+  getChatMessages,
+  type ChatMessage,
+} from "./api/rooms";
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
 import { Client } from "@stomp/stompjs";
 
 type Props = {
-  brandId: number;
+  roomId: number;
 };
 
-export default function ChattingRoom({ brandId }: Props) {
+export default function ChattingRoom({ roomId }: Props) {
+  const navigate = useNavigate();
   const kb = useKeyboardOffset();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const sheetHeight = kb > 0 ? kb : 240;
 
-  const [roomId, setRoomId] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [detail, setDetail] = useState<ChatRoomDetailResponse | null>(null);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const myUserId = Number(tokenStorage.getUserId() ?? 0); 
   const token = tokenStorage.getAccessToken();
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  
+
   useHideBottomTab(true);
   useHideHeader(true);
-  
+
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
   const isCollaborating = detail?.isCollaborating ?? false;
 
   const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
   const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
-  const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
+  const collabThumb =
+    detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
   const stompClient = useRef<Client | null>(null);
@@ -51,48 +62,15 @@ export default function ChattingRoom({ brandId }: Props) {
 
   useEffect(() => {
     if (!token) {
-      window.location.href = "/auth/login";
+      navigate("/auth/login", { replace: true });
     }
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) return;
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
-    if (!Number.isFinite(myUserId) || myUserId <= 0) return;
-
-    const run = async () => {
-      try {
-        const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
-        setRoomId(result.roomId);
-        console.log("createOrGetDirectRoom result:", result);
-      } catch (e) {
-        console.error("createOrGetDirectRoom failed:", e);
-        setRoomId(null);
-      }
-    };
-
-    run();
-  }, [token, brandId, myUserId]);
-
-  const imageInputRef = useRef<HTMLInputElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  }, [token, navigate]);
 
   const { upload } = useAttachmentUpload({
     baseUrl,
     token,
     defaultUsage: "CHAT",
   });
-
-  const handleAttachmentAction = (key: "suggest" | "image" | "file") => {
-    if (key === "image") {
-      imageInputRef.current?.click();
-      return;
-    }
-    if (key === "file") {
-      fileInputRef.current?.click();
-      return;
-    }
-  };
 
   useEffect(() => {
     if (!token || !roomId) return;
@@ -212,18 +190,8 @@ export default function ChattingRoom({ brandId }: Props) {
       { key: "image", label: "이미지", icon: "image" },
       { key: "file", label: "첨부파일", icon: "file" },
     ],
-    []
+    [],
   );
-
-  const handleToggleSheet = () => {
-    setIsSheetOpen((prev) => {
-      const next = !prev;
-      if (next) inputRef.current?.blur();
-      return next;
-    });
-  };
-
-  const handleCloseSheet = () => setIsSheetOpen(false);
 
   const handleSend = () => {
     const trimmed = text.trim();
@@ -265,9 +233,7 @@ export default function ChattingRoom({ brandId }: Props) {
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
-  // 1. 이미지 선택 핸들러
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!roomId) return;
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -304,9 +270,9 @@ export default function ChattingRoom({ brandId }: Props) {
           attachmentType: "IMAGE",
           contentType: uploaded.contentType,
           originalName: uploaded.originalName,
-          fileSize: uploaded.fileSize, 
+          fileSize: uploaded.fileSize,
           accessUrl: uploaded.accessUrl,
-          status: "READY", 
+          status: "READY",
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
@@ -315,16 +281,13 @@ export default function ChattingRoom({ brandId }: Props) {
 
       setMessages((prev) => [...prev, tempMessage]);
       setIsSheetOpen(false);
-
     } catch (err) {
       console.error(err);
       // 에러 토스트 처리 
     }
   };
 
-  // 2. 파일 선택 핸들러
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!roomId) return;
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -363,7 +326,7 @@ export default function ChattingRoom({ brandId }: Props) {
           originalName: uploaded.originalName,
           fileSize: uploaded.fileSize,
           accessUrl: uploaded.accessUrl,
-          status: "READY", 
+          status: "READY",
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
@@ -372,12 +335,11 @@ export default function ChattingRoom({ brandId }: Props) {
 
       setMessages((prev) => [...prev, tempMessage]);
       setIsSheetOpen(false);
-
     } catch (err) {
       console.error(err);
     }
   };
-  
+
   if (!token) {
     return (
       <div className="h-screen-full bg-white">
@@ -387,20 +349,11 @@ export default function ChattingRoom({ brandId }: Props) {
     );
   }
 
-  if (token && (!myUserId || myUserId <= 0)) {
+  if (!myUserId || myUserId <= 0) {
     return (
       <div className="h-screen-full bg-white">
         <NavigationHeader title="채팅" onBack={() => history.back()} />
         <div className="p-6 text-text-gray3">로그인 정보 불러오는 중...</div>
-      </div>
-    );
-  }
-
-  if (!roomId) {
-    return (
-      <div className="h-screen-full bg-white">
-        <NavigationHeader title="채팅" onBack={() => history.back()} />
-        <div className="p-6 text-text-gray3">채팅방을 여는 중...</div>
       </div>
     );
   }
@@ -414,7 +367,6 @@ export default function ChattingRoom({ brandId }: Props) {
         style={{ display: "none" }}
         onChange={handlePickImage}
       />
-
       <input
         ref={fileInputRef}
         type="file"
@@ -422,13 +374,14 @@ export default function ChattingRoom({ brandId }: Props) {
         onChange={handlePickFile}
       />
 
-      <NavigationHeader
-        title={partnerName}
-        onBack={() => history.back()}
-      />
+      <NavigationHeader title={partnerName} onBack={() => history.back()} />
 
       {detail?.campaignSummary && (
-        <CollaborationSummaryBar thumbnailUrl={collabThumb} title={collabTitle} subtitle={collabSubtitle} />
+        <CollaborationSummaryBar
+          thumbnailUrl={collabThumb}
+          title={collabTitle}
+          subtitle={collabSubtitle}
+        />
       )}
 
       <div
@@ -461,7 +414,7 @@ export default function ChattingRoom({ brandId }: Props) {
         value={text}
         onChange={setText}
         onSend={handleSend}
-        onToggleSheet={handleToggleSheet}
+        onToggleSheet={() => setIsSheetOpen((p) => !p)}
         isSheetOpen={isSheetOpen}
         sheetHeight={sheetHeight}
       />
@@ -469,10 +422,10 @@ export default function ChattingRoom({ brandId }: Props) {
       <AttachmentSheet
         open={isSheetOpen}
         actions={actions}
-        onClose={handleCloseSheet}
+        onClose={() => setIsSheetOpen(false)}
         onAction={(key) => {
-          handleAttachmentAction(key);
-          console.log("action:", key);
+          if (key === "image") imageInputRef.current?.click();
+          if (key === "file") fileInputRef.current?.click();
           setIsSheetOpen(false);
         }}
         height={sheetHeight}
