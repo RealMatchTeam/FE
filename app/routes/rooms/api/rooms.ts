@@ -56,8 +56,12 @@ export interface CampaignSummary {
 }
 
 export async function getChatRoomDetail(roomId: number): Promise<ChatRoomDetailResponse> {
-  const res = await axiosInstance.get<ChatRoomDetailResponse>(`/api/v1/chat/rooms/${roomId}`);
-  return res.data;
+  const res = await axiosInstance.get<ApiResponse<ChatRoomDetailResponse>>(`/api/v1/chat/rooms/${roomId}`);
+  const data = res.data;
+  if (!data?.isSuccess) {
+    throw new Error(data?.message ?? "채팅방 상세 조회 실패");
+  }
+  return data.result;
 }
 
 //채팅 메시지 목록 조회
