@@ -121,17 +121,27 @@ export default function ChattingRoom({ roomId }: Props) {
     });
   }, [messages.length]);
 
-  // 시트가 열리면 스크롤을 맨 아래로 (높이 전환 후)
+  // 시트가 열리면 스크롤을 맨 아래로
   useEffect(() => {
     if (isSheetOpen) {
       const el = listRef.current;
       if (!el) return;
-      // 높이 transition 완료 후 스크롤
       setTimeout(() => {
         el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
       }, 250);
     }
   }, [isSheetOpen]);
+
+  // 키보드가 열리면 스크롤을 맨 아래로
+  useEffect(() => {
+    if (kb > 0) {
+      const el = listRef.current;
+      if (!el) return;
+      setTimeout(() => {
+        el.scrollTop = el.scrollHeight;
+      }, 250);
+    }
+  }, [kb]);
 
   useEffect(() => {
     // 방이 바뀔 때 이전 방 데이터 정리
