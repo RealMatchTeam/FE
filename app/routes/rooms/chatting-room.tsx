@@ -20,6 +20,7 @@ import {
 } from "./api/rooms";
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
 import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 type Props = {
   roomId: number;
@@ -59,6 +60,7 @@ export default function ChattingRoom({ roomId }: Props) {
 
   const stompClient = useRef<Client | null>(null);
   const sentMessageIds = useRef<Set<string>>(new Set()); // 내가 보낸 메시지 추적용
+  const isSending = useRef(false); // 중복 전송 방지
 
   useEffect(() => {
     if (!token) {
@@ -132,17 +134,13 @@ export default function ChattingRoom({ roomId }: Props) {
       stompClient.current.deactivate();
     }
 
-    const wsBase = import.meta.env.VITE_WS_BASE_URL;
-    if (!wsBase) {
-      throw new Error("VITE_WS_BASE_URL is missing");
-    }
-
+    const httpBase = import.meta.env.VITE_API_BASE_URL;
     const client = new Client({
-      brokerURL: `${wsBase}/api/v1/ws/chat`, // 로컬: ws://host/api/v1/ws/chat
+      webSocketFactory: () => new SockJS(`${httpBase}/api/v1/ws/chat`),
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
-      debug: (str) => console.log(str),
+      debug: (str: string) => console.log(str),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -154,16 +152,25 @@ export default function ChattingRoom({ roomId }: Props) {
       // 1. 메시지 수신 구독
       client.subscribe(`/topic/v1/rooms/${roomId}`, (message) => {
         const payload = JSON.parse(message.body);
-        const newMessage: ChatMessage = payload.message;
+        // 서버 응답 구조에 따라 message 또는 payload 직접 사용
+        const newMessage: ChatMessage = payload.message ?? payload;
 
-        // clientMessageId가 있고, 내가 보낸 목록에 있다면 무시
-        if (newMessage.clientMessageId && sentMessageIds.current.has(newMessage.clientMessageId)) {
-          // 보낸 메시지가 서버를 통해 돌아온 것이 확인되면 Set에서 제거 (관리 최적화)
-          sentMessageIds.current.delete(newMessage.clientMessageId);
+        // clientMessageId가 있고, 내가 보낸 목록에 있다면 무시 (내가 보낸 메시지 에코)
+        const clientId = newMessage.clientMessageId;
+        if (clientId && sentMessageIds.current.has(clientId)) {
+          sentMessageIds.current.delete(clientId);
           return;
         }
 
-        setMessages((prev) => [...prev, newMessage]);
+        // 중복 메시지 방지: 이미 같은 clientMessageId 또는 messageId가 있으면 무시
+        setMessages((prev) => {
+          const isDuplicate = prev.some((m) =>
+            (clientId && m.clientMessageId === clientId) ||
+            (newMessage.messageId > 0 && m.messageId === newMessage.messageId)
+          );
+          if (isDuplicate) return prev;
+          return [...prev, newMessage];
+        });
       });
 
       // 2. 전송 ACK 구독 
@@ -196,6 +203,10 @@ export default function ChattingRoom({ roomId }: Props) {
   const handleSend = () => {
     const trimmed = text.trim();
     if (!trimmed || !roomId || !stompClient.current?.connected) return;
+
+    // 중복 전송 방지
+    if (isSending.current) return;
+    isSending.current = true;
 
     const clientId = crypto.randomUUID();
     sentMessageIds.current.add(clientId); // 보낸 ID 저장
@@ -231,6 +242,11 @@ export default function ChattingRoom({ roomId }: Props) {
     setText("");
     setIsSheetOpen(false);
     requestAnimationFrame(() => inputRef.current?.focus());
+
+    // 짧은 딜레이 후 다시 전송 가능
+    setTimeout(() => {
+      isSending.current = false;
+    }, 300);
   };
 
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -20,6 +20,8 @@ export default function ChatComposer({
   sheetHeight,
 }: Props) {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // 한글 IME 조합 중이면 무시
+    if (e.nativeEvent.isComposing) return;
     if (e.key !== "Enter") return;
     e.preventDefault();
     onSend();
