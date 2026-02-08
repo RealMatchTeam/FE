@@ -13,20 +13,17 @@ export default function Home() {
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
   const me = useAuthStore((s) => s.me);
   const setMe = useAuthStore((s) => s.setMe);
-  const [resolvedHasMatchingTest, setResolvedHasMatchingTest] = useState<
-    boolean | null
-  >(null);
+  const hasTokens = tokenStorage.hasTokens();
+  const resolvedHasMatchingTest =
+    me?.matchingTestDone !== undefined
+      ? Boolean(me.matchingTestDone)
+      : hasTokens
+        ? null
+        : false;
 
   useEffect(() => {
-    if (me?.matchingTestDone !== undefined) {
-      setResolvedHasMatchingTest(Boolean(me.matchingTestDone));
-      return;
-    }
-
-    if (!tokenStorage.hasTokens()) {
-      setResolvedHasMatchingTest(false);
-      return;
-    }
+    if (me?.matchingTestDone !== undefined) return;
+    if (!hasTokens) return;
 
     let isMounted = true;
 
@@ -45,10 +42,11 @@ export default function Home() {
           avatarUrl: result.profileImageUrl ?? undefined,
           matchingTestDone: Boolean(result.hasMatchingTest),
         });
-        setResolvedHasMatchingTest(Boolean(result.hasMatchingTest));
       } catch (error) {
         console.error("Failed to load my page info:", error);
-        if (isMounted) setResolvedHasMatchingTest(false);
+        if (isMounted) {
+          setMe({ matchingTestDone: false });
+        }
       }
     };
 
@@ -57,7 +55,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [me?.matchingTestDone, setMe]);
+  }, [hasTokens, me?.matchingTestDone, setMe]);
 
   useEffect(() => {
     if (resolvedHasMatchingTest !== true) return;
