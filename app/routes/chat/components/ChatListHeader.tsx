@@ -27,11 +27,11 @@ export function ChatListHeader({
           onChange={(e) => setQuery(e.target.value)}
         />
 
-        <button 
+        <button
           onClick={() => setQuery("")}
-          className="flex-shrink-0"
+          className="flex-shrink-0 w-4 h-4"
         >
-          <img src={closeIcon} alt="close" />
+          <img src={closeIcon} alt="close" className="w-full h-full" />
         </button>
 
       </div>

@@ -444,7 +444,7 @@ export default function ChattingRoom({ roomId }: Props) {
         ref={listRef}
         className="overflow-y-auto px-4 py-5 transition-all duration-300"
         style={{
-          height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px - ${isSheetOpen ? sheetHeight : 0}px)`
+          height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px - ${isSheetOpen ? sheetHeight : 0}px - ${kb}px)`
         }}
       >
         <div className="w-full">
