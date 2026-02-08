@@ -26,7 +26,7 @@ function ChatPage() {
         status: sort === "collaborating" ? "COLLABORATING" : "LATEST",
       });
       setRooms(Array.isArray(data.rooms) ? data.rooms : []);
-    } catch (e) {
+    } catch {
       setRooms([]); 
     } finally {
       setLoading(false);
