@@ -11,6 +11,7 @@ import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
 import { getChatRoomDetail, type ChatRoomDetailResponse, getChatMessages, type ChatMessage, createOrGetDirectRoom } from "./api/rooms";
 import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
+import { Client } from "@stomp/stompjs";
 
 type Props = {
   brandId: number;
@@ -45,11 +46,8 @@ export default function ChattingRoom({ brandId }: Props) {
   const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
-  const createdAt = useMemo(() => {
-    const now = new Date().toISOString();
-    const { dateText, timeText } = formatKoreanDateTime(now);
-    return `${dateText}\n${timeText}`;
-  }, []);
+  const stompClient = useRef<Client | null>(null);
+  const sentMessageIds = useRef<Set<string>>(new Set()); // 내가 보낸 메시지 추적용
 
   useEffect(() => {
     if (!token) {
@@ -96,8 +94,7 @@ export default function ChattingRoom({ brandId }: Props) {
   };
 
   useEffect(() => {
-    if (!token) return;
-    if (!roomId) return;
+    if (!token || !roomId) return;
 
     const run = async () => {
       try {
@@ -113,8 +110,7 @@ export default function ChattingRoom({ brandId }: Props) {
   }, [token, roomId]);
 
   useEffect(() => {
-    if (!token) return;
-    if (!roomId) return;
+    if (!token || !roomId) return;
 
     const run = async () => {
       try {
@@ -132,8 +128,71 @@ export default function ChattingRoom({ brandId }: Props) {
   useEffect(() => {
     const el = listRef.current;
     if (!el) return;
+    // 수정
+    requestAnimationFrame(() => {
     el.scrollTop = el.scrollHeight;
+  });
   }, [messages.length]);
+
+  useEffect(() => {
+    // 방이 바뀔 때 이전 방 데이터 정리
+    sentMessageIds.current.clear();
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!token || !roomId) return;
+
+    // 이미 활성화된 클라이언트가 있다면 비활성화 후 새로 생성
+    if (stompClient.current) {
+      stompClient.current.deactivate();
+    }
+
+    const client = new Client({
+      brokerURL: import.meta.env.VITE_WS_URL, // 로컬: ws://host/api/v1/ws/chat
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+      debug: (str) => console.log(str),
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    });
+
+    client.onConnect = () => {
+      console.log("Connected to STOMP");
+
+      // 1. 메시지 수신 구독
+      client.subscribe(`/topic/v1/rooms/${roomId}`, (message) => {
+        const payload = JSON.parse(message.body);
+        const newMessage: ChatMessage = payload.message;
+
+        // clientMessageId가 있고, 내가 보낸 목록에 있다면 무시
+        if (newMessage.clientMessageId && sentMessageIds.current.has(newMessage.clientMessageId)) {
+          // 보낸 메시지가 서버를 통해 돌아온 것이 확인되면 Set에서 제거 (관리 최적화)
+          sentMessageIds.current.delete(newMessage.clientMessageId);
+          return;
+        }
+
+        setMessages((prev) => [...prev, newMessage]);
+      });
+
+      // 2. 전송 ACK 구독 
+      client.subscribe(`/user/queue/v1/chat.ack`, (message) => {
+        const ack = JSON.parse(message.body);
+        if (ack.status === "FAILED") {
+          console.error("Message send failed:", ack.errorMessage);
+          // 실패 시 UI 로직 
+        }
+      });
+    };
+
+    client.activate();
+    stompClient.current = client;
+
+    return () => {
+      client.deactivate();
+    };
+  }, [token, roomId]);
 
   const actions: AttachmentAction[] = useMemo(
     () => [
@@ -156,14 +215,27 @@ export default function ChattingRoom({ brandId }: Props) {
 
   const handleSend = () => {
     const trimmed = text.trim();
-    if (!trimmed) return;
-    if (!roomId) return;
+    if (!trimmed || !roomId || !stompClient.current?.connected) return;
 
-    const tempId = -Date.now();
     const clientId = crypto.randomUUID();
+    sentMessageIds.current.add(clientId); // 보낸 ID 저장
 
-    const generalText: ChatMessage = {
-      messageId: tempId,
+    const payload = {
+      roomId,
+      messageType: "TEXT",
+      content: trimmed,
+      attachmentId: null,
+      clientMessageId: clientId,
+    };
+
+    // 서버로 전송
+    stompClient.current.publish({
+      destination: "/app/v1/chat.send",
+      body: JSON.stringify(payload),
+    });
+
+    const tempMessage: ChatMessage = {
+      messageId: -Date.now(),
       roomId,
       senderId: myUserId,
       senderType: "USER",
@@ -171,11 +243,11 @@ export default function ChattingRoom({ brandId }: Props) {
       content: trimmed,
       attachment: null,
       systemMessage: null,
-      createdAt,
+      createdAt: new Date().toISOString(),
       clientMessageId: clientId,
     };
 
-    setMessages((prev) => [...prev, generalText]);
+    setMessages((prev) => [...prev, tempMessage]);
     setText("");
     setIsSheetOpen(false);
     requestAnimationFrame(() => inputRef.current?.focus());
@@ -191,12 +263,29 @@ export default function ChattingRoom({ brandId }: Props) {
     try {
       const uploaded = await upload({ file, attachmentType: "IMAGE" });
 
+      const clientId = crypto.randomUUID();
+      sentMessageIds.current.add(clientId);
+
+      const payload = {
+        roomId,
+        messageType: "IMAGE", 
+        content: null,
+        attachmentId: uploaded.attachmentId, // 업로드된 ID 사용
+        clientMessageId: clientId,
+      };
+
+      // STOMP 서버로 전송
+      stompClient.current?.publish({
+        destination: "/app/v1/chat.send",
+        body: JSON.stringify(payload),
+      });
+
       const tempMessage: ChatMessage = {
         messageId: -Date.now(),
         roomId,
         senderId: myUserId,
         senderType: "USER",
-        messageType: "IMAGE", // 또는 "FILE" (백엔드 스펙에 맞게)
+        messageType: "IMAGE", 
         content: null,
         attachment: {
           attachmentId: uploaded.attachmentId,
@@ -209,7 +298,7 @@ export default function ChattingRoom({ brandId }: Props) {
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
-        clientMessageId: crypto.randomUUID(),
+        clientMessageId: clientId,
       };
 
       setMessages((prev) => [...prev, tempMessage]);
@@ -217,7 +306,7 @@ export default function ChattingRoom({ brandId }: Props) {
 
     } catch (err) {
       console.error(err);
-      // 에러 토스트 처리 등을 여기에 추가
+      // 에러 토스트 처리 
     }
   };
 
@@ -230,6 +319,23 @@ export default function ChattingRoom({ brandId }: Props) {
 
     try {
       const uploaded = await upload({ file, attachmentType: "FILE" });
+
+      const clientId = crypto.randomUUID();
+      sentMessageIds.current.add(clientId);
+
+      const payload = {
+        roomId,
+        messageType: "FILE", 
+        content: null,
+        attachmentId: uploaded.attachmentId, // 업로드된 ID 사용
+        clientMessageId: clientId,
+      };
+
+      // STOMP 서버로 전송 
+      stompClient.current?.publish({
+        destination: "/app/v1/chat.send",
+        body: JSON.stringify(payload),
+      });
 
       const tempMessage: ChatMessage = {
         messageId: -Date.now(),
@@ -249,7 +355,7 @@ export default function ChattingRoom({ brandId }: Props) {
         },
         systemMessage: null,
         createdAt: new Date().toISOString(),
-        clientMessageId: crypto.randomUUID(),
+        clientMessageId: clientId,
       };
 
       setMessages((prev) => [...prev, tempMessage]);
@@ -322,12 +428,14 @@ export default function ChattingRoom({ brandId }: Props) {
           <div className="w-full space-y-2">
             {messages.map((m) => {
               const isMe = m.senderType === "USER" && m.senderId === myUserId;
+              const { dateText, timeText } = formatKoreanDateTime(m.createdAt);
+              const messageKey = m.clientMessageId || m.messageId || `${m.roomId}-${m.createdAt}`;
 
               return (
                 <MessageRenderer
-                  key={m.messageId ?? m.clientMessageId ?? `${m.roomId}-${m.createdAt}`}
+                  key={messageKey}
                   message={m}
-                  timeText={createdAt}
+                  timeText={`${dateText}\n${timeText}`}
                   avatarSrc={isMe ? undefined : partnerAvatarUrl}
                 />
               );
