@@ -1,4 +1,4 @@
-import { useAuthStore } from "../../../../stores/auth-store";
+import { tokenStorage } from "../../../../lib/token";
 
 type Props = {
   //messageId: number;
@@ -20,7 +20,7 @@ export default function TextMessage ({
   createdAt,
   avatarSrc,
 }: Props) {
-  const myId = Number(useAuthStore((s) => s.me?.id ?? 0));
+  const myId = Number(tokenStorage.getUserId() ?? 0);
 
   if (messageType !== "TEXT") return null;
 
