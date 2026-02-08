@@ -59,9 +59,9 @@ export default function ChatComposer({
               <path 
                 d="M8.25 1.25V15.25M1.25 8.25H15.25" 
                 stroke="#F3F3F3" 
-                stroke-width="2.5" 
-                stroke-linecap="round" 
-                stroke-linejoin="round"
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
               />
             </svg>
 

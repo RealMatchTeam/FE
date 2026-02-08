@@ -25,11 +25,8 @@ function ChatPage() {
       const data = await getChatRooms({
         status: sort === "collaborating" ? "COLLABORATING" : "LATEST",
       });
-      console.log("[chat] response:", data);
-
       setRooms(Array.isArray(data.rooms) ? data.rooms : []);
     } catch (e) {
-      console.error("[chat] fetchRooms error:", e);
       setRooms([]); 
     } finally {
       setLoading(false);

@@ -30,7 +30,7 @@ export default function ChattingRoom({ brandId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 
-  const myUserId = Number(tokenStorage.getUserId() ?? 0); // ID도 여기서 꺼낼 수 있습니다!
+  const myUserId = Number(tokenStorage.getUserId() ?? 0); 
   const token = tokenStorage.getAccessToken();
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
   
@@ -64,6 +64,7 @@ export default function ChattingRoom({ brandId }: Props) {
       try {
         const result = await createOrGetDirectRoom({ brandId, creatorId: myUserId });
         setRoomId(result.roomId);
+        console.log("createOrGetDirectRoom result:", result);
       } catch (e) {
         console.error("createOrGetDirectRoom failed:", e);
         setRoomId(null);
@@ -115,6 +116,8 @@ export default function ChattingRoom({ brandId }: Props) {
     const run = async () => {
       try {
         const data = await getChatMessages({ roomId, size: 20 });
+        console.log("getChatMessages raw:", data);
+
         setMessages(data.messages.slice().reverse());
       } catch (e) {
         console.error(e);
@@ -124,6 +127,10 @@ export default function ChattingRoom({ brandId }: Props) {
 
     run();
   }, [token, roomId]);
+///////////
+  useEffect(() => {
+  console.log("[roomId changed]", roomId);
+}, [roomId]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -147,8 +154,13 @@ export default function ChattingRoom({ brandId }: Props) {
       stompClient.current.deactivate();
     }
 
+    const wsBase = import.meta.env.VITE_WS_BASE_URL;
+    if (!wsBase) {
+      throw new Error("VITE_WS_BASE_URL is missing");
+    }
+
     const client = new Client({
-      brokerURL: import.meta.env.VITE_WS_URL, // 로컬: ws://host/api/v1/ws/chat
+      brokerURL: `${wsBase}/api/v1/ws/chat`, // 로컬: ws://host/api/v1/ws/chat
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },

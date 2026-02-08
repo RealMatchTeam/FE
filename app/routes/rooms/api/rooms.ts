@@ -1,5 +1,12 @@
 import { axiosInstance } from "../../../api/axios";
 
+type ApiResponse<T> = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: T;
+};
+
 //채팅룸 생성 및 조회
 type CreateOrGetDirectRoomResponse = {
   isSuccess: boolean;
@@ -178,14 +185,17 @@ export async function getChatMessages({
   cursor,
   size = 20,
 }: GetChatMessagesParams): Promise<ChatMessageListResponse> {
-  const res = await axiosInstance.get<ChatMessageListResponse>(
+  const res = await axiosInstance.get<ApiResponse<ChatMessageListResponse>>(
     `/api/v1/chat/rooms/${roomId}/messages`,
     {
-      params: {
-        cursor,
-        size,
-      },
+      params: { cursor, size },
     }
   );
-  return res.data;
+
+  const data = res.data;
+  if (!data?.isSuccess) {
+    throw new Error(data?.message ?? "채팅 메시지 조회 실패");
+  }
+
+  return data.result;
 }
