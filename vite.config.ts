@@ -34,7 +34,14 @@ export default defineConfig({
     reactRouter(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
+      includeAssets: [
+        "apple-touch-icon.png",
+        "mask-icon.svg",
+        "pwa-64x64.png",
+        "pwa-192x192.png",
+        "pwa-512x512.png",
+        "maskable-icon-512x512.png",
+      ],
       manifest: {
         name: "Real Match",
         short_name: "Real Match",
