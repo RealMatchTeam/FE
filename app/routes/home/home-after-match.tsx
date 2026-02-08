@@ -42,6 +42,31 @@ const pickFirst = (arr?: string[]) => (Array.isArray(arr) ? arr[0] : undefined);
 
 const getCampaignIdForLike = (c: MatchingCampaign): number | null => {
   const id = c.campaignId ?? c.id;
+  if (typeof id !== "number") return null;
+  return Number.isFinite(id) && id > 0 ? id : null;
+};
+
+const getCampaignId = (c: MatchingCampaign): number | null => {
+  const anyC = c as unknown as {
+    campaignId?: number;
+    id?: number;
+    campaign_id?: number;
+  };
+  const id = anyC.campaignId ?? anyC.campaign_id ?? anyC.id;
+  if (typeof id !== "number") return null;
+  return Number.isFinite(id) && id > 0 ? id : null;
+};
+
+const getBrandIdFromCampaign = (c: MatchingCampaign): number | null => {
+  const anyC = c as unknown as {
+    brandId?: number;
+    brand_id?: number;
+    brand?: { id?: number; brandId?: number };
+  };
+  const id =
+    anyC.brandId ?? anyC.brand_id ?? anyC.brand?.brandId ?? anyC.brand?.id;
+
+  if (typeof id !== "number") return null;
   return Number.isFinite(id) && id > 0 ? id : null;
 };
 
@@ -190,6 +215,16 @@ export default function HomeAfterMatchPage() {
     };
   }, [profile, matchResult]);
 
+  const goCampaignDetail = (c: MatchingCampaign) => {
+    const campaignId = getCampaignId(c);
+    const brandId = getBrandIdFromCampaign(c);
+    if (!campaignId || !brandId) return;
+
+    navigate(
+      `/campaign?brandId=${brandId}&campaignId=${campaignId}&domain=${category}`,
+    );
+  };
+
   const handleBrandLikeToggle = async (id: string) => {
     const brandId = Number(id);
     if (!Number.isFinite(brandId) || brandId <= 0) return;
@@ -238,7 +273,7 @@ export default function HomeAfterMatchPage() {
     if (campaignLikeInFlight.current.has(campaignId)) return;
     campaignLikeInFlight.current.add(campaignId);
 
-    const current = currentCampaign.isLiked;
+    const current = currentCampaign.isLiked ?? false;
     const next = !current;
 
     const apply = (value: boolean) => {
@@ -308,13 +343,11 @@ export default function HomeAfterMatchPage() {
                     .map((t) => `#${t}`)
                     .join(" "),
                   badgeText: "모집중",
-                  domain: brand.name?.toLowerCase() || "",
+                  domain: category,
                   isLiked: brand.isLiked,
                 }}
                 onClick={() =>
-                  navigate(
-                    `/brand?brandId=${brand.id}&domain=${brand.name?.toLowerCase() || ""}`,
-                  )
+                  navigate(`/brand?brandId=${brand.id}&domain=${category}`)
                 }
                 onLikeToggle={handleBrandLikeToggle}
               />
@@ -332,32 +365,34 @@ export default function HomeAfterMatchPage() {
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-            {campaigns.slice(0, 3).map((campaign, i) => (
-              <CampaignCard
-                key={`match-${campaign.id}-${campaign.campaignId ?? "x"}-${i}`}
-                item={{
-                  id: String(campaign.campaignId ?? campaign.id),
-                  brandName: campaign.brandName,
-                  matchRate: campaign.matchRate || 0,
-                  descText: campaign.name || campaign.title || "",
-                  rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
-                  ddayLabel:
-                    campaign.dDay === 0
-                      ? "D-DAY"
-                      : campaign.dDay
-                        ? `D-${campaign.dDay}`
-                        : "",
-                  progressText: String(campaign.applicants),
-                  isLiked: campaign.isLiked,
-                  logoUrl: campaign.logoUrl,
-                }}
-                onClick={() => {
-                  const campaignId = campaign.campaignId ?? campaign.id;
-                  navigate(`/campaign?campaignId=${campaignId}`);
-                }}
-                onLikeToggle={handleCampaignLikeToggle}
-              />
-            ))}
+            {campaigns.slice(0, 3).map((campaign, i) => {
+              const safeCampaignId = getCampaignId(campaign);
+              if (!safeCampaignId) return null;
+
+              return (
+                <CampaignCard
+                  key={`match-${safeCampaignId}-${i}`}
+                  item={{
+                    id: String(safeCampaignId),
+                    brandName: campaign.brandName,
+                    matchRate: campaign.matchRate || 0,
+                    descText: campaign.name || campaign.title || "",
+                    rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
+                    ddayLabel:
+                      campaign.dDay === 0
+                        ? "D-DAY"
+                        : campaign.dDay
+                          ? `D-${campaign.dDay}`
+                          : "",
+                    progressText: String(campaign.applicants),
+                    isLiked: campaign.isLiked,
+                    logoUrl: campaign.logoUrl,
+                  }}
+                  onClick={() => goCampaignDetail(campaign)}
+                  onLikeToggle={handleCampaignLikeToggle}
+                />
+              );
+            })}
           </div>
         </section>
 
@@ -378,32 +413,34 @@ export default function HomeAfterMatchPage() {
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-            {popularCampaigns.slice(0, 3).map((campaign, i) => (
-              <CampaignCard
-                key={`popular-${campaign.id}-${campaign.campaignId ?? "x"}-${i}`}
-                item={{
-                  id: String(campaign.campaignId ?? campaign.id),
-                  brandName: campaign.brandName,
-                  matchRate: campaign.matchRate || 0,
-                  descText: campaign.name || campaign.title || "",
-                  rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
-                  ddayLabel:
-                    campaign.dDay === 0
-                      ? "D-DAY"
-                      : campaign.dDay
-                        ? `D-${campaign.dDay}`
-                        : "",
-                  progressText: String(campaign.applicants),
-                  isLiked: campaign.isLiked,
-                  logoUrl: campaign.logoUrl,
-                }}
-                onClick={() => {
-                  const campaignId = campaign.campaignId ?? campaign.id;
-                  navigate(`/campaign?campaignId=${campaignId}`);
-                }}
-                onLikeToggle={handleCampaignLikeToggle}
-              />
-            ))}
+            {popularCampaigns.slice(0, 3).map((campaign, i) => {
+              const safeCampaignId = getCampaignId(campaign);
+              if (!safeCampaignId) return null;
+
+              return (
+                <CampaignCard
+                  key={`popular-${safeCampaignId}-${i}`}
+                  item={{
+                    id: String(safeCampaignId),
+                    brandName: campaign.brandName,
+                    matchRate: campaign.matchRate || 0,
+                    descText: campaign.name || campaign.title || "",
+                    rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
+                    ddayLabel:
+                      campaign.dDay === 0
+                        ? "D-DAY"
+                        : campaign.dDay
+                          ? `D-${campaign.dDay}`
+                          : "",
+                    progressText: String(campaign.applicants),
+                    isLiked: campaign.isLiked,
+                    logoUrl: campaign.logoUrl,
+                  }}
+                  onClick={() => goCampaignDetail(campaign)}
+                  onLikeToggle={handleCampaignLikeToggle}
+                />
+              );
+            })}
           </div>
         </section>
       </div>
