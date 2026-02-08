@@ -122,6 +122,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const refreshToken = tokenStorage.getRefreshToken();
+
         if (!refreshToken) {
           tokenStorage.clearTokens();
           window.location.href = "/auth/login";
@@ -138,7 +139,6 @@ axiosInstance.interceptors.response.use(
           {
             headers: {
               RefreshToken: `Bearer ${refreshToken}`,
-              Authorization: "",
             },
           },
         );

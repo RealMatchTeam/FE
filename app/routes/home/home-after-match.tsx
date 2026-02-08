@@ -16,6 +16,7 @@ import MatchAnalysisSection from "./components/MatchAnalysisSection";
 import CreatorProfileCard from "./components/CreatorProfileCard";
 
 import { useMatchResultStore } from "../../stores/matching-result";
+import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import {
   getMatchingBrands,
@@ -89,6 +90,7 @@ export default function HomeAfterMatchPage() {
   const campaignLikeInFlight = useRef<Set<number>>(new Set());
 
   const matchResult = useMatchResultStore((s) => s.result);
+  const setSnsAccount = useCampaignProposalStore((s) => s.setSnsAccount);
 
   useEffect(() => {
     let alive = true;
@@ -121,7 +123,13 @@ export default function HomeAfterMatchPage() {
         profileRes.status === "fulfilled" &&
         profileRes.value.data?.isSuccess
       ) {
-        setProfileCard(profileRes.value.data.result);
+        const profileData = profileRes.value.data.result;
+        setProfileCard(profileData);
+
+        // snsAccount를 zustand에 저장
+        if (profileData.snsAccount) {
+          setSnsAccount(profileData.snsAccount);
+        }
       } else {
         setProfileCard(null);
       }
