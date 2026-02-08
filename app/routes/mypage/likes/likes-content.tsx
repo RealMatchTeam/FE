@@ -63,6 +63,15 @@ type CampaignLike = {
   logoUrl?: string | null;
 };
 
+const SORT_PARAM_MAP: Record<string, string> = {
+  "정렬 필터": "matchingRate",
+  "매칭률 순": "matchingRate",
+  "인기 순": "popularity",
+  "신규 순": "latest",
+  "금액 순": "reward",
+  "마감 순": "dDay",
+};
+
 export default function MyPageLikes() {
   useHideHeader(true);
   const navigate = useNavigate();
@@ -108,15 +117,6 @@ export default function MyPageLikes() {
     return list;
   }, [sortOption, campaignLikesApi]);
 
-  const sortParamMap: Record<string, string> = {
-    "정렬 필터": "matchingRate",
-    "매칭률 순": "matchingRate",
-    "인기 순": "popularity",
-    "신규 순": "latest",
-    "금액 순": "reward",
-    "마감 순": "dDay",
-  };
-
   useEffect(() => {
     let isMounted = true;
     const fetchScrap = async () => {
@@ -127,7 +127,7 @@ export default function MyPageLikes() {
           {
             params: {
               type: activeTab === "brand" ? "brand" : "campaign",
-              sort: sortParamMap[sortOption] ?? "matchingRate",
+              sort: SORT_PARAM_MAP[sortOption] ?? "matchingRate",
             },
           },
         );
