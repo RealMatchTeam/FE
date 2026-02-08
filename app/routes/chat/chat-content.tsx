@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { SORT_LABEL, type SortOption } from "./components/SortingSheetConstant";
 import { useEffect } from "react";
 import { ChatListHeader } from "./components/ChatListHeader";
@@ -19,7 +19,7 @@ function ChatPage() {
   // 바텀탭 숨기기
   useHideBottomTab(isSortOpen);
 
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getChatRooms({
@@ -34,11 +34,11 @@ function ChatPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [sort]);
 
   useEffect(() => {
     fetchRooms();
-  }, [sort]);
+  }, [fetchRooms]);
 
   const openSortSheet = () => {
     setPendingSort(sort);
