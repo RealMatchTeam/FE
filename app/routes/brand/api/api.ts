@@ -1,5 +1,10 @@
 import { apiClient } from "../../../api/axios";
-import type { BrandDomain, BrandDetailData, TagGroup } from "../types";
+import type {
+  BrandDomain,
+  BrandDetailData,
+  TagGroup,
+  BrandCampaignsApiResponse,
+} from "../types";
 
 type BeautyResponseDto = {
   categories: string[];
@@ -17,15 +22,14 @@ type FashionResponseDto = {
 type BrandDetailItemDto = {
   userId: number;
   brandName: string;
+  brandImages: string[];
   logoUrl?: string;
   simpleIntro?: string;
   homepageUrl?: string;
-
   brandTag: string | null;
   brandMatchingRatio: number;
   brandIsLiked: boolean;
   brandDescriptionTags: string[];
-
   beautyResponse: BeautyResponseDto | null;
   fashionResponse: FashionResponseDto | null;
 };
@@ -69,34 +73,26 @@ type SponsorProductListApiResponse = {
   result: SponsorProductListResponseDto[];
 };
 
-type BrandCampaignResponseDto = {
-  campaignId: number;
-  title: string;
-  recruitStartDate: string;
-  recruitEndDate: string;
-  status: "UPCOMING" | "RECRUITING" | "CLOSED";
-};
+type BrandCampaignDto =
+  BrandCampaignsApiResponse["result"]["campaigns"][number];
 
-type BrandCampaignSliceResponse = {
-  campaigns: BrandCampaignResponseDto[];
-  nextCursor?: number;
-};
-
-type BrandCampaignApiResponse = {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: BrandCampaignSliceResponse;
-};
-
-function formatHistoryDate(c: BrandCampaignResponseDto): { text: string; highlight: boolean } {
+function formatHistoryDate(c: BrandCampaignDto): {
+  text: string;
+  highlight: boolean;
+} {
   if (c.status === "UPCOMING" || c.status === "RECRUITING") {
     const d = new Date(c.recruitStartDate);
-    return { text: `${d.getMonth() + 1}월 ${d.getDate()}일 진행예정`, highlight: true };
+    return {
+      text: `${d.getMonth() + 1}월 ${d.getDate()}일 진행예정`,
+      highlight: true,
+    };
   }
   const d = new Date(c.recruitEndDate);
   const yy = d.getFullYear().toString().slice(2);
-  return { text: `${d.getMonth() + 1}/${d.getDate()}/${yy} 완료`, highlight: false };
+  return {
+    text: `${d.getMonth() + 1}/${d.getDate()}/${yy} 완료`,
+    highlight: false,
+  };
 }
 
 function stripHash(values: string[] | undefined | null): string[] {
@@ -115,7 +111,10 @@ function inferDomain(item: BrandDetailItemDto): BrandDomain {
   return item.fashionResponse ? "fashion" : "beauty";
 }
 
-function buildCategories(domain: BrandDomain, item: BrandDetailItemDto): string[] {
+function buildCategories(
+  domain: BrandDomain,
+  item: BrandDetailItemDto,
+): string[] {
   if (domain === "fashion") {
     const cats = unique(stripHash(item.fashionResponse?.categories));
     return cats.length ? cats : ["의류", "가방", "신발", "주얼리", "패션 소품"];
@@ -126,7 +125,7 @@ function buildCategories(domain: BrandDomain, item: BrandDetailItemDto): string[
 
 function buildTagSections(
   domain: BrandDomain,
-  item: BrandDetailItemDto
+  item: BrandDetailItemDto,
 ): Array<{ title: string; groups: TagGroup[] }> {
   if (domain === "fashion") {
     const f = item.fashionResponse;
@@ -136,8 +135,10 @@ function buildTagSections(
     const brandStyle = unique(stripHash(f.brandStyle));
 
     const groups: TagGroup[] = [];
-    if (brandType.length) groups.push({ label: "브랜드 종류", chips: brandType });
-    if (brandStyle.length) groups.push({ label: "브랜드 스타일", chips: brandStyle });
+    if (brandType.length)
+      groups.push({ label: "브랜드 종류", chips: brandType });
+    if (brandStyle.length)
+      groups.push({ label: "브랜드 스타일", chips: brandStyle });
 
     return groups.length ? [{ title: "의류 태그", groups }] : [];
   }
@@ -155,21 +156,25 @@ function buildTagSections(
   if (cats.includes("스킨케어") || cats.includes("바디")) {
     const groups: TagGroup[] = [];
     if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
-    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
+    if (mainFunction.length)
+      groups.push({ label: "주요기능", chips: mainFunction });
     if (groups.length) sections.push({ title: "스킨케어 태그", groups });
   }
 
   if (cats.includes("메이크업")) {
     const groups: TagGroup[] = [];
-    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (makeUpStyle.length)
+      groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
     if (groups.length) sections.push({ title: "메이크업 태그", groups });
   }
 
   if (!sections.length) {
     const groups: TagGroup[] = [];
     if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
-    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
-    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (mainFunction.length)
+      groups.push({ label: "주요기능", chips: mainFunction });
+    if (makeUpStyle.length)
+      groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
     return groups.length ? [{ title: "태그", groups }] : [];
   }
 
@@ -179,16 +184,20 @@ function buildTagSections(
 async function safeGet<T>(p: Promise<T>): Promise<T | null> {
   try {
     return await p;
-  } catch (e) {
-    console.error(e);
+  } catch {
     return null;
   }
 }
 
-export async function fetchBrandDetail(params: { brandId: string; domain?: BrandDomain }): Promise<BrandDetailData> {
+export async function fetchBrandDetail(params: {
+  brandId: string;
+  domain?: BrandDomain;
+}): Promise<BrandDetailData> {
   const { brandId, domain } = params;
 
-  const detailRes = await apiClient.get<BrandDetailApiResponse>(`/api/v1/brands/${brandId}`);
+  const detailRes = await apiClient.get<BrandDetailApiResponse>(
+    `/api/v1/brands/${brandId}`,
+  );
   const detail = detailRes.data;
 
   if (!detail.isSuccess || !detail.result?.length) {
@@ -202,22 +211,41 @@ export async function fetchBrandDetail(params: { brandId: string; domain?: Brand
     resolvedDomain === "fashion" && !item.fashionResponse
       ? "beauty"
       : resolvedDomain === "beauty" && !item.beautyResponse
-      ? "fashion"
-      : resolvedDomain;
+        ? "fashion"
+        : resolvedDomain;
 
   const productsRes = await safeGet(
-    apiClient.get<SponsorProductListApiResponse>(`/api/v1/brands/${brandId}/sponsor-products`)
-  );
-  const campaignsRes = await safeGet(
-    apiClient.get<BrandCampaignApiResponse>(`/api/v1/brands/${brandId}/campaigns`)
-  );
-  const recruitingRes = await safeGet(
-    apiClient.get<RecruitingCampaignsApiResponse>(`/api/v1/brands/${brandId}/campaigns/recruiting`)
+    apiClient.get<SponsorProductListApiResponse>(
+      `/api/v1/brands/${brandId}/sponsor-products`,
+    ),
   );
 
-  const productList = productsRes?.data?.isSuccess ? productsRes.data.result : [];
-  const historyList = campaignsRes?.data?.isSuccess ? campaignsRes.data.result.campaigns : [];
-  const recruitingList = recruitingRes?.data?.isSuccess ? recruitingRes.data.result.campaigns : [];
+  const campaignsRes = await safeGet(
+    apiClient.get<BrandCampaignsApiResponse>(
+      `/api/v1/brands/${brandId}/campaigns`,
+    ),
+  );
+
+  const recruitingRes = await safeGet(
+    apiClient.get<RecruitingCampaignsApiResponse>(
+      `/api/v1/brands/${brandId}/campaigns/recruiting`,
+    ),
+  );
+
+  const productList = productsRes?.data?.isSuccess
+    ? productsRes.data.result
+    : [];
+
+  const historyList = campaignsRes?.data?.isSuccess
+    ? campaignsRes.data.result.campaigns
+    : [];
+
+  const historiesHasNext =
+    campaignsRes?.data?.isSuccess && campaignsRes.data.result.hasNext;
+
+  const recruitingList = recruitingRes?.data?.isSuccess
+    ? recruitingRes.data.result.campaigns
+    : [];
 
   return {
     id: brandId,
@@ -227,7 +255,9 @@ export async function fetchBrandDetail(params: { brandId: string; domain?: Brand
     name: item.brandName,
     matchRate: item.brandMatchingRatio ?? 0,
 
-    heroImageUrl: "",
+    heroImageUrl: item.brandImages?.[0] ?? "",
+    brandImages: item.brandImages ?? [],
+
     logoText: item.brandName,
     logoImageUrl: item.logoUrl,
 
@@ -256,7 +286,14 @@ export async function fetchBrandDetail(params: { brandId: string; domain?: Brand
 
     histories: historyList.map((c) => {
       const { text, highlight } = formatHistoryDate(c);
-      return { id: String(c.campaignId), title: c.title, rightText: text, highlight };
+      return {
+        id: String(c.campaignId),
+        title: c.title,
+        rightText: text,
+        highlight,
+      };
     }),
+
+    historiesHasNext,
   };
 }

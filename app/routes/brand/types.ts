@@ -62,7 +62,7 @@ export type BrandDetailResponse = {
   isSuccess: boolean;
   code: string;
   message: string;
-  result: BrandDetailApiResult[]; 
+  result: BrandDetailApiResult[];
 };
 
 export type BrandDetailData = {
@@ -73,7 +73,7 @@ export type BrandDetailData = {
   name: string;
   matchRate: number;
 
-  heroImageUrl?: string; 
+  heroImageUrl?: string;
   brandImages?: string[];
 
   logoText?: string;
@@ -97,4 +97,24 @@ export type BrandDetailData = {
   ongoingCampaigns: BrandOngoingCampaign[];
   products: ProductMiniCardItem[];
   histories: HistoryRowItem[];
+  historiesHasNext?: boolean;
+};
+export type BrandCampaignStatus = "UPCOMING" | "RECRUITING" | "CLOSED";
+
+export type BrandCampaignDto = {
+  campaignId: number;
+  title: string;
+  recruitStartDate: string;
+  recruitEndDate: string;
+  status: BrandCampaignStatus;
+};
+
+export type BrandCampaignsApiResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    campaigns: BrandCampaignDto[];
+    hasNext: boolean;
+  };
 };
