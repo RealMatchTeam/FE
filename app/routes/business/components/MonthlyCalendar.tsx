@@ -80,6 +80,7 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
               {day}
             </div>
           ))}
+          
         </div>
 
         {/* 주차별 렌더링 */}
