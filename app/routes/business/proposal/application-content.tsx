@@ -60,9 +60,8 @@ export default function ApplicationContent() {
                 } else {
                     console.warn("데이터에 brandId가 없습니다.");
                 }
-            } catch (error: any) {
+            } catch (error) {
                 console.error("최종 데이터 로드 실패:", error);
-                alert(error.message || "상세 정보를 불러오는 중 에러가 발생했습니다.");
             } finally {
                 setIsLoading(false);
             }
