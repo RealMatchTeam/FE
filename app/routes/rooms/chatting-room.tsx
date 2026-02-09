@@ -108,10 +108,6 @@ export default function ChattingRoom({ roomId }: Props) {
 
     run();
   }, [token, roomId]);
-///////////
-  useEffect(() => {
-  console.log("[roomId changed]", roomId);
-}, [roomId]);
 
   useEffect(() => {
     const el = listRef.current;
