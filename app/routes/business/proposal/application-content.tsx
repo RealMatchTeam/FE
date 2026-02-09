@@ -47,13 +47,10 @@ export default function ApplicationContent() {
             try {
                 setIsLoading(true);
 
-                // 1. 지원 상세 정보 조회
                 const result = await getAppliedCampaignDetail(applicationId as string);
                 if (!result) throw new Error("데이터가 비어있습니다.");
                 setData(result);
 
-                // 2. 브랜드 ID 결정 로직 (고칠 부분!)
-                // 상세 API 응답에 brandId가 있으면 쓰고, 없으면 목록에서 넘겨받은 brandIdFromList를 사용합니다.
                 const finalBrandId = result.brandId || brandIdFromList;
 
                 if (finalBrandId) {

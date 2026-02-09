@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getMyCollaborations } from "./api/calendar";
 import type { CampaignCollaboration } from "./api/calendar";
 import FilterBottomSheet from "../components/FilterBottomSheet";
@@ -14,6 +14,7 @@ import EmptyState from "../components/EmptyState";
 
 export default function CalendarContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mainTab, setMainTab] = useState<"collaboration" | "matching">("collaboration");
   const [activeTab, setActiveTab] = useState<"thisMonth" | "today">("thisMonth");
   const [matchingSubTab, setMatchingSubTab] = useState<"sent" | "received" | "applied">("sent");
@@ -26,22 +27,50 @@ export default function CalendarContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getMyCollaborations({
-          type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
-          keyword: keyword.trim() || undefined,
-        });
-        setCampaigns(data || []);
-      } catch (error) {
-        console.error("로드 실패:", error);
-      } finally {
-        setIsLoading(false);
+  const fetchAllCampaigns = async () => {
+    try {
+      setIsLoading(true);
+      
+      // 방법 A: 서버 API가 type을 안 보낼 때 전체를 반환한다면 type 제거
+      // 방법 B: 전체를 가져오는 별도의 호출 로직 구현
+      const [applied, sent, received] = await Promise.all([
+        getMyCollaborations({ type: "APPLIED", keyword: keyword.trim() || undefined }),
+        getMyCollaborations({ type: "SENT", keyword: keyword.trim() || undefined }),
+        getMyCollaborations({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
+      ]);
+
+      // 모든 데이터를 하나의 배열로 합침
+      setCampaigns([...applied, ...sent, ...received]);
+    } catch (error) {
+      console.error("로드 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchAllCampaigns();
+}, [keyword, location.key]); // matchingSubTab 의존성 제거
+
+  const filteredList = useMemo(() => {
+    const today = new Date();
+    // 한국 시간 기준으로 날짜 문자열 생성 (YYYY-MM-DD)
+    const todayStr = today.getFullYear() + '-' + 
+                     String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(today.getDate()).padStart(2, '0');
+    const currentMonthStr = todayStr.substring(0, 7);
+
+    return campaigns.filter((item) => {
+      if (item.status !== "MATCHED") return false;
+
+      if (activeTab === "today") {
+        return item.startDate <= todayStr && item.endDate >= todayStr;
+      } else {
+        const startMonth = item.startDate.substring(0, 7);
+        const endMonth = item.endDate.substring(0, 7);
+        return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
       }
-    };
-    fetchCampaigns();
-  }, [matchingSubTab, keyword]);
+    });
+  }, [campaigns, activeTab]);
 
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {
@@ -72,51 +101,30 @@ export default function CalendarContent() {
   console.log("전체 데이터:", campaigns);
   console.log("필터된 데이터:", matchingList);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const currentMonthStr = todayStr.substring(0, 7);
-
   const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
 
-  const filteredList = campaigns.filter((item) => {
-    if (item.status !== "MATCHED") return false;
-
-    if (activeTab === "today") {
-      return item.startDate <= todayStr && item.endDate >= todayStr;
-    } else {
-      const startMonth = item.startDate.substring(0, 7);
-      const endMonth = item.endDate.substring(0, 7);
-      return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
-    }
-  });
-
   const handleCardClick = (item: CampaignCollaboration) => {
-  // 1. proposalId나 campaignId 중 유효한 값을 ID로 사용
-  const proposalId = item.proposalId || item.campaignId;
+    const proposalId = item.proposalId || item.campaignId;
+    const navigationState = { state: { brandId: item.brandId } };
 
-  // 2. 공통적으로 넘길 state 정의 (브랜드 ID 포함)
-  const navigationState = { state: { brandId: item.brandId } };
+    // 거절 상태인 경우
+    if (item.status === "REJECTED") {
+      navigate(`/business/rejection?proposalId=${proposalId}`, navigationState);
+      return;
+    }
 
-  // 거절 상태인 경우
-  if (item.status === "REJECTED") {
-    navigate(`/rejection?proposalId=${proposalId}`, navigationState);
-    return;
-  }
+    if (item.type === "APPLIED") {
+      navigate(`/business/proposal?type=applied&applicationId=${proposalId}`, navigationState);
+      return;
+    }
 
-  // 지원한 캠페인인 경우 (type: APPLIED)
-  if (item.type === "APPLIED") {
-    navigate(`/business/proposal?type=applied&applicationId=${proposalId}`, navigationState);
-    return;
-  }
+    if (item.type === "RECEIVED") {
+      navigate(`/business/proposal?type=received&proposalId=${proposalId}`, navigationState);
+      return;
+    }
 
-  // 받은 제안인 경우 (type: RECEIVED)
-  if (item.type === "RECEIVED") {
-    navigate(`/business/proposal?type=received&proposalId=${proposalId}`, navigationState);
-    return;
-  }
-
-  // 보낸 제안인 경우 (type: SENT)
-  navigate(`/business/proposal?type=sent&proposalId=${proposalId}`, navigationState);
-};
+    navigate(`/business/proposal?type=sent&proposalId=${proposalId}`, navigationState);
+  };
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
@@ -180,9 +188,8 @@ export default function CalendarContent() {
                 ) : filteredList.length > 0 ? (
                   filteredList.map((cp) => (
                     <CampaignCard
-                      key={cp.campaignId || cp.proposalId}
+                      key={`${cp.campaignId}-${cp.proposalId}-${cp.status}`} // 상태를 포함하여 변경 감지 극대화
                       campaignId={cp.campaignId}
-                      proposalId={cp.proposalId ?? undefined}
                       type={cp.type}
                       brand={cp.brandName}
                       title={cp.title}
