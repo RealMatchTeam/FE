@@ -1,13 +1,20 @@
 export type AttachmentType = "IMAGE" | "FILE";
 export type AttachmentUsage = "CHAT" | "PUBLIC";
 
+type ApiResponse<T> = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: T;
+};
+
 export interface ChatAttachmentUploadResponse {
   attachmentId: number;
   attachmentType: "IMAGE" | "FILE";
   contentType: string;
   originalName: string;
   fileSize: number;
-  accessUrl: string; // presigned (TTL)
+  accessUrl: string; 
   status: "READY";
   createdAt: string;
 }
@@ -18,18 +25,15 @@ export interface ChatAttachment {
   contentType: string;
   originalName: string;
   fileSize: number;
-  accessUrl: string; // 서버가 메시지 응답에 주는 경우에만
+  accessUrl: string; 
 }
-
-/* fetch를 쓸 때 Content-Type을 직접 multipart/form-data로 세팅 X
-브라우저가 boundary 포함해서 자동으로 잡아줌 */
 
 export async function uploadAttachment(params: {
   token: string;
   file: File;
   attachmentType: AttachmentType;
-  usage: AttachmentUsage; // 보통 "CHAT"
-  baseUrl: string; // 예: import.meta.env.VITE_API_BASE_URL
+  usage: AttachmentUsage; 
+  baseUrl: string; 
 }): Promise<ChatAttachmentUploadResponse> {
   const { token, file, attachmentType, usage, baseUrl } = params;
 
@@ -49,9 +53,16 @@ export async function uploadAttachment(params: {
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Attachment upload failed: ${res.status} ${text}`);
+    throw new Error(`서버 에러: ${res.status} ${text}`);
   }
 
-  const data = (await res.json()) as ChatAttachmentUploadResponse;
-  return data;
+  // ApiResponse 파싱
+  const data = (await res.json()) as ApiResponse<ChatAttachmentUploadResponse>;
+
+  // isSuccess: false
+  if (!data.isSuccess) {
+    throw new Error(data.message || "파일 업로드 중 에러 발생");
+  }
+
+  return data.result;
 }
