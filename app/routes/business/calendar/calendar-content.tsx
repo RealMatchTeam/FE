@@ -27,33 +27,33 @@ export default function CalendarContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-  const fetchAllCampaigns = async () => {
-    try {
-      setIsLoading(true);
-      
-      const [applied, sent, received] = await Promise.all([
-        getMyCollaborations({ type: "APPLIED", keyword: keyword.trim() || undefined }),
-        getMyCollaborations({ type: "SENT", keyword: keyword.trim() || undefined }),
-        getMyCollaborations({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
-      ]);
+    const fetchAllCampaigns = async () => {
+      try {
+        setIsLoading(true);
 
-      setCampaigns([...applied, ...sent, ...received]);
-    } catch (error) {
-      console.error("로드 실패:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const [applied, sent, received] = await Promise.all([
+          getMyCollaborations({ type: "APPLIED", keyword: keyword.trim() || undefined }),
+          getMyCollaborations({ type: "SENT", keyword: keyword.trim() || undefined }),
+          getMyCollaborations({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
+        ]);
 
-  fetchAllCampaigns();
-}, [keyword, location.key]); 
+        setCampaigns([...applied, ...sent, ...received]);
+      } catch (error) {
+        console.error("로드 실패:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllCampaigns();
+  }, [keyword, location.key]);
 
   const filteredList = useMemo(() => {
     const today = new Date();
 
-    const todayStr = today.getFullYear() + '-' + 
-                     String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                     String(today.getDate()).padStart(2, '0');
+    const todayStr = today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
     const currentMonthStr = todayStr.substring(0, 7);
 
     return campaigns.filter((item) => {
@@ -83,17 +83,27 @@ export default function CalendarContent() {
     }
   };
 
-  const matchingList = campaigns.filter((item) => {
-    const isCorrectSubTab =
-      matchingSubTab === "sent" ? item.type === "SENT" :
-        matchingSubTab === "received" ? item.type === "RECEIVED" :
-          item.type === "APPLIED";
+  const matchingList = useMemo(() => {
+    return campaigns.filter((item) => {
+      const isCorrectSubTab =
+        matchingSubTab === "sent" ? item.type === "SENT" :
+          matchingSubTab === "received" ? item.type === "RECEIVED" :
+            item.type === "APPLIED";
 
-    if (!isCorrectSubTab) return false;
+      if (!isCorrectSubTab) return false;
 
-    if (activeFilter === "전체") return true;
-    return getStatusLabel(item.status) === activeFilter;
-  });
+      if (activeFilter === "전체") return true;
+
+      const statusMatches = getStatusLabel(item.status) === activeFilter;
+
+      const keywordMatches = keyword ? item.brandName.includes(keyword) : true;
+
+      return statusMatches && keywordMatches;
+
+
+
+    });
+  }, [campaigns, matchingSubTab, activeFilter, keyword]);
 
   console.log("전체 데이터:", campaigns);
   console.log("필터된 데이터:", matchingList);
@@ -184,7 +194,7 @@ export default function CalendarContent() {
                 ) : filteredList.length > 0 ? (
                   filteredList.map((cp) => (
                     <CampaignCard
-                      key={`${cp.campaignId}-${cp.proposalId}-${cp.status}`} // 상태를 포함하여 변경 감지 극대화
+                      key={`${cp.campaignId}-${cp.proposalId}-${cp.status}`}
                       campaignId={cp.campaignId}
                       type={cp.type}
                       brand={cp.brandName}

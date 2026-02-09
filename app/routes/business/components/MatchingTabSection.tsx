@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { searchCollaborations, type CampaignCollaboration} from "../calendar/api/calendar"; 
+import { searchCollaborations, type CampaignCollaboration } from "../calendar/api/calendar"; 
 import searchIcon from "../../../assets/search2.svg";
 import closeIcon from "../../../assets/cancel.svg"; 
-
 
 interface Props {
   subTab: "sent" | "received" | "applied";
@@ -27,36 +26,49 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
   );
 }
 
-
-export default function MatchingTabSection({ subTab, setSubTab, receivedCount }: Props) {
+export default function MatchingTabSection({ subTab, setSubTab, receivedCount, keyword, setKeyword }: Props) {
   const [isSearching, setIsSearching] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(keyword); // 초기값으로 keyword 사용
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      if (!query.trim()) return;
-      setIsLoading(true);
-      try {
-        const data = await searchCollaborations({
-          keyword: query,
-          type: subTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
-        });
-        setCampaigns(data || []);
-      } catch (error) {
-        console.error("검색 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // 캠페인 검색 함수
+  const fetchCampaigns = async () => {
+    if (!query.trim()) return; // 검색어가 비어있으면 종료
+    setIsLoading(true);
+    try {
+      const data = await searchCollaborations({
+        keyword: query, // 브랜드명 검색
+        type: subTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
+      });
+      setCampaigns(data || []);
+    } catch (error) {
+      console.error("검색 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  // 검색 상태에 따라 캠페인 검색
+  useEffect(() => {
     if (isSearching) {
       fetchCampaigns();
     } else {
       setCampaigns([]); 
     }
   }, [isSearching, query, subTab]);
+
+  // 검색어가 변경될 때마다 자동 검색
+  useEffect(() => {
+    if (isSearching) {
+      fetchCampaigns();
+    }
+  }, [query]);
+
+  // 검색어가 변경될 때 setKeyword 호출
+  useEffect(() => {
+    setKeyword(query);
+  }, [query, setKeyword]);
 
   if (isSearching) {
     return (
@@ -68,9 +80,9 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount }:
             <input
               autoFocus
               className="flex-1 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
-              placeholder="검색어 입력"
+              placeholder="브랜드명 입력"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)} // query 업데이트
             />
             <button 
               onClick={() => { setIsSearching(false); setQuery(""); }}
@@ -89,7 +101,7 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount }:
           {!isLoading && campaigns.length > 0 ? (
             campaigns.map((item) => (
               <div key={item.campaignId} className="py-3 border-b border-text-gray5 text-[14px]">
-                {item.title}
+                {item.brandName} - {item.title} {/* 브랜드명과 제목 표시 */}
               </div>
             ))
           ) : (
