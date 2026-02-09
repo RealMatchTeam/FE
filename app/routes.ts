@@ -18,7 +18,6 @@ export default [
       route("terms", "routes/auth/signup/terms/route.tsx"),
       route("type", "routes/auth/signup/type/route.tsx"),
       route("info", "routes/auth/signup/info/route.tsx"),
-      route("info-more", "routes/auth/signup/info-more/route.tsx"),
       route("purpose", "routes/auth/signup/purpose/route.tsx"),
       route("success", "routes/auth/signup/success/route.tsx"),
     ]),

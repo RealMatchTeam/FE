@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 import PreHome from "./home-content";
 import HomeAfterMatch from "./home-after-match";
 import {
@@ -10,7 +11,9 @@ import { getMyPage } from "../mypage/api/mypage";
 import { tokenStorage } from "../../lib/token";
 
 export default function Home() {
+  const location = useLocation();
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
+  const [forceRefresh, setForceRefresh] = useState(0);
   const me = useAuthStore((s) => s.me);
   const setMe = useAuthStore((s) => s.setMe);
   const hasTokens = tokenStorage.hasTokens();
@@ -58,7 +61,10 @@ export default function Home() {
   }, [hasTokens, me?.matchingTestDone, setMe]);
 
   useEffect(() => {
-    if (resolvedHasMatchingTest !== true) return;
+    if (resolvedHasMatchingTest !== true) {
+      setHasMatch(null);
+      return;
+    }
 
     const checkMatchStatus = async () => {
       try {
@@ -75,7 +81,14 @@ export default function Home() {
     };
 
     checkMatchStatus();
-  }, [resolvedHasMatchingTest]);
+  }, [resolvedHasMatchingTest, forceRefresh]);
+
+  // location state가 변경되면 리프레시
+  useEffect(() => {
+    if (location.state?.refresh) {
+      setForceRefresh(prev => prev + 1);
+    }
+  }, [location.state]);
 
   if (resolvedHasMatchingTest === false) {
     return <PreHome />;

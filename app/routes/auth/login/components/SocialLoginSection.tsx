@@ -42,7 +42,7 @@ export function SocialLoginSection({ lastProvider }: SocialLoginSectionProps) {
             className="w-[52px] h-[52px] rounded-full bg-[#FEE500] flex items-center justify-center transition-transform hover:scale-105"
             aria-label="카카오 로그인"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"

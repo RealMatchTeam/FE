@@ -29,16 +29,16 @@ export default function CampaignCard({
     };
 
     return (
-        <div onClick={onClick} className="flex w-full p-2.5 bg-white border border-bluegray-2 rounded-2xl shadow-sm cursor-pointer">
+        <div onClick={onClick} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer">
             {/* 왼쪽: 이미지 + 배지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
                 <BrandLogo src={logoUrl} alt={brandName} />
                 {/* 원고료 & D-Day 배지 */}
                 <div className="flex items-center justify-center gap-1 w-full">
-                    <span className="px-1.5 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
+                    <span className="px-1 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
                         D-DAY
                     </span>
-                    <span className="px-1.5 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                    <span className="px-1 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
                 </div>
             </div>
 

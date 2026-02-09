@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import RealmatchHeader from "../../../components/common/RealmatchHeader";
+import RealmatchHeader from "../../../components/layout/RealmatchHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
@@ -25,7 +25,7 @@ export default function ReceivedProposalContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [modalType, setModalType] = useState<"none" | "confirm" | "success">("none");
     const [isContentOpen, setIsContentOpen] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false); 
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -55,12 +55,12 @@ export default function ReceivedProposalContent() {
 
         try {
             setIsProcessing(true);
-            
+
             const response = await approveCampaignProposal(proposalId);
 
             if (response.isSuccess) {
                 setModalType("success");
-                
+
             } else {
                 alert(response.message || "수락 처리 중 오류가 발생했습니다.");
             }
@@ -68,7 +68,7 @@ export default function ReceivedProposalContent() {
             console.error("수락 연동 에러:", error);
             alert("서버와 통신 중 에러가 발생했습니다.");
         } finally {
-            setIsProcessing(false); 
+            setIsProcessing(false);
         }
     };
     const closeModal = () => setModalType("none");
@@ -78,7 +78,7 @@ export default function ReceivedProposalContent() {
         if (!proposalId) return;
 
         const reason = window.prompt("거절 사유를 입력해주세요.", "일정이 맞지 않습니다.");
-        
+
         if (reason === null) return;
 
         try {
@@ -87,7 +87,7 @@ export default function ReceivedProposalContent() {
 
             if (response.isSuccess) {
                 alert("제안을 거절했습니다.");
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 alert(response.message || "거절 처리 중 오류가 발생했습니다.");
             }
@@ -100,7 +100,7 @@ export default function ReceivedProposalContent() {
     };
     // 태그 배열을 문자열로 변환하는 헬퍼 함수
     const formatTags = (tags: { name: string }[] | undefined | null) => {
-        if (!tags || tags.length === 0) return "정보 없음"; 
+        if (!tags || tags.length === 0) return "정보 없음";
         return tags.map(t => t.name).join(", ");
     };
 
@@ -120,9 +120,9 @@ export default function ReceivedProposalContent() {
                         showChatSection={false}
                         statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"}
                         brandName={brand?.brandName}
-                        brandTags={brand?.brandTags}      
-                        brandImageUrl={brand?.brandImageUrl} 
-                        matchingRate={brand?.matchingRate} 
+                        brandTags={brand?.brandTags}
+                        brandImageUrl={brand?.brandImageUrl}
+                        matchingRate={brand?.matchingRate}
                     />
                     <div>
                         <h2 className="text-title1 text-text-black">{proposal.title}</h2>
@@ -202,8 +202,8 @@ export default function ReceivedProposalContent() {
 
             {/* 하단 고정 버튼 영역 */}
             <div className="px-4 py-5 flex gap-3 bg-[var(--color-bg-w)] sticky bottom-0 border-t border-[var(--color-text-gray5)]">
-                <button 
-                    onClick={handleRejectClick} 
+                <button
+                    onClick={handleRejectClick}
                     disabled={isProcessing}
                     className="flex-1 h-[52px] bg-[var(--color-bg-w)] border border-[var(--color-core-3)] rounded-xl text-core-1 text-title3 active:bg-gray-50 transition-colors disabled:opacity-50"
                 >

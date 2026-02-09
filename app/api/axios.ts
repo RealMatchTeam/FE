@@ -106,7 +106,8 @@ axiosInstance.interceptors.response.use(
       originalRequest.url = normalizeUrl(originalRequest.url);
     }
 
-    if ((status === 401 || status === 400) && !originalRequest._retry) {
+    // 토큰 갱신 처리
+    if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (isRefreshing) {

@@ -9,7 +9,7 @@ import CampaignFilterBar from "./components/CampaignFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import MainIcon from "../../../assets/MainIcon.svg";
+import EmptyMatchState from "../../../components/common/EmptyMatchState";
 import { getMatchingCampaigns, getTagNamesByCategory, type MatchingCampaign } from "../api/matching";
 
 export default function CampaignContent() {
@@ -135,16 +135,11 @@ export default function CampaignContent() {
     if (error || (campaigns.length === 0 && !isLoading)) {
         if (error) console.error("Failed to fetch matching campaigns:", error);
 
-        return (
-            <div className="flex flex-col h-full bg-core-2">
-                <div className="flex flex-col items-center justify-center flex-1 bg-gradient-to-b from-[#E8E8F8] to-white px-6">
-                    <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
-                    <p className="text-title1 text-text-black text-center mb-2">
-                        매칭된 기업이 없어요 / 검색 결과가 없습니다.
-                    </p>
-                </div>
-            </div>
-        );
+        return <EmptyMatchState
+            message={`매칭된 기업이 없어요\n매칭 검사를 먼저 진행해주세요`}
+            showButton={true}
+            buttonText="매칭 검사하기"
+        />
     }
 
     // 매칭 결과가 있을 때
@@ -162,7 +157,7 @@ export default function CampaignContent() {
             <div className="flex-1 px-4 py-6 overflow-y-auto">
                 {/* 타이틀 & 필터 */}
                 <div className="mb-4">
-                    <h2 className="text-title1 mb-3">캠페인 리스트</h2>
+                    <h2 className="text-title1 mb-4">캠페인 리스트</h2>
                     <div className="flex gap-2">
                         <FilterButton
                             label={getSortButtonLabel()}

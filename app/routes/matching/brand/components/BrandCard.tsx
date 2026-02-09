@@ -19,7 +19,7 @@ export default function BrandCard({
     onLike
 }: BrandCardProps) {
     return (
-        <div className="flex w-full p-2.5 bg-white border border-bluegray-2 rounded-2xl shadow-sm">
+        <div className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm">
             {/* 왼쪽: 이미지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
                 <BrandLogo src={logoUrl} alt={name} />
@@ -28,7 +28,7 @@ export default function BrandCard({
             {/* 오른쪽: 콘텐츠 */}
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-1 h-full">
-                    <div className="flex flex-col gap-1 w-full">
+                    <div className="flex flex-col w-full">
                         {/* 헤더: 이름 & 좋아요 & 매칭률 */}
                         <div className="flex justify-between items-start">
                             <h3 className="text-title1 text-text-black truncate">{name}</h3>
@@ -49,7 +49,7 @@ export default function BrandCard({
                         </div>
 
                         {/* 태그 */}
-                        <div className="flex flex-wrap gap-1 mt-1">
+                        <div className="flex flex-wrap gap-1 mt-[6px]">
                             {tags.map((tag, i) => (
                                 <span key={i} className="text-callout1 text-text-gray3">#{tag}</span>
                             ))}
