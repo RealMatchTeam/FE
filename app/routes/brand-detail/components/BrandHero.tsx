@@ -35,7 +35,7 @@ export default function BrandHero({
       </button>
 
       <div className="absolute -bottom-8 left-5 z-10">
-        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-full bg-white shadow-[0_8px_18px_rgba(0,0,0,0.12)]">
+        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border border-[#E6E6F3] bg-white shadow-[0_8px_18px_rgba(0,0,0,0.12)]">
           {logoImageUrl ? (
             <img
               src={logoImageUrl}

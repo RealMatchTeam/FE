@@ -230,10 +230,24 @@ export default function BrandDetailContent({ data }: Props) {
 
           <DividerBlock />
 
-          <OngoingCampaignSection
-            campaigns={data.ongoingCampaigns}
-            onMore={() => {}}
-          />
+          {!data.ongoingCampaigns || data.ongoingCampaigns.length === 0 ? (
+            <section className="py-5">
+              <div className="text-title7 text-text-black">
+                진행 중인 캠페인
+              </div>
+
+              <div className="flex h-[220px] items-center justify-center">
+                <div className="text-[16px] font-medium text-text-gray3">
+                  진행 중인 캠페인이 없어요.
+                </div>
+              </div>
+            </section>
+          ) : (
+            <OngoingCampaignSection
+              campaigns={data.ongoingCampaigns}
+              onMore={() => {}}
+            />
+          )}
 
           <DividerBlock />
 
@@ -245,13 +259,23 @@ export default function BrandDetailContent({ data }: Props) {
               </button>
             </div>
 
-            <div className="mt-4 -mx-5 overflow-x-auto px-5 scrollbar-hide">
-              <div className="flex gap-3">
-                {(data.products ?? []).map((p) => (
-                  <ProductMiniCard key={p.id} item={p} />
-                ))}
+            {!data.products || data.products.length === 0 ? (
+              <div className="flex h-[220px] items-center justify-center">
+                <div className="text-[16px] font-medium text-text-gray3">
+                  협찬 가능한 제품이 없어요.
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mt-4 -mx-5 overflow-x-hidden">
+                <div className="px-5 overflow-x-auto scrollbar-hide">
+                  <div className="flex w-max gap-3">
+                    {data.products.map((p) => (
+                      <ProductMiniCard key={p.id} item={p} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
 
           <DividerBlock />
@@ -352,7 +376,5 @@ export default function BrandDetailContent({ data }: Props) {
 }
 
 function DividerBlock() {
-  return (
-    <div className="relative left-1/2 mt-5 h-2 w-screen -translate-x-1/2 bg-bluegray-1" />
-  );
+  return <div className="-mx-5 mt-5 h-2 bg-bluegray-1" />;
 }
