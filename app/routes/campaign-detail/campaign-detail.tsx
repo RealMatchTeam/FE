@@ -16,6 +16,8 @@ import type {
   CampaignDetailApiResponse,
 } from "../campaign-detail/types";
 
+import informationIconUrl from "../../assets/information-icon.svg?url";
+
 type Props = {
   brandData: BrandDetailData;
   campaignId: number;
@@ -24,12 +26,29 @@ type Props = {
 const fmtMoney = (n?: number) =>
   Number.isFinite(n) ? `${Number(n).toLocaleString()}원` : "-";
 
-const joinTagNames = (items?: { name: string }[]) =>
-  (items ?? []).map((x) => x.name).filter(Boolean);
-
 const formatDateOnly = (iso?: string) => {
   if (!iso) return "-";
   return iso.split("T")[0];
+};
+
+const joinTagNames = (items?: { name: string }[]) =>
+  (items ?? []).map((x) => x.name).filter(Boolean);
+
+const toKoreanCategory = (c?: string) => {
+  if (c === "BEAUTY") return "뷰티";
+  if (c === "FASHION") return "패션";
+  return "-";
+};
+
+const toDdayText = (dday?: number) => {
+  if (typeof dday !== "number" || !Number.isFinite(dday)) {
+    return "-";
+  }
+
+  if (dday < 0) return "모집 완료";
+  if (dday === 0) return "D-DAY";
+
+  return `D-${dday}`;
 };
 
 export default function CampaignDetailContent({
@@ -112,30 +131,7 @@ export default function CampaignDetailContent({
   }, [campaign]);
 
   const ongoing = useMemo(() => {
-    return (brandData.ongoingCampaigns ?? []).length
-      ? brandData.ongoingCampaigns
-      : [
-          {
-            campaignId: 101,
-            brandName: brandData.name,
-            title: "브이로그 협찬 캠페인",
-            recruitQuota: 10,
-            rewardAmount: 200000,
-            imageUrl: "https://picsum.photos/400/300?random=ongoing-1",
-            dday: 10,
-            isLiked: false,
-          },
-          {
-            campaignId: 102,
-            brandName: brandData.name,
-            title: "신규 런칭 제품 홍보 캠페인",
-            recruitQuota: 8,
-            rewardAmount: 150000,
-            imageUrl: "https://picsum.photos/400/300?random=ongoing-2",
-            dday: 3,
-            isLiked: false,
-          },
-        ];
+    return brandData.ongoingCampaigns ?? [];
   }, [brandData]);
 
   const handleChat = () => {
@@ -172,6 +168,8 @@ export default function CampaignDetailContent({
     return <div className="min-h-screen bg-white px-5 py-6">로딩중...</div>;
   }
 
+  const campaignImage = campaign.imageUrl ?? heroUrl;
+
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto min-h-screen max-w-[430px] bg-white">
@@ -181,13 +179,34 @@ export default function CampaignDetailContent({
           logoText={brandData.logoText ?? ""}
         />
 
-        <div className="px-5 pb-24">
+        <div className="px-5">
           <BrandInfo
             name={brandData.name}
             matchRate={brandData.matchRate}
             hashtags={(brandData.hashtags ?? []).slice(0, 2)}
             description={brandData.description}
           />
+
+          <div className="mt-2 flex items-center gap-2 h-9 font-medium text-indigo-500">
+            <MetaItem
+              icon={
+                <img
+                  src={informationIconUrl}
+                  alt=""
+                  className="block h-4 w-4 "
+                />
+              }
+              text={toDdayText(campaign.dday)}
+            />
+
+            <span className="px-1 text-indigo-300">|</span>
+
+            <span>{campaign.quota}명</span>
+
+            <span className="px-1 text-indigo-300">|</span>
+
+            <span>{toKoreanCategory(campaign.category)}</span>
+          </div>
 
           <BrandActionBar
             isHearted={isHearted}
@@ -198,21 +217,21 @@ export default function CampaignDetailContent({
 
           <div className="my-4 h-[1px] w-full bg-gray-200" />
 
-          <section className="py-4">
-            <div className="mt-4 overflow-hidden rounded-2xl bg-bluegray-1">
+          <section>
+            <div className="mt-4 overflow-hidden bg-bluegray-1">
               <img
-                src={`https://picsum.photos/800/900?random=campaign-${campaignId}`}
+                src={campaignImage}
                 alt="campaign"
                 className="h-[280px] w-full object-cover"
               />
             </div>
 
-            <div className="mt-4 text-center text-[16px] font-semibold text-text-black">
+            <div className="mt-2 text-center text-[16px] font-semibold text-text-black">
               {campaign.title}
             </div>
           </section>
 
-          <section className="py-5">
+          <section className="py-2">
             <div className="text-[14px] font-semibold text-text-black">
               상세 설명
             </div>
@@ -226,8 +245,9 @@ export default function CampaignDetailContent({
               ))}
             </div>
           </section>
+          <div className="my-6 mx-auto w-3/4 border-t border-bluegray-2" />
 
-          <section className="py-5">
+          <section>
             <div className="text-[14px] font-semibold text-text-black">
               콘텐츠
             </div>
@@ -250,6 +270,9 @@ export default function CampaignDetailContent({
                             {c}
                           </span>
                         ))}
+                        {(!row.chips || row.chips.length === 0) && (
+                          <span>-</span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -258,21 +281,13 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <DividerBlock />
-
-          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white">
-          <div className="mx-auto max-w-[430px] px-5 pb-5 pt-3">
-            <button
-              type="button"
-              onClick={() => console.log("apply:", campaignId)}
-              className="flex h-12 w-full items-center justify-center rounded-xl bg-indigo-500 text-[16px] font-semibold text-white"
-            >
+          <div className="mt-8 pb-10">
+            <button className="h-12 w-full rounded-xl bg-indigo-500 text-[16px] font-semibold text-white">
               지원하기
             </button>
           </div>
+
+          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
         </div>
       </div>
     </div>
@@ -287,9 +302,21 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
+/*
 function DividerBlock() {
   return (
     <div className="relative left-1/2 mt-5 h-2 w-screen -translate-x-1/2 bg-bluegray-1" />
+  );
+}
+  */
+
+function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      {icon && (
+        <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
+      )}
+      <span className="leading-none">{text}</span>
+    </span>
   );
 }

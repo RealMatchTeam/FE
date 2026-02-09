@@ -14,7 +14,7 @@ export default function BrandActionBar({
   onToggleHeart,
 }: Props) {
   return (
-    <div className="mt-4 flex items-center gap-2">
+    <div className="mt-2 flex items-center gap-2">
       <button
         type="button"
         onClick={onChat}

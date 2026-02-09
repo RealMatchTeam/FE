@@ -32,11 +32,13 @@ export default function BrandInfo({
         </div>
       </div>
 
-      <div className="mt-1 text-[12px] text-text-gray3">
-        {hashtags.map(tag => tag.startsWith("#") ? tag : `#${tag}`).join(" ")}
+      <div className="mt-1 text-[14px] text-text-gray3">
+        {hashtags
+          .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
+          .join(" ")}
       </div>
 
-      <div className="mt-2 text-[12px] leading-5 text-text-gray2">
+      <div className="mt-2 text-[14px] leading-5 text-text-gray2">
         {description}
       </div>
     </div>
