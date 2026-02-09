@@ -31,15 +31,12 @@ export default function CalendarContent() {
     try {
       setIsLoading(true);
       
-      // 방법 A: 서버 API가 type을 안 보낼 때 전체를 반환한다면 type 제거
-      // 방법 B: 전체를 가져오는 별도의 호출 로직 구현
       const [applied, sent, received] = await Promise.all([
         getMyCollaborations({ type: "APPLIED", keyword: keyword.trim() || undefined }),
         getMyCollaborations({ type: "SENT", keyword: keyword.trim() || undefined }),
         getMyCollaborations({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
       ]);
 
-      // 모든 데이터를 하나의 배열로 합침
       setCampaigns([...applied, ...sent, ...received]);
     } catch (error) {
       console.error("로드 실패:", error);
@@ -49,11 +46,11 @@ export default function CalendarContent() {
   };
 
   fetchAllCampaigns();
-}, [keyword, location.key]); // matchingSubTab 의존성 제거
+}, [keyword, location.key]); 
 
   const filteredList = useMemo(() => {
     const today = new Date();
-    // 한국 시간 기준으로 날짜 문자열 생성 (YYYY-MM-DD)
+
     const todayStr = today.getFullYear() + '-' + 
                      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
                      String(today.getDate()).padStart(2, '0');
@@ -107,7 +104,6 @@ export default function CalendarContent() {
     const proposalId = item.proposalId || item.campaignId;
     const navigationState = { state: { brandId: item.brandId } };
 
-    // 거절 상태인 경우
     if (item.status === "REJECTED") {
       navigate(`/business/rejection?proposalId=${proposalId}`, navigationState);
       return;

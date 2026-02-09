@@ -61,6 +61,8 @@ export default [
       route("terms", "routes/mypage/terms/route.tsx")
     ]),
 
+    route("notification", "routes/notification/route.tsx"),
+
 
     route("brand", "routes/brand/route.tsx"),
   ]),
