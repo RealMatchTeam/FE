@@ -2,6 +2,13 @@ import { axiosInstance } from "../../../api/axios";
 
 //채팅 리스트 조회
 
+export interface ApiResponse<T> {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: T;
+}
+
 export type ChatRoomListStatus = "LATEST" | "COLLABORATING";
 
 export interface ChatRoomListResponse {
@@ -32,8 +39,7 @@ type GetChatRoomsParams = {
 
 export async function getChatRooms(params: GetChatRoomsParams): Promise<ChatRoomListResponse> {
   const { status, cursor, size = 20, search } = params;
-
-  const res = await axiosInstance.get<ChatRoomListResponse>("/api/v1/chat/rooms", {
+  const res = await axiosInstance.get<ApiResponse<ChatRoomListResponse>>("/api/v1/chat/rooms", {
     params: {
       status,
       cursor,
@@ -42,7 +48,7 @@ export async function getChatRooms(params: GetChatRoomsParams): Promise<ChatRoom
     },
   });
 
-  return res.data;
+  return res.data.result;
 }
 
 

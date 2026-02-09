@@ -4,7 +4,7 @@ import GateModal from "./mypage/GateModal";
 import MenuButton from "./mypage/MenuButton";
 
 type Props = {
-  hasMatchingTest: boolean;
+  hasMatchingTest: boolean | null;
   user: {
     name: string;
     roleText?: string;
@@ -16,7 +16,6 @@ type Props = {
   onOpenLikes: () => void;
   onOpenEditProfile: () => void;
   onOpenNotifications: () => void;
-  onOpenInquiry: () => void;
   onOpenTerms: () => void;
   onOpenPrivacy: () => void;
   onLogout: () => void;
@@ -31,17 +30,16 @@ export default function MyPageHome({
   onOpenLikes,
   onOpenEditProfile,
   onOpenNotifications,
-  onOpenInquiry,
   onOpenTerms,
   onOpenPrivacy,
   onLogout,
   onWithdraw,
 }: Props) {
-  const [openGate, setOpenGate] = useState(!hasMatchingTest);
+  const [gateDismissed, setGateDismissed] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
 
-  //const actionsDisabled = useMemo(() => !hasMatchingTest, [hasMatchingTest]); 매칭검사 안했을 시
+  const openGate = hasMatchingTest === false && !gateDismissed;
 
   return (
     <div className="min-h-screen bg-white">
@@ -155,7 +153,13 @@ export default function MyPageHome({
         <MenuButton
           title="고객센터"
           label="문의하기"
-          onClick={onOpenInquiry}
+          onClick={() =>
+            window.open(
+              "https://open.kakao.com/o/sPvvelfi",
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
           py={11}
         />
         <Divider />
@@ -202,7 +206,7 @@ export default function MyPageHome({
       {/* gate modal */}
       {openGate ? (
         <GateModal
-          onClose={() => setOpenGate(false)}
+          onClose={() => setGateDismissed(true)}
           onGoTest={onGoMatchingTest}
         />
       ) : null}

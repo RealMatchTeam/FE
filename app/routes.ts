@@ -1,4 +1,9 @@
-import { type RouteConfig, route, layout, index } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  route,
+  layout,
+  index,
+} from "@react-router/dev/routes";
 
 export default [
   // Auth routes
@@ -49,26 +54,37 @@ export default [
     route("chat", "routes/chat/route.tsx"),
 
     route("rooms", "routes/rooms/route.tsx", [
-      route(":chatId", "routes/rooms/$chatId.tsx"),
+      route("brand/:brandId", "routes/rooms/$brandId.tsx"),
+      route(":roomId", "routes/rooms/$roomId.tsx"),
     ]),
 
     route("mypage", "routes/mypage/route.tsx", [
       index("routes/mypage/mypage/route.tsx"),
       route("profileCard", "routes/mypage/profileCard/route.tsx"),
+      route("traits", "routes/mypage/traits/route.tsx"),
+      route("notification", "routes/mypage/notification/route.tsx", [
+        index("routes/mypage/notification/index.tsx"),
+        route("marketing", "routes/mypage/notification/marketing/route.tsx"),
+      ]),
       route("edit", "routes/mypage/edit/route.tsx"),
       route("likes", "routes/mypage/likes/route.tsx"),
       route("privacy", "routes/mypage/privacy/route.tsx"),
-      route("terms", "routes/mypage/terms/route.tsx")
+      route("terms", "routes/mypage/terms/route.tsx"),
     ]),
 
     route("notification", "routes/notification/route.tsx"),
 
 
     route("brand", "routes/brand/route.tsx"),
+    route("brand", "routes/brand-detail/route.tsx"),
+    route("campaign", "routes/campaign-detail/route.tsx"),
   ]),
 
   // Campaign detail route (without main layout)
-  route("business/campaign/:campaignId", "routes/business/campaign/$campaignId.tsx"),
+  route(
+    "business/campaign/:campaignId",
+    "routes/business/campaign/$campaignId.tsx",
+  ),
 
   // 404 Catch-all
   route("*", "routes/not-found.tsx"),

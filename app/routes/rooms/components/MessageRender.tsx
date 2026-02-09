@@ -95,9 +95,9 @@ export default function MessageRenderer({
         );
 
         case "PROPOSAL_STATUS_NOTICE": {
-          const status = sys.payload?.status ?? sys.payload?.status;
+          const status = sys.payload?.proposalStatus;
 
-          if (status === "ACCEPTED") {
+          if (status === "MATCHED") {
             return <ChatNoticeMessage text={CHAT_NOTICE_TEXT.PROPOSAL_ACCEPTED} />;
           }
 
@@ -113,9 +113,9 @@ export default function MessageRenderer({
         }
 
         case "APPLY_STATUS_NOTICE": {
-          const status = sys.payload?.status ?? sys.payload?.status;
+          const status = sys.payload?.applyStatus;
 
-          if (status === "ACCEPTED") {
+          if (status === "MATCHED") {
             return <ChatNoticeMessage text={CHAT_NOTICE_TEXT.APPLY_ACCEPTED} />;
           }
 

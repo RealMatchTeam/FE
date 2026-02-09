@@ -6,13 +6,59 @@ import {
   MatchingTestRequiredError,
 } from "../matching/api/matching";
 import { useAuthStore } from "../../stores/auth-store";
+import { getMyPage } from "../mypage/api/mypage";
+import { tokenStorage } from "../../lib/token";
 
 export default function Home() {
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
-  const hasMatchingTest = useAuthStore((s) => s.me?.matchingTestDone);
+  const me = useAuthStore((s) => s.me);
+  const setMe = useAuthStore((s) => s.setMe);
+  const hasTokens = tokenStorage.hasTokens();
+  const resolvedHasMatchingTest =
+    me?.matchingTestDone !== undefined
+      ? Boolean(me.matchingTestDone)
+      : hasTokens
+        ? null
+        : false;
 
   useEffect(() => {
-    if (hasMatchingTest !== true) return;
+    if (me?.matchingTestDone !== undefined) return;
+    if (!hasTokens) return;
+
+    let isMounted = true;
+
+    const fetchMe = async () => {
+      try {
+        const result = await getMyPage();
+        if (!isMounted) return;
+
+        const name = result.name ?? result.nickname ?? "";
+        const roleText = result.nickname ?? result.name ?? "";
+
+        setMe({
+          name,
+          roleText,
+          email: result.email,
+          avatarUrl: result.profileImageUrl ?? undefined,
+          matchingTestDone: Boolean(result.hasMatchingTest),
+        });
+      } catch (error) {
+        console.error("Failed to load my page info:", error);
+        if (isMounted) {
+          setMe({ matchingTestDone: false });
+        }
+      }
+    };
+
+    fetchMe();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasTokens, me?.matchingTestDone, setMe]);
+
+  useEffect(() => {
+    if (resolvedHasMatchingTest !== true) return;
 
     const checkMatchStatus = async () => {
       try {
@@ -29,13 +75,13 @@ export default function Home() {
     };
 
     checkMatchStatus();
-  }, [hasMatchingTest]);
+  }, [resolvedHasMatchingTest]);
 
-  if (hasMatchingTest === false) {
+  if (resolvedHasMatchingTest === false) {
     return <PreHome />;
   }
 
-  if (hasMatch === null) {
+  if (resolvedHasMatchingTest === null || hasMatch === null) {
     return (
       <div className="flex items-center justify-center w-full h-full min-h-[50vh]">
         <div className="flex flex-col items-center gap-2">
