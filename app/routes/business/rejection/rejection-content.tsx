@@ -1,13 +1,52 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useSearchParams, useLocation } from "react-router-dom";
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
+
+import { getProposalDetail, type ProposalDetail } from "../proposal/api/proposal";
+import { getBrandSummary, type BrandSummary } from "../proposal/api/brand";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
 
 export default function RejectionContent() {
+    const [searchParams] = useSearchParams();
+    const location = useLocation();
+
+    const proposalId = searchParams.get("proposalId");
+    const brandIdFromState = location.state?.brandId;
+
+    const [data, setData] = useState<ProposalDetail | null>(null);
+    const [brand, setBrand] = useState<BrandSummary | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [isReasonOpen, setIsReasonOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!proposalId) return;
+            try {
+                setIsLoading(true);
+                // 1. 캠페인/제안 상세 정보 로드 (거절 사유 포함되어 있다고 가정)
+                const result = await getProposalDetail(proposalId);
+                setData(result);
+
+                // 2. 브랜드 정보 로드
+                const targetBrandId = result.brandId || brandIdFromState;
+                if (targetBrandId) {
+                    const brandResult = await getBrandSummary(targetBrandId);
+                    setBrand(brandResult);
+                }
+            } catch (error) {
+                console.error("데이터 로드 실패:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [proposalId, brandIdFromState]);
+
+    if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+    if (!data) return <div className="p-10 text-center">정보를 찾을 수 없습니다.</div>;
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
@@ -18,12 +57,16 @@ export default function RejectionContent() {
                 <div className="px-4 py-6 flex flex-col gap-2">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText="" // 빈 값을 넘겨 '거절' 텍스트를 숨김
+                        statusText="거절됨" // 고정 텍스트 혹은 데이터 기반
+                        brandName={brand?.brandName || "브랜드명 로딩 중"}
+                        brandImageUrl={brand?.brandImageUrl}
+                        brandTags={brand?.brandTags || ["거절"]}
+                        matchingRate={brand?.matchingRate}
                     />
 
                     <div className="px-1">
                         <h2 className="text-title6 text-text-black underline decoration-1 underline-offset-[6px]">
-                            ‘글로우 쿠션’ 신제품 론칭 리뷰
+                            ‘{data.title}’
                         </h2>
                     </div>
                 </div>
@@ -49,7 +92,7 @@ export default function RejectionContent() {
                         {!isReasonOpen && (
                             <div className="px-5 pb-5">
                                 <p className="text-body1 text-text-gray1 truncate">
-                                    안녕하세요 크리에이터 비비 님...
+                                    {data.refusalReason || "거절 사유가 입력되지 않았습니다."}
                                 </p>
                             </div>
                         )}
@@ -58,11 +101,7 @@ export default function RejectionContent() {
                         {isReasonOpen && (
                             <div className="px-5 pb-6 animate-slide-up">
                                 <p className="text-body1 text-text-gray1 leading-[1.6] whitespace-pre-wrap">
-                                    안녕하세요 크리에이터 비비님,{"\n\n"}
-                                    먼저 저희 브랜드에 제안 주신 점 진심으로 감사드립니다.{"\n\n"}
-                                    현재 크리에이터님 채널의 콘텐츠 방향이 저희 브랜드가 추구하는 이미지와 완전히 일치하지 않아 이번 협찬은 진행이 어렵다는 점 양해 부탁드립니다.{"\n\n"}
-                                    좋은 제안 주셨음에도 긍정적인 답변을 드리지 못해 아쉽게 생각하며, 향후 방향이 맞는 프로젝트가 있다면 다시 함께할 기회가 있기를 바랍니다.{"\n\n"}
-                                    감사합니다.
+                                    {data.refusalReason || "등록된 거절 사유 상세 내용이 없습니다."}
                                 </p>
                             </div>
                         )}
@@ -71,9 +110,9 @@ export default function RejectionContent() {
                     {/* 내 제안 보기 섹션 */}
                     <div className="flex flex-col gap-3">
                         <div className="w-full p-5 bg-bg-w border border-text-gray5 rounded-2xl">
-                            <h3 className="text-title1 text-text-gray1">내 제안 보기</h3>
-                            <p className="text-body1 text-text-gray3 mt-2">
-                                안녕하세요 크리에이터 비비입니다...
+                            <h3 className="text-title1 text-text-gray1 font-bold">내 제안 보기</h3>
+                            <p className="text-body1 text-text-gray3 mt-2 leading-relaxed">
+                                {data.description || "상세 제안 내용이 없습니다."}
                             </p>
                         </div>
                     </div>

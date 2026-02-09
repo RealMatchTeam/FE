@@ -3,6 +3,7 @@ import { axiosInstance } from "../../../../api/axios";
 export interface CampaignCollaboration {
   campaignId: number;
   proposalId: string | null;
+  brandId : number;
   brandName: string;
   thumbnailUrl: string;
   title: string;
