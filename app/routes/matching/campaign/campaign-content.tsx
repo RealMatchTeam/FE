@@ -205,6 +205,7 @@ export default function CampaignContent() {
                             onLike={() => toggleLike(campaign.id)}
                             onClick={() => navigate(`/business/campaign/${campaign.id}`)}
                             logoUrl={campaign.logoUrl || `/dummy-logo-${campaign.id}.png`}
+                            dDay={campaign.dDay}
                         />
                     ))}
 
