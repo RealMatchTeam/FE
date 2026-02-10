@@ -1,43 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { fetchNotifications } from "./api/notification";
 
 interface Notification {
-  id: number;
+  id: string; 
   date: string;
   message: string;
   status: "read" | "unread";
   type: "proposal" | "matching";
 }
-
-const notificationsData: Notification[] = [
-  {
-    id: 1,
-    date: "26.01.06 (화)",
-    message: "[라운드랩]에서 새로운 캠페인 제안을 보냈어요. 지금 확인해보세요!",
-    status: "unread",
-    type: "proposal",
-  },
-  {
-    id: 2,
-    date: "26.01.06 (화)",
-    message: "[라운드랩]과의 캠페인이 매칭되었어요! 캠페인 상세 내용을 확인해 주세요.",
-    status: "read",
-    type: "matching",
-  },
-  {
-    id: 3,
-    date: "26.01.02 (금)",
-    message: "[마녀공장]과의 캠페인이 매칭되었어요! 캠페인 상세 내용을 확인해 주세요.",
-    status: "read",
-    type: "matching",
-  },
-  {
-    id: 4,
-    date: "25.12.29 (화)",
-    message: "[이즈앤트리] 캠페인이 완료되었어요. 정상 금액을 출금 신청할 수 있어요!",
-    status: "unread",
-    type: "proposal",
-  },
-];
 
 // 탭 버튼 컴포넌트
 function TabButton({ label, active, onClick, count }: { label: string; active: boolean; onClick: () => void; count?: number }) {
@@ -63,8 +33,37 @@ function TabButton({ label, active, onClick, count }: { label: string; active: b
 }
 
 export default function NotificationContent() {
-  const [notifications, setNotifications] = useState<Notification[]>(notificationsData);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [activeTab, setActiveTab] = useState<"all" | "proposal" | "matching">("all");
+  const [loading, setLoading] = useState(true);
+
+  const fetchNotificationsData = async () => {
+    setLoading(true); // 로딩 시작
+    try {
+      const accessToken = localStorage.getItem('accessToken') || ''; // 토큰 가져오기
+      const data = await fetchNotifications(accessToken); // API 호출
+      if (data.isSuccess) {
+        const formattedNotifications = data.result.items.map((item: any) => ({
+          id: item.id, 
+          date: new Date(item.createdAt).toLocaleDateString('ko-KR'), 
+          message: item.body, 
+          status: item.isRead ? "read" : "unread",
+          type: item.category === "PROPOSAL" ? "proposal" : "matching",
+        }));
+        setNotifications(formattedNotifications);
+      } else {
+        console.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false); // 로딩 종료
+    }
+  };
+
+  useEffect(() => {
+    fetchNotificationsData(); // 컴포넌트 마운트 시 호출
+  }, []);
 
   const filteredNotifications = useMemo(() => {
     if (activeTab === "all") return notifications;
@@ -73,7 +72,7 @@ export default function NotificationContent() {
 
   const unreadCount = notifications.filter(n => n.status === "unread").length;
 
-  const handleReadNotification = (id: number) => {
+  const handleReadNotification = (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, status: "read" } : n))
     );
@@ -84,8 +83,7 @@ export default function NotificationContent() {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen bg-grad-auth"> {/* 전체에 그라데이션 배경 설정 */}
-      {/* 헤더 섹션 */}
+    <div className="flex flex-col w-full h-screen bg-grad-auth">
       <div className="px-4 pt-6 pb-4 flex flex-col gap-4 border-b border-text-gray5">
         <div className="flex items-center justify-between">
           <h1 className="text-[20px] font-bold text-text-black">알림</h1>
@@ -99,7 +97,6 @@ export default function NotificationContent() {
           )}
         </div>
 
-        {/* 탭 버튼 그룹 */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <TabButton 
             label="전체" 
@@ -120,7 +117,6 @@ export default function NotificationContent() {
         </div>
       </div>
 
-      {/* 알림 목록 섹션 */}
       <div className="flex-1 overflow-y-auto">
         {filteredNotifications.length > 0 ? (
           <div className="flex flex-col">
