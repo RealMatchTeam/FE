@@ -37,7 +37,7 @@ export default function MyPageTerms() {
 
         <div
           className="overflow-y-auto"
-          style={{ height: "calc(100vh - 60px)" }}
+          style={{ height: `calc(100vh - 60px - 67px)` }}
         >
           <div className="bg-white px-4 py-6 space-y-6">
             <div className="text-[16px] font-semibold text-[#171718]">약관</div>

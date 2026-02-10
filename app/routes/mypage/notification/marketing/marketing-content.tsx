@@ -38,7 +38,7 @@ export default function MarketingDetail() {
 
         <div
           className="overflow-y-auto"
-          style={{ height: "calc(100vh - 60px)" }}
+          style={{ height: `calc(100vh - 60px - 67px)` }}
         >
           <div className="px-4 py-6">
             <div className="border border-[#E8E8FB] rounded-[12px] overflow-hidden">

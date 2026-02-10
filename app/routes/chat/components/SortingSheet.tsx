@@ -48,7 +48,7 @@ export function SortFilterSheet<T extends string = SortOption>({
       {/* 시트 */}
       <div className="fixed left-1/2 -translate-x-1/2 top-[235px] w-full max-w-[430px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
         <div className="w-full max-w-[430px] h-[70px] fixed left-1/2 -translate-x-1/2">
-          <div className="px-4 text-Medium text-text-black mb-3">{title}</div>
+          <div className="px-4 text-medium text-text-black mb-3">{title}</div>
 
           <div className="bg-[#F3F4F8] px-4 py-3">
             <div className="flex gap-6">
@@ -90,7 +90,7 @@ function SortOptionButton({
   return (
     <button
       onClick={onClick}
-      className={`text-Medium ${active ? "text-text-black" : "text-text-gray3"}`}
+      className={`text-medium ${active ? "text-text-black" : "text-text-gray3"}`}
     >
       {label}
     </button>

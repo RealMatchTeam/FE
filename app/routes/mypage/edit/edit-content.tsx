@@ -39,20 +39,20 @@ export default function MyPageEdit() {
   };
 
   return (
-    <div className="h-screen-full bg-[#F3F4F8]">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+    <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+      <div className="w-full max-w-[430px] shadow-2xl flex flex-col">
         <div className="h-[60px]">
-          <NavigationHeader title="회원정보 설정" onBack={() => navigate(-1)} />
+          <NavigationHeader title="회원정보 설정" onBack={() => navigate(-1)} bgClassName={"F6F6FF"}/>
         </div>
 
         <div
           className="overflow-y-auto"
-          style={{ height: "calc(100vh - 60px)" }}
+          style={{ height: `calc(100vh - 60px - 67px)` }}
         >
-          <div className="bg-gradient-to-b from-[#F2F3FF] to-white px-4 py-6 space-y-6">
+          <div className="px-4 py-6 space-y-6">
             {/* 본명 */}
             <div className="space-y-2">
-              <div className="text-[16px] font-semibold text-[#171718]">
+              <div className="text-[14px] leading-[20px] font-medium text-[#171718]">
                 본명
               </div>
               <input
@@ -60,13 +60,14 @@ export default function MyPageEdit() {
                 placeholder="아이비"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full h-[52px] rounded-[14px] border border-[#E8E8FB] px-4 text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white"
+                disabled
+                className="w-full h-[46px] rounded-[12px] border border-[#E8E8FB] px-4 text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white"
               />
             </div>
 
             {/* 닉네임 */}
             <div className="space-y-2">
-              <div className="text-[16px] font-semibold text-[#171718]">
+              <div className="text-[14px] leading-[20px] font-medium text-[#171718]">
                 닉네임
               </div>
               <div className="relative">
@@ -75,7 +76,8 @@ export default function MyPageEdit() {
                   placeholder="비비"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
-                  className="w-full h-[52px] rounded-[14px] border border-[#E8E8FB] px-4 pr-[88px] text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white"
+                  readOnly
+                  className="w-full h-[46px] rounded-[12px] border border-[#E8E8FB] px-4 pr-[88px] text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white focus:outline-none focus:ring-0 focus:border-[#B7B7F3]"
                 />
                 <button
                   type="button"
@@ -84,7 +86,7 @@ export default function MyPageEdit() {
                     setCheckStatus("idle");
                     setIsNickSheetOpen(true);
                   }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6D6AFE] text-[14px] font-semibold"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6666E5] text-[14px] font-Pretendard"
                 >
                   변경하기
                 </button>
@@ -93,7 +95,7 @@ export default function MyPageEdit() {
 
             {/* 주소 */}
             <div className="space-y-2">
-              <div className="text-[16px] font-semibold text-[#171718]">
+              <div className="text-[14px] leading-[20px] font-medium text-[#171718]">
                 주소
               </div>
               <div className="flex gap-3">
@@ -102,11 +104,11 @@ export default function MyPageEdit() {
                   placeholder="주소"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="flex-1 h-[52px] rounded-[14px] border border-[#E8E8FB] px-4 text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white"
+                  className="flex-1 h-[46px] rounded-[12px] border border-[#E8E8FB] px-4 text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white focus:outline-none focus:ring-0 focus:border-[#B7B7F3]"
                 />
                 <button
                   type="button"
-                  className="h-[52px] px-5 rounded-[16px] bg-[#B7B7F3] text-white text-[14px] font-semibold"
+                  className="h-[46px] px-5 rounded-[12px] bg-[#B7B7F3] text-white text-[14px] font-semibold"
                 >
                   주소 찾기
                 </button>
@@ -116,7 +118,7 @@ export default function MyPageEdit() {
                 placeholder="상세 주소"
                 value={addressDetail}
                 onChange={(e) => setAddressDetail(e.target.value)}
-                className="w-full h-[52px] rounded-[14px] border border-[#E8E8FB] px-4 text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white"
+                className="w-full h-[46px] rounded-[12px] border border-[#E8E8FB] px-4 text-[15px] text-[#171718] placeholder:text-[#9B9BA1] bg-white focus:outline-none focus:ring-0 focus:border-[#B7B7F3]"
               />
               <div className="text-[12px] text-[#9B9BA1]">
                 *협찬품 받을 주소를 입력해주세요. 주소는 매칭된
