@@ -17,10 +17,10 @@ import {
   FeeInput,
 } from "../../../../components/form";
 import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
-import ProfileSelector from "../components/ProfileSelector";
+import ProfileSelector from "../../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
-import ProposalModal from "./components/ProposalModal";
+import ProposalModal from "../../components/ProposalModal";
 import {
   campaignFormSchema,
   defaultCampaignFormValues,
@@ -265,9 +265,9 @@ export default function CreateCampaignContent() {
           <ProfileSelector username={snsAccount ? `@${snsAccount}` : (me?.roleText ?? me?.name ?? undefined)} onClick={() => navigate("/mypage/profileCard")} />
         </div>
 
-        
+
         <div className="flex flex-col items-start w-[calc(100%+40px)] -mx-5 px-5 py-4 bg-bluegray-1 gap-6">
-          
+
           <div className="w-full h-auto">
             <label className="text-title3 text-text-black mb-2 block ml-2">
               캠페인명<span className="text-error text-base">*</span>

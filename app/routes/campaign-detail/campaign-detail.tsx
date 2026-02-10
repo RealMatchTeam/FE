@@ -181,7 +181,12 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
   };
 
   const handleApply = () => {
-    console.log("apply:", campaignId);
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+    navigate("/matching/apply");
   };
 
   if (campaignError) {

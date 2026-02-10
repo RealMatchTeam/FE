@@ -1,5 +1,5 @@
 import Section from "./CommonSection";
-import MainIcon from "../../../../assets/MainIcon.svg";
+import MainIcon from "../../../../assets/MainIcon.png";
 
 interface MatchingSectionProps {
   onOpenReMatch: () => void;
