@@ -72,8 +72,10 @@ export default [
       route("terms", "routes/mypage/terms/route.tsx"),
     ]),
 
+    route("notification", "routes/notification/route.tsx"),
     route("brand", "routes/brand-detail/route.tsx"),
     route("campaign", "routes/campaign-detail/route.tsx"),
+
   ]),
 
   // Campaign detail route (without main layout)
