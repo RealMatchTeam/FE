@@ -10,7 +10,7 @@ import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
+import useAttachmentUpload from "./hooks/useAttachmentUpload";
 import useChatRoomData from "./hooks/useChatRest";
 import useChatLayout from "./hooks/useChatLayout";
 import useChatStomp from "./hooks/useChatStomp";
