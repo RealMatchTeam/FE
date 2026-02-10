@@ -1,4 +1,4 @@
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { getMyPage } from "../mypage/api/mypage";
 import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
@@ -6,6 +6,7 @@ import { useAuthStore } from "../../stores/auth-store";
 import { tokenStorage } from "../../lib/token";
 
 export default function HomeIndex() {
+  const location = useLocation();
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
 
   const me = useAuthStore((s) => s.me);
@@ -64,13 +65,15 @@ export default function HomeIndex() {
         else setHasMatch(false);
       }
     })();
-  }, [resolvedHasMatchingTest]);
+  }, [resolvedHasMatchingTest, location.state]);
+
+  const effectiveHasMatch = resolvedHasMatchingTest !== true ? null : hasMatch;
 
   if (resolvedHasMatchingTest === false) {
     return <Navigate to="/pre" replace />;
   }
 
-  if (resolvedHasMatchingTest === null || (resolvedHasMatchingTest === true && hasMatch === null)) {
+  if (resolvedHasMatchingTest === null || effectiveHasMatch === null) {
     return (
       <div className="flex items-center justify-center w-full min-h-[50vh]">
         <div className="flex flex-col items-center gap-2">

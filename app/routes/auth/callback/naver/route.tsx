@@ -24,6 +24,7 @@ export default function NaverCallback() {
 
     if (accessToken && refreshToken) {
       tokenStorage.setTokens(accessToken, refreshToken);
+      localStorage.setItem("lastLoginProvider", "naver");
 
       try {
         const decoded = jwtDecode<JwtPayload>(accessToken);

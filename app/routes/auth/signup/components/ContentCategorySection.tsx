@@ -20,7 +20,7 @@ export function ContentCategorySection({
   return (
     <div className="space-y-1">
       <h3 className="text-title1 text-text-black">콘텐츠 분야</h3>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <p className="text-callout4 text-text-gray3">
           * 해당하는 콘텐츠를 <span className="text-callout4 text-core-1">모두</span> 선택해주세요
         </p>
@@ -45,7 +45,7 @@ export function ContentCategorySection({
         </div>
       </div>
 
-      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[35%]">
+      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[45%] md:h-[30%] lg:h-[25%]">
         <div className="flex flex-col h-full px-5 pb-6">
           {/* 헤더 */}
           <div className="flex justify-between items-center py-5.5">

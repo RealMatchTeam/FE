@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 import BrandHero from "../brand-detail/components/BrandHero";
 import BrandInfo from "../brand-detail/components/BrandInfo";
@@ -9,12 +9,10 @@ import OngoingCampaignSection from "../brand-detail/components/OngoingCampaignSe
 import { tokenStorage } from "../../lib/token";
 import { toggleBrandLike } from "../matching/api/matching";
 import { apiClient } from "../../api/axios";
+import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import type { BrandDetailData } from "../brand-detail/types";
-import type {
-  CampaignDetail,
-  CampaignDetailApiResponse,
-} from "../campaign-detail/types";
+import type { CampaignDetail, CampaignDetailApiResponse } from "../campaign-detail/types";
 
 import informationIconUrl from "../../assets/information-icon.svg?url";
 
@@ -49,6 +47,8 @@ const toDdayText = (dday?: number) => {
 
 export default function CampaignDetailContent({ brandData, campaignId }: Props) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
 
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
   const [isHearted, setIsHearted] = useState<boolean>(brandData.isLiked ?? false);
@@ -145,6 +145,45 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
     }
   };
 
+  const handleSuggest = () => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+
+    if (!campaign) return;
+
+    const brandId = searchParams.get("brandId");
+    const domain = searchParams.get("domain");
+
+    setProposalData({
+      brandId: Number(brandId),
+      campaignId,
+      domain: domain || "beauty",
+      brandName: brandData.name,
+      campaignTitle: campaign.title,
+      campaignDescription: campaign.description,
+      rewardAmount: campaign.rewardAmount,
+      product: campaign.product,
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
+      contentTags: {
+        formats: campaign.contentTags?.formats,
+        categories: campaign.contentTags?.categories,
+        tones: campaign.contentTags?.tones,
+        involvements: campaign.contentTags?.involvements,
+        usageRanges: campaign.contentTags?.usageRanges,
+      },
+    });
+
+    navigate("/matching/suggest");
+  };
+
+  const handleApply = () => {
+    console.log("apply:", campaignId);
+  };
+
   if (campaignError) {
     return (
       <div className="w-full bg-bg-w">
@@ -206,7 +245,7 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
           <BrandActionBar
             isHearted={isHearted}
             onChat={handleChat}
-            onSuggest={() => {}}
+            onSuggest={handleSuggest}
             onToggleHeart={handleToggleHeart}
           />
 
@@ -243,9 +282,7 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
             <div className="mt-3 space-y-4 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
                 <div key={row.label} className="flex gap-4">
-                  <div className="w-[84px] shrink-0 text-text-gray2">
-                    {row.label}
-                  </div>
+                  <div className="w-[84px] shrink-0 text-text-gray2">{row.label}</div>
                   <div className="flex-1">
                     {"value" in row && row.value ? (
                       <div className="whitespace-pre-line">{row.value}</div>
@@ -271,7 +308,8 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
           <div className="mt-8">
             <button
               type="button"
-              className="h-[52px] w-full rounded-2xl bg-core-1 text-title7 text-white active:opacity-90 transition-opacity"
+              onClick={handleApply}
+              className="h-[52px] w-full rounded-2xl bg-core-1 text-title7 text-white active:opacity-90 transition-opacity flex items-center justify-center"
             >
               지원하기
             </button>
@@ -302,9 +340,7 @@ function DividerBlock() {
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
     <span className="flex items-center gap-2">
-      {icon ? (
-        <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
-      ) : null}
+      {icon ? <span className="flex h-5 w-5 items-center justify-center">{icon}</span> : null}
       <span className="leading-none">{text}</span>
     </span>
   );

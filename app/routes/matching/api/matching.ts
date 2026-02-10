@@ -440,11 +440,11 @@ export interface CreateCampaignProposalRequest {
   campaignId: number | null;
   campaignName: string;
   description: string;
-  formats: { id: string }[];
-  categories: { id: string }[];
-  tones: { id: string }[];
-  involvements: { id: string }[];
-  usageRanges: { id: string }[];
+  formats: { id: number }[];
+  categories: { id: number }[];
+  tones: { id: number }[];
+  involvements: { id: number }[];
+  usageRanges: { id: number }[];
   rewardAmount: number;
   productId: number;
   startDate: string;
@@ -465,7 +465,7 @@ export const createCampaignProposal = async (
 ): Promise<number> => {
   try {
     const response = await apiClient.post<CreateCampaignProposalResponse>(
-      "/v1/campaigns/proposal",
+      "/v1/campaigns/proposal/request",
       data,
     );
 
@@ -559,4 +559,43 @@ export const toggleCampaignLike = async (
   }
 
   return response.data.result;
+};
+
+export interface RecruitingCampaign {
+  campaignId: number;
+  brandName: string;
+  title: string;
+  recruitQuota: number;
+  rewardAmount: number;
+  imageUrl?: string;
+  dday: number;
+  like?: boolean;
+}
+
+interface RecruitingCampaignsResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    campaigns: RecruitingCampaign[];
+  };
+}
+
+export const getRecruitingCampaigns = async (
+  brandId: number,
+): Promise<RecruitingCampaign[]> => {
+  try {
+    const response = await apiClient.get<RecruitingCampaignsResponse>(
+      `/api/v1/brands/${brandId}/campaigns/recruiting`,
+    );
+
+    if (!response.data?.isSuccess) {
+      throw new Error(response.data?.message || "모집중인 캠페인 조회 실패");
+    }
+
+    return response.data.result.campaigns || [];
+  } catch (error: unknown) {
+    console.error("모집중인 캠페인 조회 실패:", error);
+    throw error;
+  }
 };

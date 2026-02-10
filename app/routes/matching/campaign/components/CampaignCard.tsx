@@ -29,16 +29,16 @@ export default function CampaignCard({
     };
 
     return (
-        <div onClick={onClick} className="flex w-full p-2.5 bg-white border border-bluegray-2 rounded-2xl shadow-sm cursor-pointer">
+        <div onClick={onClick} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer">
             {/* 왼쪽: 이미지 + 배지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
                 <BrandLogo src={logoUrl} alt={brandName} />
                 {/* 원고료 & D-Day 배지 */}
                 <div className="flex items-center justify-center gap-1 w-full">
-                    <span className="px-1.5 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
+                    <span className="px-1 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
                         D-DAY
                     </span>
-                    <span className="px-1.5 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                    <span className="px-1 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
                 </div>
             </div>
 
@@ -51,7 +51,7 @@ export default function CampaignCard({
                             <h3 className="text-title1 text-text-black truncate">{brandName}</h3>
                             <div className="flex items-center gap-2">
                                 <span className="text-core-1"><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></span>
-                                <button onClick={onLike} className="flex-shrink-0 cursor-pointer">
+                                <button onClick={(e) => { e.stopPropagation(); onLike?.(); }} className="flex-shrink-0 cursor-pointer">
                                     {isLiked ? (
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" fill="#B7B7F3" />

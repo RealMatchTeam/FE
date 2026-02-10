@@ -11,12 +11,9 @@ export interface BrandSummary {
 
 export const getBrandSummary = async (brandId: number): Promise<BrandSummary> => {
   try {
-    // proposal.ts와 동일한 axiosInstance 사용
     const response = await axiosInstance.get<ApiResponse<BrandSummary>>(
       `/v1/brands/${brandId}/summary`
     );
-
-    // 공통 응답 구조(isSuccess) 확인
     if (response.data.isSuccess) {
       return response.data.result;
     }

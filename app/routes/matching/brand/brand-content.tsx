@@ -8,7 +8,7 @@ import BrandFilterBar from "./components/BrandFilterBar";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import MainIcon from "../../../assets/MainIcon.svg";
+import EmptyMatchState from "../../../components/common/EmptyMatchState";
 import { getMatchingBrands, toggleBrandLike, type MatchingBrand } from "../api/matching";
 
 export default function BrandContent() {
@@ -48,7 +48,7 @@ export default function BrandContent() {
             return response;
         },
         initialPageParam: 0,
-        getNextPageParam: () => undefined, 
+        getNextPageParam: () => undefined,
         staleTime: 1000 * 60 * 1, // 1분간 캐시 유지
     });
 
@@ -91,9 +91,10 @@ export default function BrandContent() {
         });
 
         try {
-            const newLikeStatus = await toggleBrandLike(id);
-
-            // API 응답으로 상태 확정
+            await toggleBrandLike(id);
+        } catch (error) {
+            console.error("브랜드 좋아요 토글 실패:", error);
+            // 실패 시 롤백
             queryClient.setQueryData(queryKey, (oldData: { pages: { brands: MatchingBrand[] }[] } | undefined) => {
                 if (!oldData) return oldData;
                 return {
@@ -101,15 +102,11 @@ export default function BrandContent() {
                     pages: oldData.pages.map((page) => ({
                         ...page,
                         brands: page.brands.map((brand: MatchingBrand) =>
-                            brand.id === id ? { ...brand, isLiked: newLikeStatus } : brand
+                            brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
                         )
                     }))
                 };
             });
-        } catch (error) {
-            console.error("Failed to toggle brand like:", error);
-            // 에러 발생 시 롤백
-            queryClient.invalidateQueries({ queryKey });
         }
     };
 
@@ -142,16 +139,11 @@ export default function BrandContent() {
     if (error || (brands.length === 0 && !isLoading)) {
         if (error) console.error("Failed to fetch matching brands:", error);
 
-        return (
-            <div className="flex flex-col h-full bg-core-2">
-                <div className="flex flex-col items-center justify-center flex-1 bg-gradient-to-b from-[#E8E8F8] to-white px-6">
-                    <img src={MainIcon} alt="No matching" className="w-[200px] h-auto mb-6" />
-                    <p className="text-title1 text-text-black text-center mb-2">
-                        매칭된 기업이 없어요
-                    </p>
-                </div>
-            </div>
-        );
+        return <EmptyMatchState
+            message={`매칭된 기업이 없어요\n매칭 검사를 먼저 진행해주세요`}
+            showButton={true}
+            buttonText="매칭 검사하기"
+        />
     }
 
     // 매칭 결과가 있을 때
@@ -169,7 +161,7 @@ export default function BrandContent() {
             <div className="flex-1 px-4 py-6 overflow-y-auto">
                 {/* 타이틀 & 필터 */}
                 <div className="mb-4">
-                    <h2 className="text-title1 mb-3">브랜드 리스트</h2>
+                    <h2 className="text-title1 mb-4">브랜드 리스트</h2>
                     <div className="flex gap-2">
                         <FilterButton
                             label={getSortButtonLabel()}

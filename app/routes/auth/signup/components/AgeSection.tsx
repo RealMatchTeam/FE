@@ -4,15 +4,25 @@ import { DatePickerModal } from "./DatePickerModal";
 
 interface AgeSectionProps<T extends FieldValues> {
   setValue: UseFormSetValue<T>;
+  initialValue?: string;
 }
 
-export function AgeSection<T extends FieldValues>({ setValue }: AgeSectionProps<T>) {
+function parseInitialDate(initialValue?: string) {
+  if (!initialValue) return null;
+  const [year, month, day] = initialValue.split("-");
+  if (year && month && day) {
+    return { year, month: String(parseInt(month)), day: String(parseInt(day)) };
+  }
+  return null;
+}
+
+export function AgeSection<T extends FieldValues>({ setValue, initialValue }: AgeSectionProps<T>) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<{
     year: string;
     month: string;
     day: string;
-  } | null>(null);
+  } | null>(() => parseInitialDate(initialValue));
 
   const handleDateSelect = (date: { year: string; month: string; day: string }) => {
     setSelectedDate(date);

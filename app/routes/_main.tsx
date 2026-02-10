@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import BottomTab from "../components/layout/BottomTab";
 import { LayoutContext } from "./layout-context";
-import Logo from "../assets/logo/RealMatchLogo_ex.svg";
+import Logo from "../assets/logo/realmatch-logo-line.png";
 import { tokenStorage } from "../lib/token";
 
 export default function MainLayout() {

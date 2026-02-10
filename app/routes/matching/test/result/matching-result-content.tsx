@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useMatchResultStore } from "../../../../stores/matching-result";
+import { useAuthStore } from "../../../../stores/auth-store";
 import MainIcon from "../../../../assets/MainIcon.svg";
 import Button from "../../../../components/common/Button";
 
@@ -29,6 +30,7 @@ export default function MatchingResultContent() {
   const location = useLocation() as { state: LocationState | null };
   const [searchParams] = useSearchParams();
   const setResult = useMatchResultStore((s) => s.setResult);
+  const setMe = useAuthStore((s) => s.setMe);
 
   const data = useMemo(() => {
     const apiResult = location.state?.apiResult;
@@ -80,7 +82,8 @@ export default function MatchingResultContent() {
       },
     });
 
-    navigate("/home");
+    setMe({ matchingTestDone: true });
+    navigate("/", { state: { refresh: Date.now() }, replace: true });
   };
 
   return (
@@ -151,13 +154,7 @@ export default function MatchingResultContent() {
           </div>
 
           <div className="mt-[40px]">
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              withLogo
-              onClick={onStart}
-            >
+            <Button variant="primary" size="lg" fullWidth withLogo onClick={onStart}>
               RealMatch 시작하기
             </Button>
           </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 //import { useCreateCampaignMutation } from "../../../hooks/queries/useCampaign";
 
-import RealmatchHeader from "../../../components/common/RealmatchHeader";
+import RealmatchHeader from "../../../components/layout/RealmatchHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
