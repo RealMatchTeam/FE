@@ -12,6 +12,61 @@ import { axiosInstance } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
 import { uploadAttachment } from "../../rooms/api/attachments";
 
+const compressImage = (
+  file: File,
+  maxWidth = 1080,
+  quality = 0.8,
+): Promise<File> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.src = objectUrl;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = (maxWidth / width) * height;
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(objectUrl);
+        reject("canvas context error");
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(objectUrl);
+          if (!blob) return reject("Blob conversion failed");
+
+          const compressedFile = new File([blob], file.name, {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          });
+
+          resolve(compressedFile);
+        },
+        "image/jpeg",
+        quality,
+      );
+    };
+
+    img.onerror = (error) => {
+      URL.revokeObjectURL(objectUrl);
+      reject(error);
+    };
+  });
+
 export default function ProfileCard() {
   useHideHeader(true);
 
@@ -51,10 +106,11 @@ export default function ProfileCard() {
 
     try {
       setIsUploadingImage(true);
+      const compressedFile = await compressImage(file);
       const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
       const uploaded = await uploadAttachment({
         token,
-        file,
+        file: compressedFile,
         attachmentType: "IMAGE",
         usage: "PUBLIC",
         baseUrl,
