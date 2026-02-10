@@ -40,7 +40,7 @@ export default function MyPageEdit() {
 
   return (
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
-      <div className="w-full max-w-[430px] shadow-2xl flex flex-col">
+      <div className="w-full shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader title="회원정보 설정" onBack={() => navigate(-1)} bgClassName={"F6F6FF"}/>
         </div>

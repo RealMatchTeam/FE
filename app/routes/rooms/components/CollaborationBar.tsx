@@ -11,7 +11,7 @@ export default function CollaborationSummaryBar({
 }: Props) {
   return (
     <div>
-      <div className="w-full max-w-[430px] h-[64px] bg-white flex items-center gap-3 px-3.5">
+      <div className="w-full h-[64px] bg-white flex items-center gap-3 px-3.5">
         {/* 썸네일 */}
         <div className="w-[40px] h-[40px] rounded-[10px] bg-[#F3F4F8] flex items-center justify-center overflow-hidden shrink-0">
           {thumbnailUrl ? (
