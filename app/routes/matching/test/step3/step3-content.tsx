@@ -44,6 +44,12 @@ type Props = {
 type Sheet = null | "snsUrl" | "gender" | "ageGroup" | "videoLength" | "views";
 const EMPTY_TAGS: TagItem[] = [];
 
+const INSTAGRAM_PREFIX = "https://instagram.com/";
+
+const extractId = (url: string) => url.replace(INSTAGRAM_PREFIX, "").trim();
+
+const isValidInstagramId = (id: string) => /^[A-Za-z0-9._]{1,30}$/.test(id);
+
 const sortById = (items: TagItem[]) => [...items].sort((a, b) => a.id - b.id);
 
 const namesByIds = (ids: number[], options: TagItem[]) =>
@@ -65,7 +71,6 @@ export default function MatchingTestStep3Content({
 
   snsUrl,
   onSnsUrlChange,
-  isValidInstagramUrl,
 
   step3Selected,
   onToggleSelect,
@@ -147,25 +152,36 @@ export default function MatchingTestStep3Content({
       <MatchingTestTopBar step={3} totalSteps={3} onBack={onBack} />
 
       {tagsLoading ? (
-        <div className="px-6 py-10 text-sm text-text-gray3">태그를 불러오는 중...</div>
+        <div className="px-6 py-10 text-sm text-text-gray3">
+          태그를 불러오는 중...
+        </div>
       ) : tagsError ? (
         <div className="px-6 py-10 text-sm text-red-500">{tagsError}</div>
       ) : null}
 
       <main className="flex-1 px-6 pb-[30px]">
         <h1 className="text-title leading-[32px] font-extrabold text-text-black">
-          <span className="text-core-1">콘텐츠 특성</span>을 <span className="text-core-1">모두</span> 선택해주세요
+          <span className="text-core-1">콘텐츠 특성</span>을{" "}
+          <span className="text-core-1">모두</span> 선택해주세요
         </h1>
 
         <section className="mt-8">
           <h2 className="text-title2 text-text-black mb-2">SNS 정보</h2>
 
-          <div className="text-title4 text-text-gray3">SNS 주소를 입력해주세요</div>
+          <div className="text-title4 text-text-gray3">
+            SNS 주소를 입력해주세요
+          </div>
           <div className="mt-2">
             <FormField
               label="인스타그램 주소"
-              value={snsUrl}
-              placeholder="입력하기"
+              value={
+                snsUrl
+                  ? snsUrl.startsWith(INSTAGRAM_PREFIX)
+                    ? snsUrl
+                    : INSTAGRAM_PREFIX + snsUrl
+                  : INSTAGRAM_PREFIX
+              }
+              placeholder="아이디 입력"
               onClick={() => open("snsUrl")}
             />
           </div>
@@ -292,15 +308,19 @@ export default function MatchingTestStep3Content({
       {sheet === "snsUrl" ? (
         <BottomSheet title="인스타그램 주소 입력" onClose={close}>
           <InputSheet
-            value={snsUrl}
-            placeholder="https://www.instagram.com/your_id"
-            onChange={onSnsUrlChange}
-            doneDisabled={!isValidInstagramUrl}
+            value={extractId(snsUrl)}
+            placeholder="your_id"
+            onChange={(v) => {
+              const cleaned = extractId(v);
+              onSnsUrlChange(INSTAGRAM_PREFIX + cleaned);
+            }}
+            doneDisabled={!isValidInstagramId(extractId(snsUrl))}
             onDone={close}
             helperText=""
             errorText={
-              snsUrl.trim().length > 0 && !isValidInstagramUrl
-                ? "instagram.com/ 으로 시작하는 URL이어야 해요."
+              extractId(snsUrl).length > 0 &&
+              !isValidInstagramId(extractId(snsUrl))
+                ? "영문, 숫자, '.', '_' 만 입력할 수 있어요."
                 : undefined
             }
           />
