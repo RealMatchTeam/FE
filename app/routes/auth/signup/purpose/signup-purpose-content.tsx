@@ -14,10 +14,23 @@ function SignUpPurposeContent() {
   const totalSteps = 3;
   const currentStep = 3;
 
-  const [selectedPurposes, setSelectedPurposes] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setPurposes, getSignupData, reset, signupPurposeIds: storedPurposeIds } = useSignupStore();
 
-  const { setPurposes, getSignupData, reset } = useSignupStore();
+  // 목적 ID -> 한글 변환
+  const getPurposeLabels = (ids: number[]): string[] => {
+    const purposeMap: Record<number, string> = {
+      1: "제품 협찬",
+      2: "수익 창출",
+      3: "팔로워 증대",
+      4: "브랜딩 강화",
+      5: "신규 브랜드 발굴",
+      6: "트렌드 탐색",
+    };
+    return ids.map(id => purposeMap[id]).filter(Boolean);
+  };
+
+  const [selectedPurposes, setSelectedPurposes] = useState<string[]>(getPurposeLabels(storedPurposeIds));
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const togglePurpose = (purpose: string) => {
     setSelectedPurposes((prev) =>
@@ -29,7 +42,7 @@ function SignUpPurposeContent() {
 
   const handleNext = async () => {
     if (selectedPurposes.length === 0) {
-      toast.warning("목적을 하나 이상 선택해주세요.");
+      toast.warning("목적을 하나 이상 선택해주세요");
       return;
     }
 
@@ -91,38 +104,38 @@ function SignUpPurposeContent() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-grad-auth">
+    <div className="flex flex-col min-h-screen bg-grad-auth">
       {/* 플로우 네비게이션 */}
       <FlowNavigation currentStep={currentStep} totalSteps={totalSteps} />
 
-      {/* 스크롤 가능한 컨텐츠 영역 */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-6">
+      <div className="flex flex-col flex-1 px-6 py-6">
         {/* 헤더 */}
-        <h2 className="text-title text-text-black text-center mb-2">
-          어떤 목적으로 사용하시나요?
-        </h2>
-        <p className="text-callout1 text-text-gray3 text-center mb-20">
-          <span className="text-core-1">모두</span> 선택해주세요
-        </p>
+        <div className="flex-1">
+          <h2 className="text-title text-text-black text-center mb-2">
+            어떤 목적으로 사용하시나요?
+          </h2>
+          <p className="text-callout1 text-text-gray3 text-center mb-23.5">
+            <span className="text-core-1">모두</span> 선택해주세요
+          </p>
 
-        {/* 목적 카드 섹션 */}
-        <PurposeSection
-          selectedPurposes={selectedPurposes}
-          onTogglePurpose={togglePurpose}
-        />
-      </div>
+          {/* 목적 카드 섹션 */}
+          <PurposeSection
+            selectedPurposes={selectedPurposes}
+            onTogglePurpose={togglePurpose}
+          />
+          <div className="mb-[107.5px] sm:mb-[90px] md:mb-[70px] lg:mb-[50px]" />
+        </div>
 
-      {/* 고정 하단 버튼 */}
-      <div className="px-6 pb-6 pt-4">
+        {/* 하단 버튼 */}
         <Button
           type="button"
           variant="primary"
           size="lg"
           fullWidth
           onClick={handleNext}
-          disabled={isSubmitting || selectedPurposes.length === 0}
+          className={isSubmitting || selectedPurposes.length === 0 ? "opacity-50" : ""}
         >
-          {isSubmitting ? "가입 중..." : "완료"}
+          {isSubmitting ? "가입 중" : "완료"}
         </Button>
       </div>
     </div>

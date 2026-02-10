@@ -49,22 +49,25 @@ const normalizeUrl = (url: string) => {
 const isRefreshRequest = (url?: string) =>
   typeof url === "string" && url.includes("/auth/refresh");
 
+// 토큰 갱신 전용 별도 인스턴스
+const refreshInstance = axios.create({
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
+  timeout: 10000,
+});
+
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const url = typeof config.url === "string" ? config.url : "";
 
+    // normalizeUrl은 상대 경로일 때만 유효함
     if (!isRefreshRequest(url) && typeof config.url === "string") {
       config.url = normalizeUrl(config.url);
     }
 
-    // refresh 요청에는 만료 accessToken이 붙으면 refresh 자체가 실패할 수 있음
-    if (isRefreshRequest(url)) {
-      if (config.headers && "Authorization" in config.headers) {
-        delete config.headers.Authorization;
-      }
-    } else {
-      const accessToken = tokenStorage.getAccessToken();
-      if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+    const accessToken = tokenStorage.getAccessToken();
+    if (accessToken && !isRefreshRequest(url)) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     return config;
@@ -95,74 +98,89 @@ axiosInstance.interceptors.response.use(
 
     const status = error.response?.status;
 
-    // refresh 자체가 실패하면 루프 돌지 말고 즉시 로그인
-    if (isRefreshRequest(originalRequest.url)) {
-      tokenStorage.clearTokens();
-      window.location.href = "/auth/login";
-      return Promise.reject(error);
-    }
+    // 401 Unauthorized 처리
+    if (status === 401) {
+      console.warn(`[Axios Interceptor] 401 detected for: ${originalRequest.url}`);
 
-    if (typeof originalRequest.url === "string") {
-      originalRequest.url = normalizeUrl(originalRequest.url);
-    }
-
-    if ((status === 401 || status === 400) && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          subscribeTokenRefresh((token: string) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(axiosInstance(originalRequest));
-          });
-        });
+      // 1. 리프레시 요청 자체가 401이면 즉시 로그아웃
+      if (isRefreshRequest(originalRequest.url)) {
+        console.error("[Axios Interceptor] Critical: Refresh API returned 401. Clearing tokens and redirecting.");
+        tokenStorage.clearTokens();
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+        return Promise.reject(error);
       }
 
-      isRefreshing = true;
+      // 2. 일반 API 요청이 401인 경우 갱신 시도
+      if (!originalRequest._retry) {
+        originalRequest._retry = true;
 
-      try {
-        const refreshToken = tokenStorage.getRefreshToken();
-        if (!refreshToken) {
-          tokenStorage.clearTokens();
-          window.location.href = "/auth/login";
-          return Promise.reject(error);
+        if (isRefreshing) {
+          console.log("[Axios Interceptor] Refresh already in progress, queuing callback.");
+          return new Promise((resolve) => {
+            subscribeTokenRefresh((token: string) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(axiosInstance(originalRequest));
+            });
+          });
         }
 
-        const refreshPath =
-          BASE_URL === "/api" ? "/v1/auth/refresh" : "/api/v1/auth/refresh";
+        isRefreshing = true;
+        console.log("[Axios Interceptor] Starting Token Refresh flow...");
 
-        // refresh 요청은 Authorization 없이 RefreshToken 헤더만
-        const res = await axiosInstance.post<RefreshResponse>(
-          refreshPath,
-          {},
-          {
-            headers: {
-              RefreshToken: `Bearer ${refreshToken}`,
-              Authorization: "",
-            },
-          },
-        );
+        try {
+          const refreshToken = tokenStorage.getRefreshToken();
+          const accessToken = tokenStorage.getAccessToken();
 
-        const accessToken = res.data?.result?.accessToken;
-        const newRefreshToken = res.data?.result?.refreshToken;
+          if (!refreshToken) {
+            console.error("[Axios Interceptor] No Refresh Token found in localStorage.");
+            throw new Error("NO_REFRESH_TOKEN");
+          }
 
-        if (!accessToken || !newRefreshToken) {
+          const refreshPath = BASE_URL === "/api" ? "/v1/auth/refresh" : "/api/v1/auth/refresh";
+
+          const headers = {
+            'accept': '*/*',
+            'RefreshToken': refreshToken,
+            'Authorization': `Bearer ${accessToken}`,
+          };
+
+          const res = await refreshInstance.post<RefreshResponse>(
+            refreshPath,
+            "",
+            {
+              headers: headers,
+            }
+          );
+
+          const { accessToken: newAccess, refreshToken: newRefresh } = res.data.result;
+          if (!newAccess || !newRefresh) {
+            throw new Error("INVALID_TOKEN_DATA_IN_RESPONSE");
+          }
+
+          tokenStorage.setTokens(newAccess, newRefresh);
+
+          isRefreshing = false;
+          onTokenRefreshed(newAccess);
+
+          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+          return axiosInstance(originalRequest);
+        } catch (refreshErr: unknown) {
+          isRefreshing = false;
+
+          if (axios.isAxiosError(refreshErr)) {
+            const status = refreshErr.response?.status;
+            console.error(`[Axios Interceptor] Refresh Request Failed (Status: ${status})`);
+          }
+
           tokenStorage.clearTokens();
-          window.location.href = "/auth/login";
-          return Promise.reject(error);
+          if (typeof window !== "undefined") {
+            window.location.href = "/auth/login";
+          }
+
+          return Promise.reject(refreshErr);
         }
-
-        tokenStorage.setTokens(accessToken, newRefreshToken);
-        onTokenRefreshed(accessToken);
-
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return axiosInstance(originalRequest);
-      } catch (e) {
-        tokenStorage.clearTokens();
-        window.location.href = "/auth/login";
-        return Promise.reject(e);
-      } finally {
-        isRefreshing = false;
       }
     }
 

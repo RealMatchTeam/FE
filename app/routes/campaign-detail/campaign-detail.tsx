@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 import BrandHero from "../brand-detail/components/BrandHero";
 import BrandInfo from "../brand-detail/components/BrandInfo";
@@ -9,6 +9,7 @@ import OngoingCampaignSection from "../brand-detail/components/OngoingCampaignSe
 import { tokenStorage } from "../../lib/token";
 import { toggleBrandLike } from "../matching/api/matching";
 import { apiClient } from "../../api/axios";
+import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import type { BrandDetailData } from "../brand-detail/types";
 import type {
@@ -37,6 +38,8 @@ export default function CampaignDetailContent({
   campaignId,
 }: Props) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
 
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
   const [isHearted, setIsHearted] = useState<boolean>(
@@ -162,6 +165,48 @@ export default function CampaignDetailContent({
     }
   };
 
+  const handleSuggest = () => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+
+    if (!campaign) return;
+
+    // URL에서 brandId와 domain 가져오기
+    const brandId = searchParams.get("brandId");
+    const domain = searchParams.get("domain");
+
+    // zustand에 캠페인 데이터 저장
+    setProposalData({
+      brandId: Number(brandId),
+      campaignId,
+      domain: domain || "beauty",
+      brandName: brandData.name,
+      campaignTitle: campaign.title,
+      campaignDescription: campaign.description,
+      rewardAmount: campaign.rewardAmount,
+      product: campaign.product,
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
+      contentTags: {
+        formats: campaign.contentTags?.formats,
+        categories: campaign.contentTags?.categories,
+        tones: campaign.contentTags?.tones,
+        involvements: campaign.contentTags?.involvements,
+        usageRanges: campaign.contentTags?.usageRanges,
+      },
+    });
+
+    // 먼저 /matching/suggest로 이동 (신규/기존 선택 화면)
+    navigate("/matching/suggest");
+  };
+
+  const handleApply = () => {
+    console.log("apply:", campaignId);
+  };
+
   if (campaignError) {
     return (
       <div className="min-h-screen bg-white px-5 py-6">{campaignError}</div>
@@ -192,7 +237,7 @@ export default function CampaignDetailContent({
           <BrandActionBar
             isHearted={isHearted}
             onChat={handleChat}
-            onSuggest={() => {}}
+            onSuggest={handleSuggest}
             onToggleHeart={handleToggleHeart}
           />
 
@@ -267,7 +312,7 @@ export default function CampaignDetailContent({
           <div className="mx-auto max-w-[430px] px-5 pb-5 pt-3">
             <button
               type="button"
-              onClick={() => console.log("apply:", campaignId)}
+              onClick={handleApply}
               className="flex h-12 w-full items-center justify-center rounded-xl bg-indigo-500 text-[16px] font-semibold text-white"
             >
               지원하기

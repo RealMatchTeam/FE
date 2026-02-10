@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import RealMatchLogo from "../../assets/logo/RealMatchLogo_ex.svg"
+import RealMatchLogo from "../../assets/logo/realmatch-logo-line.png"
 
 type RealMatchHeaderProps = {
   /** 뒤로가기 버튼 노출 여부 */
@@ -18,16 +18,12 @@ export default function RealMatchHeader({
   const handleBack = () => {
     if (onBack) return onBack();
 
-    // 가능하면 라우터 상위로, 실패하면 브라우저 히스토리
-    try {
-      navigate({ to: "/matching/test/step3" });
-    } catch {
-      window.history.back();
-    }
+    // 브라우저 히스토리 뒤로가기
+    navigate(-1);
   };
 
   return (
-    <header className="h-[56px] w-full bg-white">
+    <header className="h-[60px] w-full bg-white">
       <div className="grid h-full w-full grid-cols-3 items-center px-4">
         {/* Left: Back */}
         <div className="flex items-center">
@@ -59,13 +55,18 @@ export default function RealMatchHeader({
         </div>
 
         {/* Center: Logo + Text (정중앙 고정) */}
-        <div className="flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="flex items-center justify-center gap-2"
+        >
           <img
             src={RealMatchLogo}
             alt="Real Match"
             draggable={false}
+            className="h-[21.5px]"
           />
-        </div>
+        </button>
       </div>
 
       {/* 하단 얇은 divider (스크린샷의 라인 느낌) */}

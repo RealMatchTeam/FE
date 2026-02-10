@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useMatchResultStore } from "../../../../stores/matching-result";
+import { useAuthStore } from "../../../../stores/auth-store";
 import MainIcon from "../../../../assets/MainIcon.svg";
 import Button from "../../../../components/common/Button";
 
@@ -31,6 +32,7 @@ export default function MatchingResultContent() {
   const location = useLocation() as { state: LocationState | null };
   const [searchParams] = useSearchParams();
   const setResult = useMatchResultStore((s) => s.setResult);
+  const setMe = useAuthStore((s) => s.setMe);
 
   const data = useMemo(() => {
     const apiResult = location.state?.apiResult;
@@ -93,7 +95,11 @@ export default function MatchingResultContent() {
       },
     });
 
-    navigate("/");
+    // 매칭 테스트 완료 상태 업데이트
+    setMe({ matchingTestDone: true });
+
+    // 강제로 리프레시하기 위해 state 전달
+    navigate("/", { state: { refresh: Date.now() }, replace: true });
   };
 
   return (

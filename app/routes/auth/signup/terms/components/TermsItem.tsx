@@ -8,6 +8,7 @@ interface TermsItemProps {
   hasArrow?: boolean;
   textColor?: string;
   onDetailClick?: () => void;
+  noWrap?: boolean;
 }
 
 export function TermsItem({
@@ -17,23 +18,24 @@ export function TermsItem({
   required = false,
   hasArrow = false,
   textColor = "text-text-black",
-  onDetailClick
+  onDetailClick,
+  noWrap = false
 }: TermsItemProps) {
   return (
-    <div className="flex items-center gap-3 w-full">
+    <div className="flex items-center gap-3 w-full overflow-visible">
       <div
-        className="flex items-center gap-3 flex-1 cursor-pointer"
+        className="flex items-center gap-3 flex-1 cursor-pointer overflow-visible"
         onClick={onChange}
       >
         <div className="flex-shrink-0">
           <CheckIcon checked={checked} />
         </div>
-        <div className="flex items-start gap-1 flex-1">
+        <div className={`flex items-center gap-1 flex-1 overflow-visible ${noWrap ? 'whitespace-nowrap' : ''}`}>
           <span className={`text-body1 ${textColor}`}>
-            {label}{" "}
-            {required && <span className="text-callout4 text-core-1">(필수)</span>}
-            {!required && <span className="text-callout4 text-text-gray3">(선택)</span>}
+            {label}
           </span>
+          {required && <span className="text-callout4 text-core-1 flex-shrink-0">(필수)</span>}
+          {!required && <span className="text-callout4 text-text-gray3 flex-shrink-0">(선택)</span>}
         </div>
       </div>
 
