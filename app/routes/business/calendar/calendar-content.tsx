@@ -253,6 +253,7 @@ export default function CalendarContent() {
                             : "제안 보기"
                       }
                       logo={item.thumbnailUrl}
+                      brandId={item.brandId}
                       onClick={() => handleCardClick(item)}
                     />
                   ))

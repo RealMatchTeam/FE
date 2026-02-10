@@ -51,9 +51,7 @@ export default [
 
     route("business", "routes/business/route.tsx", [
       route("calendar", "routes/business/calendar/route.tsx"),
-      route("proposal", "routes/business/proposal/route.tsx", [
-        route("re-proposal", "routes/business/proposal/re-proposal/route.tsx"),
-      ]),
+      route("proposal", "routes/business/proposal/route.tsx"),
       route("rejection", "routes/business/rejection/route.tsx"),
       
     ]),

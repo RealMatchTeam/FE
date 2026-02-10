@@ -1,5 +1,7 @@
 import chatIcon from "../../../assets/chat-icon2.svg";
 import searchIcon from "../../../assets/icon/search.svg";
+import { tokenStorage } from "../../../lib/token";
+import { useNavigate } from "react-router-dom"; 
 
 interface MatchingCardProps {
   brand: string;
@@ -7,6 +9,7 @@ interface MatchingCardProps {
   date: string;
   actionLabel: string;
   logo?: string;
+  brandId: number;
   onClick?: () => void;
 }
 
@@ -16,8 +19,10 @@ export default function MatchingCard({
   date,
   actionLabel,
   logo,
+  brandId,
   onClick,
 }: MatchingCardProps) {
+  const navigate = useNavigate();
 
   const getStatusStyle = () => {
     switch (status) {
@@ -31,6 +36,17 @@ export default function MatchingCard({
         return "text-[var(--color-text-gray3)]";
     }
   };
+
+  const handleChat = () => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    navigate(`/rooms/brand/${brandId}`);
+  };
+
   return (
     <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-bluegray-1">
       {/* 브랜드 로고 박스 */}
@@ -72,7 +88,7 @@ export default function MatchingCard({
           </button>
 
           {/* 채팅 버튼 */}
-          <button className="w-10 h-10 flex items-center justify-center bg-core-50 rounded-lg transition-opacity hover:opacity-90 flex-shrink-0">
+          <button onClick={handleChat} className="w-10 h-10 flex items-center justify-center bg-core-50 rounded-lg transition-opacity hover:opacity-90 flex-shrink-0">
             <img src={chatIcon} alt="채팅" className="w-5 h-5 object-contain" />
           </button>
         </div>
