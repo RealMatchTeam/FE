@@ -24,7 +24,7 @@ export default function TextArea({
   }, [value]);
 
   return (
-    <div className="flex items-center w-full py-[10px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80">
+    <div className="flex items-center w-full py-[14px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80">
       <textarea
         ref={textareaRef}
         rows={1}

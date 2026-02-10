@@ -30,7 +30,7 @@ export default function FeeInput({
   };
 
   return (
-    <div className="relative flex items-center flex-1 h-[34px] px-4 rounded-md border border-core-2 bg-white/80">
+    <div className="relative flex items-center flex-1 h-[44px] px-4 rounded-md border border-core-2 bg-white/80">
       <input
         type="text"
         value={displayValue}
