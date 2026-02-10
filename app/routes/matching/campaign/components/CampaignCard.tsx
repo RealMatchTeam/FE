@@ -8,6 +8,7 @@ interface CampaignCardProps {
     applicants: number;
     isLiked?: boolean;
     logoUrl?: string;
+    dDay?: number;
     onLike?: () => void;
     onClick?: () => void;
 }
@@ -20,26 +21,49 @@ export default function CampaignCard({
     applicants,
     isLiked = false,
     logoUrl,
+    dDay,
     onLike,
     onClick
 }: CampaignCardProps) {
-    // 금액 포맷팅
     const formatReward = (amount: number) => {
         return amount.toLocaleString('ko-KR');
     };
+
+    // D-Day 포맷팅
+    const getDDayLabel = (dDay?: number) => {
+        if (dDay === undefined || dDay === null) return "";
+        if (dDay < 0) return "모집완료";
+        if (dDay === 0) return "D-DAY";
+        return `D-${dDay}`;
+    };
+
+    const isRecruitmentComplete = (dDay !== undefined && dDay < 0);
+    const dDayLabel = getDDayLabel(dDay);
 
     return (
         <div onClick={onClick} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer">
             {/* 왼쪽: 이미지 + 배지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
-                <BrandLogo src={logoUrl} alt={brandName} />
-                {/* 원고료 & D-Day 배지 */}
-                <div className="flex items-center justify-center gap-1 w-full">
-                    <span className="px-1 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
-                        D-DAY
-                    </span>
-                    <span className="px-1 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                <div className="relative w-fit">
+                    <BrandLogo src={logoUrl} alt={brandName} />
+                    {isRecruitmentComplete && (
+                        <div className="absolute inset-0 bg-black/60 rounded-xl flex items-center justify-center">
+                            <span className="text-white text-caption1 font-medium">모집완료</span>
+                        </div>
+                    )}
                 </div>
+
+                {/* 원고료 & D-Day 배지 - 모집 완료시 숨김 */}
+                {!isRecruitmentComplete && (
+                    <div className="flex items-center justify-start gap-1 w-full ml-6">
+                        {dDayLabel && (
+                            <span className="px-1 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
+                                {dDayLabel}
+                            </span>
+                        )}
+                        <span className="px-1 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                    </div>
+                )}
             </div>
 
             {/* 오른쪽: 콘텐츠 */}
@@ -54,7 +78,7 @@ export default function CampaignCard({
                                 <button onClick={(e) => { e.stopPropagation(); onLike?.(); }} className="flex-shrink-0 cursor-pointer">
                                     {isLiked ? (
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" fill="#B7B7F3" />
+                                            <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" fill={isRecruitmentComplete ? "#E0E0E0" : "#B7B7F3"} />
                                         </svg>
                                     ) : (
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

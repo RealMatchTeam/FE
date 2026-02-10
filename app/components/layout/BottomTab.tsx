@@ -58,7 +58,7 @@ export default function BottomTab() {
 
   return (
     <nav className="w-full shrink-0 mx-auto max-w-[430px] bg-white border-t border-text-gray5 safe-area-bottom">
-      <div className="flex items-center justify-center h-[66px] px-0 py-4 gap-[20px] shrink-0 self-stretch">
+      <div className="flex items-center justify-center h-[66px] py-4 pl-[3vw] gap-[12.5vw] shrink-0 self-stretch">
         {tabs.map((tab) => {
           let isActive = currentPath === tab.path;
           if (tab.path === "/matching/brand" && currentPath.startsWith("/matching")) {
@@ -67,28 +67,32 @@ export default function BottomTab() {
           if (tab.path === "/business/calendar" && currentPath.startsWith("/business")) {
             isActive = true;
           }
+          const isHome = tab.path === "/";
+          if (isHome && (currentPath === "/" || currentPath.startsWith("/home") || currentPath.startsWith("/pre"))) {
+            isActive = true;
+          }
+          const isMyPage = tab.path === "/mypage";
           return (
             <Link
               key={tab.path}
               to={tab.path}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors min-w-[50px] ${tab.path === "/business/calendar" ? "ml-2" : ""
-                }`}
+              className={`transition-colors ${isHome ? "pl-[2.5vw]" : ""} ${isMyPage ? "pr-[3.646vw]" : ""}`}
             >
-              <div>
+              <div className="flex flex-col items-center justify-center gap-1">
                 <img
                   src={isActive ? tab.iconSelected : tab.icon}
                   alt={tab.label}
-                  className="w-4 h-4"
+                  className={isHome ? "w-6 h-6" : "w-4 h-4"}
                 />
+                <span
+                  className={`text-callout4 whitespace-nowrap ${isActive
+                    ? "text-core-1 font-semibold"
+                    : "text-text-gray3"
+                    }`}
+                >
+                  {tab.label}
+                </span>
               </div>
-              <span
-                className={`text-callout4 ${isActive
-                  ? "text-core-1 font-semibold"
-                  : "text-text-gray3"
-                  }`}
-              >
-                {tab.label}
-              </span>
             </Link>
           );
         })}

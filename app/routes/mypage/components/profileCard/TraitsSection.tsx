@@ -4,7 +4,7 @@ import Section from "./CommonSection";
 import TraitCard from "./TraitCard";
 import TraitModal from "./TraitModal";
 import { TRAITS } from "./traitData";
-import { tagName } from "../../../../constants/tagNameById";
+import { tagName } from "../../../../data/tagNameById";
 type FeatureData = {
   beautyType?: {
     skinType?: number[] | null;

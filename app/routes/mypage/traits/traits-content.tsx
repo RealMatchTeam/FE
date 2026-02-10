@@ -4,7 +4,7 @@ import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import { axiosInstance } from "../../../api/axios";
 import { TRAITS } from "../components/profileCard/traitData";
-import { tagName } from "../../../constants/tagNameById";
+import { tagName } from "../../../data/tagNameById";
 import { useMatchingTestStore } from "../../../stores/matching-test";
 
 /*const KEY_MAP = {
@@ -331,8 +331,8 @@ export default function TraitsPage() {
                         {editingId === trait.id ? (
                           <div className="mt-2 flex flex-wrap gap-2">
                             {section.items.map((item, idx) => (
-                              <span 
-                                key={idx} 
+                              <span
+                                key={idx}
                                 className="px-[10px] py-1 bg-[#B7B7F3B2] border border-[#B7B7F3] text-[#6666E5] rounded-[20px] text-[14px] leading-[20px] font-medium"
                               >
                                 {item}
@@ -350,7 +350,7 @@ export default function TraitsPage() {
 
                     {editingId === trait.id && (
                       <div className="flex justify-end mt-2">
-                        <button 
+                        <button
                           onClick={handleComplete}
                           className="text-[14px] font-semibold text-[#6666E5]"
                         >
