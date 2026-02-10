@@ -1,11 +1,14 @@
 type Props = {
   title: string; // 텍스트
   onBack?: () => void; //onBack={() => history.back()} 뒤로가기
+  bgClassName?: string;
 };
 
-export default function NavigationHeader({ title, onBack }: Props) {
+export default function NavigationHeader({ title, onBack, bgClassName }: Props) {
+  const bg = bgClassName ?? "bg-[#FFFFFF]";
+
   return (
-    <div className="h-[60px] flex items-center px-4 py-[10px] bg-[#FFFFFF]">
+    <div className={`h-[60px] flex items-center px-4 py-[10px] ${bg}`}>
       <button
         type="button"
         onClick={onBack}

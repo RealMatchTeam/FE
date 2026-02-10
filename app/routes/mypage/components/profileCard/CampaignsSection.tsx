@@ -87,7 +87,7 @@ export default function CampaignsSection() {
   return (
     <section className="py-6">
       <div className="flex items-center justify-between mb-[12px]">
-        <div className="text-[14px] font-semibold text-black/80">진행한 캠페인</div>
+        <div className="text-[16px] leading-[20px] font-semibold text-black/80">진행한 캠페인</div>
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -139,14 +139,14 @@ export default function CampaignsSection() {
                   role={campaignId ? "button" : undefined}
                   tabIndex={campaignId ? 0 : -1}
                 >
-                  <div className="min-w-[72px] text-[#4A4DFF] underline underline-offset-2 text-[12px] font-semibold">
+                  <div className="min-w-[72px] text-[#6666E5] underline underline-offset-2 text-[12px] leading-[16px] font-medium">
                     {typeLabel}
                   </div>
-                  <div className="flex-1 text-[12px] text-[#5B5D6B] truncate">
+                  <div className="flex-1 text-[12px] leading-[16px] font-medium text-[#5B5D6B] truncate">
                     {brand}
                     {title}
                   </div>
-                  <div className="text-[12px] text-[#9B9BA1] shrink-0">
+                  <div className="text-[12px] leading-[16px] font-medium text-[#9B9BA1] shrink-0">
                     {rightLabel}
                   </div>
                 </div>
@@ -154,16 +154,7 @@ export default function CampaignsSection() {
             })}
           </div>
 
-          <div className="flex items-center justify-center gap-2 pt-4">
-            <button
-              type="button"
-              className="text-[#5B5D6B] px-1"
-              onClick={() => setPage(1)}
-              disabled={safePage === 1}
-              aria-label="첫 페이지"
-            >
-              «
-            </button>
+          <div className="flex items-center justify-center pt-5">
             <button
               type="button"
               className="text-[#5B5D6B] px-1"
@@ -171,7 +162,10 @@ export default function CampaignsSection() {
               disabled={safePage === 1}
               aria-label="이전 페이지"
             >
-              ‹
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 6L11.5 12L17 18" stroke="#5B5D6B" strokeWidth="1.5"/>
+              </svg>
+
             </button>
 
             {pageNumbers.map((n) => (
@@ -180,7 +174,7 @@ export default function CampaignsSection() {
                 type="button"
                 onClick={() => setPage(n)}
                 className={[
-                  "w-7 h-7 rounded-full text-[12px]",
+                  "w-5 h-5 rounded-[5px] text-[12px]",
                   n === safePage ? "bg-[#B7B7F3] text-white" : "text-[#5B5D6B]",
                 ].join(" ")}
               >
@@ -195,7 +189,10 @@ export default function CampaignsSection() {
               disabled={safePage === totalPages}
               aria-label="다음 페이지"
             >
-              ›
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 18L12.5 12L7 6" stroke="#5B5D6B" strokeWidth="1.5"/>
+              </svg>
+
             </button>
             <button
               type="button"
@@ -204,7 +201,11 @@ export default function CampaignsSection() {
               disabled={safePage === totalPages}
               aria-label="마지막 페이지"
             >
-              »
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 18L12.5 12L7 6" stroke="#5B5D6B" strokeWidth="1.5"/>
+                <path d="M13 18L18.5 12L13 6" stroke="#5B5D6B" strokeWidth="1.5"/>
+              </svg>
+
             </button>
           </div>
         </div>

@@ -70,7 +70,7 @@ export default function ConfirmModal({
         ) : null}
 
         {/* content */}
-        <div className="flex-1 px-5 flex flex-col justify-center">
+        <div className="flex-1 px-5 pt-6 flex flex-col justify-center">
           {/* icon */}
           {icon ? <div className="flex justify-center mb-4">{icon}</div> : null}
 
