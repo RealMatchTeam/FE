@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 export type SectionKey =
-  | "style"
+  | "category"
   | "function"
   | "skinType"
   | "skinTone"
@@ -30,7 +30,7 @@ export type FashionBodyTags = {
 };
 
 const EMPTY_STEP1: SelectedState = {
-  style: [],
+  category: [],
   function: [],
   skinType: [],
   skinTone: [],
@@ -65,6 +65,8 @@ const EMPTY_FASHION_BODY: FashionBodyTags = {
   bottomSizeTag: null,
 };
 
+const STEP1_SINGLE: ReadonlySet<SectionKey> = new Set(["skinType", "skinTone"]);
+
 type MatchingTestStore = {
   selected: SelectedState;
   toggleStep1: (section: SectionKey, id: number) => void;
@@ -94,8 +96,18 @@ export const useMatchingTestStore = create<MatchingTestStore>((set, get) => ({
 
   toggleStep1: (section, id) => {
     const prev = get().selected;
-    const cur = prev[section];
+    const cur = prev[section] ?? [];
     const already = cur.includes(id);
+
+    if (STEP1_SINGLE.has(section)) {
+      set({
+        selected: {
+          ...prev,
+          [section]: already ? [] : [id],
+        },
+      });
+      return;
+    }
 
     set({
       selected: {

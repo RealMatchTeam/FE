@@ -24,7 +24,7 @@ export default function NavigationHeader({ title, onBack }: Props) {
       </button>
 
       <div className="flex-1 text-center">
-        <div className="text-Title1 text-black text-4">{title}</div>
+        <div className="text-Title1 text-black">{title}</div>
       </div>
 
       {/* 오른쪽 여백 맞추기 */}

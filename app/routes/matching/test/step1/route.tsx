@@ -9,7 +9,7 @@ import {
 import type { TagItem } from "../_shared/tags/tags.types";
 
 const SECTIONS: Array<{ key: SectionKey; title: string }> = [
-  { key: "style", title: "관심 스타일" },
+  { key: "category", title: "관심 카테고리" },
   { key: "function", title: "관심 기능" },
   { key: "skinType", title: "피부 타입" },
   { key: "skinTone", title: "피부 밝기" },
@@ -52,22 +52,14 @@ export default function MatchingTestStep1Page() {
     const categories = data?.categories ?? {};
 
     return {
-      style: pickCategory(categories, ["관심 스타일"]),
+      category: pickCategory(categories, ["관심 스타일"]),
       function: pickCategory(categories, ["관심 기능"]),
       skinType: pickCategory(categories, ["피부 타입"]),
       skinTone: pickCategory(categories, [
         "피부 밝기",
-        "피부 밝기(톤)",
-        "피부 밝기 (톤)",
-        "피부 톤",
-        "피부톤",
       ]),
       makeupStyle: pickCategory(categories, [
         "메이크업 스타일",
-        "메이크업 스타일(연출)",
-        "메이크업 스타일 (연출)",
-        "메이크업",
-        "메이크업스타일",
       ]),
     };
   }, [data]);

@@ -12,21 +12,35 @@ export type CampaignContentTags = {
   usageRanges: ApiTagItem[];
 };
 
+export type CampaignCategory = "BEAUTY" | "FASHION";
+
 export type CampaignDetail = {
   campaignId: number;
   title: string;
   description: string;
+
+  imageUrl: string | null;
+  category: CampaignCategory;
+
   preferredSkills: string;
   schedule: string;
   videoSpec: string;
   product: string;
+
   rewardAmount: number;
+
   startDate: string;
   endDate: string;
+
   recruitStartDate: string;
   recruitEndDate: string;
+
+  dday: number;
   quota: number;
+
   contentTags: CampaignContentTags;
+
+  like: boolean;
 };
 
 export type CampaignDetailApiResponse = {
