@@ -1,7 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { axiosInstance } from "../../../api/axios";
+
+type NotificationSettingResponse = {
+  marketingConsent: boolean;
+  appPushEnabled: boolean;
+  emailEnabled: boolean;
+};
+
+type CustomResponseNotificationSettingResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: NotificationSettingResponse;
+};
+
+type CustomResponseString = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+};
 
 export default function MyPageNotifications() {
   useHideHeader(true);
@@ -9,6 +30,31 @@ export default function MyPageNotifications() {
   const [benefitPush, setBenefitPush] = useState(true);
   const [appPush, setAppPush] = useState(true);
   const [emailPush, setEmailPush] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchSetting = async () => {
+      try {
+        const response =
+          await axiosInstance.get<CustomResponseNotificationSettingResponse>(
+            "/api/v1/users/me/notification-settings",
+          );
+
+        if (!response.data.isSuccess) {
+          throw new Error(response.data.message || "알림 설정 조회 실패");
+        }
+
+        const data = response.data.result;
+        setBenefitPush(Boolean(data.marketingConsent));
+        setAppPush(Boolean(data.appPushEnabled));
+        setEmailPush(Boolean(data.emailEnabled));
+      } catch (error) {
+        console.error("Failed to load notification setting:", error);
+      }
+    };
+
+    fetchSetting();
+  }, []);
 
   return (
     <div className="h-screen-full bg-[#F3F4F8]">
@@ -121,6 +167,7 @@ export default function MyPageNotifications() {
         >
           <button
             type="button"
+            disabled={isSaving}
             className="
               w-full h-[52px]
               rounded-[14px]
@@ -128,6 +175,29 @@ export default function MyPageNotifications() {
               text-white text-[15px]
               font-semibold
             "
+            onClick={async () => {
+              try {
+                setIsSaving(true);
+                const payload = {
+                  marketingConsent: benefitPush,
+                  appPushEnabled: appPush,
+                  emailEnabled: emailPush,
+                };
+
+                const response = await axiosInstance.put<CustomResponseString>(
+                  "/api/v1/users/me/notification-settings",
+                  payload,
+                );
+
+                if (!response.data.isSuccess) {
+                  throw new Error(response.data.message || "알림 설정 변경 실패");
+                }
+              } catch (error) {
+                console.error("Failed to update notification setting:", error);
+              } finally {
+                setIsSaving(false);
+              }
+            }}
           >
             설정 완료
           </button>
