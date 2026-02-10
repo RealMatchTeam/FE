@@ -1,39 +1,47 @@
-// api/notification.ts
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+import { axiosInstance } from "../../../api/axios";
 
-export async function fetchNotifications(accessToken: string): Promise<any> {
-  const res = await fetch(`${API_BASE}/api/v1/notifications?filter=ALL&page=0&size=20`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch notifications');
-
-  const data = await res.json();
-  return data;
+export interface NotificationItem {
+  id: string;
+  kind: string;
+  category: "PROPOSAL" | "MATCHING" | string;
+  title: string;
+  body: string;
+  campaignId: number;
+  proposalId: number;
+  isRead: boolean;
+  createdAt: string;
+  iconType: string;
 }
 
-export async function registerFcmToken(
-  accessToken: string,
-  token: string,
-  deviceInfo?: string
-): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/v1/fcm/tokens`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify({ token, deviceInfo: deviceInfo ?? navigator.userAgent }),
-  });
-  if (!res.ok) throw new Error('FCM token registration failed');
+export interface NotificationResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    items: NotificationItem[];
+    groups: {
+      date: string;
+      label: string;
+      count: number;
+    }[];
+    unreadCount: number;
+    totalElements: number;
+    totalPages: number;
+  };
 }
 
-export async function removeFcmToken(accessToken: string, token: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/v1/fcm/tokens`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify({ token }),
+export const fetchNotifications = async (
+  filter: "ALL" | "PROPOSAL" | "MATCHING" = "ALL",
+  page: number = 0,
+  size: number = 20
+): Promise<NotificationResponse> => {
+  const response = await axiosInstance.get("/v1/notifications", {
+    params: { filter, page, size },
   });
-  if (!res.ok) throw new Error('FCM token removal failed');
-}
+  return response.data;
+};
+
+export const readAllNotifications = async (): Promise<{ isSuccess: boolean; result: { updatedCount: number } }> => {
+  const response = await axiosInstance.patch("/v1/notifications/read-all");
+  return response.data;
+};
