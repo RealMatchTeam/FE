@@ -54,7 +54,7 @@ export default [
 
     route("rooms", "routes/rooms/route.tsx", [
       route("brand/:brandId", "routes/rooms/$brandId.tsx"),
-      route("room/:roomId", "routes/rooms/$roomId.tsx"),
+      route(":roomId", "routes/rooms/$roomId.tsx"),
     ]),
 
     route("mypage", "routes/mypage/route.tsx", [

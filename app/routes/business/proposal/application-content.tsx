@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getAppliedCampaignDetail, cancelCampaignApply, type AppliedCampaignDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import Modal from "../../../components/common/Modal";
@@ -27,36 +28,47 @@ export default function ApplicationContent() {
 
     const applicationId = searchParams.get("applicationId");
 
+    const location = useLocation();
+    const brandIdFromList = location.state?.brandId;
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setTimeout(() => setModalStep("CONFIRM"), 300);
     };
 
     useEffect(() => {
-        if (!applicationId) {
-            setIsLoading(false);
-            return;
-        }
-
         const fetchData = async () => {
+            if (!applicationId) {
+                console.error("applicationId가 없습니다.");
+                setIsLoading(false);
+                return;
+            }
+
             try {
                 setIsLoading(true);
+
                 const result = await getAppliedCampaignDetail(applicationId as string);
+                if (!result) throw new Error("데이터가 비어있습니다.");
                 setData(result);
 
+                const finalBrandId = result.brandId || brandIdFromList;
 
-                if (result.campaignId) {
-                    const brandResult = await getBrandSummary(result.campaignId);
+                if (finalBrandId) {
+                    console.log("브랜드 상세 조회 요청 ID:", finalBrandId);
+                    const brandResult = await getBrandSummary(Number(finalBrandId));
                     setBrand(brandResult);
+                } else {
+                    console.warn("데이터에 brandId가 없습니다.");
                 }
             } catch (error) {
-                console.error("데이터 로드 실패:", error);
+                console.error("최종 데이터 로드 실패:", error);
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchData();
-    }, [applicationId]);
+    }, [applicationId, brandIdFromList]);
 
     const handleCancelSubmit = async () => {
         if (!applicationId || !data) return;
@@ -118,7 +130,7 @@ export default function ApplicationContent() {
                     <CampaignBrandCard
                         showChatSection={false}
                         statusText={getStatusLabel(data.status)}
-                        brandName={brand?.brandName || data.brandName}
+                        brandName={brand?.brandName || "브랜드 정보 로딩 중..."}
                         brandTags={brand?.brandTags || ["지원완료"]}
                         brandImageUrl={brand?.brandImageUrl}
                         matchingRate={brand?.matchingRate}

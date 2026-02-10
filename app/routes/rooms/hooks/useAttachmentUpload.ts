@@ -3,9 +3,10 @@ import { uploadAttachment, type ChatAttachmentUploadResponse, type AttachmentTyp
 
 /**
  * 업로드 훅
- * - uploading / error / lastUploaded 상태 제공
+ * - uploading 상태 제공
  * - upload(file, options) 호출하면 attachment 업로드 수행
  */
+
 export default function useAttachmentUpload(params: {
   baseUrl: string;
   token: string | null;

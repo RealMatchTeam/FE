@@ -1,4 +1,4 @@
-import { useAuthStore } from "../../../../stores/auth-store";
+import { tokenStorage } from "../../../../lib/token";
 
 type Props = {
   avatarSrc?: string;
@@ -22,7 +22,7 @@ export default function AttachmentMessage({
   status,
  }: Props) {
   // IMAGE / FILE
-  const myId = Number(useAuthStore((s) => s.me?.id ?? 0));
+  const myId = Number(tokenStorage.getUserId() ?? 0);
 
   if (attachmentType !== "IMAGE" && attachmentType !== "FILE") return null;
   

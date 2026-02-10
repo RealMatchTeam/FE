@@ -1,39 +1,41 @@
 import searchIcon from "../../../assets/search2.svg";
-import closeIcon from "../../../assets/cancel.svg"; 
-import { useState } from "react";
+import closeIcon from "../../../assets/cancel.svg";
 
 export function ChatListHeader({
   sortLabel,
   onClickSort,
+  searchQuery,
+  onSearchChange,
 }: {
   sortLabel: string;
   onClickSort: () => void;
   sortOpen: boolean;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }) {
-  const [query, setQuery] = useState("");
 
   return (
 
     <div className="flex flex-col gap-4 border-b border-text-gray5">
 
       {/* 검색 입력창 */}
-      <div className="flex items-center w-full relative bg-bg-w border border-core-2 rounded-[8px] px-3 py-2">
-        <img src={searchIcon} alt="search" className="w-4 h-4 opacity-40" />
-        
+      <div className="flex items-center w-full bg-bg-w border border-core-2 rounded-[8px] px-3 py-2 overflow-hidden">
+        <img src={searchIcon} alt="search" className="w-4 h-4 flex-shrink-0 opacity-40" />
+
         <input
-          className="flex-1 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
+          className="flex-1 min-w-0 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
           placeholder="검색어 입력"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
 
-        <button 
-          onClick={() => setQuery("")}
-          className="flex-shrink-0"
+        <button
+          type="button"
+          onClick={() => onSearchChange("")}
+          className="shrink-0 w-4 h-4 flex items-center justify-center"
         >
-          <img src={closeIcon} alt="close" />
+          <img src={closeIcon} alt="close" className="w-4 h-4" />
         </button>
-
       </div>
 
       <div className="flex items-center pt-2 pb-4 justify-between">

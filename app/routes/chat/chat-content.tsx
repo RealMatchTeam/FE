@@ -12,9 +12,19 @@ function ChatPage() {
   const [isSortOpen, setIsSortOpen] = useState(false); // 정렬 바텀시트
   const [sort, setSort] = useState<SortOption>("latest"); // 최신순 / 협업중만
   const [pendingSort, setPendingSort] = useState<SortOption>(sort); // 바텀시트에서 고른 값
+  const [searchQuery, setSearchQuery] = useState(""); // 검색어 (입력용)
+  const [debouncedQuery, setDebouncedQuery] = useState(""); // 검색어 (API 호출용)
 
   const [rooms, setRooms] = useState<ChatRoomCard[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // 검색어 디바운스 (100ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // 바텀탭 숨기기
   useHideBottomTab(isSortOpen);
@@ -24,14 +34,15 @@ function ChatPage() {
     try {
       const data = await getChatRooms({
         status: sort === "collaborating" ? "COLLABORATING" : "LATEST",
+        search: debouncedQuery.trim() || undefined,
       });
       setRooms(Array.isArray(data.rooms) ? data.rooms : []);
     } catch {
-      setRooms([]); 
+      setRooms([]);
     } finally {
       setLoading(false);
     }
-  }, [sort]);
+  }, [sort, debouncedQuery]);
 
   useEffect(() => {
     fetchRooms();
@@ -54,6 +65,8 @@ function ChatPage() {
           sortLabel={SORT_LABEL[sort]}
           onClickSort={openSortSheet}
           sortOpen={isSortOpen}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
         />
 
         {!loading && rooms.length === 0 ? (
