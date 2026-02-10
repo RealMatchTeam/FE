@@ -107,8 +107,6 @@ axiosInstance.interceptors.response.use(
         console.error("[Axios Interceptor] Critical: Refresh API returned 401. Clearing tokens and redirecting.");
         tokenStorage.clearTokens();
         if (typeof window !== "undefined") {
-          debugger; // Added for debugging silent failures
-          window.alert(`인증 갱신 API에서 401 응답을 받았습니다. 로그아웃합니다.`); // Added for debugging silent failures
           window.location.href = "/auth/login";
         }
         return Promise.reject(error);
