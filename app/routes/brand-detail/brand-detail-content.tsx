@@ -66,8 +66,6 @@ function ArrowRightIcon() {
   );
 }
 
-
-
 function DoubleArrowRightIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -89,6 +87,20 @@ function DoubleArrowRightIcon() {
   );
 }
 
+type ProductWithSubtitle = {
+  id: number | string;
+  title: string;
+  imageUrl: string;
+  subtitle?: string;
+};
+
+function getSubtitle(p: unknown): string {
+  if (typeof p !== "object" || p === null) return "";
+  if (!("subtitle" in p)) return "";
+  const v = (p as Record<string, unknown>).subtitle;
+  return typeof v === "string" ? v : "";
+}
+
 export default function BrandDetailContent({ data }: Props) {
   const heroUrl = data.brandImages?.[0] ?? data.heroImageUrl;
   const [isHearted, setIsHearted] = useState<boolean>(data.isLiked ?? false);
@@ -107,23 +119,25 @@ export default function BrandDetailContent({ data }: Props) {
     navigate(`/rooms/brand/${brandId}`);
   };
 
-const handleGoSponsorableProducts = () => {
-  if (!Number.isFinite(brandId) || brandId <= 0) return;
+  const handleGoSponsorableProducts = () => {
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
 
-  navigate(`/products/sponsorable?brandId=${brandId}`, {
-    state: {
-      brandId,
-      brandName: data.name,
-      products: (data.products ?? []).map((p) => ({
-        id: Number(p.id),
-        title: p.title,
-        subtitle: (p as any).subtitle ?? "",
-        imageUrl: p.imageUrl,
-      })),
-    },
-  });
-};
-
+    navigate(`/products/sponsorable?brandId=${brandId}`, {
+      state: {
+        brandId,
+        brandName: data.name,
+        products: (data.products ?? []).map((p) => {
+          const pp = p as unknown as ProductWithSubtitle;
+          return {
+            id: Number(pp.id),
+            title: pp.title,
+            subtitle: getSubtitle(p),
+            imageUrl: pp.imageUrl,
+          };
+        }),
+      },
+    });
+  };
 
   const handleToggleHeart = async () => {
     if (!Number.isFinite(brandId) || brandId <= 0) return;
@@ -262,10 +276,13 @@ const handleGoSponsorableProducts = () => {
           <section className="py-5">
             <div className="flex items-center justify-between">
               <div className="text-title1 text-text-black">협찬 가능 제품</div>
-<button type="button" onClick={handleGoSponsorableProducts} className="text-[18px] text-text-gray3">
-  ›
-</button>
-
+              <button
+                type="button"
+                onClick={handleGoSponsorableProducts}
+                className="text-[18px] text-text-gray3"
+              >
+                ›
+              </button>
             </div>
 
             {!data.products || data.products.length === 0 ? (

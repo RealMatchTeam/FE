@@ -20,7 +20,6 @@ export default function HomeIndex() {
         ? null
         : false;
 
-  // 1) 토큰 있는데 me가 없으면 내 정보 로드해서 matchingTestDone 결정
   useEffect(() => {
     if (me?.matchingTestDone !== undefined) return;
     if (!hasTokens) return;
@@ -42,7 +41,8 @@ export default function HomeIndex() {
           avatarUrl: result.profileImageUrl ?? undefined,
           matchingTestDone: Boolean(result.hasMatchingTest),
         });
-      } catch (e) {
+      } catch (error: unknown) {
+        console.error(error);
         if (isMounted) setMe({ matchingTestDone: false });
       }
     })();
@@ -52,7 +52,6 @@ export default function HomeIndex() {
     };
   }, [hasTokens, me?.matchingTestDone, setMe]);
 
-  // 2) 매칭테스트 완료면 매칭 결과 존재 여부 확인
   useEffect(() => {
     if (resolvedHasMatchingTest !== true) return;
 
@@ -60,19 +59,17 @@ export default function HomeIndex() {
       try {
         const { count } = await getMatchingBrands();
         setHasMatch(count > 0);
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof MatchingTestRequiredError) setHasMatch(false);
         else setHasMatch(false);
       }
     })();
   }, [resolvedHasMatchingTest]);
 
-  // 3) 분기
   if (resolvedHasMatchingTest === false) {
     return <Navigate to="/pre" replace />;
   }
 
-  // 로딩(토큰 있는 유저의 me/매칭 상태 확인 중)
   if (resolvedHasMatchingTest === null || (resolvedHasMatchingTest === true && hasMatch === null)) {
     return (
       <div className="flex items-center justify-center w-full min-h-[50vh]">
@@ -84,6 +81,5 @@ export default function HomeIndex() {
     );
   }
 
-  // 매칭테스트 완료 + 결과 있으면 /home, 없으면 /pre
   return <Navigate to={hasMatch ? "/home" : "/pre"} replace />;
 }
