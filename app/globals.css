@@ -276,6 +276,16 @@
     );
   }
 
+  .bg-grad-auth-reverse {
+  background: linear-gradient(
+    0deg,
+    #f6f6ff 0%,
+    #f3f3fa 48.08%,
+    #e8e8fb 100%
+  );
+}
+
+
   .bg-grad-1 {
     background: linear-gradient(
       90deg,

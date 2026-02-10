@@ -134,10 +134,7 @@ export default function BrandDetailContent({ data }: Props) {
   const groupIndex = Math.floor((page - 1) / GROUP_SIZE);
   const groupStart = groupIndex * GROUP_SIZE + 1;
 
-  const displayPages = Array.from(
-    { length: GROUP_SIZE },
-    (_, i) => groupStart + i,
-  );
+  const displayPages = Array.from({ length: GROUP_SIZE }, (_, i) => groupStart + i);
 
   const canPrevGroup = groupStart > 1;
 
@@ -174,13 +171,14 @@ export default function BrandDetailContent({ data }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto min-h-screen max-w-[430px] bg-white">
+    <div className="w-full bg-bg-w">
+      <div className="mx-auto w-full max-w-[430px] bg-bg-w">
         <BrandHero
           heroImageUrl={heroUrl}
           logoImageUrl={data.logoImageUrl}
           logoText={data.logoText ?? ""}
         />
+
         <div className="px-5 pb-10">
           <BrandInfo
             name={data.name}
@@ -196,10 +194,10 @@ export default function BrandDetailContent({ data }: Props) {
             onToggleHeart={handleToggleHeart}
           />
 
-          <div className="my-4 h-[1px] w-full bg-gray-200" />
+          <div className="my-4 h-px w-full bg-bluegray-2" />
 
           <section className="py-5">
-            <div className="text-title7 text-text-black">카테고리</div>
+            <div className="text-title1 text-text-black">카테고리</div>
             <div className="mt-3 flex flex-wrap gap-2">
               {(data.categories ?? []).map((c) => (
                 <PillChip key={c} variant="filled">
@@ -209,12 +207,10 @@ export default function BrandDetailContent({ data }: Props) {
             </div>
           </section>
 
-          <div className="h-px bg-bluegray-2" />
-
-          <section className="py-5">
+          <section>
             {(data.tagSections ?? []).map((sec, idx) => (
               <div key={`${sec.title}-${idx}`} className={idx ? "mt-6" : ""}>
-                <div className="text-title7 text-text-black">{sec.title}</div>
+                <div className="text-title3 text-text-black">{sec.title}</div>
                 <div className="mt-4 space-y-4">
                   {sec.groups.map((g) => (
                     <TagGroup
@@ -232,38 +228,28 @@ export default function BrandDetailContent({ data }: Props) {
 
           {!data.ongoingCampaigns || data.ongoingCampaigns.length === 0 ? (
             <section className="py-5">
-              <div className="text-title7 text-text-black">
-                진행 중인 캠페인
-              </div>
-
-              <div className="flex h-[220px] items-center justify-center">
-                <div className="text-[16px] font-medium text-text-gray3">
-                  진행 중인 캠페인이 없어요.
-                </div>
+              <div className="text-title1 text-text-black">진행 중인 캠페인</div>
+              <div className="flex h-[180px] items-center justify-center">
+                <div className="text-callout1 text-text-gray2">진행 중인 캠페인이 없어요.</div>
               </div>
             </section>
           ) : (
-            <OngoingCampaignSection
-              campaigns={data.ongoingCampaigns}
-              onMore={() => {}}
-            />
+            <OngoingCampaignSection campaigns={data.ongoingCampaigns} onMore={() => {}} />
           )}
 
           <DividerBlock />
 
           <section className="py-5">
             <div className="flex items-center justify-between">
-              <div className="text-title7 text-text-black">협찬 가능 제품</div>
+              <div className="text-title1 text-text-black">협찬 가능 제품</div>
               <button type="button" className="text-[18px] text-text-gray3">
                 ›
               </button>
             </div>
 
             {!data.products || data.products.length === 0 ? (
-              <div className="flex h-[220px] items-center justify-center">
-                <div className="text-[16px] font-medium text-text-gray3">
-                  협찬 가능한 제품이 없어요.
-                </div>
+              <div className="flex h-[180px] items-center justify-center">
+                <div className="text-callout1 text-text-gray2">협찬 가능한 제품이 없어요.</div>
               </div>
             ) : (
               <div className="mt-4 -mx-5 overflow-x-hidden">
@@ -281,13 +267,11 @@ export default function BrandDetailContent({ data }: Props) {
           <DividerBlock />
 
           <section className="py-5">
-            <div className="text-title7 text-text-black">캠페인 내역</div>
+            <div className="text-title1 text-text-black">캠페인 내역</div>
 
             {histories.length === 0 ? (
-              <div className="flex h-[220px] items-center justify-center">
-                <div className="text-[16px] font-medium text-text-gray3">
-                  진행한 캠페인이 없어요
-                </div>
+              <div className="flex h-[180px] items-center justify-center">
+                <div className="text-callout1 text-text-gray2">진행한 캠페인이 없어요</div>
               </div>
             ) : (
               <>
@@ -298,28 +282,25 @@ export default function BrandDetailContent({ data }: Props) {
                 </div>
 
                 <div className="mt-5 flex items-center justify-center gap-3">
-                  {/* << 그룹 이전 */}
                   {page > GROUP_SIZE && (
                     <button
                       type="button"
                       onClick={goPrevGroup}
-                      className="h-7 w-7 grid place-items-center text-text-gray3"
+                      className="grid h-7 w-7 place-items-center text-text-gray3"
                     >
                       <DoubleArrowLeftIcon />
                     </button>
                   )}
 
-                  {/* < 이전 페이지 */}
                   <button
                     type="button"
                     onClick={goPrev}
                     disabled={!canPrev}
-                    className="h-7 w-7 grid place-items-center text-text-gray3 disabled:opacity-30"
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
                   >
                     <ArrowLeftIcon />
                   </button>
 
-                  {/* 숫자 */}
                   <div className="flex items-center gap-3">
                     {displayPages.map((p) => {
                       const disabledPage = p > totalPages && !hasNext;
@@ -336,9 +317,7 @@ export default function BrandDetailContent({ data }: Props) {
                               ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
                               : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
                           }
-                          style={
-                            active ? { backgroundColor: "#A9ADFF" } : undefined
-                          }
+                          style={active ? { backgroundColor: "#A9ADFF" } : undefined}
                         >
                           {p}
                         </button>
@@ -346,22 +325,20 @@ export default function BrandDetailContent({ data }: Props) {
                     })}
                   </div>
 
-                  {/* > 다음 페이지 */}
                   <button
                     type="button"
                     onClick={goNext}
                     disabled={!canNext}
-                    className="h-7 w-7 grid place-items-center text-text-gray3 disabled:opacity-30"
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
                   >
                     <ArrowRightIcon />
                   </button>
 
-                  {/* >> 그룹 다음 */}
                   <button
                     type="button"
                     onClick={goNextGroup}
                     disabled={!canNextGroup}
-                    className="h-7 w-7 grid place-items-center text-text-gray3 disabled:opacity-30"
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
                   >
                     <DoubleArrowRightIcon />
                   </button>

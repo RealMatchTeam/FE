@@ -1,8 +1,6 @@
 // src/routes/_home/components/CategoryTabs.tsx
 import type { CategoryKey } from "../types";
 
-const PRIMARY = "#5B5DEB";
-
 export default function CategoryTabs({
   value,
   onChange,
@@ -20,16 +18,18 @@ export default function CategoryTabs({
       <div className="flex items-center justify-between">
         {tabs.map((t) => {
           const active = t.key === value;
+
           return (
             <button
               key={t.key}
               type="button"
               onClick={() => onChange(t.key)}
               className={[
-                "flex-1 py-3 text-center text-[13px] font-medium",
-                active ? "" : "text-black/35",
+                "flex-1 py-3 text-center text-title2 transition-colors",
+                active
+                  ? "text-[var(--color-core-1)]"
+                  : "text-[var(--color-text-gray3)]",
               ].join(" ")}
-              style={active ? { color: PRIMARY } : undefined}
             >
               {t.label}
             </button>
@@ -37,13 +37,14 @@ export default function CategoryTabs({
         })}
       </div>
 
-      {/* 캡쳐처럼 바닥 라인 + 활성 언더라인 */}
       <div className="relative h-px w-full bg-black/10">
         <div
-          className="absolute top-0 h-[2px] w-1/2 transition-transform"
+          className="absolute top-0 h-0.5 w-1/2 bg-[var(--color-success)] transition-transform"
           style={{
-            backgroundColor: PRIMARY,
-            transform: value === "beauty" ? "translateX(0%)" : "translateX(100%)",
+            transform:
+              value === "beauty"
+                ? "translateX(0%)"
+                : "translateX(100%)",
           }}
         />
       </div>

@@ -1,41 +1,36 @@
 import StartMatchingTestButton from "./components/StartRMButton";
-
 import MainIcon from "../../assets/MainIcon.svg";
-
 
 export default function HomeContent() {
   return (
-    <div className="w-full bg-gradient-to-b from-[#F6F7FF] to-white">
-      {/* Header */}
+    <div className="flex h-full w-full flex-col bg-grad-auth">
+      
+      {/* 중앙 컨텐츠 */}
+      <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+        
+        {/* 일러스트 */}
+        <img
+          src={MainIcon}
+          alt="매칭 없음"
+          className="w-[280px] select-none"
+          draggable={false}
+        />
 
-
-      {/* Body */}
-      <main className="flex w-full flex-col items-center px-6 text-center pt-[160px]">
-        <div className="my-[64px]">
-
-          {/* 일러스트 */}
-          <img
-            src={MainIcon}
-            alt="매칭 없음"
-            className="h-auto w-[210px] select-none"
-            draggable={false}
-          />
-
-          {/* 문구 */}
-          <div className="px-[10px] gap-[10px]">
-            <p className="text-[14px] font-semibold text-[#2F2F2F]">
-              매칭된 기업이 없어요
-            </p>
-            <p className="mt-1 text-[14px] font-semibold text-[#2F2F2F]">
-              매칭 검사를 먼저 진행해주세요
-            </p>
-          </div>
-        </div>
-        {/* 버튼 (기존 유지) */}
-        <div className="sticky  bottom-0 w-full bg-white/70 px-[24px] pt-[24px] pb-[40px] backdrop-blur">
-          <StartMatchingTestButton />
+        {/* 텍스트 영역 */}
+        <div className="mt-[28px] space-y-[6px]">
+          <p className="text-title2 text-text-gray1 leading-[20px]">
+            매칭된 기업이 없어요
+          </p>
+          <p className="text-title2 text-text-gray1 leading-[20px]">
+            매칭 검사를 먼저 진행해주세요
+          </p>
         </div>
       </main>
+
+      {/* 하단 버튼 영역 */}
+      <div className="shrink-0 px-6 pt-[20px] pb-[34px] backdrop-blur">
+        <StartMatchingTestButton />
+      </div>
     </div>
   );
 }

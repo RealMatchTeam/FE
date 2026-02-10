@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import goBackIcon from "../../../assets/go-back.svg?url"; 
 
 type Props = {
   heroImageUrl?: string;
@@ -25,14 +26,14 @@ export default function BrandHero({
         ) : null}
       </div>
 
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white/80"
-        aria-label="back"
-      >
-        ‹
-      </button>
+<button
+  type="button"
+  onClick={() => navigate(-1)}
+  className="absolute left-2 top-2 p-2"
+  aria-label="back"
+>
+  <img src={goBackIcon} alt="뒤로가기" className="h-6 w-6" />
+</button>
 
       <div className="absolute -bottom-8 left-5 z-10">
         <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border border-[#E6E6F3] bg-white shadow-[0_8px_18px_rgba(0,0,0,0.12)]">

@@ -41,26 +41,17 @@ const toKoreanCategory = (c?: string) => {
 };
 
 const toDdayText = (dday?: number) => {
-  if (typeof dday !== "number" || !Number.isFinite(dday)) {
-    return "-";
-  }
-
+  if (typeof dday !== "number" || !Number.isFinite(dday)) return "-";
   if (dday < 0) return "모집 완료";
   if (dday === 0) return "D-DAY";
-
   return `D-${dday}`;
 };
 
-export default function CampaignDetailContent({
-  brandData,
-  campaignId,
-}: Props) {
+export default function CampaignDetailContent({ brandData, campaignId }: Props) {
   const navigate = useNavigate();
 
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
-  const [isHearted, setIsHearted] = useState<boolean>(
-    brandData.isLiked ?? false,
-  );
+  const [isHearted, setIsHearted] = useState<boolean>(brandData.isLiked ?? false);
 
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
   const [campaignError, setCampaignError] = useState<string | null>(null);
@@ -77,9 +68,7 @@ export default function CampaignDetailContent({
         if (!alive) return;
 
         if (!res.data?.isSuccess) {
-          setCampaignError(
-            res.data?.message || "캠페인 정보를 불러오지 못했어요.",
-          );
+          setCampaignError(res.data?.message || "캠페인 정보를 불러오지 못했어요.");
           setCampaign(null);
           return;
         }
@@ -130,9 +119,7 @@ export default function CampaignDetailContent({
     ];
   }, [campaign]);
 
-  const ongoing = useMemo(() => {
-    return brandData.ongoingCampaigns ?? [];
-  }, [brandData]);
+  const ongoing = useMemo(() => brandData.ongoingCampaigns ?? [], [brandData]);
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -160,26 +147,36 @@ export default function CampaignDetailContent({
 
   if (campaignError) {
     return (
-      <div className="min-h-screen bg-white px-5 py-6">{campaignError}</div>
+      <div className="w-full bg-bg-w">
+        <div className="mx-auto w-full max-w-[430px] px-5 py-6 text-callout1 text-error">
+          {campaignError}
+        </div>
+      </div>
     );
   }
 
   if (!campaign) {
-    return <div className="min-h-screen bg-white px-5 py-6">로딩중...</div>;
+    return (
+      <div className="w-full bg-bg-w">
+        <div className="mx-auto w-full max-w-[430px] px-5 py-6 text-callout1 text-text-gray2">
+          로딩중...
+        </div>
+      </div>
+    );
   }
 
   const campaignImage = campaign.imageUrl ?? heroUrl;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto min-h-screen max-w-[430px] bg-white">
+    <div className="w-full bg-bg-w">
+      <div className="mx-auto w-full max-w-[430px] bg-bg-w">
         <BrandHero
           heroImageUrl={heroUrl}
           logoImageUrl={brandData.logoImageUrl}
           logoText={brandData.logoText ?? ""}
         />
 
-        <div className="px-5">
+        <div className="px-5 pb-10">
           <BrandInfo
             name={brandData.name}
             matchRate={brandData.matchRate}
@@ -187,25 +184,23 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="mt-2 flex items-center gap-2 h-9 font-medium text-indigo-500">
+          <div className="mt-2 flex h-9 items-center gap-2 text-title3 text-core-1">
             <MetaItem
               icon={
                 <img
                   src={informationIconUrl}
                   alt=""
-                  className="block h-4 w-4 "
+                  className="block h-4 w-4 select-none"
+                  draggable={false}
                 />
               }
               text={toDdayText(campaign.dday)}
             />
 
-            <span className="px-1 text-indigo-300">|</span>
-
-            <span>{campaign.quota}명</span>
-
-            <span className="px-1 text-indigo-300">|</span>
-
-            <span>{toKoreanCategory(campaign.category)}</span>
+            <span className="px-1 text-core-3">|</span>
+            <span className="text-core-1">{campaign.quota}명</span>
+            <span className="px-1 text-core-3">|</span>
+            <span className="text-core-1">{toKoreanCategory(campaign.category)}</span>
           </div>
 
           <BrandActionBar
@@ -215,43 +210,37 @@ export default function CampaignDetailContent({
             onToggleHeart={handleToggleHeart}
           />
 
-          <div className="my-4 h-[1px] w-full bg-gray-200" />
+          <div className="my-4 h-px w-full bg-bluegray-2" />
 
           <section>
-            <div className="mt-4 overflow-hidden bg-bluegray-1">
+            <div className="mt-4 overflow-hidden rounded-2xl bg-bluegray-1">
               <img
                 src={campaignImage}
                 alt="campaign"
                 className="h-[280px] w-full object-cover"
+                draggable={false}
               />
             </div>
 
-            <div className="mt-2 text-center text-[16px] font-semibold text-text-black">
+            <div className="mt-3 text-center text-title1 text-text-black">
               {campaign.title}
             </div>
           </section>
 
-          <section className="py-2">
-            <div className="text-[14px] font-semibold text-text-black">
-              상세 설명
-            </div>
-            <div className="mt-3 space-y-2 text-[13px] text-text-gray3">
+          <section className="py-5">
+            <div className="text-title1 text-text-black">상세 설명</div>
+            <div className="mt-3 space-y-2 text-callout1 text-text-gray3">
               {detailRows.map((row) => (
-                <DetailRow
-                  key={row.label}
-                  label={row.label}
-                  value={row.value}
-                />
+                <DetailRow key={row.label} label={row.label} value={row.value} />
               ))}
             </div>
           </section>
+
           <div className="my-6 mx-auto w-3/4 border-t border-bluegray-2" />
 
-          <section>
-            <div className="text-[14px] font-semibold text-text-black">
-              콘텐츠
-            </div>
-            <div className="mt-3 space-y-4 text-[13px] text-text-gray3">
+          <section className="py-1">
+            <div className="text-title1 text-text-black">콘텐츠</div>
+            <div className="mt-3 space-y-4 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
                 <div key={row.label} className="flex gap-4">
                   <div className="w-[84px] shrink-0 text-text-gray2">
@@ -265,14 +254,12 @@ export default function CampaignDetailContent({
                         {(row.chips ?? []).map((c) => (
                           <span
                             key={c}
-                            className="inline-flex items-center rounded-full border border-bluegray-2 bg-white px-3 py-1 text-[12px] font-medium text-text-gray3"
+                            className="inline-flex items-center rounded-full border border-bluegray-2 bg-bg-w px-3 py-1 text-callout1 text-text-gray3"
                           >
                             {c}
                           </span>
                         ))}
-                        {(!row.chips || row.chips.length === 0) && (
-                          <span>-</span>
-                        )}
+                        {(!row.chips || row.chips.length === 0) && <span>-</span>}
                       </div>
                     )}
                   </div>
@@ -281,11 +268,16 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="mt-8 pb-10">
-            <button className="h-12 w-full rounded-xl bg-indigo-500 text-[16px] font-semibold text-white">
+          <div className="mt-8">
+            <button
+              type="button"
+              className="h-[52px] w-full rounded-2xl bg-core-1 text-title7 text-white active:opacity-90 transition-opacity"
+            >
               지원하기
             </button>
           </div>
+
+          <DividerBlock />
 
           <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
         </div>
@@ -302,20 +294,17 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-/*
+
 function DividerBlock() {
-  return (
-    <div className="relative left-1/2 mt-5 h-2 w-screen -translate-x-1/2 bg-bluegray-1" />
-  );
+  return <div className="-mx-5 mt-5 h-2 bg-bluegray-1" />;
 }
-  */
 
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
     <span className="flex items-center gap-2">
-      {icon && (
+      {icon ? (
         <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
-      )}
+      ) : null}
       <span className="leading-none">{text}</span>
     </span>
   );

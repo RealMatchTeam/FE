@@ -28,6 +28,11 @@ export default [
   layout("routes/_main.tsx", [
     index("routes/home/index.tsx"),
 
+
+    route("pre", "routes/home/pre.tsx"),
+  route("home", "routes/home/after.tsx"),
+
+  
     route("matching", "routes/matching/route.tsx", [
       route("brand", "routes/matching/brand/route.tsx"),
       route("campaign", "routes/matching/campaign/route.tsx"),

@@ -11,7 +11,7 @@ export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
   return (
     <section className="pt-5 pb-5">
       <div className="flex items-center justify-between">
-        <div className="text-title7 text-text-black">진행 중인 캠페인</div>
+        <div className="text-title1 text-text-black">진행 중인 캠페인</div>
 
         {onMore ? (
           <button

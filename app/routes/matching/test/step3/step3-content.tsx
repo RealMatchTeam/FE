@@ -44,6 +44,8 @@ type Props = {
 type Sheet = null | "snsUrl" | "gender" | "ageGroup" | "videoLength" | "views";
 const EMPTY_TAGS: TagItem[] = [];
 
+const sortById = (items: TagItem[]) => [...items].sort((a, b) => a.id - b.id);
+
 const namesByIds = (ids: number[], options: TagItem[]) =>
   options.filter((o) => ids.includes(o.id)).map((o) => o.name);
 
@@ -84,36 +86,36 @@ export default function MatchingTestStep3Content({
   const close = () => setSheet(null);
 
   const genderOptions = useMemo(
-    () => contentTags?.viewerGenders ?? EMPTY_TAGS,
+    () => sortById(contentTags?.viewerGenders ?? EMPTY_TAGS),
     [contentTags?.viewerGenders],
   );
   const ageOptions = useMemo(
-    () => contentTags?.viewerAges ?? EMPTY_TAGS,
+    () => sortById(contentTags?.viewerAges ?? EMPTY_TAGS),
     [contentTags?.viewerAges],
   );
   const videoLenOptions = useMemo(
-    () => contentTags?.avgVideoLengths ?? EMPTY_TAGS,
+    () => sortById(contentTags?.avgVideoLengths ?? EMPTY_TAGS),
     [contentTags?.avgVideoLengths],
   );
   const viewsOptions = useMemo(
-    () => contentTags?.avgVideoViews ?? EMPTY_TAGS,
+    () => sortById(contentTags?.avgVideoViews ?? EMPTY_TAGS),
     [contentTags?.avgVideoViews],
   );
 
   const typeOptions = useMemo(
-    () => contentTags?.categories ?? EMPTY_TAGS,
+    () => sortById(contentTags?.categories ?? EMPTY_TAGS),
     [contentTags?.categories],
   );
   const toneOptions = useMemo(
-    () => contentTags?.tones ?? EMPTY_TAGS,
+    () => sortById(contentTags?.tones ?? EMPTY_TAGS),
     [contentTags?.tones],
   );
   const involvementOptions = useMemo(
-    () => contentTags?.involvements ?? EMPTY_TAGS,
+    () => sortById(contentTags?.involvements ?? EMPTY_TAGS),
     [contentTags?.involvements],
   );
   const coverageOptions = useMemo(
-    () => contentTags?.usageRanges ?? EMPTY_TAGS,
+    () => sortById(contentTags?.usageRanges ?? EMPTY_TAGS),
     [contentTags?.usageRanges],
   );
 
@@ -136,26 +138,24 @@ export default function MatchingTestStep3Content({
   );
 
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="w-full min-h-full bg-white flex flex-col">
       <MatchingTestTopBar step={3} totalSteps={3} onBack={onBack} />
 
       {tagsLoading ? (
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
+        <div className="px-6 py-10 text-sm text-text-gray3">태그를 불러오는 중...</div>
       ) : tagsError ? (
         <div className="px-6 py-10 text-sm text-red-500">{tagsError}</div>
       ) : null}
 
-      <div className="px-6 pb-6">
-        <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
-          <span className="text-core-1">콘텐츠 특성</span>을 선택해주세요
+      <main className="flex-1 px-6 pb-[30px]">
+        <h1 className="text-title leading-[32px] font-extrabold text-text-black">
+          <span className="text-core-1">콘텐츠 특성</span>을 <span className="text-core-1">모두</span> 선택해주세요
         </h1>
 
-        <div className="mt-6">
-          <div className="text-title1 text-text-black mb-2">SNS 정보</div>
-          <div className="text-sm text-text-gray3">SNS 주소를 입력해주세요</div>
+        <section className="mt-8">
+          <h2 className="text-title2 text-text-black mb-2">SNS 정보</h2>
 
+          <div className="text-title4 text-text-gray3">SNS 주소를 입력해주세요</div>
           <div className="mt-2">
             <FormField
               label="인스타그램 주소"
@@ -165,10 +165,10 @@ export default function MatchingTestStep3Content({
             />
           </div>
 
-          <div className="mt-6 text-sm text-text-gray3">
+          <div className="mt-4 text-title4 text-text-gray3">
             주 시청자 정보를 선택해주세요
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-3">
+          <div className="mt-2 grid grid-cols-2 gap-3 items-stretch">
             <FormField
               label="성별"
               value={genderValue}
@@ -183,10 +183,10 @@ export default function MatchingTestStep3Content({
             />
           </div>
 
-          <div className="mt-6 text-sm text-text-gray3">
+          <div className="mt-4 text-title4 text-text-gray3">
             평균 영상 길이 및 조회수를 선택해주세요
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-3">
+          <div className="mt-2 grid grid-cols-2 gap-3 items-stretch">
             <FormField
               label="영상 길이"
               value={lenValue}
@@ -200,7 +200,7 @@ export default function MatchingTestStep3Content({
               onClick={() => open("views")}
             />
           </div>
-        </div>
+        </section>
 
         <Section title="콘텐츠 종류">
           <ChipRow>
@@ -253,9 +253,9 @@ export default function MatchingTestStep3Content({
             ))}
           </ChipRow>
         </Section>
-      </div>
+      </main>
 
-      <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
+      <div className="sticky bottom-0 w-full bg-white px-6 pt-3 pb-6">
         <Button
           variant="primary"
           size="lg"
@@ -279,7 +279,7 @@ export default function MatchingTestStep3Content({
             onChange={onSnsUrlChange}
             doneDisabled={!isValidInstagramUrl}
             onDone={close}
-            helperText="예: https://www.instagram.com/your_id"
+            helperText=""
             errorText={
               snsUrl.trim().length > 0 && !isValidInstagramUrl
                 ? "instagram.com/ 으로 시작하는 URL이어야 해요."
@@ -357,7 +357,7 @@ function Section({
 }) {
   return (
     <section className="mt-8">
-      <h2 className="text-title1 text-text-black mb-3">{title}</h2>
+      <h2 className="text-title2 text-text-black mb-2">{title}</h2>
       <div>{children}</div>
     </section>
   );

@@ -12,7 +12,6 @@ import CategoryTabs from "./components/CategoryTabs";
 import SectionHeader from "./components/SectionHeader";
 import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
-import MatchAnalysisSection from "./components/MatchAnalysisSection";
 import CreatorProfileCard from "./components/CreatorProfileCard";
 
 import { useMatchResultStore } from "../../stores/matching-result";
@@ -354,9 +353,6 @@ export default function HomeAfterMatchPage() {
             ))}
           </div>
         </section>
-
-        <MatchAnalysisSection />
-
         <section className="mt-7">
           <SectionHeader
             title="매칭률 높은 캠페인"
@@ -397,7 +393,7 @@ export default function HomeAfterMatchPage() {
         </section>
 
         {profileModel && (
-          <div className="mt-8 px-1">
+          <div className="mt-8">
             <CreatorProfileCard
               model={profileModel}
               onMyProfileClick={() => navigate("/mypage")}
@@ -405,7 +401,7 @@ export default function HomeAfterMatchPage() {
           </div>
         )}
 
-        <section className="mt-8 pb-24">
+        <section className="mt-8 pb-5">
           <SectionHeader
             title="인기 캠페인"
             subtitle="이런 캠페인이 인기가 많아요!"

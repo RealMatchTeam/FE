@@ -5,6 +5,9 @@ type LayoutContextType = {
     setHideBottomTab: (v: boolean) => void;
     hideHeader: boolean;
     setHideHeader: (v: boolean) => void;
+disableScroll: boolean;
+  setDisableScroll: (v: boolean) => void;
+
 };
 
 export const LayoutContext = createContext<LayoutContextType | null>(null);
