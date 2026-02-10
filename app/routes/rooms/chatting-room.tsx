@@ -117,13 +117,14 @@ export default function ChattingRoom({ roomId }: Props) {
       <input
         ref={imageInputRef}
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg"
         style={{ display: "none" }}
         onChange={handlePickImage}
       />
       <input
         ref={fileInputRef}
         type="file"
+        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         style={{ display: "none" }}
         onChange={handlePickFile}
       />

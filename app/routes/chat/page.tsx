@@ -1,16 +1,16 @@
 import { useCallback, useState } from "react";
-import { SORT_LABEL, type SortOption } from "./components/SortingSheetConstant";
+import { SORT_LABEL, type SortOption } from "./components/ChatSortFilterConstant";
 import { useEffect } from "react";
 import { ChatListHeader } from "./components/ChatListHeader";
-import SortFilterSheet from "./components/SortingSheet";
-import ChatList from "./ChatList";
-import { EmptyChatState } from "./components/EmptyState";
+import SortFilterSheet from "./components/ChatSortFilterSheet";
+import ChatListCard, { ChatListSkeleton } from "./components/ChatListCard";
+import { EmptyPage } from "./components/EmptyPage";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { getChatRooms, type ChatRoomCard } from "./api/chat";
 
-function ChatPage() {
-  const [isSortOpen, setIsSortOpen] = useState(false); // 정렬 바텀시트
-  const [sort, setSort] = useState<SortOption>("latest"); // 최신순 / 협업중만
+export default function ChatPage() {
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [sort, setSort] = useState<SortOption>("latest");
   const [pendingSort, setPendingSort] = useState<SortOption>(sort); // 바텀시트에서 고른 값
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 (입력용)
   const [debouncedQuery, setDebouncedQuery] = useState(""); // 검색어 (API 호출용)
@@ -28,6 +28,7 @@ function ChatPage() {
 
   // 바텀탭 숨기기
   useHideBottomTab(isSortOpen);
+
 
   const fetchRooms = useCallback(async () => {
     setLoading(true);
@@ -59,7 +60,7 @@ function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+    <div className="h-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
       <main className="p-4 pb-16">
         <ChatListHeader
           sortLabel={SORT_LABEL[sort]}
@@ -69,10 +70,16 @@ function ChatPage() {
           onSearchChange={setSearchQuery}
         />
 
-        {!loading && rooms.length === 0 ? (
-          <EmptyChatState />
+        {loading ? (
+          <ChatListSkeleton />
+        ) : rooms.length === 0 ? (
+          <EmptyPage />
         ) : (
-          <ChatList rooms={rooms} />
+          <div className="flex flex-col gap-[10px]">
+            {rooms.map((room) => (
+              <ChatListCard key={room.roomId} room={room} />
+            ))}
+          </div>
         )}
       </main>
 
@@ -86,5 +93,3 @@ function ChatPage() {
     </div>
   );
 }
-
-export default ChatPage;

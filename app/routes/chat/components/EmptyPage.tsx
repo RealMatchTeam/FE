@@ -1,4 +1,4 @@
-export function EmptyChatState() {
+export function EmptyPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
       <h3 className="text-title text-text-gray2 mb-2">채팅방이 없어요</h3>
