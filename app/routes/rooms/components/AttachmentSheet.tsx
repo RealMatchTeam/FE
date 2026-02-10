@@ -57,7 +57,7 @@ export default function AttachmentSheet({ open, actions, onClose, onAction, heig
       {/* sheet */}
       <div
         className={[
-          "fixed bottom-0 w-full px-[68px] py-[30px] bg-[#E6E6F3] transition-transform",
+          "fixed bottom-0 w-full max-w-[480px] px-[68px] py-[30px] bg-[#E6E6F3] transition-transform",
           open ? "translate-y-0" : "translate-y-full",
         ].join(" ")}
         style={{
