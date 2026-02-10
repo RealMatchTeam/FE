@@ -76,11 +76,10 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 mb-4 text-center text-[13px] font-bold">
           {WEEK_DAYS.map((day, i) => (
-            <div key={day} className={i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : "text-text-gray3"}>
+            <div key={day} className="text-text-gray3">
               {day}
             </div>
           ))}
-          
         </div>
 
         {/* 주차별 렌더링 */}
@@ -97,7 +96,7 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
           });
 
           return (
-            <div key={weekIdx} className="grid grid-cols-7 relative border-t border-gray-100 min-h-[100px]">
+            <div key={weekIdx} className="grid grid-cols-7 relative min-h-[100px]">
               {/* 1. 날짜 숫자 및 배경 그리드 */}
               {week.map((day, dayIdx) => {
                 const isToday = day === new Date().getDate() && month === (new Date().getMonth() + 1) && year === new Date().getFullYear();
@@ -105,15 +104,15 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
                 const extraCount = dayEvents.length - 2;
 
                 return (
-                  <div key={dayIdx} className="pt-2 pb-1 flex flex-col items-center relative h-full border-r border-gray-50 last:border-r-0">
+                  <div key={dayIdx} className="pt-2 pb-1 flex flex-col items-center relative h-full">
                     {day && (
-                      <span className={`z-10 text-[12px] font-bold w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-core-1 text-white" : "text-text-black"}`}>
+                      <span className={`z-10 text-callout1 w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-core-1 text-white" : "text-text-black"}`}>
                         {day}
                       </span>
                     )}
                     {/* +N 표시: 이벤트 바 아래쪽에 배치 */}
                     {day && extraCount > 0 && (
-                      <span className="absolute bottom-1 text-[10px] text-core-1 font-extrabold z-30">
+                      <span className="absolute bottom-1 text-title5 text-core-1 font-extrabold z-30">
                         +{extraCount}
                       </span>
                     )}
@@ -121,7 +120,7 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
                 );
               })}
 
-              {/* 이벤트 바 레이어 - flex 제거 */}
+              {/* 이벤트 바 레이어 */}
               <div className="absolute top-8 w-full grid grid-cols-7 gap-1">
                 {eventsInWeek.map((event) => {
                   const sTs = new Date(event.startDate).setHours(0, 0, 0, 0);
@@ -147,14 +146,13 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
                       key={`${event.campaignId}-${weekIdx}`}
                       style={{
                         gridColumnStart: startCol + 1,
-                        gridColumnEnd: endCol + 2 // 종료일 포함
+                        gridColumnEnd: endCol + 2 
                       }}
                       className={`
-                        h-[18px] text-[10px] text-white flex items-center px-2 font-bold z-20 overflow-hidden
-                        bg-gradient-to-r from-[#747BFF] to-[#A2A7FF]
+                        h-[10px] text-[10px] text-white flex items-center px-2 font-bold z-20 overflow-hidden
+                        bg-gradient-to-r from-[#CBCBF5] to-[#6666E5] rounded-r-lg rounded-l-lg
                       `}
                     >
-                      <span className="truncate whitespace-nowrap">{event.brandName}</span>
                     </div>
                   );
                 })}
