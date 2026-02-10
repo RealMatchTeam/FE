@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import MyPageHome from "../components/MyPageHome";
 import { useAuthStore } from "../../../stores/auth-store";
-import { getMyPage } from "../api/mypage";
+import { getMyPage, withdrawMyAccount } from "../api/mypage";
 import mypageDefault from "../../../assets/mypage-default.svg";
 
 export default function MyPageContent() {
@@ -66,7 +66,15 @@ export default function MyPageContent() {
         useAuthStore.getState().logout?.();
         navigate("/auth/login");
       }}
-      onWithdraw={() => navigate("/mypage/withdraw")}
+      onWithdraw={async () => {
+        try {
+          await withdrawMyAccount();
+          useAuthStore.getState().logout?.();
+          navigate("/auth/login");
+        } catch (error) {
+          console.error("회원 탈퇴 실패:", error);
+        }
+      }}
     />
   );
 }
