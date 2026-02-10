@@ -1,6 +1,6 @@
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import ConfirmModal from "../components/mypage/ConfirmModal";
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import ProfileSection from "../components/profileCard/ProfileSection";
@@ -9,6 +9,8 @@ import MatchingSection from "../components/profileCard/MatchingSection";
 import TraitsSection from "../components/profileCard/TraitsSection";
 import CampaignsSection from "../components/profileCard/CampaignsSection";
 import { axiosInstance } from "../../../api/axios";
+import { tokenStorage } from "../../../lib/token";
+import { uploadAttachment } from "../../rooms/api/attachments";
 
 export default function ProfileCard() {
   useHideHeader(true);
@@ -19,6 +21,8 @@ export default function ProfileCard() {
     null,
   );
   const [feature, setFeature] = useState<FeatureResult | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const onOpenReMatch = () => {
     setOpenReMatchModal(true);
@@ -31,6 +35,52 @@ export default function ProfileCard() {
   const onConfirmReMatch = () => {
     setOpenReMatchModal(false);
     navigate("/matching/test/step1");
+  };
+
+  const handlePickImage = () => {
+    if (isUploadingImage) return;
+    imageInputRef.current?.click();
+  };
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const token = tokenStorage.getAccessToken();
+    if (!token) return;
+
+    try {
+      setIsUploadingImage(true);
+      const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
+      const uploaded = await uploadAttachment({
+        token,
+        file,
+        attachmentType: "IMAGE",
+        usage: "PUBLIC",
+        baseUrl,
+      });
+
+      const response =
+        await axiosInstance.patch<CustomResponseMyProfileCardResponseDto>(
+          "/api/v1/users/me/profile-image",
+          { profileImageUrl: uploaded.accessUrl },
+        );
+
+      if (!response.data.isSuccess) {
+        throw new Error(response.data.message || "프로필 이미지 변경 실패");
+      }
+
+      setProfileCard((prev) =>
+        prev
+          ? { ...prev, profileImageUrl: uploaded.accessUrl }
+          : { profileImageUrl: uploaded.accessUrl },
+      );
+    } catch (error) {
+      console.error("프로필 이미지 업로드 실패:", error);
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = "";
+    }
   };
 
   useEffect(() => {
@@ -84,12 +134,21 @@ export default function ProfileCard() {
           className="overflow-y-auto"
           style={{ height: `calc(100vh - 60px - 67px)` }}
         >
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/png,image/jpeg"
+            className="hidden"
+            onChange={handleImageChange}
+          />
           <ProfileSection
             profileImageUrl={profileCard?.profileImageUrl}
             nickname={profileCard?.nickname}
             gender={profileCard?.gender}
             age={profileCard?.age ?? null}
             contentCategories={profileCard?.contentCategories ?? null}
+            onEditImage={handlePickImage}
+            isUploadingImage={isUploadingImage}
           />
           <div className="w-full h-[10px] bg-[#F3F3FA]"></div>
 
@@ -162,6 +221,15 @@ type ProfileCardResponse = {
   code: string;
   message: string;
   result: ProfileCardResult;
+};
+
+type CustomResponseMyProfileCardResponseDto = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    profileImageUrl?: string;
+  };
 };
 
 type FeatureResult = {
