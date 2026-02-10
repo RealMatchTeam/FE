@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { createCampaignProposal, getRecruitingCampaigns, type RecruitingCampaign } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
 import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
+import { useAuthStore } from "../../../../stores/auth-store";
 import Button from "../../../../components/common/Button";
 
 import {
@@ -32,6 +33,7 @@ export default function CreateCampaignContent() {
   const type = searchParams.get("type");
   const proposalData = useCampaignProposalStore((state) => state.proposalData);
   const snsAccount = useCampaignProposalStore((state) => state.snsAccount);
+  const me = useAuthStore((state) => state.me);
 
   // 바텀시트 상태
   const [selectedCampaign, setSelectedCampaign] = useState<RecruitingCampaign | null>(null);
@@ -253,22 +255,22 @@ export default function CreateCampaignContent() {
         })}
       >
         {/* 제목 */}
-        <h2 className="text-title7 text-text-black mt-4 mb-2">{title}</h2>
+        <h2 className="text-[16px] font-semibold text-text-black mt-4 mb-1">{title}</h2>
 
         {/* 제안 프로필 */}
         <div className="mb-6">
-          <label className="text-title3 text-text-gray1 mb-1 block">
-            제안 프로필<span className="text-error">*</span>
+          <label className="text-title3 text-text-gray1 mb-1 block ml-2">
+            제안 프로필<span className="text-error text-base">*</span>
           </label>
-          <ProfileSelector username={snsAccount ? `@${snsAccount}` : undefined} />
+          <ProfileSelector username={snsAccount ? `@${snsAccount}` : (me?.roleText ?? me?.name ?? undefined)} onClick={() => navigate("/mypage/profileCard")} />
         </div>
 
-        {/* 폼 필드 컨테이너 */}
+        
         <div className="flex flex-col items-start w-[calc(100%+40px)] -mx-5 px-5 py-4 bg-bluegray-1 gap-6">
-          {/* 캠페인명 */}
+          
           <div className="w-full h-auto">
-            <label className="text-title3 text-text-black mb-2 block">
-              캠페인명<span className="text-error">*</span>
+            <label className="text-title3 text-text-black mb-2 block ml-2">
+              캠페인명<span className="text-error text-base">*</span>
             </label>
             <TextInput
               placeholder="캠페인 제안 내용을 자세히 입력해주세요"
@@ -285,12 +287,12 @@ export default function CreateCampaignContent() {
 
           {/* 캠페인 내용 */}
           <div className="w-full">
-            <label className="text-title3 text-text-black mb-2 block">
-              캠페인 내용<span className="text-error">*</span>
+            <label className="text-title3 text-text-black mb-2 block ml-2">
+              캠페인 내용<span className="text-error text-base">*</span>
             </label>
 
             {/* 설명 */}
-            <p className="text-callout1 text-text-gray2 mb-2 w-full">설명</p>
+            <p className="text-callout1 text-text-gray2 mb-2 w-full ml-2">설명</p>
             <TextArea
               placeholder="캠페인 제안 내용을 자세히 입력해주세요"
               maxLength={300}
@@ -304,7 +306,7 @@ export default function CreateCampaignContent() {
             )}
 
             {/* 형식 */}
-            <p className="text-callout1 text-text-gray2 mt-4 mb-2">형식</p>
+            <p className="text-callout1 text-text-gray2 mt-4 mb-2 ml-2">형식</p>
             <SelectField
               placeholder="형식 선택"
               value={findLabel(formatOptions, formValues.format)}
@@ -314,7 +316,7 @@ export default function CreateCampaignContent() {
             {/* 종류 / 톤 */}
             <div className="grid grid-cols-2 gap-3 mt-4 w-full">
               <div>
-                <p className="text-callout1 text-text-gray2 mb-2">종류</p>
+                <p className="text-callout1 text-text-gray2 mb-2 ml-2">종류</p>
                 <SelectField
                   placeholder="종류 선택"
                   value={findLabel(categoryOptions, formValues.category)}
@@ -322,7 +324,7 @@ export default function CreateCampaignContent() {
                 />
               </div>
               <div>
-                <p className="text-callout1 text-text-gray2 mb-2">톤</p>
+                <p className="text-callout1 text-text-gray2 mb-2 ml-2">톤</p>
                 <SelectField
                   placeholder="톤 선택"
                   value={findLabel(toneOptions, formValues.tone)}
@@ -334,7 +336,7 @@ export default function CreateCampaignContent() {
             {/* 관여도 / 활용 범위 */}
             <div className="grid grid-cols-2 gap-3 mt-4 w-full">
               <div>
-                <p className="text-callout1 text-text-gray2 mb-2">관여도</p>
+                <p className="text-callout1 text-text-gray2 mb-2 ml-2">관여도</p>
                 <SelectField
                   placeholder="관여도 선택"
                   value={findLabel(involvementOptions, formValues.involvement)}
@@ -342,7 +344,7 @@ export default function CreateCampaignContent() {
                 />
               </div>
               <div>
-                <p className="text-callout1 text-text-gray2 mb-2">활용 범위</p>
+                <p className="text-callout1 text-text-gray2 mb-2 ml-2">활용 범위</p>
                 <SelectField
                   placeholder="활용 범위 선택"
                   value={findLabel(usageScopeOptions, formValues.usageScope)}
@@ -355,8 +357,8 @@ export default function CreateCampaignContent() {
           {/* 협찬품 / 원고료 */}
           <div className="grid grid-cols-2 gap-3 w-full h-auto">
             <div className="h-auto">
-              <label className="text-title3 text-text-black mb-2 block">
-                협찬품<span className="text-error">*</span>
+              <label className="text-title3 text-text-black mb-2 block ml-2">
+                협찬품<span className="text-error text-base">*</span>
               </label>
               <SelectField
                 placeholder="협찬품 선택"
@@ -365,8 +367,8 @@ export default function CreateCampaignContent() {
               />
             </div>
             <div className="h-auto">
-              <label className="text-title3 text-text-black mb-2 block">
-                원고료<span className="text-error">*</span>
+              <label className="text-title3 text-text-black mb-2 block ml-2">
+                원고료<span className="text-error text-base">*</span>
               </label>
               <FeeInput
                 value={formValues.fee ?? ""}
@@ -377,8 +379,8 @@ export default function CreateCampaignContent() {
 
           {/* 제작 기간 */}
           <div className="w-full h-auto">
-            <label className="text-title3 text-text-black mb-2 block">
-              제작 기간<span className="text-error">*</span>
+            <label className="text-title3 text-text-black mb-2 block ml-2">
+              제작 기간<span className="text-error text-base">*</span>
             </label>
             <div className="flex items-center gap-2 w-full">
               <DateField
@@ -386,7 +388,7 @@ export default function CreateCampaignContent() {
                 value={formValues.startDate}
                 onClick={() => setIsStartDateSheetOpen(true)}
               />
-              <span className="text-text-gray3">~</span>
+              <span className="text-text-gray3 font-bold">~</span>
               <DateField
                 placeholder="끝 날짜"
                 value={formValues.endDate}

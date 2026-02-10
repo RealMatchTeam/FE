@@ -33,10 +33,10 @@ export default function DateField({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center flex-1 h-[44px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80"
+      className="flex items-center justify-center flex-1 h-[44px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80"
     >
       <span
-        className={`text-title3 ${value ? "text-text-black" : "text-text-gray3"}`}
+        className={`text-sm font-medium ${value ? "text-text-black" : "text-[#D4D4D9]"}`}
       >
         {displayValue}
       </span>
