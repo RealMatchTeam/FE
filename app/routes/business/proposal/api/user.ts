@@ -18,12 +18,12 @@ export const getProfileCard = async (): Promise<ProfileCard> => {
     const response = await axiosInstance.get(`/v1/users/me/profile-card`);
 
     if (response.data && response.data.isSuccess) {
-      return response.data.result; // 결과 반환
+      return response.data.result; 
     }
 
     throw new Error(response.data.message || "프로필 카드 로드 실패");
   } catch (error) {
     console.error("프로필 카드 조회 실패:", error);
-    throw error; // 오류 던지기
+    throw error; 
   }
 };

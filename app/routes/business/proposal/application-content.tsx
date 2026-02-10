@@ -4,13 +4,13 @@ import { useSearchParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { getAppliedCampaignDetail, cancelCampaignApply, type AppliedCampaignDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
+import { getProfileCard, type ProfileCard } from "./api/user";
 import Modal from "../../../components/common/Modal";
-
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
-import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
+import arrowPurpleIcon from "../../../assets/icon/arrow-right.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
 
 import checkIcon from "../../../assets/icon/icon-check-circle.svg";
@@ -21,13 +21,12 @@ export default function ApplicationContent() {
     const [data, setData] = useState<AppliedCampaignDetail | null>(null);
 
     const [brand, setBrand] = useState<BrandSummary | null>(null);
+    const [profileCard, setProfileCard] = useState<ProfileCard | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalStep, setModalStep] = useState<"CONFIRM" | "COMPLETE">("CONFIRM");
 
     const applicationId = searchParams.get("applicationId");
-
     const location = useLocation();
     const brandIdFromList = location.state?.brandId;
 
@@ -60,6 +59,9 @@ export default function ApplicationContent() {
                 } else {
                     console.warn("데이터에 brandId가 없습니다.");
                 }
+
+                const profileResult = await getProfileCard();
+                setProfileCard(profileResult); 
             } catch (error) {
                 console.error("최종 데이터 로드 실패:", error);
             } finally {
@@ -142,19 +144,19 @@ export default function ApplicationContent() {
                             <h2 className="text-title1 text-text-black">
                                 ‘{data.campaignTitle}’
                             </h2>
-                            <img src={arrowPurpleIcon} alt="link" className="w-5 h-5 rotate-[-90deg] opacity-60" />
+                            <img src={arrowPurpleIcon} alt="link" className="w-5 h-5" />
                         </div>
 
                         {/* 제안 프로필 */}
                         <div className="flex flex-col gap-2">
-                            <p className="text-title3 text-text-gray2">제안 프로필</p>
+                            <p className="text-title3 text-text-1">제안 프로필</p>
                             <div className="w-full p-4 bg-bluegray-2 rounded-2xl flex justify-between items-center border border-core-70">
                                 <div className="flex items-center gap-3">
                                     <div className="flex items-center justify-center w-8 h-8">
                                         <img src={profileIcon} alt="profile" className="w-full h-full" />
                                     </div>
                                     <span className="text-callout1 text-text-black">
-                                        @{data.creatorId || "ivveeee"}
+                                        {profileCard ? `@${profileCard.snsAccount}` : `@${data.creatorId || "ivveeee"}`}
                                     </span>
                                 </div>
                                 <img src={arrowPurpleIcon} alt="arrow" />

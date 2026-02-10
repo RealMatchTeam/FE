@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import RealmatchHeader from "../../../components/common/RealmatchHeader";
+import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
@@ -25,7 +25,7 @@ export default function ReceivedProposalContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [modalType, setModalType] = useState<"none" | "confirm" | "success" | "reject" | "rejectSuccess">("none");
     const [isContentOpen, setIsContentOpen] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false); 
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const [rejectReason, setRejectReason] = useState("");
 
@@ -57,12 +57,12 @@ export default function ReceivedProposalContent() {
 
         try {
             setIsProcessing(true);
-            
+
             const response = await approveCampaignProposal(proposalId);
 
             if (response.isSuccess) {
                 setModalType("success");
-                
+
             } else {
                 alert(response.message || "수락 처리 중 오류가 발생했습니다.");
             }
@@ -70,7 +70,7 @@ export default function ReceivedProposalContent() {
             console.error("수락 연동 에러:", error);
             alert("서버와 통신 중 에러가 발생했습니다.");
         } finally {
-            setIsProcessing(false); 
+            setIsProcessing(false);
         }
     };
     const closeModal = () => {
@@ -101,7 +101,7 @@ export default function ReceivedProposalContent() {
     };
 
     const formatTags = (tags: { name: string }[] | undefined | null) => {
-        if (!tags || tags.length === 0) return "정보 없음"; 
+        if (!tags || tags.length === 0) return "정보 없음";
         return tags.map(t => t.name).join(", ");
     };
 
@@ -112,7 +112,7 @@ export default function ReceivedProposalContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-[var(--color-bg-w)] font-pretendard relative">
-            <RealmatchHeader title="제안 보기" showBack={true} />
+            <Header title="제안 보기" showBack={true} />
 
             <main className="flex flex-col bg-[var(--color-bluegray-1)]">
                 <div className="bg-[var(--color-bg-w)] px-4 py-6 flex flex-col gap-2">
@@ -120,9 +120,9 @@ export default function ReceivedProposalContent() {
                         showChatSection={false}
                         statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"}
                         brandName={brand?.brandName}
-                        brandTags={brand?.brandTags}      
-                        brandImageUrl={brand?.brandImageUrl} 
-                        matchingRate={brand?.matchingRate} 
+                        brandTags={brand?.brandTags}
+                        brandImageUrl={brand?.brandImageUrl}
+                        matchingRate={brand?.matchingRate}
                     />
                     <div>
                         <h2 className="text-title1 text-text-black">{proposal.title}</h2>
@@ -202,8 +202,8 @@ export default function ReceivedProposalContent() {
 
             {/* 하단 고정 버튼 영역 */}
             <div className="px-4 py-5 flex gap-3 bg-[var(--color-bg-w)] sticky bottom-0 border-t border-[var(--color-text-gray5)]">
-                <button 
-                    onClick={handleRejectClick} 
+                <button
+                    onClick={handleRejectClick}
                     disabled={isProcessing}
                     className="flex-1 h-[52px] bg-[var(--color-bg-w)] border border-[var(--color-core-3)] rounded-xl text-core-1 text-title3 active:bg-gray-50 transition-colors disabled:opacity-50"
                 >
@@ -218,7 +218,7 @@ export default function ReceivedProposalContent() {
                 </button>
             </div>
 
-            <Modal isOpen={modalType !== "none"} onClose={closeModal}>
+            <Modal isOpen={modalType !== "none"} onClose={closeModal} className="w-full max-w-[340px] p-8 px-6">
                 {/* 모달 */}
                 {modalType === "confirm" && (
                     <div className="flex flex-col items-center text-center">
@@ -248,7 +248,7 @@ export default function ReceivedProposalContent() {
                 {modalType === "reject" && (
                     <div className="flex flex-col w-full">
                         <h3 className="text-[18px] font-bold text-text-black mb-6">비플레인 선크림 리뷰 콘텐츠</h3>
-                        
+
                         <div className="flex flex-col gap-2 mb-8">
                             <label className="text-[16px] font-bold text-text-black">거절 이유</label>
                             <div className="relative">
@@ -267,8 +267,8 @@ export default function ReceivedProposalContent() {
 
                         <div className="flex w-full gap-3">
                             <button onClick={closeModal} className="w-[90px] py-4 border border-core-3 rounded-[16px] text-core-1 font-bold">취소하기</button>
-                            <button 
-                                onClick={handleRejectSubmit} 
+                            <button
+                                onClick={handleRejectSubmit}
                                 disabled={isProcessing}
                                 className="flex-1 py-4 bg-core-1 rounded-[16px] text-white font-bold disabled:bg-text-gray5"
                             >
