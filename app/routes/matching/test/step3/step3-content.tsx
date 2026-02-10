@@ -309,7 +309,7 @@ export default function MatchingTestStep3Content({
         <BottomSheet title="인스타그램 주소 입력" onClose={close}>
           <InputSheet
             value={extractId(snsUrl)}
-            placeholder="your_id"
+            placeholder="아이디만 입력"
             onChange={(v) => {
               const cleaned = extractId(v);
               onSnsUrlChange(INSTAGRAM_PREFIX + cleaned);
