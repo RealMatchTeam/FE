@@ -71,7 +71,7 @@ export default function ProfileCard() {
 
   return (
     <div className="h-screen-full">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+      <div className="w-full bg-white shadow-2xl flex flex-col">
         {/* header */}
         <div className="h-[60px]">
           <NavigationHeader
@@ -91,11 +91,11 @@ export default function ProfileCard() {
             age={profileCard?.age ?? null}
             contentCategories={profileCard?.contentCategories ?? null}
           />
-          <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
+          <div className="w-full h-[10px] bg-[#F3F3FA]"></div>
 
           <div className="px-4">
             <SnsSection snsAccount={profileCard?.snsAccount ?? null} />
-            <div className="w-full max-w-[430px] h-[1px] bg-[#F3F3FA]"></div>
+            <div className="w-full h-[1px] bg-[#F3F3FA]"></div>
             <MatchingSection
               onOpenReMatch={onOpenReMatch}
               nickname={nickname}

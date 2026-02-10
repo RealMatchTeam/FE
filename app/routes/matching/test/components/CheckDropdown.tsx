@@ -1,7 +1,7 @@
 interface CheckDropdownProps<T extends readonly string[]> {
   options: T;
-  values: string[]; // 다중 선택
-  onToggle: (v: T[number]) => void; // 토글
+  values: string[];
+  onToggle: (v: T[number]) => void;
   onDone: () => void;
 }
 
@@ -12,9 +12,8 @@ export default function CheckDropdown<T extends readonly string[]>({
   onDone,
 }: CheckDropdownProps<T>) {
   return (
-    <div className="mx-auto w-full max-w-[260px] rounded-2xl border border-text-gray4 bg-white px-4 py-4">
-      {/* 옵션 */}
-      <div className="flex flex-col items-center gap-4">
+    <div className="bg-white">
+      <div className="space-y-1">
         {options.map((opt) => {
           const checked = values.includes(opt);
 
@@ -23,13 +22,26 @@ export default function CheckDropdown<T extends readonly string[]>({
               key={opt}
               type="button"
               onClick={() => onToggle(opt)}
-              className="flex items-center gap-3 active:opacity-90"
+              className={[
+                "w-full",
+                "h-[48px]",
+                "rounded-2xl",
+                "transition-colors",
+                "active:opacity-90",
+                "flex items-center",
+                "px-4",
+                checked
+                  ? "bg-core-2 text-core-1 font-semibold"
+                  : "bg-white text-text-gray1",
+              ].join(" ")}
             >
-              {/* 체크박스 */}
               <span
                 className={[
-                  "grid h-5 w-5 place-items-center rounded-[5px] border",
-                  checked ? "border-core-1 bg-core-1" : "border-text-gray4 bg-white",
+                  "grid place-items-center",
+                  "h-4 w-4 rounded-[4px] border",
+                  checked
+                    ? "border-core-1 bg-core-1"
+                    : "border-bluegray-2 bg-white",
                 ].join(" ")}
                 aria-hidden="true"
               >
@@ -38,24 +50,24 @@ export default function CheckDropdown<T extends readonly string[]>({
                 ) : null}
               </span>
 
-              <span className={checked ? "font-semibold text-core-1" : "text-core-1/80"}>
-                {opt}
-              </span>
+              <span className="flex-1 text-center text-title3">{opt}</span>
+
+              <span className="h-4 w-4" aria-hidden="true" />
             </button>
           );
         })}
       </div>
 
-      {/* 입력 완료 */}
-      <div className="mt-6 flex justify-center">
-        <button
-          type="button"
-          onClick={onDone}
-          className="text-[12px] font-medium text-core-1/60 active:opacity-90"
-        >
-          입력 완료
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onDone}
+        className={[
+          "mt-8 w-full h-[52px] rounded-2xl text-title7 transition-opacity",
+          "bg-core-1 text-white active:opacity-90",
+        ].join(" ")}
+      >
+        선택 완료
+      </button>
     </div>
   );
 }

@@ -187,7 +187,7 @@ export default function ApplicationContent() {
                 )}
             </main>
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} className="w-full max-w-[340px] p-8">
                 <div className="flex flex-col items-center">
                     {/* 닫기 버튼 (X) */}
                     <button onClick={handleCloseModal} className="absolute top-6 left-6">

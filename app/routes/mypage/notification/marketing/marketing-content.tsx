@@ -28,7 +28,7 @@ export default function MarketingDetail() {
 
   return (
     <div className="h-screen-full bg-[#F3F4F8]">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+      <div className="w-full bg-white shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader
             title="마케팅 활용 및 광고성 정보 수신 동의"
@@ -38,7 +38,7 @@ export default function MarketingDetail() {
 
         <div
           className="overflow-y-auto"
-          style={{ height: "calc(100vh - 60px)" }}
+          style={{ height: `calc(100vh - 60px - 67px)` }}
         >
           <div className="px-4 py-6">
             <div className="border border-[#E8E8FB] rounded-[12px] overflow-hidden">

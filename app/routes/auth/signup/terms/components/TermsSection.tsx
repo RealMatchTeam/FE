@@ -69,6 +69,7 @@ export function TermsSection({
         label="이벤트 혜택 및 광고성 정보 수신 동의"
         hasArrow
         onDetailClick={() => onDetailClick("eventMarketing")}
+        noWrap
       />
     </div>
   );

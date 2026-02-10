@@ -4,7 +4,8 @@ import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import { axiosInstance } from "../../../api/axios";
 import { TRAITS } from "../components/profileCard/traitData";
-import { tagName } from "../../../constants/tagNameById";
+import { tagName } from "../../../data/tagNameById";
+import { useMatchingTestStore } from "../../../stores/matching-test";
 
 type FeatureResult = {
   beautyType?: {
@@ -46,6 +47,30 @@ export default function TraitsPage() {
   useHideHeader(true);
   const navigate = useNavigate();
   const [feature, setFeature] = useState<FeatureResult | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null); // 수정 중인 섹션 ID
+  //const store = useMatchingTestStore(); // zustand 스토어 호출
+
+  // 수정 버튼 클릭
+  const handleEditClick = (id: string) => {
+    setEditingId(id);
+
+    // 현재 feature 데이터를 스토어 형식에 맞춰 복사
+    if (id === "beauty" && feature?.beautyType) {
+      const { interestCategories, interestFunctions } = feature.beautyType;
+      // zustand의 setState를 직접 호출예정,,
+      useMatchingTestStore.setState((state) => ({
+        selected: {
+          ...state.selected,
+          style: interestCategories || [],
+          function: interestFunctions || [],
+        }
+      }));
+    };
+  }
+  // 선택 완료 클릭 
+  const handleComplete = () => {
+    setEditingId(null);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -121,13 +146,13 @@ export default function TraitsPage() {
           ...trait,
           previewLines: [
             { label: "키", value: names(fashion?.height).join(", ") },
-            { label: "체형", value: names(fashion?.bodyShape).join(", ") },
+            { label: "체형 실루엣", value: names(fashion?.bodyShape).join(", ") },
             { label: "상의", value: names(fashion?.topSize).join(", ") },
             { label: "하의", value: names(fashion?.bottomSize).join(", ") },
           ],
           topSummary: [
             { label: "키/몸무게", value: names(fashion?.height).join(", ") },
-            { label: "체형", value: names(fashion?.bodyShape).join(", ") },
+            { label: "체형 실루엣", value: names(fashion?.bodyShape).join(", ") },
             { label: "상의 사이즈", value: names(fashion?.topSize).join(", ") },
             { label: "하의 사이즈", value: names(fashion?.bottomSize).join(", ") },
           ],
@@ -152,10 +177,10 @@ export default function TraitsPage() {
         return {
           ...trait,
           previewLines: [
-            { label: "성별", value: names(content?.viewerGender).join(", ") },
-            { label: "나이대", value: names(content?.viewerAge).join(", ") },
+            { label: "주 시청자 성별", value: names(content?.viewerGender).join(", ") },
+            { label: "주 시청자 나이대", value: names(content?.viewerAge).join(", ") },
             {
-              label: "평균 길이",
+              label: "평균 영상 길이",
               value: names(content?.avgVideoLength).join(", "),
             },
             { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
@@ -181,7 +206,7 @@ export default function TraitsPage() {
               items: names(content?.contentFormats),
             },
             {
-              title: "브랜드 톤",
+              title: "콘텐츠 톤",
               items: names(content?.contentTones),
             },
             {
@@ -202,14 +227,14 @@ export default function TraitsPage() {
 
   return (
     <div className="h-screen-full bg-[#404252]">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+      <div className="w-full bg-white shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader title="내 특성" onBack={() => navigate(-1)} />
         </div>
 
         <div
           className="overflow-y-auto "
-          style={{ height: `calc(100vh - 60px)` }}
+          style={{ height: `calc(100vh - 60px - 67px)` }}
         >
           <div className="px-4 py-4 space-y-6">
             {traits.map((trait) => {
@@ -226,6 +251,7 @@ export default function TraitsPage() {
                     <button
                       type="button"
                       className="ml-1 text-[#9B9BA1] active:opacity-70"
+                      onClick={() => handleEditClick(trait.id)}
                       aria-label="edit"
                     >
                       <svg
@@ -279,17 +305,44 @@ export default function TraitsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-[10px]">
+                  <div className="px-2 space-y-[10px]">
                     {trait.sections.map((section, i) => (
                       <div key={i}>
-                        <div className="text-callout1 font-Medium text-[#6666E5]">
+                        <div className="text-[12px] leading-[16px] font-medium text-[#6666E5]">
                           {section.title}
                         </div>
-                        <div className="text-callout1 font-Medium text-[#404252]">
-                          {section.items.join(", ")}
-                        </div>
+
+                        {/* 수정 모드일 때와 아닐 때를 구분합니다 */}
+                        {editingId === trait.id ? (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {section.items.map((item, idx) => (
+                              <span
+                                key={idx}
+                                className="px-[10px] py-1 bg-[#B7B7F3B2] border border-[#B7B7F3] text-[#6666E5] rounded-[20px] text-[14px] leading-[20px] font-medium"
+                              >
+                                {item}
+                              </span>
+                            ))}
+                            {/* 여기에 실제 수정 가능한 전체 태그 리스트를 매핑해야 합니다 */}
+                          </div>
+                        ) : (
+                          <div className="mt-[2px] text-[12px] leading-[16px] font-medium text-[#404252]">
+                            {section.items.join(", ")}
+                          </div>
+                        )}
                       </div>
                     ))}
+
+                    {editingId === trait.id && (
+                      <div className="flex justify-end mt-2">
+                        <button
+                          onClick={handleComplete}
+                          className="text-[14px] font-semibold text-[#6666E5]"
+                        >
+                          선택 완료
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className="h-[10px] bg-[#F3F3FA] -mx-4"></div>
                 </section>

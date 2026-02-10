@@ -73,15 +73,15 @@ export default function ProfileSection({
         </div>
 
         <div className="flex-1 gap-[6px]">
-          <div className="text-[16px] font-Semibold leading-[20px]">
+          <div className="text-[16px] font-semibold leading-[20px]">
             {displayName}
           </div>
-          <div className="text-[12px] text-black/50 leading-[16px] mt-[2px]">
+          <div className="text-[12px] leading-[16px] font-regular text-[#5B5D6B] mt-[2px]">
             {genderLabel} {ageLabel}
           </div>
           {interestLabel ? (
-            <div className="text-[12px] leading-[16px] mt-[2px]">
-              <span className="text-black/50">관심분야: </span>
+            <div className="text-[12px] leading-[16px] font-regular mt-[2px]">
+              <span className="text-[#5B5D6B]">관심분야: </span>
               <span className="text-[#6D6AFE]">{interestLabel}</span>
             </div>
           ) : null}

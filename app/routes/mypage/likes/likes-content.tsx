@@ -77,7 +77,7 @@ export default function MyPageLikes() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"brand" | "campaign">("brand");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("정렬 필터");
+  const [sortOption, setSortOption] = useState("매칭률 순");
   const [loading, setLoading] = useState(false);
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
@@ -209,21 +209,21 @@ export default function MyPageLikes() {
   };
 
   return (
-    <div className="h-screen-full bg-[#F3F4F8]">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+    <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+      <div className="w-full shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader title="내 찜" onBack={() => navigate(-1)} />
         </div>
 
-        <div className="border-b border-[#E8E8FB]">
+        <div className="bg-white border-b border-[#E8E8FB]">
           <div className="flex">
             <button
               type="button"
               onClick={() => setActiveTab("brand")}
               className={[
-                "flex-1 py-4 text-[16px] font-semibold",
+                "flex-1 py-4 text-[16px] font-medium",
                 activeTab === "brand"
-                  ? "text-[#4A4DFF] border-b-2 border-[#4A4DFF]"
+                  ? "text-[#6666E5] border-b-2 border-[#6666E5]"
                   : "text-[#9B9BA1]",
               ].join(" ")}
             >
@@ -233,9 +233,9 @@ export default function MyPageLikes() {
               type="button"
               onClick={() => setActiveTab("campaign")}
               className={[
-                "flex-1 py-4 text-[16px] font-semibold",
+                "flex-1 py-4 text-[16px] font-medium",
                 activeTab === "campaign"
-                  ? "text-[#4A4DFF] border-b-2 border-[#4A4DFF]"
+                  ? "text-[#6666E5] border-b-2 border-[#6666E5]"
                   : "text-[#9B9BA1]",
               ].join(" ")}
             >
@@ -246,11 +246,11 @@ export default function MyPageLikes() {
 
         <div
           className="overflow-y-auto"
-          style={{ height: "calc(100vh - 60px - 56px)" }}
+          style={{ height: `calc(100vh - 60px - 67px - 59px)` }}
         >
-          <div className="bg-gradient-to-b from-[#F2F3FF] to-white px-4 py-4">
+          <div className="px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="text-[18px] font-semibold text-black">
+              <div className="text-[16px] leading-[20px] font-semibold text-black">
                 {activeTab === "brand" ? "브랜드 리스트" : "캠페인 리스트"}
               </div>
               <FilterButton
@@ -390,8 +390,8 @@ export default function MyPageLikes() {
           currentFilter={sortOption}
           filters={
             activeTab === "brand"
-              ? ["정렬 필터", "매칭률 순", "인기 순", "신규 순"]
-              : ["정렬 필터", "매칭률 순", "인기 순", "금액 순", "마감 순"]
+              ? ["매칭률 순", "인기 순", "신규 순"]
+              : ["매칭률 순", "인기 순", "금액 순", "마감 순"]
           }
           title="정렬 필터"
         />

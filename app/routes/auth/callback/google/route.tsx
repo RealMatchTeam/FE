@@ -23,6 +23,7 @@ export default function GoogleCallback() {
 
     if (accessToken && refreshToken) {
       tokenStorage.setTokens(accessToken, refreshToken);
+      localStorage.setItem("lastLoginProvider", "google");
 
       try {
         const decoded = jwtDecode<JwtPayload>(accessToken);

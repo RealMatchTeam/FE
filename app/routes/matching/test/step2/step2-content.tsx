@@ -39,6 +39,19 @@ type Props = {
 type Sheet = null | "height" | "weightType" | "topSize" | "bottomSize";
 
 const normalize = (s: string) => s.replace(/\s+/g, "").trim();
+const sortById = (items: TagItem[]) => [...items].sort((a, b) => a.id - b.id);
+
+const parseLeadingInt = (name: string) => {
+  const m = name.match(/\d+/);
+  return m ? Number(m[0]) : null;
+};
+
+const filterByNumericRange = (items: TagItem[], min: number, max: number) => {
+  return items.filter((t) => {
+    const n = parseLeadingInt(t.name);
+    return n != null && n >= min && n <= max;
+  });
+};
 
 const pickCategory = (
   categories: Record<string, TagItem[]>,
@@ -95,22 +108,25 @@ export default function MatchingTestStep2Content({
   const [heightInput, setHeightInput] = useState("");
   const [bottomInput, setBottomInput] = useState("");
 
-  const heightOptions = useMemo(
-    () => pickCategory(fashionCategories, ["키"]),
-    [fashionCategories],
-  );
-  const weightTypeOptions = useMemo(
-    () => pickCategory(fashionCategories, ["체형"]),
-    [fashionCategories],
-  );
-  const topSizeOptions = useMemo(
-    () => pickCategory(fashionCategories, ["상의 사이즈"]),
-    [fashionCategories],
-  );
-  const bottomSizeOptions = useMemo(
-    () => pickCategory(fashionCategories, ["하의 사이즈"]),
-    [fashionCategories],
-  );
+  const heightOptions = useMemo(() => {
+    const raw = pickCategory(fashionCategories, ["키"]);
+    return sortById(filterByNumericRange(raw, 140, 200));
+  }, [fashionCategories]);
+
+  const weightTypeOptions = useMemo(() => {
+    const raw = pickCategory(fashionCategories, ["체형"]);
+    return sortById(raw);
+  }, [fashionCategories]);
+
+  const topSizeOptions = useMemo(() => {
+    const raw = pickCategory(fashionCategories, ["상의 사이즈"]);
+    return sortById(raw);
+  }, [fashionCategories]);
+
+  const bottomSizeOptions = useMemo(() => {
+    const raw = pickCategory(fashionCategories, ["하의 사이즈"]);
+    return sortById(filterByNumericRange(raw, 23, 65));
+  }, [fashionCategories]);
 
   const heightValue = useMemo(
     () => nameById(fashionBody.heightTag, heightOptions),
@@ -129,20 +145,31 @@ export default function MatchingTestStep2Content({
     [fashionBody.bottomSizeTag, bottomSizeOptions],
   );
 
+  const heightNum =
+    heightInput.trim().length > 0 && /^\d+$/.test(heightInput.trim())
+      ? Number(heightInput.trim())
+      : null;
+
+  const bottomNum =
+    bottomInput.trim().length > 0 && /^\d+$/.test(bottomInput.trim())
+      ? Number(bottomInput.trim())
+      : null;
+
+  const heightInRange = heightNum != null && heightNum >= 140 && heightNum <= 200;
+  const bottomInRange = bottomNum != null && bottomNum >= 23 && bottomNum <= 65;
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="w-full min-h-full bg-white flex flex-col">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
+        <div className="px-6 py-10 text-sm text-text-gray3">태그를 불러오는 중...</div>
       </div>
     );
   }
 
   if (errorText) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="w-full min-h-full bg-white flex flex-col">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
         <div className="px-6 py-10 text-sm text-red-500">{errorText}</div>
       </div>
@@ -150,29 +177,24 @@ export default function MatchingTestStep2Content({
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="w-full min-h-full bg-white flex flex-col">
       <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
-      <main className="flex-1 px-6">
-        <h1 className="text-[24px] leading-[32px] font-extrabold text-text-black">
+      <main className="flex-1 px-6 pb-[30px]">
+        <h1 className="text-title leading-[32px] font-extrabold text-text-black">
           관심 있는 <span className="text-core-1">패션 특성</span>을
           <br />
           <span className="text-core-1">모두</span> 선택해주세요
         </h1>
 
         {sections.map((section) => {
-          const items = itemsBySection[section.key] ?? [];
-
+          const items = sortById(itemsBySection[section.key] ?? []);
           return (
             <section key={section.key} className="mt-8">
-              <h2 className="text-[16px] leading-[24px] font-semibold text-text-black mb-3">
-                {section.title}
-              </h2>
-
+              <h2 className="text-title2 text-text-black mb-2">{section.title}</h2>
               <div className="flex flex-wrap gap-3">
                 {items.map((tag) => {
                   const checked = isSelected(section.key, tag.id);
-
                   return (
                     <SelectChip
                       key={tag.id}
@@ -188,11 +210,9 @@ export default function MatchingTestStep2Content({
         })}
 
         <section className="mt-8">
-          <h2 className="text-[16px] leading-[24px] font-semibold text-text-black mb-2">
-            체형 정보
-          </h2>
+          <h2 className="text-title2 text-text-black mb-2">체형 정보</h2>
 
-          <div className="text-body2 text-text-gray3">키를 입력해주세요</div>
+          <div className="text-title4 text-text-gray3">키를 입력해주세요</div>
           <div className="mt-2">
             <FormField
               label="키(cm)"
@@ -205,9 +225,7 @@ export default function MatchingTestStep2Content({
             />
           </div>
 
-          <div className="mt-4 text-body2 text-text-gray3">
-            체형을 선택해주세요
-          </div>
+          <div className="mt-4 text-title4 text-text-gray3">체형을 선택해주세요</div>
           <div className="mt-2">
             <FormField
               label="체형"
@@ -217,10 +235,10 @@ export default function MatchingTestStep2Content({
             />
           </div>
 
-          <div className="mt-4 text-body2 text-text-gray3">
+          <div className="mt-4 text-title4 text-text-gray3">
             평소 입는 옷 사이즈를 선택해주세요
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-3">
+          <div className="mt-2 grid grid-cols-2 gap-3 items-stretch">
             <FormField
               label="상의 사이즈"
               value={topSizeValue}
@@ -240,7 +258,7 @@ export default function MatchingTestStep2Content({
         </section>
       </main>
 
-      <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
+      <div className="sticky bottom-0 w-full bg-white px-6 pt-3 pb-6">
         <Button
           variant="primary"
           size="lg"
@@ -256,18 +274,18 @@ export default function MatchingTestStep2Content({
         <BottomSheet title="키 입력" onClose={close}>
           <InputSheet
             value={heightInput}
-            placeholder="예: 180"
+            placeholder="키를 입력해주세요"
             onChange={setHeightInput}
-            doneDisabled={!/^\d+$/.test(heightInput.trim())}
+            doneDisabled={!heightInRange}
             onDone={() => {
               const id = idByNumericInput(heightInput, heightOptions, "cm");
               if (id != null) onSetFashionBody("heightTag", id);
               close();
             }}
-            helperText="예: 180"
+            helperText="cm"
             errorText={
-              heightInput.trim().length > 0 && !/^\d+$/.test(heightInput.trim())
-                ? "숫자만 입력해주세요."
+              heightInput.trim().length > 0 && !heightInRange
+                ? "* 140~200 사이 숫자만 입력해주세요."
                 : undefined
             }
           />
@@ -278,18 +296,18 @@ export default function MatchingTestStep2Content({
         <BottomSheet title="하의 사이즈 입력" onClose={close}>
           <InputSheet
             value={bottomInput}
-            placeholder="예: 27"
+            placeholder="하의 사이즈를 입력해주세요"
             onChange={setBottomInput}
-            doneDisabled={!/^\d+$/.test(bottomInput.trim())}
+            doneDisabled={!bottomInRange}
             onDone={() => {
               const id = idByNumericInput(bottomInput, bottomSizeOptions, "");
               if (id != null) onSetFashionBody("bottomSizeTag", id);
               close();
             }}
-            helperText="예: 27"
+            helperText="in"
             errorText={
-              bottomInput.trim().length > 0 && !/^\d+$/.test(bottomInput.trim())
-                ? "숫자만 입력해주세요."
+              bottomInput.trim().length > 0 && !bottomInRange
+                ? "* 23~65 사이 숫자만 입력해주세요."
                 : undefined
             }
           />

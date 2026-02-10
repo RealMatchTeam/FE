@@ -23,6 +23,7 @@ export default function KakaoCallback() {
 
     if (accessToken && refreshToken) {
       tokenStorage.setTokens(accessToken, refreshToken);
+      localStorage.setItem("lastLoginProvider", "kakao");
 
       try {
         const decoded = jwtDecode<JwtPayload>(accessToken);

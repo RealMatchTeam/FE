@@ -46,3 +46,10 @@ export interface OAuthTokenResponse {
 
 // 회원가입 완료 응답
 export type SignupCompleteResponse = ApiResponse<OAuthTokenResponse>;
+
+// 닉네임 중복 확인 응답
+export interface NicknameAvailableResult {
+  available: boolean;
+}
+
+export type NicknameAvailableResponse = ApiResponse<NicknameAvailableResult>;

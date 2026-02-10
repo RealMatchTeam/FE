@@ -40,12 +40,13 @@ export default function MyPageHome({
   const [openWithdraw, setOpenWithdraw] = useState(false);
 
   const openGate = hasMatchingTest === false && !gateDismissed;
+  const isButtonLocked = hasMatchingTest === false;
 
   return (
     <div className="min-h-screen bg-white">
       {/* profile card */}
       <div className="flex flex-col gap-[14px] px-4 py-5">
-        <div className="flex items-start gap-[16px]">
+        <div className="flex items-center gap-[16px]">
           <div
             className="shrink-0 rounded-[20px] bg-white overflow-hidden"
             style={{ width: 50, height: 50 }}
@@ -64,13 +65,13 @@ export default function MyPageHome({
             )}
           </div>
 
-          <div className="min-w-0 flex flex-col gap-[6px]">
+          <div className="min-w-0 flex flex-col gap-[3px]">
             <div className="flex items-center gap-[6px]">
-              <div className="text-[16px] leading-[20px] font-SemiBold text-black">
+              <div className="text-[16px] leading-[20px] font-semibold text-black">
                 {user.name}
               </div>
               {user.roleText ? (
-                <div className="text-[12px] leading-[16px] text-Medium text-[#9B9BA1]">
+                <div className="text-[12px] leading-[16px] font-medium text-[#9B9BA1]">
                   {user.roleText}
                 </div>
               ) : null}
@@ -82,11 +83,15 @@ export default function MyPageHome({
         </div>
 
         {/* top buttons */}
-        <div className="flex w-full max-w-[398px] gap-[10px]">
+        <div className="flex w-full  gap-[10px]">
           <button
             type="button"
-            onClick={onOpenProfileCard}
-            className="flex h-11 flex-[2] items-center justify-center gap-[10px] rounded-[12px] text-white text-[14px] bg-[#6666E5] style-Medium transition-colors active:bg-[#3F40C2]"
+            disabled={isButtonLocked}
+            onClick={() => {
+              if (isButtonLocked) return;
+              onOpenProfileCard();
+            }}    
+            className="flex h-11 flex-[2] items-center justify-center gap-[10px] rounded-[12px] text-white text-[14px] bg-[#6666E5] font-medium transition-colors active:bg-[#3F40C2]"
           >
             {/* 아이콘 */}
             <svg
@@ -114,8 +119,12 @@ export default function MyPageHome({
 
           <button
             type="button"
-            onClick={onOpenLikes}
-            className="flex h-11 flex-[1] items-center justify-center gap-[10px] rounded-[12px] bg-[#EBEEFB] text-[#6666E5] text-[14px] style-Medium transition-colors active:bg-[#E6E6EB]"
+            disabled={isButtonLocked}
+            onClick={() => {
+              if (isButtonLocked) return;
+              onOpenLikes();
+            }}    
+            className="flex h-11 flex-[1] items-center justify-center gap-[10px] rounded-[12px] bg-[#EBEEFB] text-[#6666E5] text-[14px] font-medium transition-colors active:bg-[#E6E6EB]"
           >
             <svg
               width="24"
@@ -135,16 +144,18 @@ export default function MyPageHome({
         </div>
       </div>
 
-      <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
+      <div className="w-full h-[10px] bg-[#F3F3FA]"></div>
 
       {/* list */}
       <div>
-        <MenuButton
-          title="내 정보"
-          label="회원정보 변경"
-          onClick={onOpenEditProfile}
-          py={11}
-        />
+        <div className="mt-[5px]">
+          <MenuButton
+            title="내 정보"
+            label="회원정보 변경"
+            onClick={onOpenEditProfile}
+            py={11}
+          />
+        </div>
         <Divider />
 
         <MenuButton label="알림 설정" onClick={onOpenNotifications} py={16} />
@@ -165,14 +176,14 @@ export default function MyPageHome({
         <Divider />
 
         <div className="px-5 pt-[11px] pb-[5px]">
-          <div className="pb-[2px] text-[10px] leading-[12px] text-[#5B5D6B]">
+          <div className="pb-[2px] text-[10px] leading-[12px] font-regular text-[#5B5D6B]">
             약관
           </div>
 
           <button
             type="button"
             onClick={onOpenTerms}
-            className="w-full py-2 text-left text-[14px] leading-[20px] text-black transition-colors active:bg-[#E6E6EB]"
+            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black transition-colors active:bg-[#E6E6EB]"
           >
             약관
           </button>
@@ -180,7 +191,7 @@ export default function MyPageHome({
           <button
             type="button"
             onClick={onOpenPrivacy}
-            className="w-full py-2 text-left text-[14px] leading-[20px] text-black transition-colors active:bg-[#E6E6EB]"
+            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black transition-colors active:bg-[#E6E6EB]"
           >
             개인정보 처리 방침
           </button>
