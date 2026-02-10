@@ -98,7 +98,7 @@ export default function AttachmentMessage({
   if (!isMe) {
     return (
       <div className="flex justify-start">
-        <div className="w-fit flex items-start gap-[10px] max-w-full">
+        <div className="w-fit flex items-start gap-[10px] ">
           {/* avatar */}
           <div
             className="shrink-0 rounded-[10px] bg-white overflow-hidden"

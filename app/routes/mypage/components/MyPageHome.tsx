@@ -83,7 +83,7 @@ export default function MyPageHome({
         </div>
 
         {/* top buttons */}
-        <div className="flex w-full max-w-[398px] gap-[10px]">
+        <div className="flex w-full  gap-[10px]">
           <button
             type="button"
             disabled={isButtonLocked}
@@ -144,7 +144,7 @@ export default function MyPageHome({
         </div>
       </div>
 
-      <div className="w-full max-w-[430px] h-[10px] bg-[#F3F3FA]"></div>
+      <div className="w-full h-[10px] bg-[#F3F3FA]"></div>
 
       {/* list */}
       <div>

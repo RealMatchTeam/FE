@@ -35,7 +35,7 @@ export default function MyPagePrivacy() {
 
   return (
     <div className="h-screen-full bg-[#F3F4F8]">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+      <div className="w-full bg-white shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader title="개인정보 처리방침" onBack={() => navigate(-1)} />
         </div>

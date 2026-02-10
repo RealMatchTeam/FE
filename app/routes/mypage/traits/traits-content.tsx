@@ -7,21 +7,6 @@ import { TRAITS } from "../components/profileCard/traitData";
 import { tagName } from "../../../constants/tagNameById";
 import { useMatchingTestStore } from "../../../stores/matching-test";
 
-/*const KEY_MAP = {
-  // Beauty
-  interestCategories: { storeKey: "style", toggle: "toggleStep1" },
-  interestFunctions: { storeKey: "function", toggle: "toggleStep1" },
-  // Fashion
-  interestFields: { storeKey: "interestItem", toggle: "toggleStep2" },
-  interestStyles: { storeKey: "fashionStyle", toggle: "toggleStep2" },
-  interestBrands: { storeKey: "brandType", toggle: "toggleStep2" },
-  // Content
-  contentFormats: { storeKey: "contentFormat", toggle: "toggleStep3Chip" },
-  contentTones: { storeKey: "contentTone", toggle: "toggleStep3Chip" },
-  desiredInvolvement: { storeKey: "contentHardness", toggle: "toggleStep3Chip" },
-  desiredUsageScope: { storeKey: "editingRange", toggle: "toggleStep3Chip" },
-} as const; */
-
 type FeatureResult = {
   beautyType?: {
     skinType?: number[] | null;
@@ -242,7 +227,7 @@ export default function TraitsPage() {
 
   return (
     <div className="h-screen-full bg-[#404252]">
-      <div className="w-full max-w-[430px] bg-white shadow-2xl flex flex-col">
+      <div className="w-full bg-white shadow-2xl flex flex-col">
         <div className="h-[60px]">
           <NavigationHeader title="내 특성" onBack={() => navigate(-1)} />
         </div>
