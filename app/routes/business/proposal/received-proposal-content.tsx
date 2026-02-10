@@ -75,7 +75,7 @@ export default function ReceivedProposalContent() {
     };
     const closeModal = () => {
         setModalType("none");
-        setRejectReason(""); // 닫을 때 초기화
+        setRejectReason(""); 
     };
 
     const handleRejectClick = () => setModalType("reject");
