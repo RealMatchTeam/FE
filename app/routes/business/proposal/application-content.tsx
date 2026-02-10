@@ -12,7 +12,7 @@ import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
 
-import checkIcon from "../../../assets/icon/icon-check-circle.svg"; 
+import checkIcon from "../../../assets/icon/icon-check-circle.svg";
 import closeIcon from "../../../assets/icon/icon-close.svg";
 
 export default function ApplicationContent() {
@@ -44,9 +44,9 @@ export default function ApplicationContent() {
                 const result = await getAppliedCampaignDetail(applicationId as string);
                 setData(result);
 
-        
-                if (result.campaignId) { 
-                    const brandResult = await getBrandSummary(result.campaignId); 
+
+                if (result.campaignId) {
+                    const brandResult = await getBrandSummary(result.campaignId);
                     setBrand(brandResult);
                 }
             } catch (error) {
@@ -59,24 +59,24 @@ export default function ApplicationContent() {
     }, [applicationId]);
 
     const handleCancelSubmit = async () => {
-    if (!applicationId || !data) return;
+        if (!applicationId || !data) return;
 
-    if (data.status !== "REVIEWING") {
-        alert("검토 중인 상태에서만 취소가 가능합니다.");
-        setIsModalOpen(false);
-        return;
-    }
-
-    try {
-        const response = await cancelCampaignApply(applicationId);
-        if (response.isSuccess) {
-            setModalStep("COMPLETE");
+        if (data.status !== "REVIEWING") {
+            alert("검토 중인 상태에서만 취소가 가능합니다.");
+            setIsModalOpen(false);
+            return;
         }
-    } catch (error: unknown) {
+
+        try {
+            const response = await cancelCampaignApply(applicationId);
+            if (response.isSuccess) {
+                setModalStep("COMPLETE");
+            }
+        } catch (error: unknown) {
             console.error("취소 실패:", error);
-            
+
             let errorMessage = "지원 취소 권한이 없거나 오류가 발생했습니다.";
-            
+
             if (error instanceof Error) {
                 errorMessage = error.message;
             } else if (typeof error === "string") {
@@ -86,13 +86,13 @@ export default function ApplicationContent() {
             alert(errorMessage);
             setIsModalOpen(false);
         }
-};
+    };
 
     const navigate = useNavigate();
 
     const handleComplete = () => {
         setIsModalOpen(false);
-        navigate(-1); 
+        navigate(-1);
     };
 
     if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
@@ -117,11 +117,11 @@ export default function ApplicationContent() {
                 <div className="px-4 py-6">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText={getStatusLabel(data.status)} 
-                        brandName={brand?.brandName || data.brandName} 
-                        brandTags={brand?.brandTags || ["지원완료"]} 
-                        brandImageUrl={brand?.brandImageUrl} 
-                        matchingRate={brand?.matchingRate} 
+                        statusText={getStatusLabel(data.status)}
+                        brandName={brand?.brandName || data.brandName}
+                        brandTags={brand?.brandTags || ["지원완료"]}
+                        brandImageUrl={brand?.brandImageUrl}
+                        matchingRate={brand?.matchingRate}
                     />
 
                     <div className="flex flex-col gap-6">
@@ -162,18 +162,18 @@ export default function ApplicationContent() {
 
                 {/* 하단 버튼 영역 */}
                 {data.status !== "CANCELED" && (
-                <div className="px-4 py-5 flex justify-end bg-bg-w border-t border-bluegray-2">
-                    <button
-                        onClick={() => setIsModalOpen(true)} 
-                        className="px-6 py-2.5 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
-                    >
-                        취소하기
-                    </button>
-                </div>
-            )}
+                    <div className="px-4 py-5 flex justify-end bg-bg-w border-t border-bluegray-2">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="px-6 py-2.5 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
+                        >
+                            취소하기
+                        </button>
+                    </div>
+                )}
             </main>
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} className="w-full max-w-[340px] p-8">
                 <div className="flex flex-col items-center">
                     {/* 닫기 버튼 (X) */}
                     <button onClick={handleCloseModal} className="absolute top-6 left-6">

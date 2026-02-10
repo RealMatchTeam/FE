@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { FieldValues, UseFormSetValue, Path } from "react-hook-form";
 import { DatePickerModal } from "./DatePickerModal";
 
@@ -7,27 +7,22 @@ interface AgeSectionProps<T extends FieldValues> {
   initialValue?: string;
 }
 
+function parseInitialDate(initialValue?: string) {
+  if (!initialValue) return null;
+  const [year, month, day] = initialValue.split("-");
+  if (year && month && day) {
+    return { year, month: String(parseInt(month)), day: String(parseInt(day)) };
+  }
+  return null;
+}
+
 export function AgeSection<T extends FieldValues>({ setValue, initialValue }: AgeSectionProps<T>) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<{
     year: string;
     month: string;
     day: string;
-  } | null>(null);
-
-  // 초기값 설정
-  useEffect(() => {
-    if (initialValue && !selectedDate) {
-      const [year, month, day] = initialValue.split("-");
-      if (year && month && day) {
-        setSelectedDate({
-          year,
-          month: String(parseInt(month)),
-          day: String(parseInt(day)),
-        });
-      }
-    }
-  }, [initialValue]);
+  } | null>(() => parseInitialDate(initialValue));
 
   const handleDateSelect = (date: { year: string; month: string; day: string }) => {
     setSelectedDate(date);

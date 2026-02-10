@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Button from "../../../components/common/Button";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import { CheckIcon } from "../../auth/components/CheckIcon";
@@ -111,7 +111,7 @@ export default function MatchingSuggestContent() {
         <div className="px-5 pt-2.5 pb-20 flex flex-col gap-2.5">
           {isLoading ? (
             <div className="text-center py-8 text-text-gray2">
-              로딩 중...
+              로딩 중
             </div>
           ) : recruitingCampaigns.length === 0 ? (
             <div className="text-center py-8 text-text-gray2">

@@ -100,8 +100,8 @@ function SignUpInfoContent() {
         setSocialNicknameError("이미 존재하는 닉네임입니다");
         setSocialNicknameSuccess(null);
       }
-    } catch (error: any) {
-      if (error.response?.status === 400) {
+    } catch (error: unknown) {
+      if (error instanceof Error && "response" in error && (error as { response?: { status?: number } }).response?.status === 400) {
         setSocialNicknameError("닉네임 형식 또는 길이가 올바르지 않습니다");
         setSocialNicknameSuccess(null);
       } else {

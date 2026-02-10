@@ -218,7 +218,7 @@ export default function ReceivedProposalContent() {
                 </button>
             </div>
 
-            <Modal isOpen={modalType !== "none"} onClose={closeModal}>
+            <Modal isOpen={modalType !== "none"} onClose={closeModal} className="w-full max-w-[340px] p-8 px-6">
                 {/* 모달 */}
                 {modalType === "confirm" && (
                     <div className="flex flex-col items-center text-center">

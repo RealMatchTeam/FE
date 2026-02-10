@@ -162,7 +162,7 @@ export default function HomeAfterMatchPage() {
     return () => {
       alive = false;
     };
-  }, [category]);
+  }, [category, setSnsAccount]);
 
   const profile = useMemo<CreatorProfileModel | null>(() => {
     if (!profileCard || !feature) return null;

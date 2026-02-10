@@ -7,7 +7,7 @@ import { createCampaignProposal, getRecruitingCampaigns, type RecruitingCampaign
 import { tokenStorage } from "../../../../lib/token";
 import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 import Button from "../../../../components/common/Button";
-import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+
 import {
   TextInput,
   TextArea,
@@ -19,14 +19,7 @@ import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
 import ProfileSelector from "../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
-import {
-  formatOptions,
-  categoryOptions,
-  toneOptions,
-  involvementOptions,
-  usageScopeOptions,
-  sponsorProductOptions,
-} from "./campaignOptions";
+import ProposalModal from "./components/ProposalModal";
 import {
   campaignFormSchema,
   defaultCampaignFormValues,
@@ -53,12 +46,12 @@ export default function CreateCampaignContent() {
   const [isStartDateSheetOpen, setIsStartDateSheetOpen] = useState(false);
   const [isEndDateSheetOpen, setIsEndDateSheetOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   // 바텀탭 숨기기 (바텀시트 열렸을 때)
   const anySheetOpen = isFormatSheetOpen || isCategorySheetOpen ||
     isToneSheetOpen || isInvolvementSheetOpen || isUsageScopeSheetOpen || isSponsorProductSheetOpen ||
-    isStartDateSheetOpen || isEndDateSheetOpen || isConfirmDialogOpen;
+    isStartDateSheetOpen || isEndDateSheetOpen || isConfirmDialogOpen || isSuccessModalOpen;
   useHideBottomTab(anySheetOpen);
 
   // react-hook-form + zod
@@ -123,7 +116,6 @@ export default function CreateCampaignContent() {
   }, [type, searchParams, setValue]);
 
   useEffect(() => {
-    // zustand에서 저장된 캠페인 데이터 사용
     if (type === "existing" && proposalData) {
       setValue("campaignName", proposalData.campaignTitle || "");
       setValue("description", proposalData.campaignDescription || "");
@@ -169,6 +161,17 @@ export default function CreateCampaignContent() {
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
+  // 상세 페이지 API에서 받아온 데이터로 옵션 생성
+  const tags = proposalData?.contentTags;
+  const formatOptions = (tags?.formats ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const categoryOptions = (tags?.categories ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const toneOptions = (tags?.tones ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const involvementOptions = (tags?.involvements ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const usageScopeOptions = (tags?.usageRanges ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const sponsorProductOptions = proposalData?.product
+    ? [{ value: proposalData.product, label: proposalData.product }]
+    : [];
+
   // ID로 label 찾기 헬퍼 함수
   const findLabel = (options: { value: string; label: string }[], value?: string) => {
     if (!value) return undefined;
@@ -181,61 +184,52 @@ export default function CreateCampaignContent() {
     setIsConfirmDialogOpen(true);
   };
 
-  const handleConfirmSubmit = async () => {
-    try {
-      setIsSubmitting(true);
+  const handleConfirmSubmit = () => {
+    const formData = formValues;
+    const userId = tokenStorage.getUserId();
 
-      const formData = formValues;
-      const userId = tokenStorage.getUserId();
+    if (!userId) {
+      toast.error("로그인이 필요합니다.");
+      return;
+    }
 
-      if (!userId) {
-        toast.error("로그인이 필요합니다.");
-        return;
-      }
+    const brandIdParam = searchParams.get("brandId");
+    const campaignIdParam = searchParams.get("campaignId");
 
-      const brandIdParam = searchParams.get("brandId");
-      const campaignIdParam = searchParams.get("campaignId");
+    const brandId = brandIdParam
+      ? Number(brandIdParam)
+      : proposalData?.brandId || 1;
 
-      const brandId = brandIdParam
-        ? Number(brandIdParam)
-        : proposalData?.brandId || 1;
+    const campaignId = type === "existing"
+      ? (selectedCampaign?.campaignId || (campaignIdParam ? Number(campaignIdParam) : proposalData?.campaignId) || null)
+      : null;
 
-      const campaignId = type === "existing"
-        ? (selectedCampaign?.campaignId || (campaignIdParam ? Number(campaignIdParam) : proposalData?.campaignId) || null)
-        : null;
+    const requestData = {
+      brandId,
+      creatorId: Number(userId),
+      campaignId,
+      campaignName: formData.campaignName || "",
+      description: formData.description || "",
+      formats: formData.format ? [{ id: Number(formData.format) }] : [],
+      categories: formData.category ? [{ id: Number(formData.category) }] : [],
+      tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
+      involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
+      usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
+      rewardAmount: Number(formData.fee) || 0,
+      productId: Number(formData.sponsorProduct) || 0,
+      startDate: formData.startDate || "",
+      endDate: formData.endDate || "",
+    };
 
-      // 디버깅: 폼 데이터 확인
-      console.log("Form Data:", formData);
+    // 낙관적 UI: 즉시 완료 모달로 전환
+    setIsConfirmDialogOpen(false);
+    setIsSuccessModalOpen(true);
 
-      // API 요청 데이터 구성
-      const requestData = {
-        brandId,
-        creatorId: Number(userId),
-        campaignId,
-        campaignName: formData.campaignName || "",
-        description: formData.description || "",
-        formats: formData.format ? [{ id: Number(formData.format) }] : [],
-        categories: formData.category ? [{ id: Number(formData.category) }] : [],
-        tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
-        involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
-        usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
-        rewardAmount: Number(formData.fee) || 0,
-        productId: Number(formData.sponsorProduct) || 0,
-        startDate: formData.startDate || "",
-        endDate: formData.endDate || "",
-      };
-
-      await createCampaignProposal(requestData);
-
-      toast.success("캠페인 제안이 완료되었습니다!");
-      navigate("/matching/suggest");
-    } catch (error) {
+    // 백그라운드에서 API 호출
+    createCampaignProposal(requestData).catch((error) => {
       console.error("캠페인 제안 실패:", error);
       toast.error("캠페인 제안에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSubmitting(false);
-      setIsConfirmDialogOpen(false);
-    }
+    });
   };
 
   // 선택된 캠페인 이름 가져오기
@@ -401,14 +395,14 @@ export default function CreateCampaignContent() {
             </div>
           </div>
         </div>
-      </form>
 
-      {/* 하단 버튼 */}
-      <div className="sticky bottom-0 left-0 right-0 p-5 bg-white">
-        <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit, () => toast.error("모두 입력해주세요"))} className="shadow-none">
-          캠페인 제안하기
-        </Button>
-      </div>
+        {/* 하단 버튼 */}
+        <div className="p-5">
+          <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit, () => toast.error("모두 입력해주세요"))} className="shadow-none">
+            캠페인 제안하기
+          </Button>
+        </div>
+      </form>
 
       {/* 바텀시트 */}
       {/* 형식 선택 바텀시트 */}
@@ -493,38 +487,20 @@ export default function CreateCampaignContent() {
         onSelect={(date) => setValue("endDate", date)}
       />
 
-      {/* 제안 확인 다이얼로그 */}
-      <FilterBottomSheet
+      {/* 제안 확인 모달 */}
+      <ProposalModal
         isOpen={isConfirmDialogOpen}
+        type="confirm"
         onClose={() => setIsConfirmDialogOpen(false)}
-        className="h-auto"
-      >
-        <div className="px-5 py-6 flex flex-col gap-6">
-          <h3 className="text-title1 text-text-black text-center">
-            제안하시겠습니까?
-          </h3>
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              size="lg"
-              fullWidth
-              onClick={() => setIsConfirmDialogOpen(false)}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              onClick={handleConfirmSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "제안 중..." : "제안하기"}
-            </Button>
-          </div>
-        </div>
-      </FilterBottomSheet>
+        onConfirm={handleConfirmSubmit}
+      />
+
+      {/* 완료 모달 */}
+      <ProposalModal
+        isOpen={isSuccessModalOpen}
+        type="success"
+        onClose={() => navigate("/business/calendar")}
+      />
     </div>
   );
 }

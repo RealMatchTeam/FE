@@ -13,7 +13,6 @@ import { tokenStorage } from "../../lib/token";
 export default function Home() {
   const location = useLocation();
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
-  const [forceRefresh, setForceRefresh] = useState(0);
   const me = useAuthStore((s) => s.me);
   const setMe = useAuthStore((s) => s.setMe);
   const hasTokens = tokenStorage.hasTokens();
@@ -61,10 +60,7 @@ export default function Home() {
   }, [hasTokens, me?.matchingTestDone, setMe]);
 
   useEffect(() => {
-    if (resolvedHasMatchingTest !== true) {
-      setHasMatch(null);
-      return;
-    }
+    if (resolvedHasMatchingTest !== true) return;
 
     const checkMatchStatus = async () => {
       try {
@@ -81,20 +77,15 @@ export default function Home() {
     };
 
     checkMatchStatus();
-  }, [resolvedHasMatchingTest, forceRefresh]);
+  }, [resolvedHasMatchingTest, location.state]);
 
-  // location state가 변경되면 리프레시
-  useEffect(() => {
-    if (location.state?.refresh) {
-      setForceRefresh(prev => prev + 1);
-    }
-  }, [location.state]);
+  const effectiveHasMatch = resolvedHasMatchingTest !== true ? null : hasMatch;
 
   if (resolvedHasMatchingTest === false) {
     return <PreHome />;
   }
 
-  if (resolvedHasMatchingTest === null || hasMatch === null) {
+  if (resolvedHasMatchingTest === null || effectiveHasMatch === null) {
     return (
       <div className="flex items-center justify-center w-full h-full min-h-[50vh]">
         <div className="flex flex-col items-center gap-2">
