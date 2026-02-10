@@ -28,6 +28,7 @@ export interface ProposalDetail {
     involvements: { id: number; name: string }[];
     usageRanges: { id: number; name: string }[];
   };
+  snsAccount?: string;
 }
 
 export const getProposalDetail = async (proposalId: string): Promise<ProposalDetail> => {

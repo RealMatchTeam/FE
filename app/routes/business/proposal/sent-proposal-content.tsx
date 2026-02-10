@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { getProposalDetail, type ProposalDetail} from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
+import { getProfileCard, type ProfileCard } from "./api/user";
 import { cancelCampaignProposal } from "./api/proposal";
 
 import Header from "../../../components/layout/Header";
@@ -21,6 +22,7 @@ export default function ProposalContent() {
 
     const [data, setData] = useState<ProposalDetail | null>(null);
     const [brand, setBrand] = useState<BrandSummary | null>(null);
+    const [profileCard, setProfileCard] = useState<ProfileCard | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const proposalId = searchParams.get("proposalId");
@@ -42,6 +44,10 @@ export default function ProposalContent() {
                     const brandResult = await getBrandSummary(proposalResult.brandId);
                     setBrand(brandResult);
                 }
+
+                const profileResult = await getProfileCard(); 
+                setProfileCard(profileResult);
+
 
             } catch (error) {
                 console.error("제안 상세 조회 실패:", error);
@@ -111,7 +117,7 @@ export default function ProposalContent() {
                                         <img src={profileIcon} alt="profile" />
                                     </div>
                                     <span className="text-callout1 text-text-black">
-                                        @{data.creatorId || "unknown"}
+                                        @{profileCard?.snsAccount || "unknown"}
                                     </span>
                                 </div>
                                 <img src={arrowPurpleIcon} alt="arrow" />
