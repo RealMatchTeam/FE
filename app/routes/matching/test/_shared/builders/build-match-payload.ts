@@ -34,7 +34,7 @@ export function buildMatchPayload(): MatchesRequest {
   const step3Chips = s.step3Chips;
 
   const interestStyleTags = requireNonEmpty(
-    step1.style,
+    step1.category,
     "beauty.interestStyleTags",
   );
   const prefferedFunctionTags = requireNonEmpty(

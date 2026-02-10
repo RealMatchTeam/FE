@@ -118,3 +118,18 @@ export type BrandCampaignsApiResponse = {
     hasNext: boolean;
   };
 };
+
+export type SponsorProductDto = {
+  id: number;
+  name: string;
+  thumbnailImageUrl: string;
+  totalCount: number;
+  currentCount: number;
+};
+
+export type SponsorProductsApiResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: SponsorProductDto[];
+};

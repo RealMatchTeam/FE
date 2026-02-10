@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getMyCollaborations } from "./api/calendar";
 import type { CampaignCollaboration } from "./api/calendar";
 import FilterBottomSheet from "../components/FilterBottomSheet";
@@ -14,6 +14,7 @@ import EmptyState from "../components/EmptyState";
 
 export default function CalendarContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mainTab, setMainTab] = useState<"collaboration" | "matching">("collaboration");
   const [activeTab, setActiveTab] = useState<"thisMonth" | "today">("thisMonth");
   const [matchingSubTab, setMatchingSubTab] = useState<"sent" | "received" | "applied">("sent");
@@ -26,22 +27,47 @@ export default function CalendarContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
+    const fetchAllCampaigns = async () => {
       try {
         setIsLoading(true);
-        const data = await getMyCollaborations({
-          type: matchingSubTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
-          keyword: keyword.trim() || undefined, 
-        });
-        setCampaigns(data || []);
+
+        const [applied, sent, received] = await Promise.all([
+          getMyCollaborations({ type: "APPLIED", keyword: keyword.trim() || undefined }),
+          getMyCollaborations({ type: "SENT", keyword: keyword.trim() || undefined }),
+          getMyCollaborations({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
+        ]);
+
+        setCampaigns([...applied, ...sent, ...received]);
       } catch (error) {
         console.error("로드 실패:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCampaigns();
-  }, [matchingSubTab, keyword]);
+
+    fetchAllCampaigns();
+  }, [keyword, location.key]);
+
+  const filteredList = useMemo(() => {
+    const today = new Date();
+
+    const todayStr = today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
+    const currentMonthStr = todayStr.substring(0, 7);
+
+    return campaigns.filter((item) => {
+      if (item.status !== "MATCHED") return false;
+
+      if (activeTab === "today") {
+        return item.startDate <= todayStr && item.endDate >= todayStr;
+      } else {
+        const startMonth = item.startDate.substring(0, 7);
+        const endMonth = item.endDate.substring(0, 7);
+        return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
+      }
+    });
+  }, [campaigns, activeTab]);
 
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {
@@ -57,57 +83,53 @@ export default function CalendarContent() {
     }
   };
 
-  const matchingList = campaigns.filter((item) => {
-    const isCorrectSubTab =
-      matchingSubTab === "sent" ? item.type === "SENT" :
-        matchingSubTab === "received" ? item.type === "RECEIVED" :
-          item.type === "APPLIED";
+  const matchingList = useMemo(() => {
+    return campaigns.filter((item) => {
+      const isCorrectSubTab =
+        matchingSubTab === "sent" ? item.type === "SENT" :
+          matchingSubTab === "received" ? item.type === "RECEIVED" :
+            item.type === "APPLIED";
 
-    if (!isCorrectSubTab) return false;
+      if (!isCorrectSubTab) return false;
 
-    if (activeFilter === "전체") return true;
-    return getStatusLabel(item.status) === activeFilter;
-  });
+      if (activeFilter === "전체") return true;
+
+      const statusMatches = getStatusLabel(item.status) === activeFilter;
+
+      const keywordMatches = keyword ? item.brandName.includes(keyword) : true;
+
+      return statusMatches && keywordMatches;
+
+
+
+    });
+  }, [campaigns, matchingSubTab, activeFilter, keyword]);
 
   console.log("전체 데이터:", campaigns);
   console.log("필터된 데이터:", matchingList);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const currentMonthStr = todayStr.substring(0, 7);
-
   const calendarEvents = campaigns.filter(item => item.status === "MATCHED");
-
-  const filteredList = campaigns.filter((item) => {
-    if (item.status !== "MATCHED") return false;
-
-    if (activeTab === "today") {
-      return item.startDate <= todayStr && item.endDate >= todayStr;
-    } else {
-      const startMonth = item.startDate.substring(0, 7);
-      const endMonth = item.endDate.substring(0, 7);
-      return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
-    }
-  });
 
   const handleCardClick = (item: CampaignCollaboration) => {
     const proposalId = item.proposalId || item.campaignId;
+    const navigationState = { state: { brandId: item.brandId } };
 
     if (item.status === "REJECTED") {
-      navigate(`/rejection?proposalId=${proposalId}`);
+      navigate(`/business/rejection?proposalId=${proposalId}`, navigationState);
       return;
     }
 
     if (item.type === "APPLIED") {
-      navigate(`/business/proposal?type=applied&applicationId=${proposalId}`);
+      navigate(`/business/proposal?type=applied&applicationId=${proposalId}`, navigationState);
       return;
     }
 
     if (item.type === "RECEIVED") {
-      navigate(`/business/proposal?type=received&proposalId=${proposalId}`);
+      navigate(`/business/proposal?type=received&proposalId=${proposalId}`, navigationState);
       return;
     }
 
-    navigate(`/business/proposal?type=sent&proposalId=${proposalId}`);
+    navigate(`/business/proposal?type=sent&proposalId=${proposalId}`, navigationState);
   };
 
   return (
@@ -172,9 +194,8 @@ export default function CalendarContent() {
                 ) : filteredList.length > 0 ? (
                   filteredList.map((cp) => (
                     <CampaignCard
-                      key={cp.campaignId || cp.proposalId}
+                      key={`${cp.campaignId}-${cp.proposalId}-${cp.status}`}
                       campaignId={cp.campaignId}
-                      proposalId={cp.proposalId ?? undefined}
                       type={cp.type}
                       brand={cp.brandName}
                       title={cp.title}
@@ -220,11 +241,17 @@ export default function CalendarContent() {
                 ) : matchingList.length > 0 ? (
                   matchingList.map((item) => (
                     <MatchingCard
-                      key={item.campaignId || item.proposalId}
+                      key={item.proposalId || `campaign-${item.campaignId}`}
                       brand={item.brandName}
                       status={getStatusLabel(item.status)}
                       date={item.startDate.split('-').slice(1).join('.') + "." + item.startDate.split('-')[0].slice(2)}
-                      actionLabel={item.status === "REJECTED" ? "거절 사유 보기" : "제안 보기"}
+                      actionLabel={
+                        item.status === "REJECTED"
+                          ? "거절 사유 보기"
+                          : item.type === "APPLIED"
+                            ? "지원 보기"
+                            : "제안 보기"
+                      }
                       logo={item.thumbnailUrl}
                       onClick={() => handleCardClick(item)}
                     />

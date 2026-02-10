@@ -71,13 +71,14 @@ export default function BottomTab() {
             <Link
               key={tab.path}
               to={tab.path}
-              className="flex flex-col items-center justify-center gap-1 transition-colors min-w-[50px]"
+              className={`flex flex-col items-center justify-center gap-1 transition-colors min-w-[50px] ${tab.path === "/business/calendar" ? "ml-2" : ""
+                }`}
             >
               <div>
                 <img
                   src={isActive ? tab.iconSelected : tab.icon}
                   alt={tab.label}
-                  className="w-6 h-6"
+                  className="w-4 h-4"
                 />
               </div>
               <span

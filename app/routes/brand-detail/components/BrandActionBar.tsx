@@ -14,7 +14,7 @@ export default function BrandActionBar({
   onToggleHeart,
 }: Props) {
   return (
-    <div className="mt-4 flex items-center gap-2">
+    <div className="mt-2 flex items-center gap-2">
       <button
         type="button"
         onClick={onChat}
@@ -31,7 +31,7 @@ export default function BrandActionBar({
         제안하기
       </button>
 
-      <div className="grid h-9 w-9 place-items-center rounded-xl border border-bluegray-2 bg-bg-w">
+      <div className="grid h-9 w-9 place-items-center rounded-xl border border-bluegray-2 bg-bluegray-2">
         <HeartButton defaultPressed={isHearted} onChange={onToggleHeart} />
       </div>
     </div>

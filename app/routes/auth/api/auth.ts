@@ -3,6 +3,7 @@ import { tokenStorage } from "../../../lib/token";
 import type {
   SignupCompleteRequest,
   SignupCompleteResponse,
+  NicknameAvailableResponse,
 } from "../../../types/auth";
 
 /**
@@ -63,4 +64,21 @@ export const refreshToken = async (): Promise<SignupCompleteResponse> => {
  */
 export const logout = (): void => {
   tokenStorage.clearTokens();
+};
+
+/**
+ * 닉네임 중복 확인 API
+ * 회원가입 시 닉네임이 사용 가능한지 확인합니다.
+ */
+export const checkNicknameAvailable = async (
+  nickname: string
+): Promise<NicknameAvailableResponse> => {
+  const response = await apiClient.get<NicknameAvailableResponse>(
+    "/api/v1/users/nickname/available",
+    {
+      params: { nickname }
+    }
+  );
+
+  return response.data;
 };

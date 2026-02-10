@@ -3,10 +3,11 @@ import { useNavigate, useSearchParams, useLocation } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createCampaignProposal } from "../../api/matching";
+import { createCampaignProposal, getRecruitingCampaigns, type RecruitingCampaign } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
+import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 import Button from "../../../../components/common/Button";
-import FilterBottomSheet from "../../../../components/common/FilterBottomSheet";
+
 import {
   TextInput,
   TextArea,
@@ -15,20 +16,10 @@ import {
   FeeInput,
 } from "../../../../components/form";
 import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
-import { CheckIcon } from "../../../auth/components/CheckIcon";
-import ExistSuggestIcon from "../../../../assets/icon/exist-suggest.svg";
-import { existingCampaigns } from "../../../../data/existing-campaigns";
 import ProfileSelector from "../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
-import {
-  formatOptions,
-  categoryOptions,
-  toneOptions,
-  involvementOptions,
-  usageScopeOptions,
-  sponsorProductOptions,
-} from "./campaignOptions";
+import ProposalModal from "./components/ProposalModal";
 import {
   campaignFormSchema,
   defaultCampaignFormValues,
@@ -39,10 +30,11 @@ export default function CreateCampaignContent() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  const proposalData = useCampaignProposalStore((state) => state.proposalData);
+  const snsAccount = useCampaignProposalStore((state) => state.snsAccount);
 
-  // 바텀시트 상태 (기존 캠페인일 때만 열림)
-  const [isSheetOpen, setIsSheetOpen] = useState(type === "existing");
-  const [selectedCampaignIds, setSelectedCampaignIds] = useState<number[]>([1]);
+  // 바텀시트 상태
+  const [selectedCampaign, setSelectedCampaign] = useState<RecruitingCampaign | null>(null);
 
   // 각 필드별 바텀시트 상태
   const [isFormatSheetOpen, setIsFormatSheetOpen] = useState(false);
@@ -54,12 +46,12 @@ export default function CreateCampaignContent() {
   const [isStartDateSheetOpen, setIsStartDateSheetOpen] = useState(false);
   const [isEndDateSheetOpen, setIsEndDateSheetOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   // 바텀탭 숨기기 (바텀시트 열렸을 때)
-  const anySheetOpen = isSheetOpen || isFormatSheetOpen || isCategorySheetOpen ||
+  const anySheetOpen = isFormatSheetOpen || isCategorySheetOpen ||
     isToneSheetOpen || isInvolvementSheetOpen || isUsageScopeSheetOpen || isSponsorProductSheetOpen ||
-    isStartDateSheetOpen || isEndDateSheetOpen || isConfirmDialogOpen;
+    isStartDateSheetOpen || isEndDateSheetOpen || isConfirmDialogOpen || isSuccessModalOpen;
   useHideBottomTab(anySheetOpen);
 
   // react-hook-form + zod
@@ -75,101 +67,173 @@ export default function CreateCampaignContent() {
 
   const location = useLocation();
 
+  // URL에서 선택한 캠페인 정보를 가져와서 폼에 채우기
   useEffect(() => {
-    if (type === "existing" && location.state?.campaign) {
-      const campaign = location.state.campaign;
+    if (type !== "existing") return;
 
-      // 캠페인 데이터 매핑
+    const brandIdParam = searchParams.get("brandId");
+    const campaignIdParam = searchParams.get("campaignId");
+
+    if (!brandIdParam || !campaignIdParam) return;
+
+    const brandId = Number(brandIdParam);
+    const campaignId = Number(campaignIdParam);
+
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!Number.isFinite(campaignId) || campaignId <= 0) return;
+
+    let alive = true;
+
+    (async () => {
+      try {
+        const campaigns = await getRecruitingCampaigns(brandId);
+        if (!alive) return;
+
+        const selectedCampaign = campaigns.find((c) => c.campaignId === campaignId);
+        if (!selectedCampaign) return;
+
+        // 선택한 캠페인 정보를 폼에 반영
+        setValue("campaignName", selectedCampaign.title);
+        setValue("fee", selectedCampaign.rewardAmount.toString());
+
+        // dday를 사용해 종료 날짜 계산
+        const today = new Date();
+        const endDate = new Date(today);
+        endDate.setDate(today.getDate() + selectedCampaign.dday);
+
+        setValue("startDate", today.toISOString().split("T")[0]);
+        setValue("endDate", endDate.toISOString().split("T")[0]);
+
+        setSelectedCampaign(selectedCampaign);
+      } catch (error) {
+        console.error("모집중인 캠페인 조회 실패:", error);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [type, searchParams, setValue]);
+
+  useEffect(() => {
+    if (type === "existing" && proposalData) {
+      setValue("campaignName", proposalData.campaignTitle || "");
+      setValue("description", proposalData.campaignDescription || "");
+
+      // 태그 매핑 (ID를 문자열로 변환하여 사용)
+      if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
+        setValue("format", String(proposalData.contentTags.formats[0].id));
+      }
+      if (proposalData.contentTags?.categories && proposalData.contentTags.categories.length > 0) {
+        setValue("category", String(proposalData.contentTags.categories[0].id));
+      }
+      if (proposalData.contentTags?.tones && proposalData.contentTags.tones.length > 0) {
+        setValue("tone", String(proposalData.contentTags.tones[0].id));
+      }
+      if (proposalData.contentTags?.involvements && proposalData.contentTags.involvements.length > 0) {
+        setValue("involvement", String(proposalData.contentTags.involvements[0].id));
+      }
+      if (proposalData.contentTags?.usageRanges && proposalData.contentTags.usageRanges.length > 0) {
+        setValue("usageScope", String(proposalData.contentTags.usageRanges[0].id));
+      }
+
+      setValue("fee", proposalData.rewardAmount?.toString() || "");
+      setValue("sponsorProduct", proposalData.product || "");
+      setValue("startDate", proposalData.startDate || "");
+      setValue("endDate", proposalData.endDate || "");
+    } else if (type === "existing" && location.state?.campaign) {
+      const campaign = location.state.campaign;
       setValue("campaignName", campaign.title || "");
       setValue("description", campaign.description || "");
 
-      // 태그 매핑 (단일 선택으로 가정하거나 첫 번째 항목 사용)
-      if (campaign.contentTags?.formats?.length > 0) setValue("format", campaign.contentTags.formats[0].name); // name 또는 id 매핑 필요 (현재는 name으로 가정)
+      if (campaign.contentTags?.formats?.length > 0) setValue("format", campaign.contentTags.formats[0].name);
       if (campaign.contentTags?.categories?.length > 0) setValue("category", campaign.contentTags.categories[0].name);
       if (campaign.contentTags?.tones?.length > 0) setValue("tone", campaign.contentTags.tones[0].name);
       if (campaign.contentTags?.involvements?.length > 0) setValue("involvement", campaign.contentTags.involvements[0].name);
       if (campaign.contentTags?.usageRanges?.length > 0) setValue("usageScope", campaign.contentTags.usageRanges[0].name);
 
       setValue("fee", campaign.rewardAmount?.toString() || "");
-      setValue("sponsorProduct", campaign.productId?.toString() || ""); // productId로 매핑
+      setValue("sponsorProduct", campaign.productId?.toString() || "");
       setValue("startDate", campaign.startDate || "");
       setValue("endDate", campaign.endDate || "");
     }
-  }, [type, location.state, setValue]);
+  }, [type, proposalData, location.state, setValue]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
-  const handleToggleCampaign = (id: number) => {
-    setSelectedCampaignIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+  // 상세 페이지 API에서 받아온 데이터로 옵션 생성
+  const tags = proposalData?.contentTags;
+  const formatOptions = (tags?.formats ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const categoryOptions = (tags?.categories ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const toneOptions = (tags?.tones ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const involvementOptions = (tags?.involvements ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const usageScopeOptions = (tags?.usageRanges ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+  const sponsorProductOptions = proposalData?.product
+    ? [{ value: proposalData.product, label: proposalData.product }]
+    : [];
+
+  // ID로 label 찾기 헬퍼 함수
+  const findLabel = (options: { value: string; label: string }[], value?: string) => {
+    if (!value) return undefined;
+    return options.find((opt) => opt.value === value)?.label;
   };
 
-  const handleSheetSubmit = () => {
-    console.log("선택된 캠페인:", selectedCampaignIds);
-    setIsSheetOpen(false);
-  };
-
-  const handleSheetClose = () => {
-    setIsSheetOpen(false);
-    navigate("/matching/suggest");
-  };
 
   const onSubmit = () => {
     // 폼 검증 후 확인 다이얼로그 표시
     setIsConfirmDialogOpen(true);
   };
 
-  const handleConfirmSubmit = async () => {
-    try {
-      setIsSubmitting(true);
+  const handleConfirmSubmit = () => {
+    const formData = formValues;
+    const userId = tokenStorage.getUserId();
 
-      const formData = formValues;
-      const userId = tokenStorage.getUserId();
+    if (!userId) {
+      toast.error("로그인이 필요합니다.");
+      return;
+    }
 
-      if (!userId) {
-        toast.error("로그인이 필요합니다.");
-        return;
-      }
+    const brandIdParam = searchParams.get("brandId");
+    const campaignIdParam = searchParams.get("campaignId");
 
-      // TODO: brandId는 어디서 가져올지 확인 필요
-      const brandId = 1; // 임시값
+    const brandId = brandIdParam
+      ? Number(brandIdParam)
+      : proposalData?.brandId || 1;
 
-      // API 요청 데이터 구성
-      const requestData = {
-        brandId,
-        creatorId: Number(userId),
-        campaignId: type === "existing" ? selectedCampaignIds[0] : null,
-        campaignName: formData.campaignName || "",
-        description: formData.description || "",
-        formats: formData.format ? [{ id: formData.format }] : [],
-        categories: formData.category ? [{ id: formData.category }] : [],
-        tones: formData.tone ? [{ id: formData.tone }] : [],
-        involvements: formData.involvement ? [{ id: formData.involvement }] : [],
-        usageRanges: formData.usageScope ? [{ id: formData.usageScope }] : [],
-        rewardAmount: Number(formData.fee) || 0,
-        productId: Number(formData.sponsorProduct) || 0,
-        startDate: formData.startDate || "",
-        endDate: formData.endDate || "",
-      };
+    const campaignId = type === "existing"
+      ? (selectedCampaign?.campaignId || (campaignIdParam ? Number(campaignIdParam) : proposalData?.campaignId) || null)
+      : null;
 
-      await createCampaignProposal(requestData);
+    const requestData = {
+      brandId,
+      creatorId: Number(userId),
+      campaignId,
+      campaignName: formData.campaignName || "",
+      description: formData.description || "",
+      formats: formData.format ? [{ id: Number(formData.format) }] : [],
+      categories: formData.category ? [{ id: Number(formData.category) }] : [],
+      tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
+      involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
+      usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
+      rewardAmount: Number(formData.fee) || 0,
+      productId: Number(formData.sponsorProduct) || 0,
+      startDate: formData.startDate || "",
+      endDate: formData.endDate || "",
+    };
 
-      toast.success("캠페인 제안이 완료되었습니다!");
-      navigate("/matching/suggest");
-    } catch (error) {
+    // 낙관적 UI: 즉시 완료 모달로 전환
+    setIsConfirmDialogOpen(false);
+    setIsSuccessModalOpen(true);
+
+    // 백그라운드에서 API 호출
+    createCampaignProposal(requestData).catch((error) => {
       console.error("캠페인 제안 실패:", error);
       toast.error("캠페인 제안에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSubmitting(false);
-      setIsConfirmDialogOpen(false);
-    }
+    });
   };
 
   // 선택된 캠페인 이름 가져오기
-  const selectedCampaignName = existingCampaigns.find(
-    (c) => selectedCampaignIds.includes(c.id)
-  )?.name;
+  const selectedCampaignName = selectedCampaign?.title;
 
   const title =
     type === "existing" && selectedCampaignName
@@ -196,7 +260,7 @@ export default function CreateCampaignContent() {
           <label className="text-title3 text-text-gray1 mb-1 block">
             제안 프로필<span className="text-error">*</span>
           </label>
-          <ProfileSelector />
+          <ProfileSelector username={snsAccount ? `@${snsAccount}` : undefined} />
         </div>
 
         {/* 폼 필드 컨테이너 */}
@@ -243,7 +307,7 @@ export default function CreateCampaignContent() {
             <p className="text-callout1 text-text-gray2 mt-4 mb-2">형식</p>
             <SelectField
               placeholder="형식 선택"
-              value={formValues.format}
+              value={findLabel(formatOptions, formValues.format)}
               onClick={() => setIsFormatSheetOpen(true)}
             />
 
@@ -253,7 +317,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2">종류</p>
                 <SelectField
                   placeholder="종류 선택"
-                  value={formValues.category}
+                  value={findLabel(categoryOptions, formValues.category)}
                   onClick={() => setIsCategorySheetOpen(true)}
                 />
               </div>
@@ -261,7 +325,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2">톤</p>
                 <SelectField
                   placeholder="톤 선택"
-                  value={formValues.tone}
+                  value={findLabel(toneOptions, formValues.tone)}
                   onClick={() => setIsToneSheetOpen(true)}
                 />
               </div>
@@ -273,7 +337,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2">관여도</p>
                 <SelectField
                   placeholder="관여도 선택"
-                  value={formValues.involvement}
+                  value={findLabel(involvementOptions, formValues.involvement)}
                   onClick={() => setIsInvolvementSheetOpen(true)}
                 />
               </div>
@@ -281,7 +345,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2">활용 범위</p>
                 <SelectField
                   placeholder="활용 범위 선택"
-                  value={formValues.usageScope}
+                  value={findLabel(usageScopeOptions, formValues.usageScope)}
                   onClick={() => setIsUsageScopeSheetOpen(true)}
                 />
               </div>
@@ -296,7 +360,7 @@ export default function CreateCampaignContent() {
               </label>
               <SelectField
                 placeholder="협찬품 선택"
-                value={formValues.sponsorProduct}
+                value={findLabel(sponsorProductOptions, formValues.sponsorProduct)}
                 onClick={() => setIsSponsorProductSheetOpen(true)}
               />
             </div>
@@ -331,63 +395,16 @@ export default function CreateCampaignContent() {
             </div>
           </div>
         </div>
+
+        {/* 하단 버튼 */}
+        <div className="p-5">
+          <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit, () => toast.error("모두 입력해주세요"))} className="shadow-none">
+            캠페인 제안하기
+          </Button>
+        </div>
       </form>
 
-      {/* 하단 버튼 */}
-      <div className="sticky bottom-0 left-0 right-0 p-5 bg-white">
-        <Button variant="primary" size="lg" fullWidth withLogo onClick={handleSubmit(onSubmit, () => toast.error("모두 입력해주세요"))} className="shadow-none">
-          캠페인 제안하기
-        </Button>
-      </div>
-
       {/* 바텀시트 */}
-      {/* 기존 캠페인 선택 바텀시트 */}
-      {type === "existing" && (
-        <FilterBottomSheet
-          isOpen={isSheetOpen}
-          onClose={handleSheetClose}
-          className="h-[50%]"
-        >
-          {/* 헤더 */}
-          <div className="px-5 pt-6 pb-4">
-            <div className="flex items-center gap-2">
-              <img src={ExistSuggestIcon} alt="" className="w-6 h-6" />
-              <h3 className="text-title2 text-text-black">기존 캠페인 제안</h3>
-            </div>
-          </div>
-          <div className="w-[90%] mx-auto border-b border-core-2" />
-
-          {/* 캠페인 목록 */}
-          <div className="px-5 pt-2.5 pb-20 flex flex-col gap-2.5">
-            {existingCampaigns.map((campaign) => (
-              <label
-                key={campaign.id}
-                className="flex items-center gap-2.5 cursor-pointer"
-              >
-                <div onClick={() => handleToggleCampaign(campaign.id)}>
-                  <CheckIcon checked={selectedCampaignIds.includes(campaign.id)} />
-                </div>
-                <span className="text-title3 text-text-gray1">
-                  {campaign.name}
-                </span>
-              </label>
-            ))}
-          </div>
-
-          {/* 선택 완료 버튼 */}
-          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-white">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleSheetSubmit}
-              className="text-title7 w-[327px] h-[44px] flex items-center justify-center gap-[10px]"
-            >
-              선택 완료
-            </Button>
-          </div>
-        </FilterBottomSheet>
-      )}
-
       {/* 형식 선택 바텀시트 */}
       <SelectBottomSheet
         isOpen={isFormatSheetOpen}
@@ -470,38 +487,20 @@ export default function CreateCampaignContent() {
         onSelect={(date) => setValue("endDate", date)}
       />
 
-      {/* 제안 확인 다이얼로그 */}
-      <FilterBottomSheet
+      {/* 제안 확인 모달 */}
+      <ProposalModal
         isOpen={isConfirmDialogOpen}
+        type="confirm"
         onClose={() => setIsConfirmDialogOpen(false)}
-        className="h-auto"
-      >
-        <div className="px-5 py-6 flex flex-col gap-6">
-          <h3 className="text-title1 text-text-black text-center">
-            제안하시겠습니까?
-          </h3>
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              size="lg"
-              fullWidth
-              onClick={() => setIsConfirmDialogOpen(false)}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              onClick={handleConfirmSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "제안 중..." : "제안하기"}
-            </Button>
-          </div>
-        </div>
-      </FilterBottomSheet>
+        onConfirm={handleConfirmSubmit}
+      />
+
+      {/* 완료 모달 */}
+      <ProposalModal
+        isOpen={isSuccessModalOpen}
+        type="success"
+        onClose={() => navigate("/business/calendar")}
+      />
     </div>
   );
 }

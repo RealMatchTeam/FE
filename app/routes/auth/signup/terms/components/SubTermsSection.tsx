@@ -16,7 +16,7 @@ export function SubTermsSection({
   onDetailClick,
 }: SubTermsSectionProps) {
   return (
-    <div className="space-y-3">
+    <div className="gap-1">
       <SubTermsItem
         checked={privacyUsage}
         onChange={onPrivacyUsageChange}

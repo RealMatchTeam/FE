@@ -91,7 +91,7 @@ export default function MatchingTestStep2Page() {
     const chipsOk = computedSections.every((s) => selected[s.key].length >= 1);
 
     const bodyOk =
-      fashionBody.heightTag !== null && fashionBody.bottomSizeTag !== null;
+      fashionBody.heightTag !== null && fashionBody.weightTypeTag !== null && fashionBody.bottomSizeTag !== null;
 
     return chipsOk && bodyOk;
   }, [computedSections, selected, fashionBody]);

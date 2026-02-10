@@ -12,10 +12,10 @@ import CategoryTabs from "./components/CategoryTabs";
 import SectionHeader from "./components/SectionHeader";
 import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
-import MatchAnalysisSection from "./components/MatchAnalysisSection";
 import CreatorProfileCard from "./components/CreatorProfileCard";
 
 import { useMatchResultStore } from "../../stores/matching-result";
+import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import {
   getMatchingBrands,
@@ -89,6 +89,7 @@ export default function HomeAfterMatchPage() {
   const campaignLikeInFlight = useRef<Set<number>>(new Set());
 
   const matchResult = useMatchResultStore((s) => s.result);
+  const setSnsAccount = useCampaignProposalStore((s) => s.setSnsAccount);
 
   useEffect(() => {
     let alive = true;
@@ -121,7 +122,13 @@ export default function HomeAfterMatchPage() {
         profileRes.status === "fulfilled" &&
         profileRes.value.data?.isSuccess
       ) {
-        setProfileCard(profileRes.value.data.result);
+        const profileData = profileRes.value.data.result;
+        setProfileCard(profileData);
+
+        // snsAccount를 zustand에 저장
+        if (profileData.snsAccount) {
+          setSnsAccount(profileData.snsAccount);
+        }
       } else {
         setProfileCard(null);
       }
@@ -154,7 +161,7 @@ export default function HomeAfterMatchPage() {
     return () => {
       alive = false;
     };
-  }, [category]);
+  }, [category, setSnsAccount]);
 
   const profile = useMemo<CreatorProfileModel | null>(() => {
     if (!profileCard || !feature) return null;
@@ -354,9 +361,6 @@ export default function HomeAfterMatchPage() {
             ))}
           </div>
         </section>
-
-        <MatchAnalysisSection />
-
         <section className="mt-7">
           <SectionHeader
             title="매칭률 높은 캠페인"
@@ -397,7 +401,7 @@ export default function HomeAfterMatchPage() {
         </section>
 
         {profileModel && (
-          <div className="mt-8 px-1">
+          <div className="mt-8">
             <CreatorProfileCard
               model={profileModel}
               onMyProfileClick={() => navigate("/mypage")}
@@ -405,7 +409,7 @@ export default function HomeAfterMatchPage() {
           </div>
         )}
 
-        <section className="mt-8 pb-24">
+        <section className="mt-8 pb-5">
           <SectionHeader
             title="인기 캠페인"
             subtitle="이런 캠페인이 인기가 많아요!"

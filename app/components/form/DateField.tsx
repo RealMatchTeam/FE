@@ -31,6 +31,7 @@ export default function DateField({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       className="flex items-center flex-1 h-[34px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80"
     >

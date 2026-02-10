@@ -69,25 +69,24 @@ export const getBrandDetail = async (brandId: number | string): Promise<BrandDet
 export interface AppliedCampaignDetail {
   campaignId: number;
   campaignApplyId: number;
+  brandId: number;     
+  brandName: string;
   campaignTitle: string;
   campaignReason: string;
   status: "REVIEWING" | "MATCHED" | "REJECTED" | "CANCELED";
-  brandName?: string; 
   creatorId?: string;
 }
-
 
 export const getAppliedCampaignDetail = async (campaignId: string): Promise<AppliedCampaignDetail> => {
   try {
     const response = await axiosInstance.get<AppliedCampaignDetail>(
       `/v1/campaigns/${campaignId}/apply/me`
     );
-
-    if (response.data) {
+    if (response.data && response.data.campaignId !== undefined) {
       return response.data;
     }
 
-    throw new Error("데이터를 가져오지 못했습니다.");
+    throw new Error("데이터를 가져오는 데 실패했습니다.");
   } catch (error: unknown) {
     console.error("지원 상세 조회 실패:", error);
 
@@ -96,7 +95,9 @@ export const getAppliedCampaignDetail = async (campaignId: string): Promise<Appl
       throw new Error(errorMessage);
     }
     
-    throw new Error("알 수 없는 에러가 발생했습니다.");;
+    if (error instanceof Error) throw error;
+    
+    throw new Error("알 수 없는 에러가 발생했습니다.");
   }
 };
 

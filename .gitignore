@@ -39,3 +39,9 @@ build
 # Claude
 .claude.md
 CLAUDE.md
+
+# Testing
+playwright-report
+test-results
+coverage
+blob-report

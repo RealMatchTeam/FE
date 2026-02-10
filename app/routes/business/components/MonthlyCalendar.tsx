@@ -4,6 +4,8 @@ import { parseISO, startOfDay } from "date-fns";
 import ArrowLeftIcon from "../../../assets/icon/arrow-left.svg";
 import ArrowRightIcon from "../../../assets/icon/arrow-right.svg";
 
+import { isMatched, isDateInCampaignRange, isEventInCurrentMonth } from "../../../utils/calendar";
+
 interface MonthlyCalendarProps {
   events: CampaignCollaboration[];
 }
@@ -11,12 +13,14 @@ interface MonthlyCalendarProps {
 const WEEK_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 10));
 
-  // MATCHED 상태인 이벤트만 필터링
   const matchedEvents = useMemo(() =>
-    events.filter(event => event.status === "MATCHED"),
-    [events]
+    events.filter(event =>
+      isMatched(event.status) &&
+      isEventInCurrentMonth(event.startDate, event.endDate, currentDate)
+    ),
+    [events, currentDate]
   );
 
   const { year, month, weeks } = useMemo(() => {
@@ -46,39 +50,45 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
   const handlePrevMonth = () => setCurrentDate(new Date(year, month - 2, 1));
   const handleNextMonth = () => setCurrentDate(new Date(year, month, 1));
 
-  // 날짜 문자열 비교를 위한 헬퍼 함수
   const getTimestamp = (dateStr: string) => startOfDay(parseISO(dateStr)).getTime();
 
-  // 특정 날짜의 총 이벤트 개수를 구하는 함수 (+N 표시용)
   const getEventsForDate = (day: number) => {
-    const targetDate = startOfDay(new Date(year, month - 1, day));
-    return matchedEvents.filter(event => {
-      const start = startOfDay(parseISO(event.startDate));
-      const end = startOfDay(parseISO(event.endDate));
-      return targetDate >= start && targetDate <= end;
-    });
+    const targetDate = new Date(year, month - 1, day);
+    return matchedEvents.filter(event =>
+      isDateInCampaignRange(event.startDate, event.endDate, targetDate)
+    );
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4 bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className="flex flex-col gap-6 p-4 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
       {/* 상단 컨트롤 */}
       <div className="flex items-center justify-center gap-1">
-        <button onClick={handlePrevMonth} className="p-1"><img src={ArrowLeftIcon} alt="이전달" /></button>
-        <span className="mx-2 text-[17px] font-bold">{year}년 {String(month).padStart(2, "0")}월</span>
-        <button onClick={handleNextMonth} className="p-1"><img src={ArrowRightIcon} alt="다음달" /></button>
+        <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-50 rounded-full transition-colors">
+          <img src={ArrowLeftIcon} alt="이전달" />
+        </button>
+        <span className="mx-2 text-[17px] font-bold text-text-black">{year}년 {String(month).padStart(2, "0")}월</span>
+        <button onClick={handleNextMonth} className="p-1 hover:bg-gray-50 rounded-full transition-colors">
+          <img src={ArrowRightIcon} alt="다음달" />
+        </button>
       </div>
 
       <div className="flex flex-col">
         {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 mb-2 text-center text-[13px] text-text-gray3 font-medium">
-          {WEEK_DAYS.map(day => <div key={day}>{day}</div>)}
+        <div className="grid grid-cols-7 mb-4 text-center text-[13px] font-bold">
+          {WEEK_DAYS.map((day, i) => (
+            <div key={day} className={i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : "text-text-gray3"}>
+              {day}
+            </div>
+          ))}
+          
         </div>
 
         {/* 주차별 렌더링 */}
         {weeks.map((week, weekIdx) => {
-          const validDays = week.filter(d => d !== null) as number[];
-          const weekStartTs = new Date(year, month - 1, validDays[0]).setHours(0, 0, 0, 0);
-          const weekEndTs = new Date(year, month - 1, validDays[validDays.length - 1]).setHours(23, 59, 59, 999);
+          const firstValidDay = week.find(d => d !== null)!;
+          const lastValidDay = [...week].reverse().find(d => d !== null)!;
+          const weekStartTs = new Date(year, month - 1, firstValidDay).setHours(0, 0, 0, 0);
+          const weekEndTs = new Date(year, month - 1, lastValidDay).setHours(23, 59, 59, 999);
 
           const eventsInWeek = matchedEvents.filter(event => {
             const s = getTimestamp(event.startDate);
@@ -87,72 +97,64 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
           });
 
           return (
-            <div key={weekIdx} className="grid grid-cols-7 relative border-t border-gray-50 min-h-[90px]">
-              {/* 1. 배경 날짜 및 +N 표시 */}
+            <div key={weekIdx} className="grid grid-cols-7 relative border-t border-gray-100 min-h-[100px]">
+              {/* 1. 날짜 숫자 및 배경 그리드 */}
               {week.map((day, dayIdx) => {
                 const isToday = day === new Date().getDate() && month === (new Date().getMonth() + 1) && year === new Date().getFullYear();
-
-                // 해당 날짜의 총 이벤트 개수 (+N 표시용)
                 const dayEvents = day ? getEventsForDate(day) : [];
-                const hasMore = dayEvents.length > 2;
+                const extraCount = dayEvents.length - 2;
 
                 return (
-                  <div key={dayIdx} className="pt-2 flex flex-col items-center relative h-full border-r border-gray-50 last:border-r-0">
+                  <div key={dayIdx} className="pt-2 pb-1 flex flex-col items-center relative h-full border-r border-gray-50 last:border-r-0">
                     {day && (
-                      <>
-                        <span className={`z-10 text-[14px] w-6 h-6 flex items-center justify-center rounded-full mb-1 ${isToday ? "bg-core-1 text-white font-bold" : "text-text-black"
-                          }`}>
-                          {day}
-                        </span>
-                        {/* 3개 이상일 때 +N 표시 */}
-                        {hasMore && (
-                          <span className="absolute bottom-1 text-[10px] text-core-1 font-bold">
-                            +{dayEvents.length - 2}
-                          </span>
-                        )}
-                      </>
+                      <span className={`z-10 text-[12px] font-bold w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-core-1 text-white" : "text-text-black"}`}>
+                        {day}
+                      </span>
+                    )}
+                    {/* +N 표시: 이벤트 바 아래쪽에 배치 */}
+                    {day && extraCount > 0 && (
+                      <span className="absolute bottom-1 text-[10px] text-core-1 font-extrabold z-30">
+                        +{extraCount}
+                      </span>
                     )}
                   </div>
                 );
               })}
 
-              {/* 2. 이벤트 바 레이어 */}
-              <div className="absolute top-10 w-full flex flex-col gap-1 px-0.5">
-                {eventsInWeek.slice(0, 2).map((event) => {
-                  const sTs = getTimestamp(event.startDate);
-                  const eTs = getTimestamp(event.endDate);
+              {/* 이벤트 바 레이어 - flex 제거 */}
+              <div className="absolute top-8 w-full grid grid-cols-7 gap-1">
+                {eventsInWeek.map((event) => {
+                  const sTs = new Date(event.startDate).setHours(0, 0, 0, 0);
+                  const eTs = new Date(event.endDate).setHours(0, 0, 0, 0);
 
-                  let startCol = 0;
-                  for (let i = 0; i < 7; i++) {
-                    if (week[i] !== null) {
-                      const currentTs = new Date(year, month - 1, week[i]!).setHours(0, 0, 0, 0);
-                      if (currentTs >= sTs) { startCol = i; break; }
-                    }
-                  }
+                  let startCol = -1;
+                  let endCol = -1;
 
-                  let endCol = 6;
-                  for (let i = 6; i >= 0; i--) {
-                    if (week[i] !== null) {
-                      const currentTs = new Date(year, month - 1, week[i]!).setHours(0, 0, 0, 0);
-                      if (currentTs <= eTs) { endCol = i; break; }
+                  week.forEach((day, i) => {
+                    if (day === null) return;
+                    const currentDayTs = new Date(year, month - 1, day).setHours(0, 0, 0, 0);
+
+                    if (currentDayTs >= sTs && currentDayTs <= eTs) {
+                      if (startCol === -1) startCol = i;
+                      endCol = i;
                     }
-                  }
+                  });
+
+                  if (startCol === -1 || endCol === -1) return null;
 
                   return (
                     <div
                       key={`${event.campaignId}-${weekIdx}`}
                       style={{
                         gridColumnStart: startCol + 1,
-                        gridColumnEnd: endCol + 2
+                        gridColumnEnd: endCol + 2 // 종료일 포함
                       }}
                       className={`
-                        h-[20px] text-[10px] text-white flex items-center justify-center px-2 font-bold z-20
-                        ${sTs >= weekStartTs ? "rounded-l-full ml-1" : ""} 
-                        ${eTs <= weekEndTs ? "rounded-r-full mr-1" : ""}
-                        bg-gradient-to-r from-[#747BFF] to-[#A2A7FF] shadow-sm
+                        h-[18px] text-[10px] text-white flex items-center px-2 font-bold z-20 overflow-hidden
+                        bg-gradient-to-r from-[#747BFF] to-[#A2A7FF]
                       `}
                     >
-                      <span className="truncate">{event.brandName}</span>
+                      <span className="truncate whitespace-nowrap">{event.brandName}</span>
                     </div>
                   );
                 })}

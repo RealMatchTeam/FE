@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import CloseIcon from "../../../../assets/matchingTest-go-back.svg?url";
 
 interface BottomSheetProps {
   title: string;
@@ -19,16 +20,17 @@ export default function BottomSheet({ title, children, onClose }: BottomSheetPro
 
       {/* sheet */}
       <div className="absolute bottom-0 left-1/2 w-full max-w-[430px] -translate-x-1/2 rounded-t-2xl bg-white shadow-xl">
-        {/* header: 좌 타이틀 / 우 닫기 */}
+        {/* header */}
         <div className="flex items-center justify-between px-5 pt-5">
-          <div className="text-[14px] font-semibold text-text-black">{title}</div>
+          <div className="text-title2 text-text-black">{title}</div>
 
           <button
             type="button"
             onClick={onClose}
-            className="text-[13px] font-medium text-text-gray3 active:opacity-90"
+            aria-label="닫기"
+            className="p-1 active:opacity-80"
           >
-            닫기
+            <img src={CloseIcon} alt="" className="h-3 w-3" />
           </button>
         </div>
 
