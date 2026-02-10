@@ -77,6 +77,9 @@ export default [
       route("terms", "routes/mypage/terms/route.tsx"),
     ]),
 
+route("products/sponsorable", "routes/brand-detail/sponsorable/route.tsx"),
+
+
     route("brand", "routes/brand-detail/route.tsx"),
     route("campaign", "routes/campaign-detail/route.tsx"),
   ]),

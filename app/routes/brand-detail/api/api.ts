@@ -58,7 +58,7 @@ type RecruitingCampaignsApiResponse = {
   result: { campaigns: RecruitingCampaignCardDto[] };
 };
 
-type SponsorProductListResponseDto = {
+export type SponsorProductListResponseDto = {
   id: number;
   name: string;
   thumbnailImageUrl: string;
@@ -111,10 +111,7 @@ function inferDomain(item: BrandDetailItemDto): BrandDomain {
   return item.fashionResponse ? "fashion" : "beauty";
 }
 
-function buildCategories(
-  domain: BrandDomain,
-  item: BrandDetailItemDto,
-): string[] {
+function buildCategories(domain: BrandDomain, item: BrandDetailItemDto): string[] {
   if (domain === "fashion") {
     const cats = unique(stripHash(item.fashionResponse?.categories));
     return cats.length ? cats : ["의류", "가방", "신발", "주얼리", "패션 소품"];
@@ -135,10 +132,8 @@ function buildTagSections(
     const brandStyle = unique(stripHash(f.brandStyle));
 
     const groups: TagGroup[] = [];
-    if (brandType.length)
-      groups.push({ label: "브랜드 종류", chips: brandType });
-    if (brandStyle.length)
-      groups.push({ label: "브랜드 스타일", chips: brandStyle });
+    if (brandType.length) groups.push({ label: "브랜드 종류", chips: brandType });
+    if (brandStyle.length) groups.push({ label: "브랜드 스타일", chips: brandStyle });
 
     return groups.length ? [{ title: "의류 태그", groups }] : [];
   }
@@ -156,25 +151,21 @@ function buildTagSections(
   if (cats.includes("스킨케어") || cats.includes("바디")) {
     const groups: TagGroup[] = [];
     if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
-    if (mainFunction.length)
-      groups.push({ label: "주요기능", chips: mainFunction });
+    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
     if (groups.length) sections.push({ title: "스킨케어 태그", groups });
   }
 
   if (cats.includes("메이크업")) {
     const groups: TagGroup[] = [];
-    if (makeUpStyle.length)
-      groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
     if (groups.length) sections.push({ title: "메이크업 태그", groups });
   }
 
   if (!sections.length) {
     const groups: TagGroup[] = [];
     if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
-    if (mainFunction.length)
-      groups.push({ label: "주요기능", chips: mainFunction });
-    if (makeUpStyle.length)
-      groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
+    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
     return groups.length ? [{ title: "태그", groups }] : [];
   }
 
@@ -187,6 +178,24 @@ async function safeGet<T>(p: Promise<T>): Promise<T | null> {
   } catch {
     return null;
   }
+}
+
+export async function fetchSponsorProductList(params: {
+  brandId: string;
+}): Promise<SponsorProductListResponseDto[]> {
+  const { brandId } = params;
+
+  const res = await apiClient.get<SponsorProductListApiResponse>(
+    `/api/v1/brands/${brandId}/sponsor-products`,
+  );
+
+  const data = res.data;
+
+  if (!data.isSuccess) {
+    throw new Error(data.message || "협찬 가능 제품 조회 실패");
+  }
+
+  return data.result ?? [];
 }
 
 export async function fetchBrandDetail(params: {
@@ -232,9 +241,7 @@ export async function fetchBrandDetail(params: {
     ),
   );
 
-  const productList = productsRes?.data?.isSuccess
-    ? productsRes.data.result
-    : [];
+  const productList = productsRes?.data?.isSuccess ? productsRes.data.result : [];
 
   const historyList = campaignsRes?.data?.isSuccess
     ? campaignsRes.data.result.campaigns

@@ -66,6 +66,8 @@ function ArrowRightIcon() {
   );
 }
 
+
+
 function DoubleArrowRightIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -104,6 +106,24 @@ export default function BrandDetailContent({ data }: Props) {
     if (!Number.isFinite(brandId) || brandId <= 0) return;
     navigate(`/rooms/brand/${brandId}`);
   };
+
+const handleGoSponsorableProducts = () => {
+  if (!Number.isFinite(brandId) || brandId <= 0) return;
+
+  navigate(`/products/sponsorable?brandId=${brandId}`, {
+    state: {
+      brandId,
+      brandName: data.name,
+      products: (data.products ?? []).map((p) => ({
+        id: Number(p.id),
+        title: p.title,
+        subtitle: (p as any).subtitle ?? "",
+        imageUrl: p.imageUrl,
+      })),
+    },
+  });
+};
+
 
   const handleToggleHeart = async () => {
     if (!Number.isFinite(brandId) || brandId <= 0) return;
@@ -242,9 +262,10 @@ export default function BrandDetailContent({ data }: Props) {
           <section className="py-5">
             <div className="flex items-center justify-between">
               <div className="text-title1 text-text-black">협찬 가능 제품</div>
-              <button type="button" className="text-[18px] text-text-gray3">
-                ›
-              </button>
+<button type="button" onClick={handleGoSponsorableProducts} className="text-[18px] text-text-gray3">
+  ›
+</button>
+
             </div>
 
             {!data.products || data.products.length === 0 ? (

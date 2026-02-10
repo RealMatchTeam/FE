@@ -102,6 +102,11 @@ export default function MatchingTestStep3Content({
     [contentTags?.avgVideoViews],
   );
 
+  const formatOptions = useMemo(
+    () => sortById(contentTags?.formats ?? EMPTY_TAGS),
+    [contentTags?.formats],
+  );
+
   const typeOptions = useMemo(
     () => sortById(contentTags?.categories ?? EMPTY_TAGS),
     [contentTags?.categories],
@@ -201,6 +206,19 @@ export default function MatchingTestStep3Content({
             />
           </div>
         </section>
+
+        <Section title="콘텐츠 형식">
+          <ChipRow>
+            {formatOptions.map((t) => (
+              <SelectChip
+                key={t.id}
+                label={t.name}
+                isSelected={step3Chips.contentFormat.includes(t.id)}
+                onToggle={() => onToggleChip("contentFormat", t.id)}
+              />
+            ))}
+          </ChipRow>
+        </Section>
 
         <Section title="콘텐츠 종류">
           <ChipRow>
