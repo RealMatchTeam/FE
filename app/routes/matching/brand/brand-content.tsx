@@ -91,9 +91,10 @@ export default function BrandContent() {
         });
 
         try {
-            const newLikeStatus = await toggleBrandLike(id);
-
-            // API 응답으로 상태 확정
+            await toggleBrandLike(id);
+        } catch (error) {
+            console.error("브랜드 좋아요 토글 실패:", error);
+            // 실패 시 롤백
             queryClient.setQueryData(queryKey, (oldData: { pages: { brands: MatchingBrand[] }[] } | undefined) => {
                 if (!oldData) return oldData;
                 return {
@@ -101,15 +102,11 @@ export default function BrandContent() {
                     pages: oldData.pages.map((page) => ({
                         ...page,
                         brands: page.brands.map((brand: MatchingBrand) =>
-                            brand.id === id ? { ...brand, isLiked: newLikeStatus } : brand
+                            brand.id === id ? { ...brand, isLiked: !brand.isLiked } : brand
                         )
                     }))
                 };
             });
-        } catch (error) {
-            console.error("Failed to toggle brand like:", error);
-            // 에러 발생 시 롤백
-            queryClient.invalidateQueries({ queryKey });
         }
     };
 

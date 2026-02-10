@@ -10,7 +10,7 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
-import { getMatchingCampaigns, getTagNamesByCategory, type MatchingCampaign } from "../api/matching";
+import { getMatchingCampaigns, getTagNamesByCategory, toggleCampaignLike, type MatchingCampaign } from "../api/matching";
 
 export default function CampaignContent() {
     const [searchParams] = useSearchParams();
@@ -104,6 +104,25 @@ export default function CampaignContent() {
                 }))
             };
         });
+
+        try {
+            await toggleCampaignLike(id);
+        } catch (error) {
+            console.error("캠페인 좋아요 토글 실패:", error);
+            // 실패 시 롤백
+            queryClient.setQueryData(queryKey, (oldData: { pages: { campaigns: MatchingCampaign[] }[] } | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page) => ({
+                        ...page,
+                        campaigns: page.campaigns.map((campaign) =>
+                            campaign.id === id ? { ...campaign, isLiked: !campaign.isLiked } : campaign
+                        )
+                    }))
+                };
+            });
+        }
     };
 
     const handleFilterApply = (sort: string, tags: string[]) => {
