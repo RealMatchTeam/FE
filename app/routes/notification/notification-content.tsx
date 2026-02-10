@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { fetchNotifications, readAllNotifications, type NotificationItem } from "./api/notification";
+import { fetchNotifications, readAllNotifications, readNotification, type NotificationItem } from "./api/notification";
 
 function TabButton({ label, active, onClick, count }: { label: string; active: boolean; onClick: () => void; count?: number }) {
     return (
         <button
             onClick={onClick}
             className={`px-4 py-2 rounded-lg text-[14px] font-bold transition-all flex items-center gap-1.5 ${active
-                    ? "bg-core-1 text-white"
-                    : "bg-white border border-text-gray5 text-text-gray3"
+                ? "bg-core-1 text-white"
+                : "bg-white border border-text-gray5 text-text-gray3"
                 }`}
         >
             {label}
@@ -60,6 +60,24 @@ export default function NotificationContent() {
         }
     };
 
+    const handleReadNotification = async (id: string, isRead: boolean) => {
+        if (isRead) return;
+
+        try {
+            const data = await readNotification(id);
+            if (data.isSuccess) {
+                // 해당 알림만 읽음 처리
+                setNotifications((prev) =>
+                    prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+                );
+                // 전체 미읽음 개수 감소
+                setUnreadCount((prev) => Math.max(0, prev - 1));
+            }
+        } catch (error) {
+            console.error("단건 읽기 처리 실패:", error);
+        }
+    };
+
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -70,24 +88,17 @@ export default function NotificationContent() {
         }).replace(/ /g, '').slice(0, -1);
     };
 
-    const handleReadNotification = (id: string) => {
-        setNotifications((prev) =>
-            prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-        );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-    };
-
     return (
         <div className="flex flex-col w-full h-screen bg-grad-auth">
             <div className="px-4 pt-6 pb-4 flex flex-col gap-4 border-b border-text-gray5 bg-white">
                 <div className="flex items-center justify-between">
                     <h1 className="text-[20px] font-bold text-text-black">알림</h1>
-                        <button
-                            className="text-[13px] font-medium text-text-gray3 underline active:text-core-1 transition-colors"
-                            onClick={handleReadAll}
-                        >
-                            전체 읽기
-                        </button>
+                    <button
+                        className="text-[13px] font-medium text-text-gray3 underline active:text-core-1 transition-colors"
+                        onClick={handleReadAll}
+                    >
+                        전체 읽기
+                    </button>
                 </div>
 
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -118,14 +129,13 @@ export default function NotificationContent() {
                         {notifications.map((item) => (
                             <div
                                 key={item.id}
-                                onClick={() => handleReadNotification(item.id)}
+                                // 클릭 시 단건 읽기 함수 호출
+                                onClick={() => handleReadNotification(item.id, item.isRead)}
                                 className={`p-4 border-b border-gray-50 flex flex-col gap-1 transition-colors active:bg-gray-50 ${!item.isRead ? "bg-blue-50/50" : "bg-white"
                                     }`}
                             >
                                 <div className="flex items-center justify-between mb-1">
-                                    <span className={`font-pretendard text-[14px] font-semibold leading-[20px] ${
-                                        /* 읽었을 때는 텍스트도 회색으로 변경 */
-                                        !item.isRead ? "text-core-1" : "text-text-gray3"
+                                    <span className={`font-pretendard text-[14px] font-semibold leading-[20px] ${!item.isRead ? "text-core-1" : "text-text-gray3"
                                         }`}>
                                         {formatDate(item.createdAt)}
                                     </span>
@@ -133,8 +143,9 @@ export default function NotificationContent() {
                                         <div className="w-1.5 h-1.5 rounded-full bg-core-1" />
                                     )}
                                 </div>
-                                {/* API 명세서의 title과 body 사용 */}
-                                <p className={`text-[14px] leading-relaxed ${!item.isRead ? "text-text-black font-semibold" : "text-text-gray2 font-medium"
+                                <p className={`text-[14px] leading-relaxed transition-colors ${!item.isRead
+                                        ? "text-text-black font-semibold"
+                                        : "text-text-gray3 font-medium"
                                     }`}>
                                     {item.body}
                                 </p>

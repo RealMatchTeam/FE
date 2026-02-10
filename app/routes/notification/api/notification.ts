@@ -45,3 +45,8 @@ export const readAllNotifications = async (): Promise<{ isSuccess: boolean; resu
   const response = await axiosInstance.patch("/v1/notifications/read-all");
   return response.data;
 };
+
+export const readNotification = async (id: string): Promise<{ isSuccess: boolean }> => {
+  const response = await axiosInstance.patch(`/v1/notifications/${id}/read`);
+  return response.data;
+};
