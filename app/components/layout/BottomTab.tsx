@@ -57,8 +57,9 @@ export default function BottomTab() {
   const currentPath = location.pathname;
 
   return (
-    <nav className="w-full shrink-0 mx-auto max-w-[430px] bg-white border-t border-text-gray5 safe-area-bottom">
-      <div className="flex items-center justify-center h-[66px] py-4 pl-[3vw] gap-[12.5vw] shrink-0 self-stretch">
+    <nav className="w-full shrink-0 bg-white border-t border-text-gray5 safe-area-bottom">
+      <div className="mx-auto w-full max-w-[430px]">
+        <div className="grid grid-cols-5 items-center h-[66px] px-2">
         {tabs.map((tab) => {
           let isActive = currentPath === tab.path;
           if (tab.path === "/matching/brand" && currentPath.startsWith("/matching")) {
@@ -71,18 +72,17 @@ export default function BottomTab() {
           if (isHome && (currentPath === "/" || currentPath.startsWith("/home") || currentPath.startsWith("/pre"))) {
             isActive = true;
           }
-          const isMyPage = tab.path === "/mypage";
           return (
             <Link
               key={tab.path}
               to={tab.path}
-              className={`transition-colors ${isHome ? "pl-[2.5vw]" : ""} ${isMyPage ? "pr-[3.646vw]" : ""}`}
+              className="transition-colors w-full h-full"
             >
-              <div className="flex flex-col items-center justify-center gap-1">
+              <div className="flex flex-col items-center justify-center gap-1 h-full">
                 <img
                   src={isActive ? tab.iconSelected : tab.icon}
                   alt={tab.label}
-                  className={isHome ? "w-6 h-6" : "w-4 h-4"}
+                  className="w-6 h-6"
                 />
                 <span
                   className={`text-callout4 whitespace-nowrap ${isActive
@@ -96,6 +96,7 @@ export default function BottomTab() {
             </Link>
           );
         })}
+        </div>
       </div>
     </nav>
   );
