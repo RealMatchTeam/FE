@@ -96,16 +96,19 @@ export default function MyPageLikes() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"brand" | "campaign">("brand");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("매칭률 순");
-  const [pendingSort, setPendingSort] = useState(sortOption);
+  const [brandSortOption, setBrandSortOption] = useState("정렬 필터");
+  const [campaignSortOption, setCampaignSortOption] = useState("정렬 필터");
+  const [pendingSort, setPendingSort] = useState("정렬 필터");
   const [loading, setLoading] = useState(false);
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
 
   useHideBottomTab(isFilterOpen);
 
-  const getSortButtonLabel = () => sortOption;
-  const isFiltered = sortOption !== "정렬 필터";
+  const currentSortOption =
+    activeTab === "brand" ? brandSortOption : campaignSortOption;
+  const getSortButtonLabel = () => currentSortOption;
+  const isFiltered = currentSortOption !== "정렬 필터";
 
   const brandSortOptions = useMemo(
     () => ["매칭률 순", "인기 순", "신규 순"].map((label) => ({ label, value: label })),
@@ -117,18 +120,22 @@ export default function MyPageLikes() {
   );
 
   const openSortSheet = () => {
-    setPendingSort(sortOption);
+    setPendingSort(currentSortOption);
     setIsFilterOpen(true);
   };
 
   const applySort = () => {
-    setSortOption(pendingSort);
+    if (activeTab === "brand") {
+      setBrandSortOption(pendingSort);
+    } else {
+      setCampaignSortOption(pendingSort);
+    }
     setIsFilterOpen(false);
   };
 
   const brandLikes = useMemo(() => {
     return [...brandLikesApi].sort((a, b) => {
-      switch (sortOption) {
+      switch (brandSortOption) {
         case "매칭률 순":
           return b.matchRate - a.matchRate;
         case "인기 순":
@@ -139,11 +146,11 @@ export default function MyPageLikes() {
           return 0;
       }
     });
-  }, [sortOption, brandLikesApi]);
+  }, [brandSortOption, brandLikesApi]);
 
   const campaignLikes = useMemo(() => {
     return [...campaignLikesApi].sort((a, b) => {
-      switch (sortOption) {
+      switch (campaignSortOption) {
         case "매칭률 순":
           return b.matchRate - a.matchRate;
         case "인기 순":
@@ -156,7 +163,7 @@ export default function MyPageLikes() {
           return 0;
       }
     });
-  }, [sortOption, campaignLikesApi]);
+  }, [campaignSortOption, campaignLikesApi]);
 
   useEffect(() => {
     let isMounted = true;
@@ -169,7 +176,7 @@ export default function MyPageLikes() {
               "/api/v1/users/me/favorites/brand",
               {
                 params: {
-                  sort: BRAND_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                  sort: BRAND_SORT_PARAM_MAP[brandSortOption] ?? "MATCH_SCORE",
                 },
               },
             );
@@ -195,7 +202,7 @@ export default function MyPageLikes() {
               "/api/v1/users/me/favorites/campaign",
               {
                 params: {
-                  sort: CAMPAIGN_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                  sort: CAMPAIGN_SORT_PARAM_MAP[campaignSortOption] ?? "MATCH_SCORE",
                 },
               },
             );
@@ -244,7 +251,7 @@ export default function MyPageLikes() {
     return () => {
       isMounted = false;
     };
-  }, [activeTab, sortOption]);
+  }, [activeTab, brandSortOption, campaignSortOption]);
 
   const toggleBrandLike = async (brandId: number) => {
     setBrandLikesApi((prev) =>
