@@ -45,7 +45,7 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
             className="grid h-6 w-6 place-items-center translate-x-1.5 -translate-y-1.5"
           >
             <HeartButton
-              defaultPressed={!!item.isLiked}
+              pressed={!!item.isLiked}
               onChange={(newValue) => onLikeToggle?.(item.id, newValue)}
             />
           </div>

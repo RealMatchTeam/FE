@@ -14,7 +14,7 @@
 
   /* Text 컬러 */
   --color-text-black: #171718;
-  --color-text-gray1: #494a50;
+  --color-text-gray1: #404252;
   --color-text-gray2: #5b5d6b;
   --color-text-gray3: #9b9ba1;
   --color-text-gray4: #d4d4d9;
@@ -277,14 +277,8 @@
   }
 
   .bg-grad-auth-reverse {
-  background: linear-gradient(
-    0deg,
-    #f6f6ff 0%,
-    #f3f3fa 48.08%,
-    #e8e8fb 100%
-  );
-}
-
+    background: linear-gradient(0deg, #f6f6ff 0%, #f3f3fa 48.08%, #e8e8fb 100%);
+  }
 
   .bg-grad-1 {
     background: linear-gradient(

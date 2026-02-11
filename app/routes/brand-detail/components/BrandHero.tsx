@@ -15,7 +15,7 @@ export default function BrandHero({
   const navigate = useNavigate();
 
   return (
-    <div className="relative h-[210px] w-full bg-bluegray-2">
+    <div className="relative h-[210px] w-full ">
       <div className="h-full w-full overflow-hidden">
         {heroImageUrl ? (
           <img
