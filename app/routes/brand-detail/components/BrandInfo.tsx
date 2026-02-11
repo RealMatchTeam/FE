@@ -1,5 +1,3 @@
-const PRIMARY = "#6666E5";
-
 type Props = {
   name: string;
   matchRate: number;
@@ -15,32 +13,25 @@ export default function BrandInfo({
 }: Props) {
   return (
     <div className="pt-10">
-      <div className="flex items-start justify-between">
-        <div className="text-[20px] font-semibold tracking-tight text-text-black">
-          {name}
-        </div>
+      <div className="flex items-center justify-between">
+        <div className="text-title text-text-black">{name}</div>
 
-        {/* 기존 한 줄 유지 + 숫자만 크게 */}
-        <div
-          className="text-[14px] font-semibold leading-none"
-          style={{ color: PRIMARY }}
-        >
-          <span>매칭률 </span>
-          <span className="text-[24px] font-extrabold tracking-tight">
+        <div className="flex items-center gap-2">
+          <span className="text-callout1 text-core-1 leading-none">매칭률</span>
+
+          <span className="text-title text-core-1 leading-none">
             {matchRate}%
           </span>
         </div>
       </div>
 
-      <div className="mt-1 text-[14px] text-text-gray3">
+      <div className=" text-title3 text-text-gray3">
         {hashtags
           .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
           .join(" ")}
       </div>
 
-      <div className="mt-2 text-[14px] leading-5 text-text-gray2">
-        {description}
-      </div>
+      <div className="mt-2 text-title3 text-text-gray1">{description}</div>
     </div>
   );
 }
