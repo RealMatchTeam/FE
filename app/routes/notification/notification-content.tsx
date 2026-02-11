@@ -44,7 +44,7 @@ export default function NotificationContent() {
 
     useEffect(() => {
         fetchNotificationsData();
-    }, [activeTab]);
+    }, [activeTab, fetchNotificationsData]);
 
     const handleReadAll = async () => {
         try {

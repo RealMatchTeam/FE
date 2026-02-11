@@ -58,12 +58,6 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
     }
   }, [isSearching, query, subTab]);
 
-  // 검색어가 변경될 때마다 자동 검색
-  useEffect(() => {
-    if (isSearching) {
-      fetchCampaigns();
-    }
-  }, [query]);
 
   // 검색어가 변경될 때 setKeyword 호출
   useEffect(() => {

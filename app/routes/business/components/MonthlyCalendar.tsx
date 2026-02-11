@@ -75,7 +75,7 @@ export default function MonthlyCalendar({ events }: MonthlyCalendarProps) {
       <div className="flex flex-col">
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 mb-4 text-center text-[13px] font-bold">
-          {WEEK_DAYS.map((day, i) => (
+          {WEEK_DAYS.map(day => (
             <div key={day} className="text-text-gray3">
               {day}
             </div>
