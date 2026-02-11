@@ -10,7 +10,7 @@ import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
-import chatIcon from "../../../assets/icon/icon-chat.svg"; // 채팅 아이콘 추가 필요
+import chatIcon from "../../../assets/chat-icon.svg"; // 채팅 아이콘 추가 필요
 
 export default function SentCampaignContent() {
     const [searchParams] = useSearchParams();
