@@ -63,14 +63,14 @@ export default function ConfirmModal({
             type="button"
             aria-label="닫기"
             onClick={onClose}
-            className="absolute left-3 top-3 grid place-items-center w-8 h-8 rounded-full text-[#7B7D8A] active:bg-black/5"
+            className="absolute left-4 top-4 grid place-items-center w-8 h-8 rounded-full text-[#7B7D8A] active:bg-black/5"
           >
             <span className="text-[22px] leading-none">×</span>
           </button>
         ) : null}
 
         {/* content */}
-        <div className="flex-1 px-5 pt-6 flex flex-col justify-center">
+        <div className="flex-1 px-5 pt-4 flex flex-col justify-center">
           {/* icon */}
           {icon ? <div className="flex justify-center mb-4">{icon}</div> : null}
 
@@ -86,7 +86,7 @@ export default function ConfirmModal({
         </div>
 
         {/* buttons – bottom */}
-        <div className="mt-auto px-5 pb-4">
+        <div className="mt-auto px-5 pb-5">
           <div className="flex gap-3">
             <button
               type="button"

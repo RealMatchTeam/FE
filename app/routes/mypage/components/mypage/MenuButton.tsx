@@ -1,11 +1,17 @@
 export default function MenuButton({
-  title, label, onClick, muted, py,
+  title,
+  label,
+  onClick,
+  muted,
+  py,
+  disableActiveBg,
 }: {
   title?: string;
   label: string;
   onClick: () => void;
   muted?: boolean;
   py?: number;
+  disableActiveBg?: boolean;
 }) {
   return (
     <div className="w-full">
@@ -28,8 +34,9 @@ export default function MenuButton({
           onClick={onClick}
           className={[
             "w-full text-left rounded-none",
-            "transition-colors active:bg-[#E6E6EB]",
-            muted ? "text-[#B7B7BF]" : "text-[#111]",
+            "transition-colors",
+            disableActiveBg ? "" : "active:bg-[#E6E6EB]",
+            muted ? "text-[#E6E6EB]" : "text-[#111]",
             "text-[14px] leading-[20px] font-medium",
           ].join(" ")}
           style={{
