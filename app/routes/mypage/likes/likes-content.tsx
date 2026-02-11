@@ -3,10 +3,9 @@ import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import FilterBottomSheet from "../../business/components/FilterBottomSheet";
-import FilterButton from "../../../components/common/FilterButton";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { axiosInstance } from "../../../api/axios";
+import SortFilterSheet from "../../chat/components/ChatSortFilterSheet";
 
 type BrandLike = {
   id: number;
@@ -97,18 +96,46 @@ export default function MyPageLikes() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"brand" | "campaign">("brand");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("매칭률 순");
+  const [brandSortOption, setBrandSortOption] = useState("정렬 필터");
+  const [campaignSortOption, setCampaignSortOption] = useState("정렬 필터");
+  const [pendingSort, setPendingSort] = useState("정렬 필터");
   const [loading, setLoading] = useState(false);
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
 
   useHideBottomTab(isFilterOpen);
 
-  const getSortButtonLabel = () => sortOption;
+  const currentSortOption =
+    activeTab === "brand" ? brandSortOption : campaignSortOption;
+  const getSortButtonLabel = () => currentSortOption;
+  const isFiltered = currentSortOption !== "정렬 필터";
+
+  const brandSortOptions = useMemo(
+    () => ["매칭률 순", "인기 순", "신규 순"].map((label) => ({ label, value: label })),
+    [],
+  );
+  const campaignSortOptions = useMemo(
+    () => ["매칭률 순", "인기 순", "금액 순", "마감 순"].map((label) => ({ label, value: label })),
+    [],
+  );
+
+  const openSortSheet = () => {
+    setPendingSort(currentSortOption);
+    setIsFilterOpen(true);
+  };
+
+  const applySort = () => {
+    if (activeTab === "brand") {
+      setBrandSortOption(pendingSort);
+    } else {
+      setCampaignSortOption(pendingSort);
+    }
+    setIsFilterOpen(false);
+  };
 
   const brandLikes = useMemo(() => {
     return [...brandLikesApi].sort((a, b) => {
-      switch (sortOption) {
+      switch (brandSortOption) {
         case "매칭률 순":
           return b.matchRate - a.matchRate;
         case "인기 순":
@@ -119,11 +146,11 @@ export default function MyPageLikes() {
           return 0;
       }
     });
-  }, [sortOption, brandLikesApi]);
+  }, [brandSortOption, brandLikesApi]);
 
   const campaignLikes = useMemo(() => {
     return [...campaignLikesApi].sort((a, b) => {
-      switch (sortOption) {
+      switch (campaignSortOption) {
         case "매칭률 순":
           return b.matchRate - a.matchRate;
         case "인기 순":
@@ -136,7 +163,7 @@ export default function MyPageLikes() {
           return 0;
       }
     });
-  }, [sortOption, campaignLikesApi]);
+  }, [campaignSortOption, campaignLikesApi]);
 
   useEffect(() => {
     let isMounted = true;
@@ -149,7 +176,7 @@ export default function MyPageLikes() {
               "/api/v1/users/me/favorites/brand",
               {
                 params: {
-                  sort: BRAND_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                  sort: BRAND_SORT_PARAM_MAP[brandSortOption] ?? "MATCH_SCORE",
                 },
               },
             );
@@ -175,7 +202,7 @@ export default function MyPageLikes() {
               "/api/v1/users/me/favorites/campaign",
               {
                 params: {
-                  sort: CAMPAIGN_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                  sort: CAMPAIGN_SORT_PARAM_MAP[campaignSortOption] ?? "MATCH_SCORE",
                 },
               },
             );
@@ -224,7 +251,7 @@ export default function MyPageLikes() {
     return () => {
       isMounted = false;
     };
-  }, [activeTab, sortOption]);
+  }, [activeTab, brandSortOption, campaignSortOption]);
 
   const toggleBrandLike = async (brandId: number) => {
     setBrandLikesApi((prev) =>
@@ -299,13 +326,31 @@ export default function MyPageLikes() {
               <div className="text-[16px] leading-[20px] font-semibold text-black">
                 {activeTab === "brand" ? "브랜드 리스트" : "캠페인 리스트"}
               </div>
-              <FilterButton
-                label={getSortButtonLabel()}
-                isActive={sortOption !== "정렬 필터"}
-                onClick={() => {
-                  setIsFilterOpen(true);
-                }}
-              />
+              <button
+                type="button"
+                onClick={openSortSheet}
+                className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-Pretendard ${
+                  isFiltered
+                    ? "border-core-70 text-core-1 bg-core-70"
+                    : "border-core-2 text-gray-2 bg-white text-title3"
+                }`}
+              >
+                {getSortButtonLabel()}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className={`w-6 h-6 ${isFiltered ? "text-core-1" : "text-text-gray2"}`}
+                >
+                  <path
+                    d="M6 8L10 12L14 8"
+                    stroke="currentColor"
+                    strokeWidth="1.0"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
 
             {loading ? (
@@ -437,18 +482,15 @@ export default function MyPageLikes() {
           </div>
         </div>
 
-        <FilterBottomSheet
-          isOpen={isFilterOpen}
+        <SortFilterSheet
+          open={isFilterOpen}
+          value={pendingSort}
+          onChange={setPendingSort}
           onClose={() => setIsFilterOpen(false)}
-          onApply={(filter) => setSortOption(filter)}
-          currentFilter={sortOption}
-          className="h-[100dvh]"
-          filters={
-            activeTab === "brand"
-              ? ["매칭률 순", "인기 순", "신규 순"]
-              : ["매칭률 순", "인기 순", "금액 순", "마감 순"]
-          }
+          onApply={applySort}
+          options={activeTab === "brand" ? brandSortOptions : campaignSortOptions}
           title="정렬 필터"
+          applyLabel="적용하기"
         />
       </div>
     </div>
