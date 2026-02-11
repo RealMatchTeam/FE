@@ -319,7 +319,7 @@ export async function fetchBrandDetail(params: {
 
     products: productList.map((p) => ({
       id: String(p.id),
-      title: p.name,
+      title: p.name || "",
       imageUrl: p.thumbnailImageUrl || "",
     })),
 

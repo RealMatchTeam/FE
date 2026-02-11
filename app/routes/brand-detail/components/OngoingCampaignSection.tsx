@@ -1,3 +1,4 @@
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CampaignCard from "../../home/components/CampaignCard";
 import { toCampaignItem } from "./toCampaignItem";
 import type { BrandOngoingCampaign } from "../types";
@@ -9,6 +10,20 @@ type Props = {
 
 export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
   const isEmpty = campaigns.length === 0;
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const handleCampaignClick = (campaignId: number) => {
+    const brandId = searchParams.get("brandId");
+    const domain = searchParams.get("domain");
+
+    const params = new URLSearchParams();
+    if (brandId) params.set("brandId", brandId);
+    if (domain) params.set("domain", domain);
+    params.set("campaignId", String(campaignId));
+
+    navigate(`/campaign-detail?${params.toString()}`);
+  };
 
   return (
     <section className="pt-9 pb-9">
@@ -50,7 +65,11 @@ export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
           <div className="mt-4 -mx-5 overflow-x-auto px-5 scrollbar-hide">
             <div className="flex gap-3">
               {campaigns.map((c) => (
-                <CampaignCard key={c.campaignId} item={toCampaignItem(c)} />
+                <CampaignCard
+                  key={c.campaignId}
+                  item={toCampaignItem(c)}
+                  onClick={() => handleCampaignClick(c.campaignId)}
+                />
               ))}
             </div>
           </div>

@@ -8,7 +8,7 @@ type Props = {
   item: ProductMiniCardItem;
 };
 
-function ellipsis10(text: string) {
+function ellipsis10(text: string | undefined) {
   if (!text) return "";
   return text.length > 10 ? `${text.slice(0, 10)}...` : text;
 }

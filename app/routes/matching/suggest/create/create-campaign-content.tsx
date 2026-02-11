@@ -3,10 +3,11 @@ import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createCampaignProposal, getRecruitingCampaigns, type RecruitingCampaign } from "../../api/matching";
+import { createCampaignProposal } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
 import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 import { useAuthStore } from "../../../../stores/auth-store";
+import { apiClient } from "../../../../api/axios";
 import Button from "../../../../components/common/Button";
 
 import {
@@ -38,7 +39,6 @@ export default function CreateCampaignContent() {
   const me = useAuthStore((state) => state.me);
 
   // 바텀시트 상태
-  const [selectedCampaign, setSelectedCampaign] = useState<RecruitingCampaign | null>(null);
 
   // 각 필드별 바텀시트 상태
   const [isFormatSheetOpen, setIsFormatSheetOpen] = useState(false);
@@ -75,8 +75,8 @@ export default function CreateCampaignContent() {
 
     let alive = true;
 
-    // proposalData가 있으면 우선 사용
-    if (proposalData) {
+    // proposalData가 있고 contentTags가 있으면 우선 사용
+    if (proposalData && proposalData.contentTags) {
       setValue("campaignName", proposalData.campaignTitle || "");
       setValue("description", proposalData.campaignDescription || "");
 
@@ -104,38 +104,65 @@ export default function CreateCampaignContent() {
       return;
     }
 
-    // URL 파라미터로 캠페인 조회
-    const brandIdParam = searchParams.get("brandId");
+    // URL 파라미터로 캠페인 상세 조회
     const campaignIdParam = searchParams.get("campaignId");
 
-    if (brandIdParam && campaignIdParam) {
-      const brandId = Number(brandIdParam);
+    if (campaignIdParam) {
       const campaignId = Number(campaignIdParam);
 
-      if (Number.isFinite(brandId) && brandId > 0 && Number.isFinite(campaignId) && campaignId > 0) {
+      if (Number.isFinite(campaignId) && campaignId > 0) {
         (async () => {
           try {
-            const campaigns = await getRecruitingCampaigns(brandId);
+            const res = await apiClient.get<{
+              isSuccess: boolean;
+              result: {
+                title: string;
+                description: string;
+                rewardAmount: number;
+                product: string;
+                startDate: string;
+                endDate: string;
+                contentTags?: {
+                  formats?: { name: string; id: number }[];
+                  categories?: { name: string; id: number }[];
+                  tones?: { name: string; id: number }[];
+                  involvements?: { name: string; id: number }[];
+                  usageRanges?: { name: string; id: number }[];
+                };
+              };
+            }>(`/api/v1/campaigns/${campaignId}`);
+
             if (!alive) return;
 
-            const selectedCampaign = campaigns.find((c) => c.campaignId === campaignId);
-            if (!selectedCampaign) return;
+            if (res.data?.isSuccess && res.data.result) {
+              const campaign = res.data.result;
 
-            // 선택한 캠페인 정보를 폼에 반영
-            setValue("campaignName", selectedCampaign.title);
-            setValue("fee", selectedCampaign.rewardAmount.toString());
+              setValue("campaignName", campaign.title || "");
+              setValue("description", campaign.description || "");
+              setValue("fee", campaign.rewardAmount?.toString() || "");
+              setValue("sponsorProduct", campaign.product || "");
+              setValue("startDate", campaign.startDate || "");
+              setValue("endDate", campaign.endDate || "");
 
-            // dday를 사용해 종료 날짜 계산
-            const today = new Date();
-            const endDate = new Date(today);
-            endDate.setDate(today.getDate() + selectedCampaign.dday);
-
-            setValue("startDate", today.toISOString().split("T")[0]);
-            setValue("endDate", endDate.toISOString().split("T")[0]);
-
-            setSelectedCampaign(selectedCampaign);
+              // 태그 매핑
+              if (campaign.contentTags?.formats && campaign.contentTags.formats.length > 0) {
+                setValue("format", String(campaign.contentTags.formats[0].id));
+              }
+              if (campaign.contentTags?.categories && campaign.contentTags.categories.length > 0) {
+                setValue("category", String(campaign.contentTags.categories[0].id));
+              }
+              if (campaign.contentTags?.tones && campaign.contentTags.tones.length > 0) {
+                setValue("tone", String(campaign.contentTags.tones[0].id));
+              }
+              if (campaign.contentTags?.involvements && campaign.contentTags.involvements.length > 0) {
+                setValue("involvement", String(campaign.contentTags.involvements[0].id));
+              }
+              if (campaign.contentTags?.usageRanges && campaign.contentTags.usageRanges.length > 0) {
+                setValue("usageScope", String(campaign.contentTags.usageRanges[0].id));
+              }
+            }
           } catch (error) {
-            console.error("모집중인 캠페인 조회 실패:", error);
+            console.error("캠페인 상세 조회 실패:", error);
           }
         })();
       }
@@ -144,7 +171,6 @@ export default function CreateCampaignContent() {
     return () => {
       alive = false;
     };
-    // proposalData와 searchParams만 의존성에 포함 (location.state 제거)
   }, [type, proposalData, searchParams, setValue]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
@@ -217,9 +243,15 @@ export default function CreateCampaignContent() {
       ? Number(brandIdParam)
       : proposalData?.brandId || 1;
 
-    const campaignId = type === "existing"
-      ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || selectedCampaign?.campaignId || null))
-      : null;
+    const campaignId = campaignIdParam
+      ? Number(campaignIdParam)
+      : (proposalData?.campaignId || null);
+
+    const getTagName = (id: string | number | undefined) => {
+      if (!id) return "";
+      const numId = typeof id === "string" ? Number(id) : id;
+      return TAG_NAME_BY_ID[numId] || "";
+    };
 
     const requestData = {
       brandId,
@@ -227,11 +259,11 @@ export default function CreateCampaignContent() {
       campaignId,
       campaignName: formData.campaignName || "",
       description: formData.description || "",
-      formats: formData.format ? [{ id: Number(formData.format) }] : [],
-      categories: formData.category ? [{ id: Number(formData.category) }] : [],
-      tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
-      involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
-      usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
+      formats: formData.format ? [{ id: Number(formData.format), name: getTagName(formData.format) }] : [],
+      categories: formData.category ? [{ id: Number(formData.category), name: getTagName(formData.category) }] : [],
+      tones: formData.tone ? [{ id: Number(formData.tone), name: getTagName(formData.tone) }] : [],
+      involvements: formData.involvement ? [{ id: Number(formData.involvement), name: getTagName(formData.involvement) }] : [],
+      usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope), name: getTagName(formData.usageScope) }] : [],
       rewardAmount: Number(formData.fee) || 0,
       productId: Number(formData.sponsorProduct) || 0,
       startDate: formData.startDate || "",
@@ -249,12 +281,9 @@ export default function CreateCampaignContent() {
     });
   };
 
-  // 선택된 캠페인 이름 가져오기
-  const selectedCampaignName = selectedCampaign?.title;
-
   const title =
-    type === "existing" && selectedCampaignName
-      ? selectedCampaignName
+    type === "existing" && proposalData?.campaignTitle
+      ? proposalData.campaignTitle
       : type === "existing"
         ? "기존 캠페인 제안하기"
         : "신규 캠페인 제안하기";

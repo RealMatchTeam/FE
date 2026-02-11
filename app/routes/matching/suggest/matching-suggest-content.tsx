@@ -70,6 +70,15 @@ export default function MatchingSuggestContent() {
     );
     if (!selectedCampaign || !proposalData) return;
 
+    // 선택한 캠페인 정보를 proposalData에 업데이트
+    const setProposalData = useCampaignProposalStore.getState().setProposalData;
+    setProposalData({
+      ...proposalData,
+      campaignId: selectedCampaignId,
+      campaignTitle: selectedCampaign.title,
+      rewardAmount: selectedCampaign.rewardAmount,
+    });
+
     // 선택한 캠페인 정보와 함께 페이지 이동
     navigate(
       `/matching/suggest/create?type=existing&brandId=${proposalData.brandId}&campaignId=${selectedCampaignId}&domain=${proposalData.domain}`,

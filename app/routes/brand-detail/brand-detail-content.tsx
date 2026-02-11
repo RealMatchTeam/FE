@@ -121,7 +121,7 @@ export default function BrandDetailContent({ data }: Props) {
     navigate(`/rooms/brand/${brandId}`);
   };
 
-  const handleSuggest = () => {
+  const handleSuggest = async () => {
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
       navigate("/auth/login");
@@ -130,10 +130,26 @@ export default function BrandDetailContent({ data }: Props) {
     if (!Number.isFinite(brandId) || brandId <= 0) return;
 
     const domain = searchParams.get("domain");
+    const campaignIdParam = searchParams.get("campaignId");
+
+    // URL에 campaignId가 없으면 recruiting API에서 첫 번째 캠페인 ID 가져오기
+    let campaignId = campaignIdParam ? Number(campaignIdParam) : null;
+
+    if (!campaignId) {
+      try {
+        const { getRecruitingCampaigns } = await import("../matching/api/matching");
+        const campaigns = await getRecruitingCampaigns(brandId);
+        if (campaigns && campaigns.length > 0) {
+          campaignId = campaigns[0].campaignId;
+        }
+      } catch (error) {
+        console.error("모집중인 캠페인 조회 실패:", error);
+      }
+    }
 
     setProposalData({
       brandId,
-      campaignId: 0,
+      campaignId,
       domain: domain || "beauty",
       brandName: data.name,
       products: (data.products ?? []).map((p) => ({ id: p.id, name: p.title })),
