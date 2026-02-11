@@ -7,11 +7,13 @@ type LoadingSpinnerProps = {
 
 export default function LoadingSpinner({
   className = "",
-  size = 120,
+  size = 300,
 }: LoadingSpinnerProps) {
   return (
     <div
-      className={["flex items-center justify-center", className].join(" ").trim()}
+      className={["flex items-center justify-center", className]
+        .join(" ")
+        .trim()}
       role="status"
       aria-label="loading"
     >
