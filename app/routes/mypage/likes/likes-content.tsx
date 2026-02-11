@@ -107,36 +107,35 @@ export default function MyPageLikes() {
   const getSortButtonLabel = () => sortOption;
 
   const brandLikes = useMemo(() => {
-    const base = brandLikesApi;
-    const list = [...base];
-    if (sortOption === "매칭률 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
-    }
-    if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.likeCount - a.likeCount);
-    }
-    if (sortOption === "신규 순") {
-      return list.sort((a, b) => b.id - a.id);
-    }
-    return list;
+    return [...brandLikesApi].sort((a, b) => {
+      switch (sortOption) {
+        case "매칭률 순":
+          return b.matchRate - a.matchRate;
+        case "인기 순":
+          return b.likeCount - a.likeCount;
+        case "신규 순":
+          return b.id - a.id;
+        default:
+          return 0;
+      }
+    });
   }, [sortOption, brandLikesApi]);
 
   const campaignLikes = useMemo(() => {
-    const base = campaignLikesApi;
-    const list = [...base];
-    if (sortOption === "매칭률 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
-    }
-    if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.likeCount - a.likeCount);
-    }
-    if (sortOption === "금액 순") {
-      return list.sort((a, b) => b.reward - a.reward);
-    }
-    if (sortOption === "마감 순") {
-      return list.sort((a, b) => a.ddayValue - b.ddayValue);
-    }
-    return list;
+    return [...campaignLikesApi].sort((a, b) => {
+      switch (sortOption) {
+        case "매칭률 순":
+          return b.matchRate - a.matchRate;
+        case "인기 순":
+          return b.likeCount - a.likeCount;
+        case "금액 순":
+          return b.reward - a.reward;
+        case "마감 순":
+          return a.ddayValue - b.ddayValue;
+        default:
+          return 0;
+      }
+    });
   }, [sortOption, campaignLikesApi]);
 
   useEffect(() => {
