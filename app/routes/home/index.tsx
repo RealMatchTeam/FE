@@ -1,12 +1,13 @@
-import { Navigate, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { getMyPage } from "../mypage/api/mypage";
 import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
 import { useAuthStore } from "../../stores/auth-store";
 import { tokenStorage } from "../../lib/token";
+import HomeContent from "./home-content";
+import HomeAfterMatch from "./home-after-match";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function HomeIndex() {
-  const location = useLocation();
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
 
   const me = useAuthStore((s) => s.me);
@@ -56,33 +57,36 @@ export default function HomeIndex() {
   useEffect(() => {
     if (resolvedHasMatchingTest !== true) return;
 
+    let isMounted = true;
+
     (async () => {
       try {
         const { count } = await getMatchingBrands();
+        if (!isMounted) return;
         setHasMatch(count > 0);
       } catch (error: unknown) {
+        if (!isMounted) return;
         if (error instanceof MatchingTestRequiredError) setHasMatch(false);
         else setHasMatch(false);
       }
     })();
-  }, [resolvedHasMatchingTest, location.state]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [resolvedHasMatchingTest]);
 
   const effectiveHasMatch = resolvedHasMatchingTest !== true ? null : hasMatch;
 
   if (resolvedHasMatchingTest === false) {
-    return <Navigate to="/pre" replace />;
+    return <HomeContent />;
   }
 
   if (resolvedHasMatchingTest === null || effectiveHasMatch === null) {
     return (
-      <div className="flex items-center justify-center w-full min-h-[50vh]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-4 border-gray-200 border-t-primary rounded-full animate-spin" />
-          <span className="text-gray-400 text-sm">로딩중...</span>
-        </div>
-      </div>
+      <LoadingSpinner className="min-h-[50vh]" />
     );
   }
 
-  return <Navigate to={hasMatch ? "/home" : "/pre"} replace />;
+  return <HomeAfterMatch />;
 }

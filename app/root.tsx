@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
   },
 });
 
-async function registerServiceWorker() {
+/*async function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     try {
       await navigator.serviceWorker.register('/firebase-messaging-sw.js');
@@ -28,7 +28,7 @@ async function registerServiceWorker() {
       console.error('Service Worker registration failed:', error);
     }
   }
-}
+}*/
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -39,6 +39,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
+        <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+        <link rel="icon" type="image/png" href="/favicon.png?v=2" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="mask-icon" href="/mask-icon.svg" color="#6666E5" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#6666E5" />
+        <meta name="description" content="Real Match - 실시간 매칭 서비스" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <title>Real Match</title>
         <Meta />
         <Links />
       </head>
@@ -53,7 +63,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
 
-  registerServiceWorker();
+  //registerServiceWorker();
 
   return (
     <QueryClientProvider client={queryClient}>

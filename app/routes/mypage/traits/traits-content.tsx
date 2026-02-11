@@ -43,6 +43,25 @@ type FeatureResponse = {
   result: FeatureResult;
 };
 
+const ALL_OPTIONS: Record<string, Record<string, string[]>> = {
+  beauty: {
+    "관심 카테고리": ["스킨케어", "메이크업", "향수", "바디", "헤어"],
+    "관심 기능": ["트러블", "수분 / 보습", "진정", "미백", "안티에이징", "각질 / 모공"],
+  },
+  fashion: {
+    "관심 스타일": ["미니멀", "페미닌", "러블리", "비즈니스 캐주얼", "캐주얼", "스트리트"],
+    "관심 아이탬/분야": ["의류", "가방", "신발", "주얼리", "패션 소품"],
+    "관심 브랜드": ["SPA", "빈티지", "중가 브랜드", "디자이너 브랜드", "명품 브랜드"],
+  },
+  content: {
+    "콘텐츠 형식": ["인스타 스토리", "인스타 포스트", "인스타 릴스"],
+    "콘텐츠 종류": ["브이로그", "리뷰", "겟레디윗미", "비포&애프터", "스토리/썰", "챌린지"],
+    "콘텐츠 톤": ["전문적인", "감성적인", "유쾌/재밌는", "트렌디한", "일상적인", "수다적인"],
+    "콘텐츠 희망 관여도": ["관여 안함", "가이드라인만 제공", "대본 일부 제공", "모든 연출 관여"],
+    "콘텐츠 희망 활용 범위": ["크리에이터 1차 활용", "브랜드 2차 활용"],
+  },
+};
+
 export default function TraitsPage() {
   useHideHeader(true);
   const navigate = useNavigate();
@@ -57,7 +76,6 @@ export default function TraitsPage() {
     // 현재 feature 데이터를 스토어 형식에 맞춰 복사
     if (id === "beauty" && feature?.beautyType) {
       const { interestCategories, interestFunctions } = feature.beautyType;
-      // zustand의 setState를 직접 호출예정,,
       useMatchingTestStore.setState((state) => ({
         selected: {
           ...state.selected,
@@ -67,10 +85,6 @@ export default function TraitsPage() {
       }));
     };
   }
-  // 선택 완료 클릭 
-  const handleComplete = () => {
-    setEditingId(null);
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -225,6 +239,22 @@ export default function TraitsPage() {
     });
   }, [feature]);
 
+  // 토글 버튼
+  const handleTagToggle = (traitId: string, sectionTitle: string, value: string) => {
+    // Todo: zustand 스토어 업데이트
+    console.log(`${traitId}의 ${sectionTitle} 섹션에서 ${value} 클릭됨`);
+  };
+
+  // 선택완료 버튼
+  const handleComplete = async () => {
+    try {
+    //Todo: API 연동
+    setEditingId(null); // 수정 종료
+    } catch (error) {
+      console.error("저장 실패:", error);
+    }
+  };
+
   return (
     <div className="h-screen-full bg-[#404252]">
       <div className="w-full bg-white shadow-2xl flex flex-col">
@@ -312,18 +342,27 @@ export default function TraitsPage() {
                           {section.title}
                         </div>
 
-                        {/* 수정 모드일 때와 아닐 때를 구분합니다 */}
                         {editingId === trait.id ? (
                           <div className="mt-2 flex flex-wrap gap-2">
-                            {section.items.map((item, idx) => (
-                              <span
-                                key={idx}
-                                className="px-[10px] py-1 bg-[#B7B7F3B2] border border-[#B7B7F3] text-[#6666E5] rounded-[20px] text-[14px] leading-[20px] font-medium"
-                              >
-                                {item}
-                              </span>
-                            ))}
-                            {/* 여기에 실제 수정 가능한 전체 태그 리스트를 매핑해야 합니다 */}
+                            {ALL_OPTIONS[trait.id]?.[section.title]?.map((option, idx) => {
+                              const isSelected = section.items.includes(option); // 현재 선택 여부 확인
+                              
+                              return (
+                                <span 
+                                  key={idx} 
+                                  onClick={() => {
+                                    handleTagToggle(trait.id, section.title, option);
+                                  }}
+                                  className={`px-[10px] py-1 border rounded-[20px] text-[14px] leading-[20px] font-medium cursor-pointer transition-colors
+                                    ${isSelected 
+                                      ? "bg-[#B7B7F3B2] border-[#B7B7F3] text-[#6666E5]" 
+                                      : "bg-white border-[#E5E7EB] text-[#9B9BA1]"     
+                                    }`}
+                                >
+                                  {option}
+                                </span>
+                              );
+                            })}
                           </div>
                         ) : (
                           <div className="mt-[2px] text-[12px] leading-[16px] font-medium text-[#404252]">

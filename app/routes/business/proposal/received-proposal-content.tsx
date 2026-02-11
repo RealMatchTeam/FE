@@ -5,6 +5,7 @@ import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 import { getProposalDetail, approveCampaignProposal, rejectCampaignProposal, type ProposalDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
@@ -108,7 +109,7 @@ export default function ReceivedProposalContent() {
 
     const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
 
-    if (isLoading) return <div className="p-10 text-center text-text-gray3 font-pretendard">로딩 중...</div>;
+    if (isLoading) return <LoadingSpinner className="py-10" />;
     if (!proposal) return <div className="p-10 text-center text-text-gray3 font-pretendard">데이터를 찾을 수 없습니다.</div>;
 
     return (
