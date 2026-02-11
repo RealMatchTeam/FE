@@ -168,7 +168,7 @@ export default function MatchingTestStep3Content({
         <section className="mt-8">
           <h2 className="text-title2 text-text-black mb-2">SNS 정보</h2>
 
-          <div className="text-title4 text-text-gray3">
+          <div className="text-callout1 text-text-gray3">
             주 SNS 주소를 입력해주세요
           </div>
           <div className="mt-2">
