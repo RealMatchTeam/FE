@@ -35,12 +35,14 @@ export default function CampaignCard({
     const id = proposalId || campaignId;
 
     if (type === "APPLIED") {
+      // 지원한 경우의 캠페인 보기 
       navigate(`/business/proposal?type=applied&applicationId=${id}`);
     } else if (type === "RECEIVED") {
-      navigate(`/business/proposal?type=received&proposalId=${id}`);
+      // 받은 제안 -> 받은 캠페인 보기
+      navigate(`/business/proposal?type=received-campaign&proposalId=${id}`);
     } else {
-      // 기본값 또는 SENT
-      navigate(`/business/proposal?type=sent&proposalId=${id}`);
+      // 보낸 제안 (SENT) -> 보낸 캠페인 보기
+      navigate(`/business/proposal?type=sent-campaign&proposalId=${id}`);
     }
   };
 

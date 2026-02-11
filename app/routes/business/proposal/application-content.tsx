@@ -62,7 +62,7 @@ export default function ApplicationContent() {
                 }
 
                 const profileResult = await getProfileCard();
-                setProfileCard(profileResult); 
+                setProfileCard(profileResult);
             } catch (error) {
                 console.error("최종 데이터 로드 실패:", error);
             } finally {
@@ -83,7 +83,7 @@ export default function ApplicationContent() {
         }
 
         try {
-            const response = await cancelCampaignApply(applicationId);
+            const response = await cancelCampaignApply(data.campaignApplyId);
             if (response.isSuccess) {
                 setModalStep("COMPLETE");
             }
@@ -151,7 +151,11 @@ export default function ApplicationContent() {
                         {/* 제안 프로필 */}
                         <div className="flex flex-col gap-2">
                             <p className="text-title3 text-text-1">제안 프로필</p>
-                            <div className="w-full p-4 bg-bluegray-2 rounded-2xl flex justify-between items-center border border-core-70">
+                            <div
+                                // 1. 클릭 시 마이페이지 프로필 카드로 이동하도록 추가
+                                onClick={() => navigate("/mypage/profileCard")}
+                                className="w-full p-4 bg-bluegray-2 rounded-2xl flex justify-between items-center border border-core-70 cursor-pointer active:bg-bluegray-3 transition-colors"
+                            >
                                 <div className="flex items-center gap-3">
                                     <div className="flex items-center justify-center w-8 h-8">
                                         <img src={profileIcon} alt="profile" className="w-full h-full" />
@@ -203,7 +207,7 @@ export default function ApplicationContent() {
                     {modalStep === "CONFIRM" ? (
                         <>
                             <h3 className="text-[20px] font-bold text-text-black mb-10 leading-snug">
-                                제안을 취소하시겠습니까?
+                                지원을 취소하시겠습니까?
                             </h3>
                             <div className="flex w-full gap-3">
                                 <button

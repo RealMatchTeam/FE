@@ -203,6 +203,7 @@ export default function CalendarContent() {
                     <CampaignCard
                       key={`${cp.campaignId}-${cp.proposalId}-${cp.status}`}
                       campaignId={cp.campaignId}
+                      proposalId={cp.proposalId ?? undefined}
                       type={cp.type}
                       brand={cp.brandName}
                       title={cp.title}
