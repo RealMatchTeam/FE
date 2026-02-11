@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import FilterBottomSheet from "../../business/components/FilterBottomSheet";
 import FilterButton from "../../../components/common/FilterButton";
 import { axiosInstance } from "../../../api/axios";
@@ -11,44 +12,30 @@ type BrandLike = {
   name: string;
   tags: string[];
   matchRate: number;
+  likeCount: number;
   isLiked: boolean;
   logoUrl?: string | null;
 };
 
-type BrandScrap = {
+type FavoriteBrandDto = {
   brandId: number;
   brandName: string;
-  brandLogo?: string | null;
-  matchingRate: number;
-  hashtags: string[];
-  isScraped: boolean;
+  brandLogoUrl?: string | null;
+  matchingRatio: number;
+  likeCount: number;
+  tags: string[];
 };
 
-type CampaignScrap = {
-  campaignId: number;
-  brandName: string;
-  campaignTitle: string;
-  brandLogo?: string | null;
-  matchingRate: number;
-  reward: number;
-  dDay: number;
-  currentApplicants: number;
-  totalRecruits: number;
-  isScraped: boolean;
+type FavoriteBrandListResponseDto = {
+  count: number;
+  brands: FavoriteBrandDto[];
 };
 
-type MyScrapResponseDto = {
-  type: string;
-  totalCount: number;
-  brandList?: BrandScrap[];
-  campaignList?: CampaignScrap[];
-};
-
-type CustomResponseMyScrapResponseDto = {
+type CustomResponseFavoriteBrandListResponseDto = {
   isSuccess: boolean;
   code: string;
   message: string;
-  result: MyScrapResponseDto;
+  result: FavoriteBrandListResponseDto;
 };
 
 type CampaignLike = {
@@ -56,20 +43,52 @@ type CampaignLike = {
   brand: string;
   title: string;
   matchRate: number;
+  likeCount: number;
   reward: number;
   dday: string;
+  ddayValue: number;
   applicants: string;
   isLiked: boolean;
   logoUrl?: string | null;
 };
 
-const SORT_PARAM_MAP: Record<string, string> = {
-  "정렬 필터": "matchingRate",
-  "매칭률 순": "matchingRate",
-  "인기 순": "popularity",
-  "신규 순": "latest",
-  "금액 순": "reward",
-  "마감 순": "dDay",
+type FavoriteCampaignDto = {
+  campaignId: number;
+  brandName: string;
+  campaignTitle: string;
+  brandLogoUrl?: string | null;
+  matchingRatio: number;
+  likeCount: number;
+  rewardAmount: number;
+  quota: number;
+  dday: number;
+};
+
+type FavoriteCampaignListResponseDto = {
+  count: number;
+  campaigns: FavoriteCampaignDto[];
+};
+
+type CustomResponseFavoriteCampaignListResponseDto = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: FavoriteCampaignListResponseDto;
+};
+
+const BRAND_SORT_PARAM_MAP: Record<string, string> = {
+  "정렬 필터": "MATCH_SCORE",
+  "매칭률 순": "MATCH_SCORE",
+  "인기 순": "POPULARITY",
+  "신규 순": "NEWEST",
+};
+
+const CAMPAIGN_SORT_PARAM_MAP: Record<string, string> = {
+  "정렬 필터": "MATCH_SCORE",
+  "매칭률 순": "MATCH_SCORE",
+  "인기 순": "POPULARITY",
+  "금액 순": "REWARD_AMOUNT",
+  "마감 순": "D_DAY",
 };
 
 export default function MyPageLikes() {
@@ -82,6 +101,8 @@ export default function MyPageLikes() {
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
 
+  useHideBottomTab(isFilterOpen);
+
   const getSortButtonLabel = () => sortOption;
 
   const brandLikes = useMemo(() => {
@@ -91,7 +112,7 @@ export default function MyPageLikes() {
       return list.sort((a, b) => b.matchRate - a.matchRate);
     }
     if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
+      return list.sort((a, b) => b.likeCount - a.likeCount);
     }
     if (sortOption === "신규 순") {
       return list.sort((a, b) => b.id - a.id);
@@ -106,13 +127,13 @@ export default function MyPageLikes() {
       return list.sort((a, b) => b.matchRate - a.matchRate);
     }
     if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
+      return list.sort((a, b) => b.likeCount - a.likeCount);
     }
     if (sortOption === "금액 순") {
       return list.sort((a, b) => b.reward - a.reward);
     }
     if (sortOption === "마감 순") {
-      return list.sort((a, b) => a.id - b.id);
+      return list.sort((a, b) => a.ddayValue - b.ddayValue);
     }
     return list;
   }, [sortOption, campaignLikesApi]);
@@ -122,44 +143,69 @@ export default function MyPageLikes() {
     const fetchScrap = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance.get<CustomResponseMyScrapResponseDto>(
-          "/api/v1/users/me/scrap",
-          {
-            params: {
-              type: activeTab === "brand" ? "brand" : "campaign",
-              sort: SORT_PARAM_MAP[sortOption] ?? "matchingRate",
-            },
-          },
-        );
-        if (!isMounted) return;
-        if (!res.data?.isSuccess) {
-          throw new Error(res.data?.message || "찜 목록 조회 실패");
-        }
-        const result = res.data.result;
         if (activeTab === "brand") {
+          const res =
+            await axiosInstance.get<CustomResponseFavoriteBrandListResponseDto>(
+              "/api/v1/users/me/favorites/brand",
+              {
+                params: {
+                  sort: BRAND_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                },
+              },
+            );
+          if (!isMounted) return;
+          if (!res.data?.isSuccess) {
+            throw new Error(res.data?.message || "찜 목록 조회 실패");
+          }
+          const result = res.data.result;
           const mapped =
-            result.brandList?.map((b) => ({
+            result.brands?.map((b) => ({
               id: b.brandId,
               name: b.brandName,
-              tags: b.hashtags ?? [],
-              matchRate: b.matchingRate ?? 0,
-              isLiked: Boolean(b.isScraped),
-              logoUrl: b.brandLogo ?? null,
+              tags: b.tags ?? [],
+              matchRate: b.matchingRatio ?? 0,
+              likeCount: b.likeCount ?? 0,
+              isLiked: true,
+              logoUrl: b.brandLogoUrl ?? null,
             })) ?? [];
           setBrandLikesApi(mapped);
         } else {
+          const res =
+            await axiosInstance.get<CustomResponseFavoriteCampaignListResponseDto>(
+              "/api/v1/users/me/favorites/campaign",
+              {
+                params: {
+                  sort: CAMPAIGN_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                },
+              },
+            );
+          if (!isMounted) return;
+          if (!res.data?.isSuccess) {
+            throw new Error(res.data?.message || "찜 목록 조회 실패");
+          }
+          const result = res.data.result;
           const mapped =
-            result.campaignList?.map((c) => ({
-              id: c.campaignId,
-              brand: c.brandName,
-              title: c.campaignTitle,
-              matchRate: c.matchingRate ?? 0,
-              reward: c.reward ?? 0,
-              dday: c.dDay === 0 ? "D-Day" : `D-${c.dDay}`,
-              applicants: `${c.currentApplicants}/${c.totalRecruits}명`,
-              isLiked: Boolean(c.isScraped),
-              logoUrl: c.brandLogo ?? null,
-            })) ?? [];
+            result.campaigns?.map((c) => {
+              const dday =
+                c.dday === 0
+                  ? "D-Day"
+                  : c.dday > 0
+                    ? `D-${c.dday}`
+                    : `D+${Math.abs(c.dday)}`;
+              return {
+                id: c.campaignId,
+                brand: c.brandName,
+                title: c.campaignTitle,
+                matchRate: c.matchingRatio ?? 0,
+                likeCount: c.likeCount ?? 0,
+                reward: c.rewardAmount ?? 0,
+                dday,
+                ddayValue: c.dday ?? 0,
+                applicants: c.quota ? `${c.quota}명` : "-",
+                isLiked: true,
+                logoUrl: c.brandLogoUrl ?? null,
+              };
+            }) ?? [];
           setCampaignLikesApi(mapped);
         }
       } catch (error) {
@@ -388,6 +434,7 @@ export default function MyPageLikes() {
           onClose={() => setIsFilterOpen(false)}
           onApply={(filter) => setSortOption(filter)}
           currentFilter={sortOption}
+          className="h-[100dvh]"
           filters={
             activeTab === "brand"
               ? ["매칭률 순", "인기 순", "신규 순"]

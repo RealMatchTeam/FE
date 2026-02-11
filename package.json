@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "react-router dev",
     "build": "react-router build",
+    "postbuild": "cp -R public/. build/client/",
     "lint": "eslint ."
   },
   "dependencies": {
