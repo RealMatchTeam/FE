@@ -157,7 +157,7 @@ export default function NotificationContent() {
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center min-h-[70vh]">
+                    <div className="flex flex-col items-center justify-center min-h-[75vh]">
                         <img src={emptyImg} alt="" className="h-[160px] w-[160px] select-none" />
                         <p className="font-medium text-[14px] text-[#5B5D6B] text-center mt-2">
                             받은 알림이 없어요
