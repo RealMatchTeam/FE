@@ -7,6 +7,7 @@ interface FilterBottomSheetProps {
   currentFilter: string;
   filters?: string[];
   title?: string;
+  className?: string;
 }
 
 const DEFAULT_FILTERS = ["전체", "검토 중", "매칭", "거절"];
@@ -18,6 +19,7 @@ export default function FilterBottomSheet({
   currentFilter,
   filters,
   title = "정렬 필터",
+  className,
 }: FilterBottomSheetProps) {
   const [selected, setSelected] = useState(currentFilter);
   const filterOptions = filters ?? DEFAULT_FILTERS;
@@ -34,7 +36,10 @@ export default function FilterBottomSheet({
 
       {/* 바텀 시트 본체 */}
       <div 
-        className="relative bg-[var(--color-bg-w)] rounded-t-[24px] overflow-hidden animate-slide-up w-full max-w-[430px] h-[530px] flex flex-col"
+        className={[
+          "relative bg-[var(--color-bg-w)] rounded-t-[24px] overflow-hidden animate-slide-up w-full max-w-[430px] h-[530px] flex flex-col",
+          className ?? "",
+        ].join(" ")}
       >
         {/* 헤더 영역 */}
         <div className="px-4 pt-8 pb-4">

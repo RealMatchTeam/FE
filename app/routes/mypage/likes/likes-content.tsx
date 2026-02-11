@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import FilterBottomSheet from "../../business/components/FilterBottomSheet";
 import FilterButton from "../../../components/common/FilterButton";
 import { axiosInstance } from "../../../api/axios";
@@ -99,6 +100,8 @@ export default function MyPageLikes() {
   const [loading, setLoading] = useState(false);
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
+
+  useHideBottomTab(isFilterOpen);
 
   const getSortButtonLabel = () => sortOption;
 
@@ -431,6 +434,7 @@ export default function MyPageLikes() {
           onClose={() => setIsFilterOpen(false)}
           onApply={(filter) => setSortOption(filter)}
           currentFilter={sortOption}
+          className="h-[100dvh]"
           filters={
             activeTab === "brand"
               ? ["매칭률 순", "인기 순", "신규 순"]
