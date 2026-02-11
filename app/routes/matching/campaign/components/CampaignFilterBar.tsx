@@ -11,12 +11,12 @@ interface CampaignFilterBarProps {
 
 export default function CampaignFilterBar({ category, onCategoryChange, searchKeyword, onSearchChange }: CampaignFilterBarProps) {
     return (
-        <div className="px-4 py-3 bg-core-2 shrink-0 space-y-4">
-            <div className="flex w-full gap-2">
-                <div className="flex gap-2 flex-[3] min-w-0">
+        <div className="px-4 py-3 shrink-0 space-y-4 bg-transparent">
+            <div className="flex w-full gap-3 items-center">
+                <div className="flex gap-2 shrink-0">
                     <button
                         className={cn(
-                            "flex-1 flex justify-center items-center gap-[10px] px-[10px] py-[8px] h-auto text-title2 rounded-[8px] whitespace-nowrap cursor-pointer transition-colors font-semibold",
+                            "px-[12px] py-[8px] h-10 text-title2 rounded-[8px] whitespace-nowrap cursor-pointer transition-colors font-semibold",
                             category === "BEAUTY"
                                 ? "bg-core-1 text-white"
                                 : "bg-white text-text-gray3 border border-gray-100"
@@ -27,7 +27,7 @@ export default function CampaignFilterBar({ category, onCategoryChange, searchKe
                     </button>
                     <button
                         className={cn(
-                            "flex-1 flex justify-center items-center gap-[10px] px-[10px] py-[8px] h-auto text-title2 rounded-[8px] whitespace-nowrap cursor-pointer transition-colors font-semibold",
+                            "px-[12px] py-[8px] h-10 text-title2 rounded-[8px] whitespace-nowrap cursor-pointer transition-colors font-semibold",
                             category === "FASHION"
                                 ? "bg-core-1 text-white"
                                 : "bg-white text-text-gray3 border border-gray-100"
@@ -37,7 +37,7 @@ export default function CampaignFilterBar({ category, onCategoryChange, searchKe
                         패션
                     </button>
                 </div>
-                <div className="flex-[7] min-w-0 justify-center">
+                <div className="flex-1 min-w-0">
                     <SearchBar placeholder="캠페인 검색" className="w-full" value={searchKeyword} onChange={onSearchChange} />
                 </div>
             </div>

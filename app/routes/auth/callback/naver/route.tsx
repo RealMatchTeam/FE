@@ -23,6 +23,7 @@ export default function NaverCallback() {
     const refreshToken = searchParams.get("refreshToken") || searchParams.get("refresh_token");
 
     if (accessToken && refreshToken) {
+      console.log("[Naver Callback] Tokens received, storing and navigating...");
       tokenStorage.setTokens(accessToken, refreshToken);
       localStorage.setItem("lastLoginProvider", "naver");
 

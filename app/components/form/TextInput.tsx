@@ -20,7 +20,7 @@ export default function TextInput({
         onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
         className="flex-1 min-w-0 bg-transparent text-title3 text-text-black placeholder:text-text-gray3 focus:outline-none"
       />
-      <span className="text-callout1 text-text-gray3 shrink-0">
+      <span className="text-callout4 text-text-gray4 shrink-0">
         {value.length}/{maxLength}
       </span>
     </div>

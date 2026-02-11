@@ -73,6 +73,7 @@ export default function MessageRenderer({
           return (
             <ProposalMessage
               kind={sys.kind}
+              proposalId={String(sys.payload.proposalId)}
               createdAt={timeText ?? message.createdAt}
               avatarSrc={avatarSrc}
               campaignName={sys.payload.campaignName}
@@ -89,6 +90,7 @@ export default function MessageRenderer({
               orderNumber={sys.payload.orderNumber}
               createdAt={timeText ?? message.createdAt}
               avatarSrc={avatarSrc}
+              proposalDirection={"NONE"}
             />
           )
 
@@ -96,10 +98,11 @@ export default function MessageRenderer({
         return (
           <ProposalMessage
             kind={sys.kind}
+            applyId={String(sys.payload.applyId)}
             createdAt={timeText ?? message.createdAt}
             avatarSrc={avatarSrc}
             campaignName={sys.payload.campaignName}
-            bodyText={sys.payload.applyReason} 
+            bodyText={sys.payload.applyReason}
             proposalDirection={"NONE"}
           />
         );

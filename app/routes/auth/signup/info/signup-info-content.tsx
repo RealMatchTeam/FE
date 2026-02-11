@@ -170,7 +170,7 @@ function SignUpInfoContent() {
 
       <div className="flex flex-col flex-1 px-6 py-6">
         {/* 헤더 */}
-        <div className="flex-1">
+        <div className="flex flex-col">
           <h2 className="text-title text-text-black text-center mb-17.5">
             기본 정보를 입력해주세요
           </h2>
@@ -210,7 +210,7 @@ function SignUpInfoContent() {
               onToggleCategory={toggleCategory}
             />
           </form>
-          <div className="mb-[42px] sm:mb-[36px] md:mb-[28px] lg:mb-[20px]" />
+          <div className="mb-8" />
         </div>
 
         {/* 하단 버튼 */}
@@ -220,15 +220,14 @@ function SignUpInfoContent() {
           size="lg"
           fullWidth
           onClick={handleNext}
-          className={
-            !socialNicknameValue ||
+          className={`mt-auto md:mt-10 ${!socialNicknameValue ||
               !socialBirthDateValue ||
               !socialGenderValue ||
               !socialNicknameSuccess ||
               selectedCategories.length === 0
               ? "opacity-50"
               : ""
-          }
+            }`}
         >
           다음
         </Button>

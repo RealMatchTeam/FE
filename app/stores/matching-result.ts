@@ -17,7 +17,6 @@ export type MatchingResultData = {
   completed: true;
   updatedAt: number;
   summary: MatchingResultSummary;
-  // API 응답 데이터
   apiResult?: MatchResponseDto;
 };
 

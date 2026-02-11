@@ -58,7 +58,9 @@ export default [
       
     ]),
 
-    route("chat", "routes/chat/route.tsx"),
+    route("chat", "routes/chat/route.tsx", [
+      route("resuggest", "routes/chat/resuggest/route.tsx"),
+    ]),
 
     route("rooms", "routes/room/route.tsx", [
       route("brand/:brandId", "routes/room/$brandId.tsx"),

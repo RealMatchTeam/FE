@@ -204,6 +204,29 @@ export default function CampaignDetailContent({
       navigate("/auth/login");
       return;
     }
+
+    if (!campaign) return;
+
+    setProposalData({
+      brandId: Number(searchParams.get("brandId")),
+      campaignId,
+      domain: searchParams.get("domain") || "beauty",
+      brandName: brandData.name,
+      campaignTitle: campaign.title,
+      campaignDescription: campaign.description,
+      rewardAmount: campaign.rewardAmount,
+      product: campaign.product,
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
+      contentTags: {
+        formats: campaign.contentTags?.formats,
+        categories: campaign.contentTags?.categories,
+        tones: campaign.contentTags?.tones,
+        involvements: campaign.contentTags?.involvements,
+        usageRanges: campaign.contentTags?.usageRanges,
+      },
+    });
+
     navigate("/matching/apply");
   };
 
@@ -347,7 +370,7 @@ export default function CampaignDetailContent({
 
           <DividerBlock />
 
-          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
+          <OngoingCampaignSection campaigns={ongoing} onMore={() => { }} />
         </div>
       </div>
     </div>

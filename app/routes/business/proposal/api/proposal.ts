@@ -28,6 +28,7 @@ export interface ProposalDetail {
     involvements: { id: number; name: string }[];
     usageRanges: { id: number; name: string }[];
   };
+  createdAt: string;
   snsAccount?: string;
 }
 
@@ -70,7 +71,7 @@ export const getBrandDetail = async (brandId: number | string): Promise<BrandDet
 export interface AppliedCampaignDetail {
   campaignId: number;
   campaignApplyId: number;
-  brandId: number;     
+  brandId: number;
   brandName: string;
   campaignTitle: string;
   campaignReason: string;
@@ -96,9 +97,9 @@ export const getAppliedCampaignDetail = async (campaignId: string): Promise<Appl
       const errorMessage = error.response?.data?.message || "지원 상세 데이터 로드 실패";
       throw new Error(errorMessage);
     }
-    
+
     if (error instanceof Error) throw error;
-    
+
     throw new Error("알 수 없는 에러가 발생했습니다.");
   }
 };
@@ -121,10 +122,10 @@ export const rejectCampaignProposal = async (
   rejectReason: string
 ): Promise<ApiResponse<string>> => {
   try {
-    
+
     const response = await axiosInstance.patch<ApiResponse<string>>(
       `/v1/campaigns/proposal/${campaignProposalId}/reject`,
-      { rejectReason } 
+      { rejectReason }
     );
     return response.data;
   } catch (error) {

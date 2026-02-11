@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LoginLogo from "../../../assets/logo/login-logo.png";
+import LoginLogo from "../../../assets/logo/login-logo.svg";
 import { SocialLoginSection } from "./components/SocialLoginSection";
 
 function LoginContent() {
