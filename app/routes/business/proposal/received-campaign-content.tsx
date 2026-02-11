@@ -4,7 +4,6 @@ import Header from "../../../components/layout/Header";
 
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
-//import Modal from "../../../components/common/Modal";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 import { getProposalDetail, type ProposalDetail } from "./api/proposal";
@@ -13,9 +12,7 @@ import { getBrandSummary, type BrandSummary } from "./api/brand";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
-import chatIcon from "../../../assets/icon/icon-chat.svg";
-//import checkIcon from "../../../assets/icon/icon-check-circle.svg";
-//import closeIcon from "../../../assets/icon/icon-close.svg";
+import chatIcon from "../../../assets/chat-icon.svg";
 
 interface TagItem {
     name: string;
@@ -57,32 +54,6 @@ export default function ReceivedCampaignContent() {
         fetchData();
     }, [proposalId]);
 
-    // 수락/거절 핸들러 (기존 로직 유지)
-    //const handleAcceptClick = () => setModalType("confirm");
-    //const handleRejectClick = () => setModalType("reject");
-    //const closeModal = () => { setModalType("none"); setRejectReason(""); };
-
-    /*const handleConfirm = async () => {
-        if (!proposalId) return;
-        try {
-            setIsProcessing(true);
-            const response = await approveCampaignProposal(proposalId);
-            if (response.isSuccess) setModalType("success");
-        } catch (error) {
-            alert("처리 중 에러가 발생했습니다.");
-        } finally { setIsProcessing(false); }
-    };
-
-    const handleRejectSubmit = async () => {
-        if (!proposalId) return;
-        try {
-            setIsProcessing(true);
-            const response = await rejectCampaignProposal(proposalId, rejectReason);
-            if (response.isSuccess) setModalType("rejectSuccess");
-        } catch (error) {
-            alert("처리 중 에러가 발생했습니다.");
-        } finally { setIsProcessing(false); }
-    };*/
 
     const formatTags = (tags: TagItem[] | undefined | null) => 
         (!tags || tags.length === 0 ? "정보 없음" : tags.map((t: TagItem) => t.name).join(", "));
