@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import { axiosInstance } from "../../../api/axios";
 
@@ -75,6 +76,8 @@ export default function MyPageEdit() {
   >("idle");
   const [isNickChecking, setIsNickChecking] = useState(false);
   const [isAddressSaving, setIsAddressSaving] = useState(false);
+  const [isNickSaving, setIsNickSaving] = useState(false);
+  useHideBottomTab(isNickSheetOpen);
 
   useEffect(() => {
     const fetchMyEditInfo = async () => {
@@ -322,7 +325,7 @@ export default function MyPageEdit() {
                 detailAddress: nextDetailAddress,
               };
 
-              const response = await axiosInstance.post<CustomResponseVoid>(
+              const response = await axiosInstance.patch<CustomResponseVoid>(
                 "/api/v1/users/me/edit",
                 payload,
               );
@@ -441,18 +444,51 @@ export default function MyPageEdit() {
 
           <button
             type="button"
-            className="w-full h-[48px] rounded-[12px] bg-[#6666E5] text-white text-[15px] font-semibold transition"
-            onClick={() => {
-              if (checkStatus !== "valid") {
-                return;
-              }
+            className={[
+              "w-full h-[48px] rounded-[12px] text-white text-[15px] font-semibold transition",
+              checkStatus !== "valid" || isNickSaving
+                ? "bg-[#C8C8D4] cursor-not-allowed"
+                : "bg-[#6666E5]",
+            ].join(" ")}
+            disabled={checkStatus !== "valid" || isNickSaving}
+            onClick={async () => {
+              if (checkStatus !== "valid" || isNickSaving) return;
 
               const nextNickname = nickDraft.trim();
-              setNickname(nextNickname);
-              setIsNickSheetOpen(false);
+              const nextAddress = address.trim() || originalAddress;
+              const nextDetailAddress =
+                addressDetail.trim() || originalDetailAddress;
+
+              try {
+                setIsNickSaving(true);
+                const payload = {
+                  nickname: nextNickname,
+                  address: nextAddress,
+                  detailAddress: nextDetailAddress,
+                };
+
+                const response = await axiosInstance.patch<CustomResponseVoid>(
+                  "/api/v1/users/me/edit",
+                  payload,
+                );
+
+                if (!response.data.isSuccess) {
+                  throw new Error(response.data.message || "회원정보 변경 실패");
+                }
+
+                setNickname(nextNickname);
+                setOriginalNickname(nextNickname);
+                setOriginalAddress(nextAddress);
+                setOriginalDetailAddress(nextDetailAddress);
+                setIsNickSheetOpen(false);
+              } catch (error) {
+                console.error("Failed to update nickname:", error);
+              } finally {
+                setIsNickSaving(false);
+              }
             }}
           >
-            변경 완료
+            {isNickSaving ? "변경 중..." : "변경 완료"}
           </button>
         </div>
       </FilterBottomSheet>
