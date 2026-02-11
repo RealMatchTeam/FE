@@ -30,8 +30,7 @@ import {
   type MatchingCampaign,
 } from "../matching/api/matching";
 import { apiClient } from "../../api/axios";
-import bannerBeauty from "../../assets/home-banner/banner-beauty.svg";
-import bannerFashion from "../../assets/home-banner/banner-fashion.svg";
+import BannerCarousel from "./components/BannerCarousel";
 
 type ApiCategoryFilter = "ALL" | "FASHION" | "BEAUTY";
 type CampaignSort = "MATCH_SCORE" | "POPULARITY" | "REWARD_AMOUNT" | "D_DAY";
@@ -442,13 +441,7 @@ export default function HomeAfterMatchPage() {
     return (
       <div className="min-h-screen bg-white">
         <div className="bg-white px-5 pt-6 pb-[calc(116px+env(safe-area-inset-bottom))]">
-          <div className="-mx-5 mb-4">
-            <img
-              src={category === "beauty" ? bannerBeauty : bannerFashion}
-              alt="배너"
-              className="h-62.5 w-full object-cover"
-            />
-          </div>
+          <BannerCarousel />
 
           <CategoryTabs value={category} onChange={setCategory} />
 
