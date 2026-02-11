@@ -3,11 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import MiniLogo from "../../assets/logo/mini-logo.svg";
 import BrandHero from "../brand-detail/components/BrandHero";
 import BrandInfo from "../brand-detail/components/BrandInfo";
-import BrandActionBar from "../brand-detail/components/BrandActionBar";
+import CampaingActionBar from "./components/CampaignActionBar";
 import OngoingCampaignSection from "../brand-detail/components/OngoingCampaignSection";
 
 import { tokenStorage } from "../../lib/token";
-import { toggleBrandLike } from "../matching/api/matching";
 import { apiClient } from "../../api/axios";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
@@ -19,6 +18,7 @@ import type {
 
 import informationIconUrl from "../../assets/information-icon.svg?url";
 import CampaignDetailSkeleton from "./components/CampaignDetailSkeleton";
+import { toggleCampaignLike } from "./campaign-like";
 
 type Props = {
   brandData: BrandDetailData;
@@ -58,9 +58,8 @@ export default function CampaignDetailContent({
   const setProposalData = useCampaignProposalStore((s) => s.setProposalData);
 
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
-  const [isHearted, setIsHearted] = useState<boolean>(
-    brandData.isLiked ?? false,
-  );
+
+  const [isCampaignLiked, setIsCampaignLiked] = useState(false);
 
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
   const [campaignError, setCampaignError] = useState<string | null>(null);
@@ -140,19 +139,28 @@ export default function CampaignDetailContent({
     }
     navigate(`/rooms/brand/${brandData.id}`);
   };
+  const handleToggleHeart = async (next: boolean) => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
 
-  const handleToggleHeart = async () => {
-    const brandIdNum = Number(brandData.id);
-    if (!Number.isFinite(brandIdNum) || brandIdNum <= 0) return;
+    const campaignIdNum = Number(campaignId);
+    if (!Number.isFinite(campaignIdNum) || campaignIdNum <= 0) return;
 
-    const prev = isHearted;
-    setIsHearted(!prev);
+    const prev = isCampaignLiked;
+
+    setIsCampaignLiked(next);
 
     try {
-      const serverStatus = await toggleBrandLike(brandIdNum);
-      setIsHearted(serverStatus);
+      const serverStatus = await toggleCampaignLike(campaignIdNum);
+
+      if (typeof serverStatus === "boolean") {
+        setIsCampaignLiked(serverStatus);
+      }
     } catch {
-      setIsHearted(prev);
+      setIsCampaignLiked(prev);
     }
   };
 
@@ -254,7 +262,7 @@ export default function CampaignDetailContent({
           logoText={brandData.logoText ?? ""}
         />
 
-        <div className="px-5 pb-10">
+        <div className="px-5">
           <BrandInfo
             name={brandData.name}
             matchRate={brandData.matchRate}
@@ -262,7 +270,7 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="mt-2 flex h-9 items-center gap-2 text-title3 text-core-1">
+          <div className="my-3.5 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
             <MetaItem
               icon={
                 <img
@@ -283,17 +291,17 @@ export default function CampaignDetailContent({
             </span>
           </div>
 
-          <BrandActionBar
-            isHearted={isHearted}
+          <CampaingActionBar
+            isHearted={isCampaignLiked}
             onChat={handleChat}
             onSuggest={handleSuggest}
             onToggleHeart={handleToggleHeart}
           />
 
-          <div className="my-4 h-px w-full bg-bluegray-2" />
+          <div className="my-4 h-px w-full bg-core-2" />
 
           <section>
-            <div className="mt-4 overflow-hidden rounded-2xl bg-bluegray-1">
+            <div className="my-6 overflow-hidden bg-bluegray-1">
               <img
                 src={campaignImage}
                 alt="campaign"
@@ -302,14 +310,14 @@ export default function CampaignDetailContent({
               />
             </div>
 
-            <div className="mt-3 text-center text-title text-text-black">
+            <div className=" text-center text-title text-text-black">
               {campaign.title}
             </div>
           </section>
 
-          <section className="py-5">
+          <section className="py-6.5">
             <div className="text-title1 text-text-black">상세 설명</div>
-            <div className="mt-3 space-y-2">
+            <div className="mt-2.5 space-y-2.5">
               {detailRows.map((row) => (
                 <DetailRow
                   key={row.label}
@@ -320,27 +328,29 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="my-6 mx-auto w-3/4 border-t border-bluegray-2" />
+          <div className="my-6 mx-auto w-3/4 border-t border-core-2" />
 
-          <section className="py-1">
+          <section className="py-6">
             <div className="text-title1 text-text-black">콘텐츠</div>
-            <div className="mt-3 space-y-4 text-callout1 text-text-gray3">
+
+            <div className="mt-2.5 space-y-2.5 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
-                <div key={row.label} className="flex gap-4">
-                  <div className="w-[84px] shrink-0 text-title3 text-text-gray3">
+                <div key={row.label} className="flex">
+                  <div className="w-21 shrink-0 text-title3 text-text-gray3">
                     {row.label}
                   </div>
-                  <div className="flex-1">
+
+                  <div className="flex-1 gap-[14px]">
                     {"value" in row && row.value ? (
                       <div className="whitespace-pre-line text-title3 text-text-gray1">
                         {row.value}
                       </div>
                     ) : (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {(row.chips ?? []).map((c) => (
                           <span
                             key={c}
-                            className="inline-flex items-center rounded-full border border-core-2 bg-bg-w px-3 py-1 text-callout1 text-text-gray1"
+                            className="inline-flex items-center rounded-full border border-core-2 bg-bg-w px-2 py-1 text-callout1 text-text-gray1"
                           >
                             {c}
                           </span>
@@ -356,7 +366,7 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="mt-8">
+          <div className="mt-6 mb-9">
             <button
               type="button"
               onClick={handleApply}
@@ -366,15 +376,13 @@ export default function CampaignDetailContent({
                 <img
                   src={MiniLogo}
                   alt=""
-                  className="h-[16px] w-[26px] select-none"
+                  className="h-4 w-6.5 select-none"
                   draggable={false}
                 />
                 <span className="text-title7 text-white">지원하기</span>
               </span>
             </button>
           </div>
-
-          <DividerBlock />
 
           <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
         </div>
@@ -386,18 +394,12 @@ export default function CampaignDetailContent({
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-4">
-      <div className="w-[84px] shrink-0 text-title3 text-text-gray3">
-        {label}
-      </div>
+      <div className="w-21 shrink-0 text-title3 text-text-gray3">{label}</div>
       <div className="whitespace-pre-line text-title3 text-text-gray1">
         {value}
       </div>
     </div>
   );
-}
-
-function DividerBlock() {
-  return <div className="-mx-5 mt-5 h-2 bg-bluegray-1" />;
 }
 
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
