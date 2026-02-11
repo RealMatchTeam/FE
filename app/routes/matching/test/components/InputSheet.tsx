@@ -1,5 +1,4 @@
 import React from "react";
-import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
 
 interface InputSheetProps {
   value: string;
@@ -29,8 +28,6 @@ export default function InputSheet({
   type = "text",
   autoCapitalize = "none",
 }: InputSheetProps) {
-  useHideBottomTab(true);
-
   const showError = Boolean(errorText) && value.trim().length > 0;
 
   return (

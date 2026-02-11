@@ -268,7 +268,7 @@ export default function MatchingTestStep2Content({
         </section>
       </main>
 
-      <div className="sticky bottom-0 w-full bg-white px-6 pt-3 pb-6">
+      <div className="sticky bottom-0 w-full bg-white px-6 pt-3 md:pt-6 pb-6">
         <Button
           variant="primary"
           size="lg"
