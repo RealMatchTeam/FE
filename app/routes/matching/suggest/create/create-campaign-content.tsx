@@ -218,7 +218,7 @@ export default function CreateCampaignContent() {
       : proposalData?.brandId || 1;
 
     const campaignId = type === "existing"
-      ? (selectedCampaign?.campaignId || (campaignIdParam ? Number(campaignIdParam) : proposalData?.campaignId) || null)
+      ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || selectedCampaign?.campaignId || null))
       : null;
 
     const requestData = {
