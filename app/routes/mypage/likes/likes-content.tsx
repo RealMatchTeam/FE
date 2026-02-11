@@ -5,6 +5,7 @@ import { useHideHeader } from "../../../hooks/useHideHeader";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import FilterBottomSheet from "../../business/components/FilterBottomSheet";
 import FilterButton from "../../../components/common/FilterButton";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { axiosInstance } from "../../../api/axios";
 
 type BrandLike = {
@@ -308,9 +309,7 @@ export default function MyPageLikes() {
             </div>
 
             {loading ? (
-              <div className="py-10 text-center text-[#9B9BA1] text-[14px]">
-                로딩 중...
-              </div>
+              <LoadingSpinner className="py-10" />
             ) : (
             <div className="mt-4 space-y-4">
               {activeTab === "brand"

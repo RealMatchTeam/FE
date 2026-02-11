@@ -9,6 +9,7 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { getMatchingBrands, toggleBrandLike, type MatchingBrand, MatchingTestRequiredError } from "../api/matching";
 
 export default function BrandContent() {
@@ -130,7 +131,7 @@ export default function BrandContent() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
-                <div className="text-lg text-text-gray3">로딩 중...</div>
+                <LoadingSpinner />
             </div>
         );
     }

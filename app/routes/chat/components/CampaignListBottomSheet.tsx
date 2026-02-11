@@ -4,6 +4,8 @@ import { getMyCollaborations, type CampaignCollaboration } from "../../business/
 import { getProposalDetail } from "../../business/proposal/api/proposal";
 import { type ProposalDetail } from "../../matching/api/matching";
 import { toast } from "sonner";
+import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 interface Props {
     isOpen: boolean;
@@ -75,15 +77,9 @@ export default function CampaignListBottomSheet({ isOpen, onClose, onSelect }: P
 
     if (loading || loadingDetail) {
         return (
-            <SelectBottomSheet
-                isOpen={isOpen}
-                onClose={onClose}
-                title={loadingDetail ? "제안 정보를 불러오는 중..." : "불러오는 중..."}
-                options={[]}
-                selectedValues={[]}
-                onSubmit={() => { }}
-                hasCustomInput={false}
-            />
+            <FilterBottomSheet isOpen={isOpen} onClose={onClose} className="h-[60%]">
+                <LoadingSpinner className="h-full" />
+            </FilterBottomSheet>
         );
     }
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { searchCollaborations, type CampaignCollaboration } from "../calendar/api/calendar"; 
 import searchIcon from "../../../assets/search2.svg";
 import closeIcon from "../../../assets/cancel.svg"; 
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 interface Props {
   subTab: "sent" | "received" | "applied";
@@ -81,7 +82,7 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
         </div>
 
         {/* 로딩 표시 */}
-        {isLoading && <div className="text-center py-4 text-text-gray3">로딩 중...</div>}
+        {isLoading && <LoadingSpinner className="py-4" size={80} />}
 
         {/* 검색 결과 리스트 */}
         <div className="px-4 overflow-y-auto">

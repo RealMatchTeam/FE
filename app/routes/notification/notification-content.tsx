@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchNotifications, readAllNotifications, readNotification, type NotificationItem } from "./api/notification";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 function TabButton({ label, active, onClick, count }: { label: string; active: boolean; onClick: () => void; count?: number }) {
     return (
@@ -123,7 +124,7 @@ export default function NotificationContent() {
 
             <div className="flex-1 overflow-y-auto">
                 {loading ? (
-                    <div className="flex justify-center items-center h-40 text-text-gray3">로딩 중...</div>
+                    <LoadingSpinner className="h-40" />
                 ) : notifications.length > 0 ? (
                     <div className="flex flex-col">
                         {notifications.map((item) => (
