@@ -298,7 +298,7 @@ export default function MyPageLikes() {
                             </div>
                             <button
                               type="button"
-                              className="text-[#B7B7F3] text-[20px]"
+                              className="text-[#B7B7F3] text-[24px]"
                               aria-label="찜 해제"
                               onClick={() => toggleBrandLike(brand.id)}
                             >
@@ -336,16 +336,16 @@ export default function MyPageLikes() {
                           )}
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="px-[2px] py-1 rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
+                          <span className="px-[2px] py-[1px] rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.dday}
                           </span>
-                          <span className="px-[2px] py-1 rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
+                          <span className="px-[2px] py-[2px] rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.applicants}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 py-4">
                         <div className="flex items-start justify-between gap-2">
                           <div className="text-[16px] leading-[20px] font-semibold text-[#171718] truncate">
                             {campaign.brand}
@@ -356,7 +356,7 @@ export default function MyPageLikes() {
                             </div>
                             <button
                               type="button"
-                              className="text-[#B7B7F3] text-[22px] leading-none"
+                              className="text-[#B7B7F3] text-[24px] leading-none"
                               aria-label="찜 해제"
                               onClick={() => toggleCampaignLike(campaign.id)}
                             >
