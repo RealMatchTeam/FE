@@ -90,7 +90,7 @@ export default function MatchingTestContent({
         <h1 className="text-title leading-8 text-text-black">
           관심 있는 <span className="text-core-1">뷰티 특성</span>을
           <br />
-          <span className="text-core-1">모두</span> 선택해주세요
+          <span className=" text-core-1">모두</span> 선택해주세요
         </h1>
 
         {sortedSections.map((section) => {
