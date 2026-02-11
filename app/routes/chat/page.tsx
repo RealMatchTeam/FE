@@ -12,6 +12,7 @@ export default function ChatPage() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sort, setSort] = useState<SortOption>("latest");
   const [pendingSort, setPendingSort] = useState<SortOption>(sort); // 바텀시트에서 고른 값
+  const [hasApplied, setHasApplied] = useState(false); // 적용하기 누른 적 있는지
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 (입력용)
   const [debouncedQuery, setDebouncedQuery] = useState(""); // 검색어 (API 호출용)
 
@@ -56,6 +57,7 @@ export default function ChatPage() {
 
   const applySort = () => {
     setSort(pendingSort);
+    setHasApplied(true);
     setIsSortOpen(false);
   };
 
@@ -64,6 +66,7 @@ export default function ChatPage() {
       <main className="p-4 pb-16">
         <ChatListHeader
           sortLabel={SORT_LABEL[sort]}
+          isFiltered={hasApplied}
           onClickSort={openSortSheet}
           sortOpen={isSortOpen}
           searchQuery={searchQuery}

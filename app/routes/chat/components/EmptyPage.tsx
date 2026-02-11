@@ -1,9 +1,11 @@
+import emptyImg from "../../../assets/empty.png";
+
 export function EmptyPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <h3 className="text-title text-text-gray2 mb-2">채팅방이 없어요</h3>
-      <p className="text-body1 text-text-gray3 text-center">
-        매칭이 성사되면 채팅을 시작할 수 있어요
+      <img src={emptyImg} alt="" className="h-auto w-[210px] select-none" />
+      <p className="font-medium text-[14px] text-[#5B5D6B] text-center mt-2">
+        받은 채팅이 없어요
       </p>
     </div>
   );

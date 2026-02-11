@@ -12,6 +12,7 @@ import HistoryRow from "./components/HistoryRow";
 
 import { tokenStorage } from "../../lib/token";
 import { toggleBrandLike } from "../matching/api/matching";
+import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import type { BrandDetailData } from "./types";
 
@@ -108,6 +109,7 @@ export default function BrandDetailContent({ data }: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const brandId = Number(searchParams.get("brandId"));
+  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -126,7 +128,17 @@ export default function BrandDetailContent({ data }: Props) {
       return;
     }
     if (!Number.isFinite(brandId) || brandId <= 0) return;
-    navigate(`/matching/suggest/create?brandId=${brandId}`);
+
+    const domain = searchParams.get("domain");
+
+    setProposalData({
+      brandId,
+      campaignId: 0,
+      domain: domain || "beauty",
+      brandName: data.name,
+    });
+
+    navigate("/matching/suggest");
   };
 
   const handleGoSponsorableProducts = () => {
