@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import Button from "../../components/common/Button";
 
 import BrandHero from "../brand-detail/components/BrandHero";
 import BrandInfo from "../brand-detail/components/BrandInfo";
@@ -12,7 +13,10 @@ import { apiClient } from "../../api/axios";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import type { BrandDetailData } from "../brand-detail/types";
-import type { CampaignDetail, CampaignDetailApiResponse } from "../campaign-detail/types";
+import type {
+  CampaignDetail,
+  CampaignDetailApiResponse,
+} from "../campaign-detail/types";
 
 import informationIconUrl from "../../assets/information-icon.svg?url";
 
@@ -45,13 +49,18 @@ const toDdayText = (dday?: number) => {
   return `D-${dday}`;
 };
 
-export default function CampaignDetailContent({ brandData, campaignId }: Props) {
+export default function CampaignDetailContent({
+  brandData,
+  campaignId,
+}: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
+  const setProposalData = useCampaignProposalStore((s) => s.setProposalData);
 
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
-  const [isHearted, setIsHearted] = useState<boolean>(brandData.isLiked ?? false);
+  const [isHearted, setIsHearted] = useState<boolean>(
+    brandData.isLiked ?? false,
+  );
 
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
   const [campaignError, setCampaignError] = useState<string | null>(null);
@@ -68,7 +77,9 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
         if (!alive) return;
 
         if (!res.data?.isSuccess) {
-          setCampaignError(res.data?.message || "캠페인 정보를 불러오지 못했어요.");
+          setCampaignError(
+            res.data?.message || "캠페인 정보를 불러오지 못했어요.",
+          );
           setCampaign(null);
           return;
         }
@@ -154,13 +165,19 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
 
     if (!campaign) return;
 
-    const brandId = searchParams.get("brandId");
-    const domain = searchParams.get("domain");
+    const brandIdNum = Number(brandData.id);
+    if (!Number.isFinite(brandIdNum) || brandIdNum <= 0) return;
+
+    const domainParam = searchParams.get("domain");
+    const domain =
+      domainParam === "fashion" || domainParam === "beauty"
+        ? domainParam
+        : "beauty";
 
     setProposalData({
-      brandId: Number(brandId),
+      brandId: brandIdNum,
       campaignId,
-      domain: domain || "beauty",
+      domain,
       brandName: brandData.name,
       campaignTitle: campaign.title,
       campaignDescription: campaign.description,
@@ -192,7 +209,7 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
   if (campaignError) {
     return (
       <div className="w-full bg-bg-w">
-        <div className="mx-auto w-full max-w-[430px] px-5 py-6 text-callout1 text-error">
+        <div className="px-5 py-6 text-callout1 text-error">
           {campaignError}
         </div>
       </div>
@@ -202,9 +219,7 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
   if (!campaign) {
     return (
       <div className="w-full bg-bg-w">
-        <div className="mx-auto w-full max-w-[430px] px-5 py-6 text-callout1 text-text-gray2">
-          로딩중...
-        </div>
+        <div className="px-5 py-6 text-callout1 text-text-gray2">로딩중...</div>
       </div>
     );
   }
@@ -213,7 +228,7 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
 
   return (
     <div className="w-full bg-bg-w">
-      <div className="mx-auto w-full max-w-[430px] bg-bg-w">
+      <div className="w-full bg-bg-w">
         <BrandHero
           heroImageUrl={heroUrl}
           logoImageUrl={brandData.logoImageUrl}
@@ -244,7 +259,9 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
             <span className="px-1 text-core-3">|</span>
             <span className="text-core-1">{campaign.quota}명</span>
             <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">{toKoreanCategory(campaign.category)}</span>
+            <span className="text-core-1">
+              {toKoreanCategory(campaign.category)}
+            </span>
           </div>
 
           <BrandActionBar
@@ -275,7 +292,11 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
             <div className="text-title1 text-text-black">상세 설명</div>
             <div className="mt-3 space-y-2 text-callout1 text-text-gray3">
               {detailRows.map((row) => (
-                <DetailRow key={row.label} label={row.label} value={row.value} />
+                <DetailRow
+                  key={row.label}
+                  label={row.label}
+                  value={row.value}
+                />
               ))}
             </div>
           </section>
@@ -287,7 +308,9 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
             <div className="mt-3 space-y-4 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
                 <div key={row.label} className="flex gap-4">
-                  <div className="w-[84px] shrink-0 text-text-gray2">{row.label}</div>
+                  <div className="w-[84px] shrink-0 text-text-gray2">
+                    {row.label}
+                  </div>
                   <div className="flex-1">
                     {"value" in row && row.value ? (
                       <div className="whitespace-pre-line">{row.value}</div>
@@ -301,7 +324,9 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
                             {c}
                           </span>
                         ))}
-                        {(!row.chips || row.chips.length === 0) && <span>-</span>}
+                        {(!row.chips || row.chips.length === 0) && (
+                          <span>-</span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -311,13 +336,16 @@ export default function CampaignDetailContent({ brandData, campaignId }: Props) 
           </section>
 
           <div className="mt-8">
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="lg"
+              withLogo
+              fullWidth
               onClick={handleApply}
-              className="h-[52px] w-full rounded-2xl bg-core-1 text-title7 text-white active:opacity-90 transition-opacity flex items-center justify-center"
             >
               지원하기
-            </button>
+            </Button>
           </div>
 
           <DividerBlock />
@@ -345,7 +373,9 @@ function DividerBlock() {
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
     <span className="flex items-center gap-2">
-      {icon ? <span className="flex h-5 w-5 items-center justify-center">{icon}</span> : null}
+      {icon ? (
+        <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
+      ) : null}
       <span className="leading-none">{text}</span>
     </span>
   );

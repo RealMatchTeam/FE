@@ -27,11 +27,9 @@ export default [
   layout("routes/_main.tsx", [
     index("routes/home/index.tsx"),
 
-
     route("pre", "routes/home/pre.tsx"),
-  route("home", "routes/home/after.tsx"),
+    route("home", "routes/home/after.tsx"),
 
-  
     route("matching", "routes/matching/route.tsx", [
       route("brand", "routes/matching/brand/route.tsx"),
       route("campaign", "routes/matching/campaign/route.tsx"),
@@ -81,13 +79,16 @@ export default [
       route("terms", "routes/mypage/terms/route.tsx"),
     ]),
 
-route("products/sponsorable", "routes/brand-detail/sponsorable/route.tsx"),
+    route("products/sponsorable", "routes/brand-detail/sponsorable/route.tsx"),
 
+    route(
+      "products/sponsorable/detail",
+      "routes/brand-detail/sponsorable/detail/route.tsx",
+    ),
 
     route("notification", "routes/notification/route.tsx"),
     route("brand", "routes/brand-detail/route.tsx"),
     route("campaign", "routes/campaign-detail/route.tsx"),
-
   ]),
 
   // Campaign detail route (without main layout)

@@ -178,7 +178,10 @@ export default function BrandDetailContent({ data }: Props) {
   const groupIndex = Math.floor((page - 1) / GROUP_SIZE);
   const groupStart = groupIndex * GROUP_SIZE + 1;
 
-  const displayPages = Array.from({ length: GROUP_SIZE }, (_, i) => groupStart + i);
+  const displayPages = Array.from(
+    { length: GROUP_SIZE },
+    (_, i) => groupStart + i,
+  );
 
   const canPrevGroup = groupStart > 1;
 
@@ -216,7 +219,10 @@ export default function BrandDetailContent({ data }: Props) {
 
   return (
     <div className="w-full bg-bg-w">
-      <div className="mx-auto w-full max-w-[430px] bg-bg-w">
+      <div
+        className="w-full
+ bg-bg-w"
+      >
         <BrandHero
           heroImageUrl={heroUrl}
           logoImageUrl={data.logoImageUrl}
@@ -272,13 +278,20 @@ export default function BrandDetailContent({ data }: Props) {
 
           {!data.ongoingCampaigns || data.ongoingCampaigns.length === 0 ? (
             <section className="py-5">
-              <div className="text-title1 text-text-black">진행 중인 캠페인</div>
+              <div className="text-title1 text-text-black">
+                진행 중인 캠페인
+              </div>
               <div className="flex h-[180px] items-center justify-center">
-                <div className="text-callout1 text-text-gray2">진행 중인 캠페인이 없어요.</div>
+                <div className="text-callout1 text-text-gray2">
+                  진행 중인 캠페인이 없어요
+                </div>
               </div>
             </section>
           ) : (
-            <OngoingCampaignSection campaigns={data.ongoingCampaigns} onMore={() => {}} />
+            <OngoingCampaignSection
+              campaigns={data.ongoingCampaigns}
+              onMore={() => {}}
+            />
           )}
 
           <DividerBlock />
@@ -297,7 +310,9 @@ export default function BrandDetailContent({ data }: Props) {
 
             {!data.products || data.products.length === 0 ? (
               <div className="flex h-[180px] items-center justify-center">
-                <div className="text-callout1 text-text-gray2">협찬 가능한 제품이 없어요.</div>
+                <div className="text-callout1 text-text-gray2">
+                  협찬 가능한 제품이 없어요.
+                </div>
               </div>
             ) : (
               <div className="mt-4 -mx-5 overflow-x-hidden">
@@ -319,7 +334,9 @@ export default function BrandDetailContent({ data }: Props) {
 
             {histories.length === 0 ? (
               <div className="flex h-[180px] items-center justify-center">
-                <div className="text-callout1 text-text-gray2">진행한 캠페인이 없어요</div>
+                <div className="text-callout1 text-text-gray2">
+                  진행한 캠페인이 없어요
+                </div>
               </div>
             ) : (
               <>
@@ -365,7 +382,9 @@ export default function BrandDetailContent({ data }: Props) {
                               ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
                               : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
                           }
-                          style={active ? { backgroundColor: "#A9ADFF" } : undefined}
+                          style={
+                            active ? { backgroundColor: "#A9ADFF" } : undefined
+                          }
                         >
                           {p}
                         </button>

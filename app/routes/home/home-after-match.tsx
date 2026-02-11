@@ -318,12 +318,12 @@ export default function HomeAfterMatchPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white px-5 pt-6">
+      <div className="bg-white px-5 pt-6 pb-[calc(116px+env(safe-area-inset-bottom))]">
         <div className="-mx-5 mb-4">
           <img
             src={category === "beauty" ? bannerBeauty : bannerFashion}
             alt="배너"
-            className="h-[250px] w-full object-cover"
+            className="h-62.5 w-full object-cover"
           />
         </div>
 
@@ -337,7 +337,7 @@ export default function HomeAfterMatchPage() {
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-            {brands.slice(0, 3).map((brand, i) => (
+            {brands.map((brand, i) => (
               <BrandCard
                 key={`brand-${brand.id}-${i}`}
                 item={{
@@ -369,7 +369,7 @@ export default function HomeAfterMatchPage() {
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-            {campaigns.slice(0, 3).map((campaign, i) => {
+            {campaigns.map((campaign, i) => {
               const safeCampaignId = getCampaignId(campaign);
               if (!safeCampaignId) return null;
 
@@ -404,7 +404,7 @@ export default function HomeAfterMatchPage() {
           <div className="mt-8">
             <CreatorProfileCard
               model={profileModel}
-              onMyProfileClick={() => navigate("/mypage")}
+              onMyProfileClick={() => navigate("/mypage/profileCard")}
             />
           </div>
         )}
@@ -417,7 +417,7 @@ export default function HomeAfterMatchPage() {
           />
 
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-            {popularCampaigns.slice(0, 3).map((campaign, i) => {
+            {popularCampaigns.map((campaign, i) => {
               const safeCampaignId = getCampaignId(campaign);
               if (!safeCampaignId) return null;
 

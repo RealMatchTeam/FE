@@ -37,14 +37,14 @@ export default function CategoryTabs({
         })}
       </div>
 
-      <div className="relative h-px w-full bg-black/10">
+      <div className="relative -mx-5 h-2">
+        <div className="absolute bottom-0 h-px w-full bg-black/10" />
+
         <div
-          className="absolute top-0 h-0.5 w-1/2 bg-[var(--color-success)] transition-transform"
+          className="absolute bottom-0 mx-5 h-0.5 w-[calc(50%-0px)] bg-[var(--color-success)] transition-transform"
           style={{
             transform:
-              value === "beauty"
-                ? "translateX(0%)"
-                : "translateX(100%)",
+              value === "beauty" ? "translateX(0%)" : "translateX(100%)",
           }}
         />
       </div>

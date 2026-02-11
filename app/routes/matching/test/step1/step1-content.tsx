@@ -28,7 +28,8 @@ const SECTION_ORDER: SectionKey[] = [
   "makeupStyle",
 ];
 
-const sortTagsById = (items: TagItem[]) => [...items].sort((a, b) => a.id - b.id);
+const sortTagsById = (items: TagItem[]) =>
+  [...items].sort((a, b) => a.id - b.id);
 
 export default function MatchingTestContent({
   isLoading,
@@ -66,7 +67,9 @@ export default function MatchingTestContent({
     return (
       <div className="w-full mx-auto h-full bg-white">
         <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">태그를 불러오는 중...</div>
+        <div className="px-6 py-10 text-sm text-text-gray3">
+          태그를 불러오는 중...
+        </div>
       </div>
     );
   }
@@ -85,7 +88,7 @@ export default function MatchingTestContent({
       <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
 
       <main className="flex-1 px-6 pb-6">
-        <h1 className="text-title leading-[32px] font-extrabold text-text-black">
+        <h1 className="text-title leading-8 text-text-black">
           관심 있는 <span className="text-core-1">뷰티 특성</span>을
           <br />
           <span className="text-core-1">모두</span> 선택해주세요
@@ -95,10 +98,12 @@ export default function MatchingTestContent({
           const items = sortedItemsBySection[section.key] ?? [];
 
           return (
-            <section key={section.key} className="mt-8">
-              <h2 className="text-title2 text-text-black mb-2">{section.title}</h2>
+            <section key={section.key} className="mt-8 bg-white">
+              <h2 className="text-title2 text-text-black mb-2">
+                {section.title}
+              </h2>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 bg-white">
                 {items.map((tag) => {
                   const checked = isSelected(section.key, tag.id);
 
@@ -118,7 +123,13 @@ export default function MatchingTestContent({
       </main>
 
       <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
-        <Button variant="primary" size="lg" fullWidth onClick={onNext} disabled={!canGoNext}>
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onClick={onNext}
+          disabled={!canGoNext}
+        >
           다음
         </Button>
       </div>
