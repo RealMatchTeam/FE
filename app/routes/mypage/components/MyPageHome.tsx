@@ -150,6 +150,7 @@ export default function MyPageHome({
             label="회원정보 변경"
             onClick={onOpenEditProfile}
             py={11}
+            disableActiveBg
           />
         </div>
         <Divider />
