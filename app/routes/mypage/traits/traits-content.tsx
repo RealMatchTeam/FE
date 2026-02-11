@@ -344,7 +344,6 @@ export default function TraitsPage() {
 
                         {editingId === trait.id ? (
                           <div className="mt-2 flex flex-wrap gap-2">
-<<<<<<< HEAD
                             {ALL_OPTIONS[trait.id]?.[section.title]?.map((option, idx) => {
                               const isSelected = section.items.includes(option); // 현재 선택 여부 확인
                               
@@ -364,17 +363,6 @@ export default function TraitsPage() {
                                 </span>
                               );
                             })}
-=======
-                            {section.items.map((item, idx) => (
-                              <span
-                                key={idx}
-                                className="px-[10px] py-1 bg-[#B7B7F3B2] border border-[#B7B7F3] text-[#6666E5] rounded-[20px] text-[14px] leading-[20px] font-medium"
-                              >
-                                {item}
-                              </span>
-                            ))}
-                            {/* 여기에 실제 수정 가능한 전체 태그 리스트를 매핑해야 합니다 */}
->>>>>>> a2b3c403565999f7b5720fb1b2e8d025c33bd8d1
                           </div>
                         ) : (
                           <div className="mt-[2px] text-[12px] leading-[16px] font-medium text-[#404252]">
