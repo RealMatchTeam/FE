@@ -12,7 +12,7 @@ export default function SectionHeader({
     <div className="flex items-start justify-between text-[var(--color-text-black)]">
       <div>
         <div className="text-[16px] leading-[20px] font-semibold">{title}</div>
-        {subtitle ? <div className="mt-[10px] text-callout1 text-[var(--color-text-gray3)]">{subtitle}</div> : null}
+        {subtitle ? <div className="mt-[5px] text-callout1 text-[var(--color-text-gray3)]">{subtitle}</div> : null}
       </div>
 
       {onMore ? (
