@@ -11,7 +11,7 @@ export default function ContentCategoryDropdown({
   const [selected, setSelected] = useState<(typeof OPTIONS)[number]>("패션");
 
   return (
-    <div className="w-[375px] bg-white border border-text-gray4 rounded-2xl pt-5 pb-6">
+    <div className=" bg-white border border-text-gray4 rounded-2xl pt-5 pb-6">
       <div className="flex justify-center">
         <span className="inline-flex items-center justify-center w-[55px] h-[16px] text-[12px] leading-[16px] font-medium text-text-gray3">
           콘텐츠 분야

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 import { getProposalDetail, type ProposalDetail } from "../proposal/api/proposal";
 import { getBrandSummary, type BrandSummary } from "../proposal/api/brand";
@@ -45,7 +46,7 @@ export default function RejectionContent() {
         fetchData();
     }, [proposalId, brandIdFromState]);
 
-    if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+    if (isLoading) return <LoadingSpinner className="py-10" />;
     if (!data) return <div className="p-10 text-center">정보를 찾을 수 없습니다.</div>;
 
     return (
@@ -58,7 +59,7 @@ export default function RejectionContent() {
                     <CampaignBrandCard
                         showChatSection={false}
                         statusText="거절됨" // 고정 텍스트 혹은 데이터 기반
-                        brandName={brand?.brandName || "브랜드명 로딩 중"}
+                        brandName={brand?.brandName}
                         brandImageUrl={brand?.brandImageUrl}
                         brandTags={brand?.brandTags || ["거절"]}
                         matchingRate={brand?.matchingRate}

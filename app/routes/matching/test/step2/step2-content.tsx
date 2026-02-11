@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import MatchingTestTopBar from "../components/MatchingTestHeader";
 import SelectChip from "../components/SelectChip";
 import Button from "../../../../components/common/Button";
+import LoadingSpinner from "../../../../components/common/LoadingSpinner";
 
 import BottomSheet from "../components/BottomSheet";
 import InputSheet from "../components/InputSheet";
@@ -163,9 +164,7 @@ export default function MatchingTestStep2Content({
     return (
       <div className="w-full min-h-full bg-white flex flex-col">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
+        <LoadingSpinner className="py-10" />
       </div>
     );
   }
@@ -184,7 +183,7 @@ export default function MatchingTestStep2Content({
       <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
       <main className="flex-1 px-6 pb-[30px] bg-white">
-        <h1 className="text-title leading-[32px] font-extrabold text-text-black">
+        <h1 className="text-title leading-[32px] text-text-black">
           관심 있는 <span className="text-core-1">패션 특성</span>을
           <br />
           <span className="text-core-1">모두</span> 선택해주세요

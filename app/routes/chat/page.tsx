@@ -3,10 +3,11 @@ import { SORT_LABEL, type SortOption } from "./components/ChatSortFilterConstant
 import { useEffect } from "react";
 import { ChatListHeader } from "./components/ChatListHeader";
 import SortFilterSheet from "./components/ChatSortFilterSheet";
-import ChatListCard, { ChatListSkeleton } from "./components/ChatListCard";
+import ChatListCard from "./components/ChatListCard";
 import { EmptyPage } from "./components/EmptyPage";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { getChatRooms, type ChatRoomCard } from "./api/chat";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function ChatPage() {
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -74,7 +75,7 @@ export default function ChatPage() {
         />
 
         {loading ? (
-          <ChatListSkeleton />
+          <LoadingSpinner className="py-10" />
         ) : rooms.length === 0 ? (
           <EmptyPage />
         ) : (

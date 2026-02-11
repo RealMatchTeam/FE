@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
   },
 });
 
-async function registerServiceWorker() {
+/*async function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     try {
       await navigator.serviceWorker.register('/firebase-messaging-sw.js');
@@ -28,7 +28,7 @@ async function registerServiceWorker() {
       console.error('Service Worker registration failed:', error);
     }
   }
-}
+}*/
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -63,7 +63,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
 
-  registerServiceWorker();
+  //registerServiceWorker();
 
   return (
     <QueryClientProvider client={queryClient}>

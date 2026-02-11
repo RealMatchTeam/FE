@@ -127,7 +127,7 @@ export default function NotificationContent() {
                 style={{ height: `calc(100vh - 60px - 67px - 60px)` }}
             >
                 {loading ? (
-                    <div className="flex justify-center items-center h-40 text-text-gray3">로딩 중...</div>
+                    <LoadingSpinner className="h-40" />
                 ) : notifications.length > 0 ? (
                     <div className="flex flex-col">
                         {notifications.map((item) => (

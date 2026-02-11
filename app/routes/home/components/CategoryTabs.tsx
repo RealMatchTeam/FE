@@ -14,8 +14,8 @@ export default function CategoryTabs({
   ];
 
   return (
-    <div className="mt-2">
-      <div className="flex items-center justify-between">
+    <div className="relative h-12.5 w-full bg-white">
+      <div className="flex h-full items-center px-4">
         {tabs.map((t) => {
           const active = t.key === value;
 
@@ -25,10 +25,8 @@ export default function CategoryTabs({
               type="button"
               onClick={() => onChange(t.key)}
               className={[
-                "flex-1 py-3 text-center text-title2 transition-colors",
-                active
-                  ? "text-[var(--color-core-1)]"
-                  : "text-[var(--color-text-gray3)]",
+                "flex-1 h-full flex items-center justify-center text-title2 transition-colors",
+                active ? "text-(--color-core-1)" : "text-text-gray3",
               ].join(" ")}
             >
               {t.label}
@@ -37,11 +35,11 @@ export default function CategoryTabs({
         })}
       </div>
 
-      <div className="relative -mx-5 h-2">
-        <div className="absolute bottom-0 h-px w-full bg-black/10" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-black/10" />
 
+      <div className="absolute bottom-0 left-0 right-0 px-4">
         <div
-          className="absolute bottom-0 mx-5 h-0.5 w-[calc(50%-0px)] bg-[var(--color-success)] transition-transform"
+          className="h-0.5 w-1/2 bg-(--color-success) transition-transform"
           style={{
             transform:
               value === "beauty" ? "translateX(0%)" : "translateX(100%)",

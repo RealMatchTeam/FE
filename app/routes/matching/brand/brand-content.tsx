@@ -9,7 +9,8 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
-import { getMatchingBrands, toggleBrandLike, type MatchingBrand } from "../api/matching";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
+import { getMatchingBrands, toggleBrandLike, type MatchingBrand, MatchingTestRequiredError } from "../api/matching";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
@@ -130,21 +131,29 @@ export default function BrandContent() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
-                <div className="text-lg text-text-gray3">로딩 중...</div>
+                <LoadingSpinner />
             </div>
         );
     }
 
-    // 매칭 결과가 없거나 에러
-    if (error || (brands.length === 0 && !isLoading)) {
-        if (error) console.error("Failed to fetch matching brands:", error);
-
+    // 매칭 검사를 안한 경우
+    if (error instanceof MatchingTestRequiredError) {
         return <EmptyMatchState
             message={`매칭된 기업이 없어요\n매칭 검사를 먼저 진행해주세요`}
             showButton={true}
             buttonText="매칭 검사하기"
             contentClassName="pb-14"
         />
+    }
+
+    // 기타 에러
+    if (error) {
+        console.error("Failed to fetch matching brands:", error);
+        return (
+            <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
+                <div className="text-lg text-text-gray3">오류가 발생했습니다</div>
+            </div>
+        );
     }
 
     // 매칭 결과가 있을 때
