@@ -83,6 +83,8 @@ export interface ChatMessage {
   systemMessage: SystemMessage | null; // SYSTEM일 때만
   createdAt: string; // ISO-8601 형식
   clientMessageId: string | null; // 사용자가 보낸 메시지의 UUID
+  _uploading?: boolean; // 클라이언트 전용: 파일 업로드 진행 중
+  _uploadFileName?: string; // 클라이언트 전용: 업로드 중인 파일명
 }
 
 export interface ChatAttachment {
