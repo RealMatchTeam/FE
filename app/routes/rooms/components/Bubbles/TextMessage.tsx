@@ -52,7 +52,7 @@ export default function TextMessage ({
   if (isLeft) {
     return (
       <div className="flex justify-start">
-        <div className="w-fit flex items-start gap-[10px] max-w-full">
+        <div className="flex items-start gap-[10px] max-w-[80%]">
           {/* avatar */}
           <div
             className="shrink-0 rounded-[10px] bg-white overflow-hidden"
@@ -73,18 +73,16 @@ export default function TextMessage ({
           </div>
 
           { /*bubble + time*/ }
-          <div className="flex justify-start">
-            <div className="flex items-end gap-[8px] max-w-[calc(100%-48px)]">
-              <div className="w-fit max-w-[240px] rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-[12px] leading-[16px] text-Medium text-black break-words whitespace-pre-line">
-                {content}
-              </div>
-
-              {timeText ? (
-                <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
-                  {timeText}
-                </div>
-              ) : null}
+          <div className="flex items-end gap-[8px] min-w-0">
+            <div className="rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-[12px] leading-[16px] text-Medium text-black break-words whitespace-pre-line">
+              {content}
             </div>
+
+            {timeText ? (
+              <div className="shrink-0 text-[10px] leading-[12px] text-[#9B9BA1] whitespace-pre-line">
+                {timeText}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

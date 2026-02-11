@@ -1,19 +1,7 @@
-import { formatKoreanDateTime } from "../../utils/dateTime";
+import { formatKoreanDateTime } from "@utils/dateTime";
 import { useNavigate } from "react-router-dom";
-import { type ChatRoomCard } from "./api/chat";
 
-export function ChatList({ rooms }: { rooms: ChatRoomCard[] }) {
-  
-  return (
-    <div className="flex flex-col gap-[10px]">
-      {rooms.map((room) => (
-        <ChatListItem key={room.roomId} room={room} />
-      ))}
-    </div>
-  );
-}
-
-export function ChatListItem({ room }: { room: ChatRoomCard }) {
+export default function ChatListCard({ room }: { room: ChatRoomCard }) {
   const { dateText, timeText } = formatKoreanDateTime(room.lastMessageAt);
   const navigate = useNavigate();
 
@@ -39,7 +27,7 @@ export function ChatListItem({ room }: { room: ChatRoomCard }) {
       </div>
 
       {/* 중간 텍스트 영역 */}
-      <div className="w-[227px] min-w-0">
+      <div className="flex-1 min-w-0">
         {/* 1줄: 브랜드명 + 상태 뱃지 */}
         <div className="flex items-center gap-2">
           <div className="text-title1 text-text-black font-Pretendard truncate">
@@ -89,4 +77,31 @@ export function ChatListItem({ room }: { room: ChatRoomCard }) {
   );
 }
 
-export default ChatList;
+export function ChatListSkeleton({ count = 5 }: { count?: number }) {
+  return (
+    <div className="flex flex-col gap-[10px]">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="w-full rounded-[10px] bg-white px-4 py-[14px] flex items-start gap-[14px]"
+        >
+          {/* 왼쪽 로고 */}
+          <div className="w-[43px] h-[43px] rounded-[10px] bg-[#F2F2F5] shrink-0 animate-pulse" />
+
+          {/* 중간 텍스트 */}
+          <div className="flex-1 min-w-0">
+            <div className="h-[16px] w-[100px] bg-[#F2F2F5] rounded-[4px] animate-pulse" />
+            <div className="h-[12px] w-[180px] bg-[#F2F2F5] rounded-[4px] mt-2.5 animate-pulse" />
+            <div className="h-[12px] w-[120px] bg-[#F2F2F5] rounded-[4px] mt-1 animate-pulse" />
+          </div>
+
+          {/* 오른쪽 */}
+          <div className="flex flex-col items-end justify-between w-[68px] h-[65px] shrink-0">
+            <div className="w-[20px] h-[20px] rounded-full bg-[#F2F2F5] animate-pulse" />
+            <div className="h-[10px] w-[50px] bg-[#F2F2F5] rounded-[4px] animate-pulse" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

@@ -29,6 +29,18 @@ type Args = {
   inputRef: React.RefObject<HTMLInputElement | null>;
 };
 
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg"];
+const ALLOWED_FILE_EXTENSIONS = [".pdf", ".doc", ".docx"];
+
+function isAllowedImage(file: File): boolean {
+  return ALLOWED_IMAGE_TYPES.includes(file.type);
+}
+
+function isAllowedFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return ALLOWED_FILE_EXTENSIONS.some((ext) => name.endsWith(ext));
+}
+
 export default function useChatActions({
   roomId,
   myUserId,
@@ -97,6 +109,11 @@ export default function useChatActions({
     e.target.value = "";
     if (!file) return;
 
+    if (!isAllowedImage(file)) {
+      toast.error("PNG, JPEG 형식의 이미지만 첨부할 수 있습니다.");
+      return;
+    }
+
     try {
       const uploaded = await upload({ file, attachmentType: "IMAGE" });
 
@@ -156,6 +173,11 @@ export default function useChatActions({
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+
+    if (!isAllowedFile(file)) {
+      toast.error("PDF, DOC, DOCX 형식의 파일만 첨부할 수 있습니다.");
+      return;
+    }
 
     try {
       const uploaded = await upload({ file, attachmentType: "FILE" });

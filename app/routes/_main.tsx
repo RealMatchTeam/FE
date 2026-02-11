@@ -44,7 +44,7 @@ export default function MainLayout() {
 
         <main
           className={[
-            "flex-1 w-full bg-[#FAFAFA]",
+            "flex-1 w-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]",
             disableScroll ? "overflow-hidden" : "overflow-y-auto",
           ].join(" ")}
         >

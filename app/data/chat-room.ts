@@ -1,4 +1,4 @@
-import { type ChatRoom } from "../routes/chat/ChatList";
+import { type ChatRoom } from "../routes/chat/page";
 
 export const rooms: ChatRoom[] = [
   {
