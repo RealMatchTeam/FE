@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import CampaignDetailContent from "./campaign-detail";
+import CampaignDetailSkeleton from "./components/CampaignDetailSkeleton";
 import { fetchBrandDetail } from "../brand-detail/api/api";
 import type { BrandDetailData, BrandDomain } from "../brand-detail/types";
 import { apiClient } from "../../api/axios";
@@ -130,7 +131,7 @@ export default function CampaignDetailRoute() {
   }
 
   if (!resolvedBrandId || !data) {
-    return <div className="min-h-screen bg-white px-5 py-6">로딩중...</div>;
+    return <CampaignDetailSkeleton />;
   }
 
   return <CampaignDetailContent brandData={data} campaignId={campaignId} />;
