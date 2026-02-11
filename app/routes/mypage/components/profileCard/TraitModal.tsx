@@ -65,15 +65,7 @@ export default function TraitModal({
               <div className="flex items-center justify-center">
                 <div className="">{trait.icon("w-[46px] h-[47px]")}</div>
               </div>
-              <div
-                className="text-title1"
-                style={{
-                  background: "var(--OO, radial-gradient(90.97% 90.97% at 9.03% 50%, #382FE4 0%, #5D5DFF 47.6%, #3915DA 95.19%))",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
+              <div className="text-title1 text-core-1">
                 {trait.badge}
               </div>
             </div>
@@ -96,7 +88,7 @@ export default function TraitModal({
                     i === 0 ? "" : "border-l border-[#E8E8FB]",
                   ].join(" ")}
                 >
-                  <div className="text-callout2 text-core1">
+                  <div className="text-callout2 text-core-1">
                     {item.label}
                   </div>
                   <div className="mt-1 text-callout1 text-text-gray2">
@@ -108,10 +100,10 @@ export default function TraitModal({
           </div>
 
           {/* sections */}
-          <div className="space-y-[10px]">
+          <div className="space-y-[14px]">
             {trait.sections.map((section, i) => (
               <div key={i}>
-                <div className="text-callout1 text-core1">
+                <div className="text-callout1 text-core-1">
                   {section.title}
                 </div>
                 <div className="text-callout1 text-text-gray1">
