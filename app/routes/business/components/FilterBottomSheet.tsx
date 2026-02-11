@@ -68,7 +68,7 @@ export default function FilterBottomSheet({
         </div>
 
         {/* 하단 적용하기 버튼 */}
-        <div className="mt-auto px-4 pb-10">
+        <div className="mt-auto px-4 pb-6">
           <button
             onClick={() => {
               onApply(selected);
