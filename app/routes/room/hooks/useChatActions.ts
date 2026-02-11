@@ -114,24 +114,40 @@ export default function useChatActions({
       return;
     }
 
+    const uploadingId = -Date.now();
+    const uploadingMsg: ChatMessage = {
+      messageId: uploadingId,
+      roomId,
+      senderId: myUserId,
+      senderType: "USER",
+      messageType: "IMAGE",
+      content: null,
+      attachment: null,
+      systemMessage: null,
+      createdAt: new Date().toISOString(),
+      clientMessageId: null,
+      _uploading: true,
+      _uploadFileName: file.name,
+    };
+
+    setMessages((prev) => [...prev, uploadingMsg]);
+    setIsSheetOpen(false);
+
     try {
       const uploaded = await upload({ file, attachmentType: "IMAGE" });
 
       const clientId = crypto.randomUUID();
       sentMessageIds.current.add(clientId);
 
-      const payload = {
-        roomId,
-        messageType: "IMAGE",
-        content: null,
-        attachmentId: uploaded.attachmentId, // 업로드된 ID 사용
-        clientMessageId: clientId,
-      };
-
-      // STOMP 서버로 전송
       stompClient.current?.publish({
         destination: "/app/v1/chat.send",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          roomId,
+          messageType: "IMAGE",
+          content: null,
+          attachmentId: uploaded.attachmentId,
+          clientMessageId: clientId,
+        }),
       });
 
       const tempMessage: ChatMessage = {
@@ -155,10 +171,12 @@ export default function useChatActions({
         clientMessageId: clientId,
       };
 
-      setMessages((prev) => [...prev, tempMessage]);
-      setIsSheetOpen(false);
+      setMessages((prev) =>
+        prev.map((m) => (m.messageId === uploadingId ? tempMessage : m)),
+      );
     } catch (err) {
       console.error(err);
+      setMessages((prev) => prev.filter((m) => m.messageId !== uploadingId));
       const message =
         err instanceof Error ? err.message : "이미지 업로드에 실패했습니다.";
       if (message.includes("지원하지 않는")) {
@@ -179,24 +197,40 @@ export default function useChatActions({
       return;
     }
 
+    const uploadingId = -Date.now();
+    const uploadingMsg: ChatMessage = {
+      messageId: uploadingId,
+      roomId,
+      senderId: myUserId,
+      senderType: "USER",
+      messageType: "FILE",
+      content: null,
+      attachment: null,
+      systemMessage: null,
+      createdAt: new Date().toISOString(),
+      clientMessageId: null,
+      _uploading: true,
+      _uploadFileName: file.name,
+    };
+
+    setMessages((prev) => [...prev, uploadingMsg]);
+    setIsSheetOpen(false);
+
     try {
       const uploaded = await upload({ file, attachmentType: "FILE" });
 
       const clientId = crypto.randomUUID();
       sentMessageIds.current.add(clientId);
 
-      const payload = {
-        roomId,
-        messageType: "FILE",
-        content: null,
-        attachmentId: uploaded.attachmentId, // 업로드된 ID 사용
-        clientMessageId: clientId,
-      };
-
-      // STOMP 서버로 전송
       stompClient.current?.publish({
         destination: "/app/v1/chat.send",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          roomId,
+          messageType: "FILE",
+          content: null,
+          attachmentId: uploaded.attachmentId,
+          clientMessageId: clientId,
+        }),
       });
 
       const tempMessage: ChatMessage = {
@@ -220,10 +254,12 @@ export default function useChatActions({
         clientMessageId: clientId,
       };
 
-      setMessages((prev) => [...prev, tempMessage]);
-      setIsSheetOpen(false);
+      setMessages((prev) =>
+        prev.map((m) => (m.messageId === uploadingId ? tempMessage : m)),
+      );
     } catch (err) {
       console.error(err);
+      setMessages((prev) => prev.filter((m) => m.messageId !== uploadingId));
       const message =
         err instanceof Error ? err.message : "파일 업로드에 실패했습니다.";
       if (message.includes("지원하지 않는")) {

@@ -3,6 +3,7 @@ import ProposalMessage from "./Bubbles/ProposalMessage";
 import MatchingMessage from "./Bubbles/MatchingMessage";
 import { CHAT_NOTICE_TEXT } from "./Bubbles/SystemEventMessage";
 import AttachmentMessage from "./Bubbles/AttachmentMessage";
+import UploadingMessage from "./Bubbles/UploadingMessage";
 import type { ChatMessage } from "../api/rooms";
 import ChatNoticeMessage from "./Bubbles/SystemEventMessage";
 
@@ -17,6 +18,15 @@ export default function MessageRenderer({
   timeText,
   avatarSrc,
 }: Props) {
+
+  if (message._uploading) {
+    return (
+      <UploadingMessage
+        fileName={message._uploadFileName ?? ""}
+        type={message.messageType === "IMAGE" ? "IMAGE" : "FILE"}
+      />
+    );
+  }
 
   switch (message.messageType) {
     case "TEXT": {
