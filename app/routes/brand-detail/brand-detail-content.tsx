@@ -273,7 +273,7 @@ export default function BrandDetailContent({ data }: Props) {
               </div>
               <div className="flex h-[180px] items-center justify-center">
                 <div className="text-callout1 text-text-gray2">
-                  진행 중인 캠페인이 없어요.
+                  진행 중인 캠페인이 없어요
                 </div>
               </div>
             </section>

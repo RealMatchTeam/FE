@@ -318,7 +318,7 @@ export default function HomeAfterMatchPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white px-5 pt-6">
+      <div className="bg-white px-5 pt-6 pb-[calc(116px+env(safe-area-inset-bottom))]">
         <div className="-mx-5 mb-4">
           <img
             src={category === "beauty" ? bannerBeauty : bannerFashion}
@@ -404,7 +404,7 @@ export default function HomeAfterMatchPage() {
           <div className="mt-8">
             <CreatorProfileCard
               model={profileModel}
-              onMyProfileClick={() => navigate("/mypage")}
+              onMyProfileClick={() => navigate("/mypage/profileCard")}
             />
           </div>
         )}

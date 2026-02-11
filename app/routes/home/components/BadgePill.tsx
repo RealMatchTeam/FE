@@ -13,10 +13,10 @@ export default function BadgePill({
     return (
       <span
         className="
-          inline-flex h-4 max-w-[38px] items-center justify-center truncate
+          inline-flex h-4 max-w-9.5 items-center justify-center truncate
           rounded-[5px]
           px-1
-          text-title5 font-semibold leading-[14px]
+          text-title5 leading-3.5
           text-core-1
           bg-core-2
           align-middle

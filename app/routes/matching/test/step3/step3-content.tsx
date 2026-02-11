@@ -159,8 +159,8 @@ export default function MatchingTestStep3Content({
         <div className="px-6 py-10 text-sm text-red-500">{tagsError}</div>
       ) : null}
 
-      <main className="flex-1 px-6 pb-[30px]">
-        <h1 className="text-title leading-[32px] font-extrabold text-text-black">
+      <main className="flex-1 px-6 pb-7.5 bg-white">
+        <h1 className="text-title leading-8 font-extrabold text-text-black">
           <span className="text-core-1">콘텐츠 특성</span>을{" "}
           <span className="text-core-1">모두</span> 선택해주세요
         </h1>
@@ -186,7 +186,7 @@ export default function MatchingTestStep3Content({
             />
           </div>
 
-          <div className="mt-4 text-title4 text-text-gray3">
+          <div className="mt-4 text-callout1 text-text-gray3">
             주 시청자 정보를 선택해주세요
           </div>
           <div className="mt-2 grid grid-cols-2 gap-3 items-stretch">

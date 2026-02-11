@@ -10,18 +10,18 @@ type Props = {
 
 export default function BrandCard({ item, onClick, onLikeToggle }: Props) {
   return (
-    <div onClick={onClick} className="w-[118px] shrink-0 cursor-pointer text-left">
-      <div className="relative aspect-square rounded-xl border border-core-2 bg-white">
+    <div onClick={onClick} className="w-29.5 shrink-0 cursor-pointer text-left">
+      <div className="relative aspect-square rounded-xl border border-core-2 bg-white overflow-hidden">
         <div className="absolute left-2 right-2 top-2 flex items-center justify-between">
           <div className="flex h-6 min-w-0 items-center">
-            <div className="ml-[6px] flex items-center overflow-visible -translate-x-[6px] -translate-y-[6px]">
+            <div className="ml-1.5 flex items-center overflow-visible -translate-x-1.5 -translate-y-1.5">
               {item.badgeText ? <BadgePill text={item.badgeText} /> : null}
             </div>
           </div>
 
           <div
             onClick={(e) => e.stopPropagation()}
-            className="grid h-6 w-6 place-items-center translate-x-[6px] -translate-y-[6px]"
+            className="grid h-6 w-6 place-items-center translate-x-1.5 -translate-y-1.5"
           >
             <HeartButton
               defaultPressed={!!item.isLiked}
@@ -30,16 +30,18 @@ export default function BrandCard({ item, onClick, onLikeToggle }: Props) {
           </div>
         </div>
 
-        <div className="flex h-full items-center justify-center px-3">
+        <div className="h-full w-full">
           {item.logoUrl ? (
             <img
               src={item.logoUrl}
               alt={item.name}
               draggable={false}
-              className="block max-h-[28px] max-w-[78%] object-contain pointer-events-none select-none"
+              className="h-full w-full object-cover pointer-events-none select-none"
             />
           ) : (
-            <div className="text-[16px] font-semibold tracking-tight">{item.name}</div>
+            <div className="flex h-full items-center justify-center text-title7 tracking-tight">
+              {item.name}
+            </div>
           )}
         </div>
       </div>
@@ -47,10 +49,14 @@ export default function BrandCard({ item, onClick, onLikeToggle }: Props) {
       <div className="mt-2">
         <div className="flex items-baseline justify-between">
           <div className="text-title7 text-text-black">{item.name}</div>
-          <div className="text-[14px] font-semibold text-core-1">{item.matchRate}%</div>
+          <div className="text-[14px] font-semibold text-core-1">
+            {item.matchRate}%
+          </div>
         </div>
 
-        <div className="mt-0.5 text-title5 text-text-gray3">{item.subText ?? ""}</div>
+        <div className="mt-0.5 text-callout2 text-text-gray3">
+          {item.subText ?? ""}
+        </div>
       </div>
     </div>
   );

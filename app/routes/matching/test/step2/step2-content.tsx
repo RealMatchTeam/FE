@@ -155,14 +155,17 @@ export default function MatchingTestStep2Content({
       ? Number(bottomInput.trim())
       : null;
 
-  const heightInRange = heightNum != null && heightNum >= 140 && heightNum <= 200;
+  const heightInRange =
+    heightNum != null && heightNum >= 140 && heightNum <= 200;
   const bottomInRange = bottomNum != null && bottomNum >= 23 && bottomNum <= 65;
 
   if (isLoading) {
     return (
       <div className="w-full min-h-full bg-white flex flex-col">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">태그를 불러오는 중...</div>
+        <div className="px-6 py-10 text-sm text-text-gray3">
+          태그를 불러오는 중...
+        </div>
       </div>
     );
   }
@@ -180,7 +183,7 @@ export default function MatchingTestStep2Content({
     <div className="w-full min-h-full bg-white flex flex-col">
       <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
 
-      <main className="flex-1 px-6 pb-[30px]">
+      <main className="flex-1 px-6 pb-[30px] bg-white">
         <h1 className="text-title leading-[32px] font-extrabold text-text-black">
           관심 있는 <span className="text-core-1">패션 특성</span>을
           <br />
@@ -190,9 +193,11 @@ export default function MatchingTestStep2Content({
         {sections.map((section) => {
           const items = sortById(itemsBySection[section.key] ?? []);
           return (
-            <section key={section.key} className="mt-8">
-              <h2 className="text-title2 text-text-black mb-2">{section.title}</h2>
-              <div className="flex flex-wrap gap-3">
+            <section key={section.key} className="mt-8 bg-white">
+              <h2 className="text-title2 text-text-black mb-2 bg-white">
+                {section.title}
+              </h2>
+              <div className="flex flex-wrap gap-3 bg-white">
                 {items.map((tag) => {
                   const checked = isSelected(section.key, tag.id);
                   return (
@@ -209,10 +214,14 @@ export default function MatchingTestStep2Content({
           );
         })}
 
-        <section className="mt-8">
-          <h2 className="text-title2 text-text-black mb-2">체형 정보</h2>
+        <section className="mt-8 bg-white">
+          <h2 className="text-title2 text-text-black mb-2 bg-white">
+            체형 정보
+          </h2>
 
-          <div className="text-title4 text-text-gray3">키를 입력해주세요</div>
+          <div className="text-title4 text-text-gray3 bg-white">
+            키를 입력해주세요
+          </div>
           <div className="mt-2">
             <FormField
               label="키(cm)"
@@ -225,7 +234,9 @@ export default function MatchingTestStep2Content({
             />
           </div>
 
-          <div className="mt-4 text-title4 text-text-gray3">체형을 선택해주세요</div>
+          <div className="mt-4 text-title4 text-text-gray3 bg-white">
+            체형을 선택해주세요
+          </div>
           <div className="mt-2">
             <FormField
               label="체형"
@@ -238,7 +249,7 @@ export default function MatchingTestStep2Content({
           <div className="mt-4 text-title4 text-text-gray3">
             평소 입는 옷 사이즈를 선택해주세요
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-3 items-stretch">
+          <div className="mt-2 grid grid-cols-2 gap-3 items-stretch bg-white">
             <FormField
               label="상의 사이즈"
               value={topSizeValue}
