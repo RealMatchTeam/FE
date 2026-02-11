@@ -220,7 +220,7 @@ function SignUpInfoContent() {
           size="lg"
           fullWidth
           onClick={handleNext}
-          className={`mt-6 mb-6 md:mt-10 md:mb-0 ${!socialNicknameValue ||
+          className={`mt-auto md:mt-10 lg:mt-42 ${!socialNicknameValue ||
             !socialBirthDateValue ||
             !socialGenderValue ||
             !socialNicknameSuccess ||

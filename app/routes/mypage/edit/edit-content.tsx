@@ -121,9 +121,14 @@ export default function MyPageEdit() {
     const existingScript = document.getElementById(
       scriptId,
     ) as HTMLScriptElement | null;
+
+    const handleLoad = () => setIsAddressApiReady(true);
+
     if (existingScript) {
-      existingScript.addEventListener("load", () => setIsAddressApiReady(true));
-      return;
+      existingScript.addEventListener("load", handleLoad);
+      return () => {
+        existingScript.removeEventListener("load", handleLoad);
+      };
     }
 
     const script = document.createElement("script");
@@ -131,8 +136,12 @@ export default function MyPageEdit() {
     script.src =
       "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
     script.async = true;
-    script.onload = () => setIsAddressApiReady(true);
+    script.onload = handleLoad;
     document.body.appendChild(script);
+
+    return () => {
+      script.onload = null;
+    };
   }, []);
 
   const handleAddressSearch = () => {

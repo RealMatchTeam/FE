@@ -49,13 +49,19 @@ export default function CalendarContent() {
     fetchAllCampaigns();
   }, [keyword, location.key]);
 
-  const filteredList = useMemo(() => {
+  // 날짜 계산을 별도 useMemo로 분리
+  const dateInfo = useMemo(() => {
     const today = new Date();
-
     const todayStr = today.getFullYear() + '-' +
       String(today.getMonth() + 1).padStart(2, '0') + '-' +
       String(today.getDate()).padStart(2, '0');
     const currentMonthStr = todayStr.substring(0, 7);
+
+    return { todayStr, currentMonthStr };
+  }, []);
+
+  const filteredList = useMemo(() => {
+    const { todayStr, currentMonthStr } = dateInfo;
 
     return campaigns.filter((item) => {
       if (item.status !== "MATCHED") return false;
@@ -68,7 +74,7 @@ export default function CalendarContent() {
         return startMonth <= currentMonthStr && endMonth >= currentMonthStr;
       }
     });
-  }, [campaigns, activeTab]);
+  }, [campaigns, activeTab, dateInfo]);
 
   const getStatusLabel = (status: CampaignCollaboration["status"]): "매칭" | "검토 중" | "거절" => {
     switch (status) {

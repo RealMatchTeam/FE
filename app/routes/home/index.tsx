@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getMyPage } from "../mypage/api/mypage";
 import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
 import { useAuthStore } from "../../stores/auth-store";
@@ -9,6 +9,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function HomeIndex() {
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
+  const hasLoadedRef = useRef(false);
 
   const me = useAuthStore((s) => s.me);
   const setMe = useAuthStore((s) => s.setMe);
@@ -23,9 +24,11 @@ export default function HomeIndex() {
         : false;
 
   useEffect(() => {
-    if (me?.matchingTestDone !== undefined) return;
+    // 이미 로드했거나 매칭 테스트 정보가 있으면 skip
+    if (hasLoadedRef.current || me?.matchingTestDone !== undefined) return;
     if (!hasTokens) return;
 
+    hasLoadedRef.current = true;
     let isMounted = true;
 
     (async () => {
@@ -52,7 +55,7 @@ export default function HomeIndex() {
     return () => {
       isMounted = false;
     };
-  }, [hasTokens, me?.matchingTestDone, setMe]);
+  }, [hasTokens, setMe]);
 
   useEffect(() => {
     if (resolvedHasMatchingTest !== true) return;
