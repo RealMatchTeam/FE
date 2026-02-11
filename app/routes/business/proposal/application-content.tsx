@@ -8,6 +8,7 @@ import { getProfileCard, type ProfileCard } from "./api/user";
 import Modal from "../../../components/common/Modal";
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
 import arrowPurpleIcon from "../../../assets/icon/arrow-right.svg";
@@ -109,7 +110,7 @@ export default function ApplicationContent() {
         navigate(-1);
     };
 
-    if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+    if (isLoading) return <LoadingSpinner className="py-10" />;
     if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
 
     const getStatusLabel = (status: string) => {
@@ -132,7 +133,7 @@ export default function ApplicationContent() {
                     <CampaignBrandCard
                         showChatSection={false}
                         statusText={getStatusLabel(data.status)}
-                        brandName={brand?.brandName || "브랜드 정보 로딩 중..."}
+                        brandName={brand?.brandName}
                         brandTags={brand?.brandTags || ["지원완료"]}
                         brandImageUrl={brand?.brandImageUrl}
                         matchingRate={brand?.matchingRate}

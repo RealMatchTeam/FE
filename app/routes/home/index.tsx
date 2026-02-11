@@ -5,6 +5,7 @@ import { useAuthStore } from "../../stores/auth-store";
 import { tokenStorage } from "../../lib/token";
 import HomeContent from "./home-content";
 import HomeAfterMatch from "./home-after-match";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function HomeIndex() {
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
@@ -83,12 +84,7 @@ export default function HomeIndex() {
 
   if (resolvedHasMatchingTest === null || effectiveHasMatch === null) {
     return (
-      <div className="flex items-center justify-center w-full min-h-[50vh]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-4 border-gray-200 border-t-primary rounded-full animate-spin" />
-          <span className="text-gray-400 text-sm">로딩중...</span>
-        </div>
-      </div>
+      <LoadingSpinner className="min-h-[50vh]" />
     );
   }
 

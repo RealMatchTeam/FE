@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import MatchingTestTopBar from "../components/MatchingTestHeader";
 import SelectChip from "../components/SelectChip";
 import Button from "../../../../components/common/Button";
+import LoadingSpinner from "../../../../components/common/LoadingSpinner";
 import type { SectionKey } from "../../../../stores/matching-test";
 import type { TagItem } from "../_shared/tags/tags.types";
 
@@ -67,9 +68,7 @@ export default function MatchingTestContent({
     return (
       <div className="w-full mx-auto h-full bg-white">
         <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
+        <LoadingSpinner className="py-10" />
       </div>
     );
   }
