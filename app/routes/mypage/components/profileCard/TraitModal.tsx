@@ -16,7 +16,7 @@ export default function TraitModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4 py-5"
       onClick={onClose}
     >
       <div
@@ -96,10 +96,10 @@ export default function TraitModal({
                     i === 0 ? "" : "border-l border-[#E8E8FB]",
                   ].join(" ")}
                 >
-                  <div className="text-[10px] leading-[12px] text-[#6666E5] font-SemiBold">
+                  <div className="text-callout2 text-core1">
                     {item.label}
                   </div>
-                  <div className="mt-1 text-[12px] leading-[16px] text-[#5B5D6B] font-Pretendard">
+                  <div className="mt-1 text-callout1 text-text-gray2">
                     {item.value}
                   </div>
                 </div>
@@ -111,10 +111,10 @@ export default function TraitModal({
           <div className="space-y-[10px]">
             {trait.sections.map((section, i) => (
               <div key={i}>
-                <div className="text-[12px] leading-[16px] font-Medium text-[#6666E5]">
+                <div className="text-callout1 text-core1">
                   {section.title}
                 </div>
-                <div className="text-[12px] leading-[16px] font-Medium text-[#404252]">
+                <div className="text-callout1 text-text-gray1">
                   {section.items.join(", ")}
                 </div>
               </div>
