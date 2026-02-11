@@ -1,14 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { getMyPage } from "../mypage/api/mypage";
-import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
 import { useAuthStore } from "../../stores/auth-store";
 import { tokenStorage } from "../../lib/token";
 import HomeContent from "./home-content";
 import HomeAfterMatch from "./home-after-match";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function HomeIndex() {
-  const [hasMatch, setHasMatch] = useState<boolean | null>(null);
   const hasLoadedRef = useRef(false);
 
   const me = useAuthStore((s) => s.me);
@@ -57,39 +54,16 @@ export default function HomeIndex() {
     };
   }, [hasTokens, setMe]);
 
-  useEffect(() => {
-    if (resolvedHasMatchingTest !== true) return;
+  // 토큰 없으면 비로그인 홈
+  if (!hasTokens) {
+    return <HomeContent />;
+  }
 
-    let isMounted = true;
-
-    (async () => {
-      try {
-        const { count } = await getMatchingBrands();
-        if (!isMounted) return;
-        setHasMatch(count > 0);
-      } catch (error: unknown) {
-        if (!isMounted) return;
-        if (error instanceof MatchingTestRequiredError) setHasMatch(false);
-        else setHasMatch(false);
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [resolvedHasMatchingTest]);
-
-  const effectiveHasMatch = resolvedHasMatchingTest !== true ? null : hasMatch;
-
+  // 매칭 테스트 안 했다고 확정된 경우
   if (resolvedHasMatchingTest === false) {
     return <HomeContent />;
   }
 
-  if (resolvedHasMatchingTest === null || effectiveHasMatch === null) {
-    return (
-      <LoadingSpinner className="min-h-[50vh]" />
-    );
-  }
-
+  // 토큰 있으면 낙관적으로 바로 HomeAfterMatch 렌더 (getMyPage와 병렬 로딩)
   return <HomeAfterMatch />;
 }
