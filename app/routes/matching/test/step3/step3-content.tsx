@@ -308,6 +308,9 @@ export default function MatchingTestStep3Content({
       {sheet === "snsUrl" ? (
         <BottomSheet title="인스타그램 주소 입력" onClose={close}>
           <InputSheet
+            inputMode="text"
+            type="text"
+            autoCapitalize="none"
             value={extractId(snsUrl)}
             placeholder="아이디만 입력"
             onChange={(v) => {

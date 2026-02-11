@@ -318,25 +318,22 @@ export default function HomeAfterMatchPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white px-5 pt-6 pb-[calc(116px+env(safe-area-inset-bottom))]">
-        <div className="-mx-5 mb-4">
-          <img
-            src={category === "beauty" ? bannerBeauty : bannerFashion}
-            alt="배너"
-            className="h-62.5 w-full object-cover"
-          />
-        </div>
+      <div className="bg-white pb-[calc(116px+env(safe-area-inset-bottom))]">
+        <img
+          src={category === "beauty" ? bannerBeauty : bannerFashion}
+          alt="배너"
+          className="h-[250px] w-full object-cover"
+        />
 
         <CategoryTabs value={category} onChange={setCategory} />
 
-        <section className="mt-6">
+        <section className="my-9 mx-4">
           <SectionHeader
             title="매칭률 높은 브랜드"
             subtitle="이런 브랜드가 매칭률이 가장 높아요!"
             onMore={goBrandList}
           />
-
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto pb-2 px-4">
             {brands.map((brand, i) => (
               <BrandCard
                 key={`brand-${brand.id}-${i}`}
@@ -361,14 +358,14 @@ export default function HomeAfterMatchPage() {
             ))}
           </div>
         </section>
-        <section className="mt-7">
+
+        <section className="my-9 mx-4">
           <SectionHeader
             title="매칭률 높은 캠페인"
             subtitle="이런 캠페인이 매칭률이 가장 높아요!"
             onMore={goCampaignList}
           />
-
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto pb-2 px-4">
             {campaigns.map((campaign, i) => {
               const safeCampaignId = getCampaignId(campaign);
               if (!safeCampaignId) return null;
@@ -401,22 +398,26 @@ export default function HomeAfterMatchPage() {
         </section>
 
         {profileModel && (
-          <div className="mt-8">
-            <CreatorProfileCard
-              model={profileModel}
-              onMyProfileClick={() => navigate("/mypage/profileCard")}
-            />
-          </div>
+          <section className="my-9 mx-4">
+            <div className="text-title1 text-text-black">
+              크리에이터 님의 프로필
+            </div>
+            <div className="mt-4">
+              <CreatorProfileCard
+                model={profileModel}
+                onMyProfileClick={() => navigate("/mypage/profileCard")}
+              />
+            </div>
+          </section>
         )}
 
-        <section className="mt-8 pb-5">
+        <section className="my-9 mx-4">
           <SectionHeader
             title="인기 캠페인"
             subtitle="이런 캠페인이 인기가 많아요!"
             onMore={goCampaignList}
           />
-
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto pb-2 px-4">
             {popularCampaigns.map((campaign, i) => {
               const safeCampaignId = getCampaignId(campaign);
               if (!safeCampaignId) return null;
