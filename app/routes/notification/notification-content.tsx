@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { fetchNotifications, readAllNotifications, readNotification, type NotificationItem } from "./api/notification";
+import { useHideHeader } from "../../hooks/useHideHeader";
+import NavigationHeader from "../../components/common/NavigateHeader";
+import emptyImg from "./../../assets/empty.png";
+import { useNavigate } from "react-router-dom";
 
 function TabButton({ label, active, onClick, count }: { label: string; active: boolean; onClick: () => void; count?: number }) {
     return (
         <button
             onClick={onClick}
-            className={`px-4 py-2 rounded-lg text-[14px] font-bold transition-all flex items-center gap-1.5 ${active
+            className={`px-[10px] py-[6px] rounded-[8px] text-[14px] font-medium transition-all flex items-center gap-1.5 ${active
                 ? "bg-core-1 text-white"
-                : "bg-white border border-text-gray5 text-text-gray3"
+                : "bg-white border border-[#E6E6F3] text-text-gray3"
                 }`}
         >
             {label}
@@ -26,6 +30,9 @@ export default function NotificationContent() {
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<"ALL" | "PROPOSAL" | "MATCHING">("ALL");
+    const navigate = useNavigate();
+
+    useHideHeader(true);
 
     const fetchNotificationsData = async () => {
         setLoading(true);
@@ -44,7 +51,7 @@ export default function NotificationContent() {
 
     useEffect(() => {
         fetchNotificationsData();
-    }, [activeTab, fetchNotificationsData]);
+    }, [activeTab]);
 
     const handleReadAll = async () => {
         try {
@@ -89,19 +96,13 @@ export default function NotificationContent() {
     };
 
     return (
-        <div className="flex flex-col w-full h-screen bg-grad-auth">
-            <div className="px-4 pt-6 pb-4 flex flex-col gap-4 border-b border-text-gray5 bg-white">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-[20px] font-bold text-text-black">알림</h1>
-                    <button
-                        className="text-[13px] font-medium text-text-gray3 underline active:text-core-1 transition-colors"
-                        onClick={handleReadAll}
-                    >
-                        전체 읽기
-                    </button>
-                </div>
+        <div className="h-screen-full bg-grad-auth ">
+            <div className="h-[60px]">
+                <NavigationHeader title="알림" onBack={() => navigate(-1)} />
+            </div>
 
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <div className="px-4 flex flex-col gap-4 border-b border-text-gray5">
+                <div className="py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
                     <TabButton
                         label="전체"
                         active={activeTab === "ALL"}
@@ -121,7 +122,10 @@ export default function NotificationContent() {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div
+                className="overflow-y-auto"
+                style={{ height: `calc(100vh - 60px - 67px - 60px)` }}
+            >
                 {loading ? (
                     <div className="flex justify-center items-center h-40 text-text-gray3">로딩 중...</div>
                 ) : notifications.length > 0 ? (
@@ -153,8 +157,11 @@ export default function NotificationContent() {
                         ))}
                     </div>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center py-20 text-text-gray4">
-                        <p>표시할 알림이 없습니다.</p>
+                    <div className="flex flex-col items-center justify-center min-h-[70vh]">
+                        <img src={emptyImg} alt="" className="h-[160px] w-[160px] select-none" />
+                        <p className="font-medium text-[14px] text-[#5B5D6B] text-center mt-2">
+                            받은 알림이 없어요
+                        </p>
                     </div>
                 )}
             </div>
