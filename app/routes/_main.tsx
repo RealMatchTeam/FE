@@ -34,9 +34,13 @@ export default function MainLayout() {
           <header className="w-full bg-white shrink-0 py-4.5">
             <div className="grid h-full w-full grid-cols-3 items-center">
               <div />
-              <div className="flex items-center justify-center">
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="flex items-center justify-center"
+              >
                 <img alt="Real Match" draggable="false" src={Logo} />
-              </div>
+              </button>
               <div />
             </div>
           </header>

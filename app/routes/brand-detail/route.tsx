@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router";
 import BrandDetailContent from "./brand-detail-content";
+import BrandDetailSkeleton from "./components/BrandDetailSkeleton";
 import { useBrandDetail } from "./query";
 import type { BrandDomain } from "./types";
 
@@ -25,7 +26,7 @@ export default function BrandDetailPage() {
   }
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white px-5 py-6">로딩중…</div>;
+    return <BrandDetailSkeleton />;
   }
 
   if (isError || !data) {
