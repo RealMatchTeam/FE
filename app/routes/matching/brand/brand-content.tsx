@@ -20,6 +20,7 @@ export default function BrandContent() {
 
     // 필터 상태
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [filterOpenTab, setFilterOpenTab] = useState<"sort" | "filter">("sort");
     const [sortOption, setSortOption] = useState("정렬 필터");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -176,12 +177,12 @@ export default function BrandContent() {
                         <FilterButton
                             label={getSortButtonLabel()}
                             isActive={sortOption !== "정렬 필터"}
-                            onClick={() => setIsFilterOpen(true)}
+                            onClick={() => { setFilterOpenTab("sort"); setIsFilterOpen(true); }}
                         />
                         <FilterButton
                             label={getFilterButtonLabel()}
                             isActive={selectedTags.length > 0}
-                            onClick={() => setIsFilterOpen(true)}
+                            onClick={() => { setFilterOpenTab("filter"); setIsFilterOpen(true); }}
                         />
                     </div>
                 </div>
@@ -211,6 +212,7 @@ export default function BrandContent() {
                     selectedTags={selectedTags}
                     onApply={handleFilterApply}
                     onClose={() => setIsFilterOpen(false)}
+                    initialTab={filterOpenTab}
                 />
             </FilterBottomSheet>
         </div>
