@@ -31,7 +31,7 @@ export function GenderSection<T extends FieldValues>({ genderValue, setValue }: 
       </div>
 
       {/* 바텀시트 */}
-      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[45%] md:h-[50%] lg:h-[50%] lg:w-[40%]">
+      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[40%] max-w-[430px]">
         <div className="flex flex-col h-full px-5 pb-6">
           {/* 헤더 */}
           <div className="relative flex items-center py-5.5">
