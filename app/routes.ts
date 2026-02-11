@@ -42,6 +42,10 @@ export default [
       route("create", "routes/matching/suggest/create/route.tsx"),
     ]),
 
+    route("matching/apply", "routes/matching/apply/route.tsx", [
+      index("routes/matching/apply/index.tsx"),
+    ]),
+
     route("matching/test", "routes/matching/test/route.tsx", [
       route("step1", "routes/matching/test/step1/route.tsx"),
       route("step2", "routes/matching/test/step2/route.tsx"),

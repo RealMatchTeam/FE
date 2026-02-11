@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 import { useContext, useEffect } from "react";
 import { LayoutContext } from "../../layout-context";
-import SuggestHeader from "./components/SuggestHeader";
+import MatchingHeader from "../components/MatchingHeader";
 
 export default function MatchingSuggestLayout() {
   const layout = useContext(LayoutContext);
@@ -17,7 +17,7 @@ export default function MatchingSuggestLayout() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <SuggestHeader title="제안 하기" />
+      <MatchingHeader title="제안하기" />
       <Outlet />
     </div>
   );

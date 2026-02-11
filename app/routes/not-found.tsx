@@ -1,4 +1,4 @@
-import MainIcon from "../assets/MainIcon.svg";
+import MainIcon from "../assets/MainIcon.png";
 
 export default function NotFound() {
     return (
