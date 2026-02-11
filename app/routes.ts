@@ -40,6 +40,10 @@ export default [
       route("create", "routes/matching/suggest/create/route.tsx"),
     ]),
 
+    route("matching/apply", "routes/matching/apply/route.tsx", [
+      index("routes/matching/apply/index.tsx"),
+    ]),
+
     route("matching/test", "routes/matching/test/route.tsx", [
       route("step1", "routes/matching/test/step1/route.tsx"),
       route("step2", "routes/matching/test/step2/route.tsx"),
@@ -51,13 +55,14 @@ export default [
       route("calendar", "routes/business/calendar/route.tsx"),
       route("proposal", "routes/business/proposal/route.tsx"),
       route("rejection", "routes/business/rejection/route.tsx"),
+      
     ]),
 
     route("chat", "routes/chat/route.tsx"),
 
-    route("rooms", "routes/rooms/route.tsx", [
-      route("brand/:brandId", "routes/rooms/$brandId.tsx"),
-      route(":roomId", "routes/rooms/$roomId.tsx"),
+    route("rooms", "routes/room/route.tsx", [
+      route("brand/:brandId", "routes/room/$brandId.tsx"),
+      route(":roomId", "routes/room/$roomId.tsx"),
     ]),
 
     route("mypage", "routes/mypage/route.tsx", [

@@ -1,4 +1,4 @@
-import { SORT_LABEL, type SortOption } from "./SortingSheetConstant";
+import { SORT_LABEL, type SortOption } from "./ChatSortFilterConstant";
 
 // 정렬, 필터 옵션 (최신순/협업 중)
 
@@ -46,7 +46,7 @@ export function SortFilterSheet<T extends string = SortOption>({
       />
 
       {/* 시트 */}
-      <div className="fixed left-1/2 -translate-x-1/2 top-[235px] w-full max-w-[480px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
+      <div className="fixed left-1/2 -translate-x-1/2 bottom-[0px] w-full max-w-[480px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
         <div className="w-full max-w-[480px] h-[70px] fixed left-1/2 -translate-x-1/2">
           <div className="px-4 text-medium text-text-black mb-3">{title}</div>
 

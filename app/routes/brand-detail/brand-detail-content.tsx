@@ -119,6 +119,16 @@ export default function BrandDetailContent({ data }: Props) {
     navigate(`/rooms/brand/${brandId}`);
   };
 
+  const handleSuggest = () => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    navigate(`/matching/suggest/create?brandId=${brandId}`);
+  };
+
   const handleGoSponsorableProducts = () => {
     if (!Number.isFinite(brandId) || brandId <= 0) return;
 
@@ -230,7 +240,7 @@ export default function BrandDetailContent({ data }: Props) {
           <BrandActionBar
             isHearted={isHearted}
             onChat={handleChat}
-            onSuggest={() => {}}
+            onSuggest={handleSuggest}
             onToggleHeart={handleToggleHeart}
           />
 

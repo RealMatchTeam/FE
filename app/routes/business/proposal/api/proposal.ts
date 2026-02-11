@@ -28,6 +28,7 @@ export interface ProposalDetail {
     involvements: { id: number; name: string }[];
     usageRanges: { id: number; name: string }[];
   };
+  snsAccount?: string;
 }
 
 export const getProposalDetail = async (proposalId: string): Promise<ProposalDetail> => {
@@ -75,6 +76,7 @@ export interface AppliedCampaignDetail {
   campaignReason: string;
   status: "REVIEWING" | "MATCHED" | "REJECTED" | "CANCELED";
   creatorId?: string;
+
 }
 
 export const getAppliedCampaignDetail = async (campaignId: string): Promise<AppliedCampaignDetail> => {
@@ -151,7 +153,6 @@ export const cancelCampaignProposal = async (
 };
 
 // 캠페인 지원 취소 API
-
 export const cancelCampaignApply = async (
   campaignApplyId: string | number
 ): Promise<ApiResponse<string>> => {
@@ -164,6 +165,42 @@ export const cancelCampaignApply = async (
     console.error("지원 취소 실패:", error);
     if (error instanceof AxiosError) {
       const errorMessage = error.response?.data?.message || "지원 취소에 실패했습니다.";
+      throw new Error(errorMessage);
+    }
+    throw error;
+  }
+};
+
+// 캠페인 제안 수정 API
+export const updateProposal = async (
+  campaignProposalId: string | number,
+  requestData: {
+    brandId: number;
+    creatorId: number;
+    campaignId: number | null;
+    campaignName: string;
+    description: string;
+    formats: { id: number }[];
+    categories: { id: number; customValue?: string }[];
+    tones: { id: number }[];
+    involvements: { id: number }[];
+    usageRanges: { id: number }[];
+    rewardAmount: number;
+    productId: number;
+    startDate: string;
+    endDate: string;
+  }
+): Promise<ApiResponse<string>> => {
+  try {
+    const response = await axiosInstance.patch<ApiResponse<string>>(
+      `/v1/campaigns/proposal/${campaignProposalId}/re-request`,
+      requestData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("제안 수정 실패:", error);
+    if (error instanceof AxiosError) {
+      const errorMessage = error.response?.data?.message || "제안 수정에 실패했습니다.";
       throw new Error(errorMessage);
     }
     throw error;

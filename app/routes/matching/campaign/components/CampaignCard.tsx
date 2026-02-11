@@ -8,6 +8,7 @@ interface CampaignCardProps {
     applicants: number;
     isLiked?: boolean;
     logoUrl?: string;
+    dDay?: number;
     onLike?: () => void;
     onClick?: () => void;
 }
@@ -20,26 +21,45 @@ export default function CampaignCard({
     applicants,
     isLiked = false,
     logoUrl,
+    dDay,
     onLike,
     onClick
 }: CampaignCardProps) {
-    // 금액 포맷팅
     const formatReward = (amount: number) => {
         return amount.toLocaleString('ko-KR');
     };
 
+    // D-Day 포맷팅
+    const getDDayLabel = (dDay?: number) => {
+        if (dDay === undefined || dDay === null) return "";
+        if (dDay < 0) return "모집완료";
+        if (dDay === 0) return "D-DAY";
+        return `D-${dDay}`;
+    };
+
+    const isRecruitmentComplete = (dDay !== undefined && dDay < 0);
+    const dDayLabel = getDDayLabel(dDay);
+    const isDDay = dDay === 0;
+
     return (
-        <div onClick={onClick} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer">
+        <div onClick={onClick} className="relative flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer overflow-hidden">
             {/* 왼쪽: 이미지 + 배지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
-                <BrandLogo src={logoUrl} alt={brandName} />
-                {/* 원고료 & D-Day 배지 */}
-                <div className="flex items-center justify-center gap-1 w-full">
-                    <span className="px-1 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
-                        D-DAY
-                    </span>
-                    <span className="px-1 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                <div className="relative w-fit">
+                    <BrandLogo src={logoUrl} alt={brandName} />
                 </div>
+
+                {/* 원고료 & D-Day 배지 - 모집 완료시 숨김 */}
+                {!isRecruitmentComplete && (
+                    <div className="flex items-center justify-start gap-1 w-full ml-6">
+                        {dDayLabel && !isDDay && (
+                            <span className="px-1 py-0.5 bg-white text-core-1 text-title5 rounded border border-core-1 border-[0.5px]">
+                                {dDayLabel}
+                            </span>
+                        )}
+                        <span className="px-1 py-0.5 bg-core-2 text-core-1 text-title5 rounded">{applicants}명</span>
+                    </div>
+                )}
             </div>
 
             {/* 오른쪽: 콘텐츠 */}
@@ -48,26 +68,36 @@ export default function CampaignCard({
                     <div className="flex flex-col gap-1 w-full">
                         {/* 헤더: 브랜드명 & 매칭률 & 좋아요 */}
                         <div className="flex justify-between items-start">
-                            <h3 className="text-title1 text-text-black truncate">{brandName}</h3>
+                            <h3 className={`text-title1 truncate ${isRecruitmentComplete ? 'text-text-gray3' : 'text-text-black'}`}>{brandName}</h3>
                             <div className="flex items-center gap-2">
-                                <span className="text-core-1"><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></span>
+                                {isRecruitmentComplete ? (
+                                    <span className="text-text-gray3 text-title3 font-medium">모집완료</span>
+                                ) : (
+                                    <>
+                                        {isDDay ? (
+                                            <span className="text-core-1 text-title1 font-bold">D-DAY</span>
+                                        ) : (
+                                            <span className="text-core-1"><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></span>
+                                        )}
+                                    </>
+                                )}
                                 <button onClick={(e) => { e.stopPropagation(); onLike?.(); }} className="flex-shrink-0 cursor-pointer">
                                     {isLiked ? (
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" fill="#B7B7F3" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 14" fill="none">
+                                            <path d="M14.7663 1.169C14.3753 0.798396 13.9111 0.504403 13.4002 0.303821C12.8893 0.10324 12.3417 0 11.7887 0C11.2357 0 10.6881 0.10324 10.1772 0.303821C9.66629 0.504403 9.20211 0.798396 8.81116 1.169L7.9998 1.93779L7.18843 1.169C6.39874 0.420752 5.32768 0.000387845 4.21089 0.000387853C3.09409 0.000387861 2.02303 0.420752 1.23334 1.169C0.443646 1.91726 8.32078e-09 2.93211 0 3.99029C-8.32078e-09 5.04848 0.443646 6.06333 1.23334 6.81159L7.9998 13.2229L14.7663 6.81159C15.1574 6.44115 15.4677 6.00133 15.6794 5.51724C15.891 5.03315 16 4.51429 16 3.99029C16 3.4663 15.891 2.94744 15.6794 2.46335C15.4677 1.97926 15.1574 1.53944 14.7663 1.169Z" fill="#B7B7F3" />
                                         </svg>
                                     ) : (
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12.1 18.55L12 18.65L11.89 18.55C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5C9.04 5 10.54 5.99 11.07 7.36H12.93C13.46 5.99 14.96 5 16.5 5C18.5 5 20 6.5 20 8.5C20 11.39 16.86 14.24 12.1 18.55ZM16.5 3C14.76 3 13.09 3.81 12 5.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5C2 12.28 5.4 15.36 10.55 20.03L12 21.35L13.45 20.03C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3Z" fill="#C1C1CB" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 18 16" fill="none">
+                                            <path d="M15.5163 2.05768C15.1253 1.68707 14.6611 1.39308 14.1502 1.19249C13.6393 0.991912 13.0917 0.888672 12.5387 0.888672C11.9857 0.888672 11.4381 0.991912 10.9272 1.19249C10.4163 1.39308 9.95211 1.68707 9.56116 2.05768L8.7498 2.82646L7.93843 2.05768C7.14874 1.30942 6.07768 0.88906 4.96089 0.88906C3.84409 0.88906 2.77303 1.30942 1.98334 2.05768C1.19365 2.80593 0.75 3.82078 0.75 4.87897C0.75 5.93716 1.19365 6.952 1.98334 7.70026L8.7498 14.1116L15.5163 7.70026C15.9074 7.32982 16.2177 6.89 16.4294 6.40591C16.641 5.92183 16.75 5.40296 16.75 4.87897C16.75 4.35497 16.641 3.83611 16.4294 3.35202C16.2177 2.86793 15.9074 2.42811 15.5163 2.05768Z" stroke="#B7B7F3" stroke-width="1.5" />
                                         </svg>
                                     )}
                                 </button>
                             </div>
                         </div>
                         {/* 캠페인 제목 */}
-                        <p className="text-title3 text-black truncate">{title}</p>
+                        <p className={`text-title3 truncate ${isRecruitmentComplete ? 'text-text-gray3' : 'text-black'}`}>{title}</p>
                         {/* 원고료 */}
-                        <span className="text-callout1 text-core-1">원고료: {formatReward(reward)}원</span>
+                        <span className={`text-callout1 ${isRecruitmentComplete ? 'text-text-gray3' : 'text-core-1'}`}>원고료: {formatReward(reward)}원</span>
                     </div>
                 </div>
             </div>

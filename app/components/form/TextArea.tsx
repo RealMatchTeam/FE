@@ -24,16 +24,16 @@ export default function TextArea({
   }, [value]);
 
   return (
-    <div className="flex items-center w-full py-[10px] px-4 gap-[10px] rounded-md border border-core-2 bg-white/80">
+    <div className="flex flex-col items-start w-full py-[10px] px-4 gap-[10px] rounded-[6px] border border-core-2 bg-white/80">
       <textarea
         ref={textareaRef}
-        rows={1}
+        rows={3}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
-        className="flex-1 bg-transparent text-title3 text-text-black placeholder:text-text-gray3 focus:outline-none resize-none overflow-hidden leading-[20px]"
+        className="flex-1 w-full bg-transparent text-title3 text-text-black placeholder:text-callout4 placeholder:text-text-gray4 focus:outline-none resize-none overflow-auto leading-[20px]"
       />
-      <span className="text-callout1 text-text-gray3 shrink-0">
+      <span className="text-callout4 text-text-gray4 self-end">
         {value.length}/{maxLength}
       </span>
     </div>

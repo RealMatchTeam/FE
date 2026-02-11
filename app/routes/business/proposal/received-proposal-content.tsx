@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import RealmatchHeader from "../../../components/layout/RealmatchHeader";
+import Header from "../../../components/layout/Header";
+
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
@@ -75,7 +76,7 @@ export default function ReceivedProposalContent() {
     };
     const closeModal = () => {
         setModalType("none");
-        setRejectReason(""); // 닫을 때 초기화
+        setRejectReason(""); 
     };
 
     const handleRejectClick = () => setModalType("reject");
@@ -112,7 +113,7 @@ export default function ReceivedProposalContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-[var(--color-bg-w)] font-pretendard relative">
-            <RealmatchHeader title="제안 보기" showBack={true} />
+            <Header title="제안 보기" showBack={true} />
 
             <main className="flex flex-col bg-[var(--color-bluegray-1)]">
                 <div className="bg-[var(--color-bg-w)] px-4 py-6 flex flex-col gap-2">

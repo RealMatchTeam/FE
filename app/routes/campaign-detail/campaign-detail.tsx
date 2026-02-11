@@ -203,12 +203,7 @@ export default function CampaignDetailContent({
       navigate("/auth/login");
       return;
     }
-
-    navigate(`/business/proposal?type=applied&campaignId=${campaignId}`, {
-      state: {
-        brandId: Number(brandData.id),
-      },
-    });
+    navigate("/matching/apply");
   };
 
   if (campaignError) {

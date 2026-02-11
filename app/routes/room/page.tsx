@@ -10,7 +10,7 @@ import { formatKoreanDateTime } from "../../utils/dateTime";
 import CollaborationSummaryBar from "./components/CollaborationBar";
 import { useHideBottomTab } from "../../hooks/useHideBottomTab";
 import { useHideHeader } from "../../hooks/useHideHeader";
-import useAttachmentUpload from "../rooms/hooks/useAttachmentUpload";
+import useAttachmentUpload from "./hooks/useAttachmentUpload";
 import useChatRoomData from "./hooks/useChatRest";
 import useChatLayout from "./hooks/useChatLayout";
 import useChatStomp from "./hooks/useChatStomp";
@@ -117,13 +117,14 @@ export default function ChattingRoom({ roomId }: Props) {
       <input
         ref={imageInputRef}
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg"
         style={{ display: "none" }}
         onChange={handlePickImage}
       />
       <input
         ref={fileInputRef}
         type="file"
+        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         style={{ display: "none" }}
         onChange={handlePickFile}
       />

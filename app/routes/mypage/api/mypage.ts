@@ -15,6 +15,13 @@ type CustomResponseMyPageResponseDto = {
   result: MyPageResponseDto;
 };
 
+type CustomResponseVoid = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: unknown;
+};
+
 export const getMyPage = async (): Promise<MyPageResponseDto> => {
   const response = await axiosInstance.get<CustomResponseMyPageResponseDto>(
     "/api/v1/users/me",
@@ -25,4 +32,14 @@ export const getMyPage = async (): Promise<MyPageResponseDto> => {
   }
 
   return response.data.result;
+};
+
+export const withdrawMyAccount = async (): Promise<void> => {
+  const response = await axiosInstance.delete<CustomResponseVoid>(
+    "/api/v1/users/me",
+  );
+
+  if (!response.data.isSuccess) {
+    throw new Error(response.data.message || "회원 탈퇴 실패");
+  }
 };

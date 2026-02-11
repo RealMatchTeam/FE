@@ -4,18 +4,30 @@ type Props = {
   bgClassName?: string;
 };
 
-export default function NavigationHeader({ title, onBack, bgClassName }: Props) {
+export default function NavigationHeader({
+  title,
+  onBack,
+  bgClassName,
+}: Props) {
   const bg = bgClassName ?? "bg-[#FFFFFF]";
 
   return (
-    <div className={`h-[60px] flex items-center px-4 py-[10px] ${bg}`}>
+    <div
+      className={`h-[60px] flex items-center bg-[#FFFFFF] px-4 py-[10px] ${bg}`}
+    >
       <button
         type="button"
         onClick={onBack}
         className="w-6 h-6 grid place-items-center text-gray2"
         aria-label="back"
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M14.5 5.5L8.5 12l6 6.5"
             stroke="#5B5D6B"

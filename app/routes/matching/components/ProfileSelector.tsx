@@ -9,6 +9,7 @@ export default function ProfileSelector({
 }: ProfileSelectorProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="flex items-center justify-between w-full py-[14px] px-4 gap-2.5 rounded-xl border border-core-70 bg-bluegray-2"
     >
