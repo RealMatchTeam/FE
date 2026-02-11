@@ -86,11 +86,7 @@ export default function MyPageHome({
         <div className="flex w-full  gap-[10px]">
           <button
             type="button"
-            disabled={isButtonLocked}
-            onClick={() => {
-              if (isButtonLocked) return;
-              onOpenProfileCard();
-            }}    
+            onClick={onOpenProfileCard}
             className="flex h-11 flex-[2] items-center justify-center gap-[10px] rounded-[12px] text-white text-[14px] bg-[#6666E5] font-medium transition-colors active:bg-[#3F40C2]"
           >
             {/* 아이콘 */}
