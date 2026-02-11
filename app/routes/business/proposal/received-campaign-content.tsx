@@ -17,6 +17,12 @@ import chatIcon from "../../../assets/icon/icon-chat.svg";
 //import checkIcon from "../../../assets/icon/icon-check-circle.svg";
 //import closeIcon from "../../../assets/icon/icon-close.svg";
 
+interface TagItem {
+    name: string;
+    [key: string]: any; // 다른 속성이 있을 수 있음을 허용하거나 필요한 속성만 정의
+}
+
+
 export default function ReceivedCampaignContent() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -79,7 +85,8 @@ export default function ReceivedCampaignContent() {
         } finally { setIsProcessing(false); }
     };*/
 
-    const formatTags = (tags: any) => (!tags || tags.length === 0 ? "정보 없음" : tags.map((t: any) => t.name).join(", "));
+    const formatTags = (tags: TagItem[] | undefined | null) => 
+        (!tags || tags.length === 0 ? "정보 없음" : tags.map((t: TagItem) => t.name).join(", "));
     const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
 
     if (isLoading) return <LoadingSpinner className="py-10" />;
