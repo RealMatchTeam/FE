@@ -231,7 +231,7 @@ export default function MatchingTestStep3Content({
                 label={t.name}
                 isSelected={step3Chips.contentFormat.includes(t.id)}
                 onToggle={() => {
-                  onToggleChip("contentType", t.id);
+                  onToggleChip("contentFormat", t.id);
 
                   console.log(
                     "현재 step3Chips:",
