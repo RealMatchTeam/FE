@@ -28,7 +28,7 @@ export default function BrandHero({
 
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/home")}
         className="absolute left-2 top-4 p-2"
         aria-label="back"
       >

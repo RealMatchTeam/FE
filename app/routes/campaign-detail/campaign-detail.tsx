@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MiniLogo from "../../assets/logo/mini-logo.svg";
 import BrandHero from "../brand-detail/components/BrandHero";
 import BrandInfo from "../brand-detail/components/BrandInfo";
-import CampaingActionBar from "./components/CampaignActionBar";
+import CampaignActionBar from "./components/CampaignActionBar";
 import OngoingCampaignSection from "../brand-detail/components/OngoingCampaignSection";
 
 import { tokenStorage } from "../../lib/token";
@@ -97,6 +97,16 @@ export default function CampaignDetailContent({
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
   const [campaignError, setCampaignError] = useState<string | null>(null);
 
+  const [ongoingCampaigns, setOngoingCampaigns] = useState<OngoingCampaign[]>(
+    brandData.ongoingCampaigns ?? [],
+  );
+
+  useEffect(() => {
+    setOngoingCampaigns(brandData.ongoingCampaigns ?? []);
+  }, [brandData.ongoingCampaigns]);
+
+  const ongoingLikeInFlight = useRef<Set<number>>(new Set());
+
   useEffect(() => {
     let alive = true;
 
@@ -171,8 +181,6 @@ export default function CampaignDetailContent({
     ];
   }, [campaign]);
 
-  const ongoing = useMemo(() => brandData.ongoingCampaigns ?? [], [brandData]);
-
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
@@ -204,6 +212,67 @@ export default function CampaignDetailContent({
       }
     } catch {
       setIsCampaignLiked(prev);
+    }
+  };
+
+  const handleOngoingLikeToggle = async (id: string) => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+
+    const clickedId = Number(id);
+    if (!Number.isFinite(clickedId) || clickedId <= 0) return;
+
+    const currentItem = ongoingCampaigns.find((c) => {
+      const cid = getCampaignIdFromOngoing(c);
+      return cid === clickedId;
+    });
+    if (!currentItem) return;
+
+    const cid = getCampaignIdFromOngoing(currentItem);
+    if (!cid) return;
+
+    if (ongoingLikeInFlight.current.has(cid)) return;
+    ongoingLikeInFlight.current.add(cid);
+
+    const prev =
+      (currentItem as unknown as { isLiked?: boolean }).isLiked ?? false;
+    const next = !prev;
+
+    setOngoingCampaigns((prevList) =>
+      prevList.map((c) => {
+        const eachId = getCampaignIdFromOngoing(c);
+        if (eachId !== clickedId) return c;
+        return { ...(c as object), isLiked: next } as OngoingCampaign;
+      }),
+    );
+
+    try {
+      const serverStatus = await toggleCampaignLike(cid);
+      if (typeof serverStatus === "boolean") {
+        setOngoingCampaigns((prevList) =>
+          prevList.map((c) => {
+            const eachId = getCampaignIdFromOngoing(c);
+            if (eachId !== clickedId) return c;
+            return {
+              ...(c as object),
+              isLiked: serverStatus,
+            } as OngoingCampaign;
+          }),
+        );
+      }
+    } catch {
+      setOngoingCampaigns((prevList) =>
+        prevList.map((c) => {
+          const eachId = getCampaignIdFromOngoing(c);
+          if (eachId !== clickedId) return c;
+          return { ...(c as object), isLiked: prev } as OngoingCampaign;
+        }),
+      );
+    } finally {
+      ongoingLikeInFlight.current.delete(cid);
     }
   };
 
@@ -363,7 +432,7 @@ export default function CampaignDetailContent({
             </span>
           </div>
 
-          <CampaingActionBar
+          <CampaignActionBar
             isHearted={isCampaignLiked}
             onChat={handleChat}
             onSuggest={handleSuggest}
@@ -382,14 +451,14 @@ export default function CampaignDetailContent({
               />
             </div>
 
-            <div className=" text-center text-title text-text-black">
+            <div className="text-center text-title text-text-black">
               {campaign.title}
             </div>
           </section>
 
-          <section className="pt-6.5 pb-6">
+          <section className="pt-6 pb-6.5">
             <div className="text-title1 text-text-black">상세 설명</div>
-            <div className="mt-2.5 space-y-2.5">
+            <div className="mt-3 space-y-2.5">
               {detailRows.map((row) => (
                 <DetailRow
                   key={row.label}
@@ -400,12 +469,12 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className=" mx-auto w-3/4 border-t border-core-2" />
+          <div className="mx-auto w-3/4 border-t border-core-2" />
 
           <section className="py-6">
             <div className="text-title1 text-text-black">콘텐츠</div>
 
-            <div className="mt-2.5 space-y-2.5 text-callout1 text-text-gray3">
+            <div className="mt-3 space-y-2.5 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
                 <div key={row.label} className="flex">
                   <div className="w-21 shrink-0 text-title3 text-text-gray3">
@@ -442,7 +511,7 @@ export default function CampaignDetailContent({
             <button
               type="button"
               onClick={handleApply}
-              className="inline-flex w-full h-13 items-center justify-center gap-2.5 rounded-xl bg-core-1"
+              className="inline-flex h-13 w-full items-center justify-center gap-2.5 rounded-xl bg-core-1"
             >
               <span className="flex items-center justify-center gap-2">
                 <img
@@ -457,9 +526,10 @@ export default function CampaignDetailContent({
           </div>
 
           <OngoingCampaignSection
-            campaigns={ongoing}
+            campaigns={ongoingCampaigns}
             onMore={() => {}}
             onCampaignClick={goOngoingCampaignDetail}
+            onLikeToggle={handleOngoingLikeToggle}
           />
         </div>
       </div>
