@@ -19,7 +19,6 @@ import chatIcon from "../../../assets/icon/icon-chat.svg";
 
 interface TagItem {
     name: string;
-    [key: string]: any; // 다른 속성이 있을 수 있음을 허용하거나 필요한 속성만 정의
 }
 
 
