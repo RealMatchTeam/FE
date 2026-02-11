@@ -5,7 +5,12 @@ import { useHideHeader } from "../../../hooks/useHideHeader";
 import { axiosInstance } from "../../../api/axios";
 import { TRAITS } from "../components/profileCard/traitData";
 import { tagName } from "../../../data/tagNameById";
-import { useMatchingTestStore } from "../../../stores/matching-test";
+import {
+  useBeautyTags,
+  useFashionTags,
+  useContentTags,
+} from "../../matching/test/_shared/tags/tags.query";
+import type { TagItem } from "../../matching/test/_shared/tags/tags.types";
 
 type FeatureResult = {
   beautyType?: {
@@ -43,48 +48,221 @@ type FeatureResponse = {
   result: FeatureResult;
 };
 
-const ALL_OPTIONS: Record<string, Record<string, string[]>> = {
+type CustomResponseVoid = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: unknown;
+};
+
+type TraitId = "beauty" | "fashion" | "content";
+
+type EditSelections = {
   beauty: {
-    "관심 카테고리": ["스킨케어", "메이크업", "향수", "바디", "헤어"],
-    "관심 기능": ["트러블", "수분 / 보습", "진정", "미백", "안티에이징", "각질 / 모공"],
+    "관심 카테고리": number[];
+    "관심 기능": number[];
+  };
+  fashion: {
+    "관심 스타일": number[];
+    "관심 분야": number[];
+    "관심 브랜드": number[];
+  };
+  content: {
+    "콘텐츠 형식": number[];
+    "콘텐츠 톤": number[];
+    "희망 관여도": number[];
+    "희망 활용 범위": number[];
+  };
+};
+
+const pickCategory = (
+  categories: Record<string, TagItem[]>,
+  candidates: readonly string[],
+): TagItem[] => {
+  for (const key of candidates) {
+    const v = categories[key];
+    if (Array.isArray(v)) return v;
+  }
+
+  const normalize = (s: string) => s.replace(/\s+/g, "").trim();
+  const keys = Object.keys(categories);
+
+  for (const cand of candidates) {
+    const hit = keys.find((k) => normalize(k) === normalize(cand));
+    if (hit) {
+      const v = categories[hit];
+      if (Array.isArray(v)) return v;
+    }
+  }
+
+  return [];
+};
+
+const EMPTY_EDIT_SELECTIONS: EditSelections = {
+  beauty: {
+    "관심 카테고리": [],
+    "관심 기능": [],
   },
   fashion: {
-    "관심 스타일": ["미니멀", "페미닌", "러블리", "비즈니스 캐주얼", "캐주얼", "스트리트"],
-    "관심 아이탬/분야": ["의류", "가방", "신발", "주얼리", "패션 소품"],
-    "관심 브랜드": ["SPA", "빈티지", "중가 브랜드", "디자이너 브랜드", "명품 브랜드"],
+    "관심 스타일": [],
+    "관심 분야": [],
+    "관심 브랜드": [],
   },
   content: {
-    "콘텐츠 형식": ["인스타 스토리", "인스타 포스트", "인스타 릴스"],
-    "콘텐츠 종류": ["브이로그", "리뷰", "겟레디윗미", "비포&애프터", "스토리/썰", "챌린지"],
-    "콘텐츠 톤": ["전문적인", "감성적인", "유쾌/재밌는", "트렌디한", "일상적인", "수다적인"],
-    "콘텐츠 희망 관여도": ["관여 안함", "가이드라인만 제공", "대본 일부 제공", "모든 연출 관여"],
-    "콘텐츠 희망 활용 범위": ["크리에이터 1차 활용", "브랜드 2차 활용"],
+    "콘텐츠 형식": [],
+    "콘텐츠 톤": [],
+    "희망 관여도": [],
+    "희망 활용 범위": [],
   },
+};
+
+const buildEditSelections = (
+  feature: FeatureResult | null,
+): EditSelections => ({
+  beauty: {
+    "관심 카테고리": feature?.beautyType?.interestCategories ?? [],
+    "관심 기능": feature?.beautyType?.interestFunctions ?? [],
+  },
+  fashion: {
+    "관심 스타일": feature?.fashionType?.interestStyles ?? [],
+    "관심 분야": feature?.fashionType?.interestFields ?? [],
+    "관심 브랜드": feature?.fashionType?.interestBrands ?? [],
+  },
+  content: {
+    "콘텐츠 형식": feature?.contentsType?.contentFormats ?? [],
+    "콘텐츠 톤": feature?.contentsType?.contentTones ?? [],
+    "희망 관여도": feature?.contentsType?.desiredInvolvement ?? [],
+    "희망 활용 범위": feature?.contentsType?.desiredUsageScope ?? [],
+  },
+});
+
+const getSectionSelections = (
+  selections: EditSelections,
+  traitId: TraitId,
+  sectionTitle: string,
+): number[] => {
+  return (selections[traitId] as Record<string, number[]>)[sectionTitle] ?? [];
+};
+
+const buildPatchPayload = (traitId: TraitId, selections: EditSelections) => {
+  if (traitId === "beauty") {
+    return {
+      beauty: {
+        interestStyleTags: selections.beauty["관심 카테고리"],
+        prefferedFunctionTags: selections.beauty["관심 기능"],
+      },
+    };
+  }
+
+  if (traitId === "fashion") {
+    return {
+      fashion: {
+        interestStyleTags: selections.fashion["관심 스타일"],
+        preferredItemTags: selections.fashion["관심 분야"],
+        preferredBrandTags: selections.fashion["관심 브랜드"],
+      },
+    };
+  }
+
+  return {
+    content: {
+      typeTags: selections.content["콘텐츠 형식"],
+      toneTags: selections.content["콘텐츠 톤"],
+      prefferedInvolvementTags: selections.content["희망 관여도"],
+      prefferedCoverageTags: selections.content["희망 활용 범위"],
+    },
+  };
 };
 
 export default function TraitsPage() {
   useHideHeader(true);
   const navigate = useNavigate();
   const [feature, setFeature] = useState<FeatureResult | null>(null);
+  const [editSelections, setEditSelections] = useState<EditSelections>(
+    EMPTY_EDIT_SELECTIONS,
+  );
   const [editingId, setEditingId] = useState<string | null>(null); // 수정 중인 섹션 ID
-  //const store = useMatchingTestStore(); // zustand 스토어 호출
+  const [isSaving, setIsSaving] = useState(false);
+  const { data: beautyTags } = useBeautyTags();
+  const { data: fashionTags } = useFashionTags();
+  const { data: contentTags } = useContentTags();
+
+  const tagNameById = useMemo(() => {
+    const map = new Map<number, string>();
+    const addItems = (items?: TagItem[]) => {
+      (items ?? []).forEach((item) => {
+        if (typeof item.id === "number" && item.name) {
+          map.set(item.id, item.name);
+        }
+      });
+    };
+    const addCategories = (categories?: Record<string, TagItem[]>) => {
+      Object.values(categories ?? {}).forEach(addItems);
+    };
+
+    addCategories(beautyTags?.categories);
+    addCategories(fashionTags?.categories);
+
+    addItems(contentTags?.viewerGenders);
+    addItems(contentTags?.viewerAges);
+    addItems(contentTags?.avgVideoLengths);
+    addItems(contentTags?.avgVideoViews);
+    addItems(contentTags?.formats);
+    addItems(contentTags?.categories);
+    addItems(contentTags?.tones);
+    addItems(contentTags?.involvements);
+    addItems(contentTags?.usageRanges);
+
+    return map;
+  }, [beautyTags, fashionTags, contentTags]);
+
+  const tagOptions: Record<TraitId, Record<string, TagItem[]>> = useMemo(() => {
+    const beautyCategories = beautyTags?.categories ?? {};
+    const fashionCategories = fashionTags?.categories ?? {};
+
+    return {
+      beauty: {
+        "관심 카테고리": pickCategory(beautyCategories, [
+          "관심 카테고리",
+          "관심 스타일",
+        ]),
+        "관심 기능": pickCategory(beautyCategories, ["관심 기능"]),
+      },
+      fashion: {
+        "관심 분야": pickCategory(fashionCategories, [
+          "관심 아이템/분야",
+          "관심 분야",
+          "관심 아이템",
+          "아이템/분야",
+          "아이템",
+        ]),
+        "관심 스타일": pickCategory(fashionCategories, [
+          "관심 스타일",
+          "패션 스타일",
+          "스타일",
+        ]),
+        "관심 브랜드": pickCategory(fashionCategories, [
+          "관심 브랜드",
+          "관심 브랜드 종류",
+          "선호 브랜드 종류",
+          "브랜드 종류",
+          "브랜드 타입",
+          "브랜드",
+        ]),
+      },
+      content: {
+        "콘텐츠 형식": contentTags?.formats ?? [],
+        "콘텐츠 톤": contentTags?.tones ?? [],
+        "희망 관여도": contentTags?.involvements ?? [],
+        "희망 활용 범위": contentTags?.usageRanges ?? [],
+      },
+    };
+  }, [beautyTags, fashionTags, contentTags]);
 
   // 수정 버튼 클릭
   const handleEditClick = (id: string) => {
     setEditingId(id);
-
-    // 현재 feature 데이터를 스토어 형식에 맞춰 복사
-    if (id === "beauty" && feature?.beautyType) {
-      const { interestCategories, interestFunctions } = feature.beautyType;
-      useMatchingTestStore.setState((state) => ({
-        selected: {
-          ...state.selected,
-          style: interestCategories || [],
-          function: interestFunctions || [],
-        }
-      }));
-    };
-  }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -95,11 +273,16 @@ export default function TraitsPage() {
           "/api/v1/users/me/feature",
         );
         if (!isMounted) return;
-        setFeature(featureRes.data?.isSuccess ? featureRes.data.result : null);
+        const nextFeature = featureRes.data?.isSuccess
+          ? featureRes.data.result
+          : null;
+        setFeature(nextFeature);
+        setEditSelections(buildEditSelections(nextFeature));
       } catch (error) {
         console.error("특성 조회 실패:", error);
         if (!isMounted) return;
         setFeature(null);
+        setEditSelections(EMPTY_EDIT_SELECTIONS);
       }
     };
 
@@ -119,7 +302,7 @@ export default function TraitsPage() {
 
     const names = (ids?: number[] | null) =>
       (ids ?? [])
-        .map((id) => tagName(id))
+        .map((id) => tagNameById.get(id) ?? tagName(id))
         .filter((value): value is string => Boolean(value));
 
     return TRAITS.map((trait) => {
@@ -128,7 +311,10 @@ export default function TraitsPage() {
           ...trait,
           previewLines: [
             { label: "피부 타입", value: names(beauty?.skinType).join(", ") },
-            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
+            {
+              label: "피부 밝기",
+              value: names(beauty?.skinBrightness).join(", "),
+            },
             {
               label: "메이크업 \n스타일",
               value: names(beauty?.makeupStyle).join(", "),
@@ -136,7 +322,10 @@ export default function TraitsPage() {
           ],
           topSummary: [
             { label: "피부타입", value: names(beauty?.skinType).join(", ") },
-            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
+            {
+              label: "피부 밝기",
+              value: names(beauty?.skinBrightness).join(", "),
+            },
             {
               label: "메이크업 스타일",
               value: names(beauty?.makeupStyle).join(", "),
@@ -160,15 +349,24 @@ export default function TraitsPage() {
           ...trait,
           previewLines: [
             { label: "키", value: names(fashion?.height).join(", ") },
-            { label: "체형 실루엣", value: names(fashion?.bodyShape).join(", ") },
+            {
+              label: "체형 실루엣",
+              value: names(fashion?.bodyShape).join(", "),
+            },
             { label: "상의", value: names(fashion?.topSize).join(", ") },
             { label: "하의", value: names(fashion?.bottomSize).join(", ") },
           ],
           topSummary: [
             { label: "키/몸무게", value: names(fashion?.height).join(", ") },
-            { label: "체형 실루엣", value: names(fashion?.bodyShape).join(", ") },
+            {
+              label: "체형 실루엣",
+              value: names(fashion?.bodyShape).join(", "),
+            },
             { label: "상의 사이즈", value: names(fashion?.topSize).join(", ") },
-            { label: "하의 사이즈", value: names(fashion?.bottomSize).join(", ") },
+            {
+              label: "하의 사이즈",
+              value: names(fashion?.bottomSize).join(", "),
+            },
           ],
           sections: [
             {
@@ -191,13 +389,22 @@ export default function TraitsPage() {
         return {
           ...trait,
           previewLines: [
-            { label: "주 시청자 성별", value: names(content?.viewerGender).join(", ") },
-            { label: "주 시청자 나이대", value: names(content?.viewerAge).join(", ") },
+            {
+              label: "주 시청자 성별",
+              value: names(content?.viewerGender).join(", "),
+            },
+            {
+              label: "주 시청자 나이대",
+              value: names(content?.viewerAge).join(", "),
+            },
             {
               label: "평균 영상 길이",
               value: names(content?.avgVideoLength).join(", "),
             },
-            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
+            {
+              label: "평균 조회수",
+              value: names(content?.avgViews).join(", "),
+            },
           ],
           topSummary: [
             {
@@ -212,7 +419,10 @@ export default function TraitsPage() {
               label: "평균 영상 길이",
               value: names(content?.avgVideoLength).join(", "),
             },
-            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
+            {
+              label: "평균 조회수",
+              value: names(content?.avgViews).join(", "),
+            },
           ],
           sections: [
             {
@@ -237,21 +447,112 @@ export default function TraitsPage() {
 
       return trait;
     });
-  }, [feature]);
+  }, [feature, tagNameById]);
 
   // 토글 버튼
-  const handleTagToggle = (traitId: string, sectionTitle: string, value: string) => {
-    // Todo: zustand 스토어 업데이트
-    console.log(`${traitId}의 ${sectionTitle} 섹션에서 ${value} 클릭됨`);
+  const handleTagToggle = (
+    traitId: string,
+    sectionTitle: string,
+    valueId: number,
+  ) => {
+    if (
+      traitId !== "beauty" &&
+      traitId !== "fashion" &&
+      traitId !== "content"
+    ) {
+      return;
+    }
+
+    if (!Number.isFinite(valueId)) {
+      console.warn("유효하지 않은 태그 ID:", valueId);
+      return;
+    }
+
+    setEditSelections((prev) => {
+      const prevSection = getSectionSelections(prev, traitId, sectionTitle);
+      const exists = prevSection.includes(valueId);
+      const nextSection = exists
+        ? prevSection.filter((id) => id !== valueId)
+        : [...prevSection, valueId];
+
+      return {
+        ...prev,
+        [traitId]: {
+          ...(prev[traitId] as Record<string, number[]>),
+          [sectionTitle]: nextSection,
+        },
+      };
+    });
   };
 
   // 선택완료 버튼
   const handleComplete = async () => {
+    if (!editingId) return;
+
+    if (
+      editingId !== "beauty" &&
+      editingId !== "fashion" &&
+      editingId !== "content"
+    ) {
+      setEditingId(null);
+      return;
+    }
+
     try {
-    //Todo: API 연동
-    setEditingId(null); // 수정 종료
+      setIsSaving(true);
+      const payload = buildPatchPayload(editingId, editSelections);
+      const response = await axiosInstance.patch<CustomResponseVoid>(
+        "/api/v1/users/me/feature",
+        payload,
+      );
+
+      if (!response.data?.isSuccess) {
+        throw new Error(response.data?.message || "특성 저장 실패");
+      }
+
+      setFeature((prev) => {
+        const next: FeatureResult = {
+          ...(prev ?? {}),
+          beautyType: { ...(prev?.beautyType ?? {}) },
+          fashionType: { ...(prev?.fashionType ?? {}) },
+          contentsType: { ...(prev?.contentsType ?? {}) },
+        };
+
+        if (editingId === "beauty") {
+          next.beautyType = {
+            ...(prev?.beautyType ?? {}),
+            interestCategories: editSelections.beauty["관심 카테고리"],
+            interestFunctions: editSelections.beauty["관심 기능"],
+          };
+        }
+
+        if (editingId === "fashion") {
+          next.fashionType = {
+            ...(prev?.fashionType ?? {}),
+            interestStyles: editSelections.fashion["관심 스타일"],
+            interestFields: editSelections.fashion["관심 분야"],
+            interestBrands: editSelections.fashion["관심 브랜드"],
+          };
+        }
+
+        if (editingId === "content") {
+          next.contentsType = {
+            ...(prev?.contentsType ?? {}),
+            contentFormats: editSelections.content["콘텐츠 형식"],
+            contentTones: editSelections.content["콘텐츠 톤"],
+            desiredInvolvement: editSelections.content["희망 관여도"],
+            desiredUsageScope: editSelections.content["희망 활용 범위"],
+          };
+        }
+
+        return next;
+      });
+
+      setEditingId(null);
     } catch (error) {
       console.error("저장 실패:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -344,25 +645,39 @@ export default function TraitsPage() {
 
                         {editingId === trait.id ? (
                           <div className="mt-2 flex flex-wrap gap-2">
-                            {ALL_OPTIONS[trait.id]?.[section.title]?.map((option, idx) => {
-                              const isSelected = section.items.includes(option); // 현재 선택 여부 확인
-                              
-                              return (
-                                <span 
-                                  key={idx} 
-                                  onClick={() => {
-                                    handleTagToggle(trait.id, section.title, option);
-                                  }}
-                                  className={`px-[10px] py-1 border rounded-[20px] text-[14px] leading-[20px] font-medium cursor-pointer transition-colors
-                                    ${isSelected 
-                                      ? "bg-[#B7B7F3B2] border-[#B7B7F3] text-[#6666E5]" 
-                                      : "bg-white border-[#E5E7EB] text-[#9B9BA1]"     
+                            {tagOptions[trait.id]?.[section.title]?.map(
+                              (option) => {
+                                const selectedIds = getSectionSelections(
+                                  editSelections,
+                                  trait.id,
+                                  section.title,
+                                );
+                                const isSelected =
+                                  typeof option.id === "number" &&
+                                  selectedIds.includes(option.id);
+
+                                return (
+                                  <span
+                                    key={option.id}
+                                    onClick={() => {
+                                      handleTagToggle(
+                                        trait.id,
+                                        section.title,
+                                        option.id,
+                                      );
+                                    }}
+                                    className={`px-[10px] py-1 border rounded-[20px] text-[14px] leading-[20px] font-medium cursor-pointer transition-colors
+                                    ${
+                                      isSelected
+                                        ? "bg-[#B7B7F3B2] border-[#B7B7F3] text-[#6666E5]"
+                                        : "bg-white border-[#E5E7EB] text-[#9B9BA1]"
                                     }`}
-                                >
-                                  {option}
-                                </span>
-                              );
-                            })}
+                                  >
+                                    {option.name}
+                                  </span>
+                                );
+                              },
+                            )}
                           </div>
                         ) : (
                           <div className="mt-[2px] text-[12px] leading-[16px] font-medium text-[#404252]">
@@ -376,9 +691,10 @@ export default function TraitsPage() {
                       <div className="flex justify-end mt-2">
                         <button
                           onClick={handleComplete}
+                          disabled={isSaving}
                           className="text-[14px] font-semibold text-[#6666E5]"
                         >
-                          선택 완료
+                          {isSaving ? "저장 중..." : "선택 완료"}
                         </button>
                       </div>
                     )}
