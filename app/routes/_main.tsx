@@ -1,5 +1,5 @@
-import { Outlet, useNavigate } from "react-router";
-import { useState, useEffect } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router";
+import { useState, useEffect, useRef } from "react";
 import BottomTab from "../components/layout/BottomTab";
 import { LayoutContext } from "./layout-context";
 import Logo from "../assets/logo/realmatch-logo-line.png";
@@ -10,6 +10,12 @@ export default function MainLayout() {
   const [hideHeader, setHideHeader] = useState(false);
   const [disableScroll, setDisableScroll] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+  }, [location.pathname]);
 
   useEffect(() => {
     const accessToken = tokenStorage.getAccessToken();
@@ -47,6 +53,7 @@ export default function MainLayout() {
         )}
 
         <main
+          ref={mainRef}
           className={[
             "flex-1 w-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]",
             disableScroll ? "overflow-hidden" : "overflow-y-auto",
