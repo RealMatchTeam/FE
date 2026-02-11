@@ -25,6 +25,8 @@ type Props = {
   campaignId: number;
 };
 
+type OngoingCampaign = NonNullable<BrandDetailData["ongoingCampaigns"]>[number];
+
 const fmtMoney = (n?: number) =>
   Number.isFinite(n) ? `${Number(n).toLocaleString()}원` : "-";
 
@@ -48,6 +50,37 @@ const toDdayText = (dday?: number) => {
   if (dday === 0) return "D-DAY";
   return `D-${dday}`;
 };
+
+const getNumberField = (
+  obj: unknown,
+  keys: readonly string[],
+): number | null => {
+  if (!obj || typeof obj !== "object") return null;
+  const rec = obj as Record<string, unknown>;
+  for (const k of keys) {
+    const v = rec[k];
+    if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+  }
+  return null;
+};
+
+const getNestedNumberField = (
+  obj: unknown,
+  outerKey: string,
+  innerKeys: readonly string[],
+): number | null => {
+  if (!obj || typeof obj !== "object") return null;
+  const rec = obj as Record<string, unknown>;
+  const nested = rec[outerKey];
+  return getNumberField(nested, innerKeys);
+};
+
+const getCampaignIdFromOngoing = (c: OngoingCampaign): number | null =>
+  getNumberField(c, ["campaignId", "campaign_id", "id"]);
+
+const getBrandIdFromOngoing = (c: OngoingCampaign): number | null =>
+  getNumberField(c, ["brandId", "brand_id"]) ??
+  getNestedNumberField(c, "brand", ["brandId", "id"]);
 
 export default function CampaignDetailContent({
   brandData,
@@ -85,6 +118,15 @@ export default function CampaignDetailContent({
 
         setCampaign(res.data.result);
         setCampaignError(null);
+
+        const liked = (() => {
+          const r: unknown = res.data.result;
+          if (!r || typeof r !== "object") return false;
+          const rec = r as Record<string, unknown>;
+          return rec["isLiked"] === true;
+        })();
+
+        setIsCampaignLiked(liked);
       } catch {
         if (!alive) return;
         setCampaignError("캠페인 정보를 불러오지 못했어요.");
@@ -139,6 +181,7 @@ export default function CampaignDetailContent({
     }
     navigate(`/rooms/brand/${brandData.id}`);
   };
+
   const handleToggleHeart = async (next: boolean) => {
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
@@ -237,6 +280,35 @@ export default function CampaignDetailContent({
     navigate("/matching/apply");
   };
 
+  const goOngoingCampaignDetail = (c: OngoingCampaign) => {
+    const cid = getCampaignIdFromOngoing(c);
+    if (!cid) return;
+
+    const domainParam = searchParams.get("domain");
+    const domain =
+      domainParam === "fashion" || domainParam === "beauty"
+        ? domainParam
+        : "beauty";
+
+    const bidFromItem = getBrandIdFromOngoing(c);
+    const brandIdFromQuery = Number(searchParams.get("brandId"));
+    const fallbackBrandId = Number(brandData.id);
+
+    const brandIdNum =
+      bidFromItem ??
+      (Number.isFinite(brandIdFromQuery) && brandIdFromQuery > 0
+        ? brandIdFromQuery
+        : Number.isFinite(fallbackBrandId) && fallbackBrandId > 0
+          ? fallbackBrandId
+          : null);
+
+    if (!brandIdNum) return;
+
+    navigate(
+      `/campaign?brandId=${brandIdNum}&campaignId=${cid}&domain=${domain}`,
+    );
+  };
+
   if (campaignError) {
     return (
       <div className="w-full bg-bg-w">
@@ -315,7 +387,7 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <section className="py-6.5">
+          <section className="pt-6.5 pb-6">
             <div className="text-title1 text-text-black">상세 설명</div>
             <div className="mt-2.5 space-y-2.5">
               {detailRows.map((row) => (
@@ -328,7 +400,7 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="my-6 mx-auto w-3/4 border-t border-core-2" />
+          <div className=" mx-auto w-3/4 border-t border-core-2" />
 
           <section className="py-6">
             <div className="text-title1 text-text-black">콘텐츠</div>
@@ -384,7 +456,11 @@ export default function CampaignDetailContent({
             </button>
           </div>
 
-          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
+          <OngoingCampaignSection
+            campaigns={ongoing}
+            onMore={() => {}}
+            onCampaignClick={goOngoingCampaignDetail}
+          />
         </div>
       </div>
     </div>

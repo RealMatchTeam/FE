@@ -5,15 +5,20 @@ import type { BrandOngoingCampaign } from "../types";
 type Props = {
   campaigns: BrandOngoingCampaign[];
   onMore?: () => void;
+  onCampaignClick?: (c: BrandOngoingCampaign) => void;
 };
 
-export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
+export default function OngoingCampaignSection({
+  campaigns,
+  onMore,
+  onCampaignClick,
+}: Props) {
   const isEmpty = campaigns.length === 0;
 
   return (
-    <section className="pt-9 pb-9">
+    <section>
       {isEmpty ? (
-        <div className="inline-flex w-full flex-col items-start gap-2 bg-white px-5 py-9">
+        <div className="inline-flex w-full flex-col items-start gap-2 bg-white py-9">
           <div className="self-stretch text-title1 text-text-black">
             캠페인 내역
           </div>
@@ -50,7 +55,14 @@ export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
           <div className="mt-4 -mx-5 overflow-x-auto px-5 scrollbar-hide">
             <div className="flex gap-3">
               {campaigns.map((c) => (
-                <CampaignCard key={c.campaignId} item={toCampaignItem(c)} />
+                <button
+                  key={c.campaignId}
+                  type="button"
+                  onClick={() => onCampaignClick?.(c)}
+                  className="text-left"
+                >
+                  <CampaignCard item={toCampaignItem(c)} />
+                </button>
               ))}
             </div>
           </div>
