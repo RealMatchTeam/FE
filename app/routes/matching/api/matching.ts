@@ -19,8 +19,10 @@ export class MatchingTestRequiredError extends Error {
 }
 
 export interface MatchResult {
+  username: string;
   userType: string;
   typeTag: string[];
+  userTypeImage?: string;
   highMatchingBrandList?: {
     count: number;
     brands: MatchingBrand[];
@@ -28,8 +30,10 @@ export interface MatchResult {
 }
 
 export interface MatchResponseDto {
+  username: string;
   userName: string;
   userType: string;
+  userTypeImage?: string;
   typeTag: string[];
   highMatchingBrandList: {
     count: number;
@@ -675,13 +679,18 @@ export interface AppliedCampaignDetail {
   contentTags?: CampaignContentTags;
 }
 
-export const getAppliedCampaignDetail = async (campaignId: number | string): Promise<AppliedCampaignDetail> => {
+export const getAppliedCampaignDetail = async (
+  campaignId: number | string,
+): Promise<AppliedCampaignDetail> => {
   try {
     const response = await apiClient.get<AppliedCampaignDetail>(
-      `/api/v1/campaigns/${campaignId}/apply/me`
+      `/api/v1/campaigns/${campaignId}/apply/me`,
     );
 
-    const data = response.data as unknown as { isSuccess?: boolean; message?: string };
+    const data = response.data as unknown as {
+      isSuccess?: boolean;
+      message?: string;
+    };
     if (data && data.isSuccess === false) {
       throw new Error(data.message || "지원 상세 조회 실패");
     }
@@ -773,7 +782,9 @@ interface ProposalDetailResponse {
   result: ProposalDetail;
 }
 
-export const getProposalDetail = async (proposalId: number): Promise<ProposalDetail> => {
+export const getProposalDetail = async (
+  proposalId: number,
+): Promise<ProposalDetail> => {
   try {
     const response = await apiClient.get<ProposalDetailResponse>(
       `/v1/campaigns/proposal/${proposalId}`,
@@ -790,10 +801,12 @@ export const getProposalDetail = async (proposalId: number): Promise<ProposalDet
   }
 };
 
-export const getCampaignDetail = async (campaignId: number): Promise<CampaignDetail> => {
+export const getCampaignDetail = async (
+  campaignId: number,
+): Promise<CampaignDetail> => {
   try {
     const response = await apiClient.get<CampaignDetailResponse>(
-      `/api/v1/campaigns/${campaignId}`
+      `/api/v1/campaigns/${campaignId}`,
     );
 
     if (!response.data?.isSuccess) {

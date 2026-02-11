@@ -1,9 +1,15 @@
-import { useMemo } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMatchResultStore } from "../../../../stores/matching-result";
 import { useAuthStore } from "../../../../stores/auth-store";
-import MainIcon from "../../../../assets/MainIcon.png";
 import Button from "../../../../components/common/Button";
+
+import { getMatchAnalysis } from "../../api/matching";
+
+import engineerIcon from "../../../../assets/usertype/engineer.svg";
+import directorIcon from "../../../../assets/usertype/director.svg";
+import storytellerIcon from "../../../../assets/usertype/storyteller.svg";
+import experimentorIcon from "../../../../assets/usertype/experimentor.svg";
 
 type Brand = {
   brandId: number;
@@ -25,46 +31,81 @@ type LocationState = { apiResult?: ApiResult };
 const top3 = (brands: Brand[]) =>
   [...brands].sort((a, b) => b.matchingRatio - a.matchingRatio).slice(0, 3);
 
+const userTypeToIcon: Record<string, string> = {
+  "섬세한 설계자": engineerIcon,
+  "유연한 연출가": directorIcon,
+  "재치있는 스토리텔러": storytellerIcon,
+  "도전적인 실험가": experimentorIcon,
+};
+
 export default function MatchingResultContent() {
   const navigate = useNavigate();
   const location = useLocation() as { state: LocationState | null };
-  const [searchParams] = useSearchParams();
   const setResult = useMatchResultStore((s) => s.setResult);
   const setMe = useAuthStore((s) => s.setMe);
 
+  const [apiResult, setApiResult] = useState<ApiResult | null>(
+    location.state?.apiResult ?? null,
+  );
+  const [loading, setLoading] = useState(!location.state?.apiResult);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (apiResult) return;
+
+    const ac = new AbortController();
+
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const r = await getMatchAnalysis();
+
+        if (ac.signal.aborted) return;
+        setApiResult(r as unknown as ApiResult);
+      } catch (err) {
+        if (ac.signal.aborted) return;
+
+        if (err instanceof DOMException && err.name === "AbortError") return;
+
+        console.error("getMatchAnalysis failed:", err);
+        setError("매칭 결과를 불러오지 못했어요.");
+      } finally {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+
+    return () => {
+      ac.abort();
+    };
+  }, [apiResult]);
+
   const data = useMemo(() => {
-    const apiResult = location.state?.apiResult;
+    const r = apiResult;
 
-    if (apiResult) {
-      const brands = top3(apiResult.highMatchingBrandList.brands);
-      return {
-        userName: apiResult.username,
-        userType: apiResult.userType,
-        tags: apiResult.typeTag.slice(0, 3),
-        brands,
-      };
-    }
+    const fallback = {
+      userName: "비비",
+      userType: "유연한 연출가",
+      tags: ["연출유연", "트렌드적응", "브랜딩애호"],
+      brands: top3([
+        { brandId: 1, brandName: "isntree", matchingRatio: 98 },
+        { brandId: 2, brandName: "beplain", matchingRatio: 95 },
+        { brandId: 3, brandName: "ma:nyo", matchingRatio: 90 },
+      ]),
+    };
 
-    const userName =
-      searchParams.get("username") ?? searchParams.get("userName") ?? "비비";
-    const userType = searchParams.get("userType") ?? "유연한 연출가";
+    if (!r) return fallback;
 
-    const tags =
-      searchParams
-        .get("typeTag")
-        ?.split(",")
-        .map((v) => v.trim())
-        .filter(Boolean)
-        .slice(0, 3) ?? ["연출유연", "트렌드적응", "브랜딩애호"];
+    return {
+      userName: r.username,
+      userType: r.userType,
+      tags: (r.typeTag ?? []).slice(0, 3),
+      brands: top3(r.highMatchingBrandList?.brands ?? []),
+    };
+  }, [apiResult]);
 
-    const brands: Brand[] = [
-      { brandId: 1, brandName: "isntree", matchingRatio: 98 },
-      { brandId: 2, brandName: "beplain", matchingRatio: 95 },
-      { brandId: 3, brandName: "ma:nyo", matchingRatio: 90 },
-    ];
-
-    return { userName, userType, tags, brands: top3(brands) };
-  }, [location.state, searchParams]);
+  const userTypeIconSrc = userTypeToIcon[data.userType] ?? directorIcon;
 
   const onStart = () => {
     setResult({
@@ -88,7 +129,7 @@ export default function MatchingResultContent() {
 
   return (
     <div className="min-h-full w-full bg-grad-auth-reverse">
-      <div className="mx-auto min-h-full w-full max-w-[430px]">
+      <div className="mx-auto min-h-full w-full pb-30">
         <div className="min-h-full w-full px-6 pt-[120px] pb-[22px] flex flex-col">
           <div className="text-center">
             <p className="text-callout1 text-text-gray2">
@@ -113,12 +154,19 @@ export default function MatchingResultContent() {
 
             <div className="mt-[32px] flex justify-center">
               <img
-                src={MainIcon}
-                alt="매칭 결과"
+                src={userTypeIconSrc}
+                alt={data.userType}
                 className="w-[230px] select-none"
                 draggable={false}
               />
             </div>
+
+            {loading ? (
+              <p className="mt-3 text-caption1 text-text-gray2">불러오는 중…</p>
+            ) : null}
+            {error ? (
+              <p className="mt-3 text-caption1 text-red-500">{error}</p>
+            ) : null}
 
             <p className="mt-[32px] text-title3 text-text-gray2">
               나와 어울리는 TOP3 브랜드
@@ -143,7 +191,9 @@ export default function MatchingResultContent() {
                   </div>
 
                   <div className="mt-[6px] flex justify-between text-caption2">
-                    <span className="truncate text-text-gray2">{b.brandName}</span>
+                    <span className="truncate text-text-gray2">
+                      {b.brandName}
+                    </span>
                     <span className="font-semibold text-core-1">
                       {b.matchingRatio}%
                     </span>
@@ -154,7 +204,14 @@ export default function MatchingResultContent() {
           </div>
 
           <div className="mt-[40px]">
-            <Button variant="primary" size="lg" fullWidth withLogo onClick={onStart}>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              withLogo
+              onClick={onStart}
+              disabled={loading}
+            >
               RealMatch 시작하기
             </Button>
           </div>

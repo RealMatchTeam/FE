@@ -160,7 +160,7 @@ export default function MatchingTestStep3Content({
       ) : null}
 
       <main className="flex-1 px-6 pb-7.5 bg-white">
-        <h1 className="text-title leading-8 font-extrabold text-text-black">
+        <h1 className="text-title leading-8 text-text-black">
           <span className="text-core-1">콘텐츠 특성</span>을{" "}
           <span className="text-core-1">모두</span> 선택해주세요
         </h1>

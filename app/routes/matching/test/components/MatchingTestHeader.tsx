@@ -1,17 +1,11 @@
 interface MatchingTestTopBarProps {
-  /** 1부터 시작 (1,2,3...) */
   step: number;
   totalSteps: number;
   onBack: () => void;
 
-  /** 레이아웃 미세조정 필요하면 사용 */
   className?: string;
 }
 
-/*
- * 진행바 + 뒤로가기 + "n / total" 텍스트를 한 번에 통일하는 컴포넌트
- * 1/3, 2/3, 3/3에 따라 진행바 길이가 변함
- */
 export default function MatchingTestHeader({
   step,
   totalSteps,
@@ -24,14 +18,12 @@ export default function MatchingTestHeader({
 
   return (
     <div className={className}>
-      {/* progress */}
       <div className="pt-2">
         <div className="h-[2px] w-full bg-bluegray-2">
           <div className="h-[2px] bg-core-1" style={{ width: `${percent}%` }} />
         </div>
       </div>
 
-      {/* header (step1 스타일로 통일) */}
       <div className="px-5 pt-4">
         <div className="relative flex items-center justify-center mb-6">
           <button

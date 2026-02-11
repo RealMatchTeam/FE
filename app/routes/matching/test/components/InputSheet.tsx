@@ -1,3 +1,6 @@
+import React from "react";
+import { useHideBottomTab } from "../../../../hooks/useHideBottomTab";
+
 interface InputSheetProps {
   value: string;
   placeholder: string;
@@ -26,10 +29,12 @@ export default function InputSheet({
   type = "text",
   autoCapitalize = "none",
 }: InputSheetProps) {
+  useHideBottomTab(true);
+
   const showError = Boolean(errorText) && value.trim().length > 0;
 
   return (
-    <div className="px-2 pb-6">
+    <div className=" pb-6">
       <div
         className={[
           "flex items-center",
