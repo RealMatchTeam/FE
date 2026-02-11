@@ -3,11 +3,13 @@ import closeIcon from "../../../assets/cancel.svg";
 
 export function ChatListHeader({
   sortLabel,
+  isFiltered = false,
   onClickSort,
   searchQuery,
   onSearchChange,
 }: {
   sortLabel: string;
+  isFiltered?: boolean;
   onClickSort: () => void;
   sortOpen: boolean;
   searchQuery: string;
@@ -24,7 +26,7 @@ export function ChatListHeader({
 
         <input
           className="flex-1 min-w-0 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
-          placeholder="검색어 입력"
+          placeholder="채팅 검색"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -40,26 +42,32 @@ export function ChatListHeader({
 
       <div className="flex items-center pt-2 pb-4 justify-between">
 
-        <div className="px-1 text-[16px] leading-[20px] font-Semibold text-black">
+        <div className="px-1 text-title1 leading-[20px] text-black">
           채팅 목록
         </div>
 
         {/* 정렬 버튼 - 텍스트는 sortLabel */}
         <button
           onClick={onClickSort}
-          className="flex items-center gap-1 w-fit h-7 px-3 rounded-full border border-[#E6E6F3] text-[#5B5D6B] text-[14px] font-Pretendard text-text-gray2 bg-white"
+          className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-Pretendard ${
+            isFiltered
+              ? "border-core-70 text-core-1 bg-core-70"
+              : "border-core-2 text-gray-2 bg-white text-title3"
+          }`}
         >
           {sortLabel}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
-            fill="currentColor"
-            className="w-4 h-4 text-text-gray3"
+            fill="none"
+            className={`w-6 h-6 ${isFiltered ? "text-core-1" : "text-text-gray2"}`}
           >
             <path
-              fillRule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-              clipRule="evenodd"
+              d="M6 8L10 12L14 8"
+              stroke="currentColor"
+              strokeWidth="1.0"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </button>
