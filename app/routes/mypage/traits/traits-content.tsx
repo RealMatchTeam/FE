@@ -571,7 +571,7 @@ export default function TraitsPage() {
             {traits.map((trait) => {
               const cols = trait.topSummary.length;
               return (
-                <section key={trait.id} className="space-y-3 bg-white">
+                <section key={trait.id} className="space-y-5 bg-white">
                   <div className="flex items-center justify-center gap-2">
                     <div className="flex items-center justify-center">
                       {trait.icon("w-[46px] h-[47px]")}
@@ -586,24 +586,17 @@ export default function TraitsPage() {
                       aria-label="edit"
                     >
                       <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
+                        width="9"
+                        height="9"
+                        viewBox="0 0 9 9"
                         fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25Z"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M14.06 4.19 19.81 9.94"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M0.9375 7.91973V6.74536L5.4875 2.19536L6.6625 3.36973L2.1125 7.91973H0.9375ZM7.325 2.70661L7.82812 2.20348C7.85723 2.17445 7.88032 2.13997 7.89607 2.102C7.91182 2.06404 7.91993 2.02334 7.91993 1.98223C7.91993 1.94113 7.91182 1.90043 7.89607 1.86246C7.88032 1.8245 7.85723 1.79001 7.82812 1.76098L7.09625 1.02911C7.06722 1.00001 7.03274 0.976917 6.99477 0.961163C6.95681 0.945409 6.9161 0.937299 6.875 0.937299C6.8339 0.937299 6.79319 0.945409 6.75523 0.961163C6.71726 0.976917 6.68278 1.00001 6.65375 1.02911L6.15062 1.53223L7.325 2.70661ZM0 7.91973V6.35723L5.99125 0.365983C6.22566 0.131644 6.54354 0 6.875 0C7.20646 0 7.52434 0.131644 7.75875 0.365983L8.49125 1.09848C8.72559 1.33289 8.85723 1.65078 8.85723 1.98223C8.85723 2.31369 8.72559 2.63157 8.49125 2.86598L2.5 8.85723H0V7.91973Z"
+                          fill="#9B9BA1"
                         />
                       </svg>
                     </button>
@@ -636,7 +629,7 @@ export default function TraitsPage() {
                     </div>
                   </div>
 
-                  <div className="px-2 space-y-[10px]">
+                  <div className="px-2 space-y-5">
                     {trait.sections.map((section, i) => (
                       <div key={i}>
                         <div className="text-[12px] leading-[16px] font-medium text-[#6666E5]">
