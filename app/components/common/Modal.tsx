@@ -1,8 +1,8 @@
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
   className?: string;
+  children: React.ReactNode;
 }
 
 export default function Modal({ isOpen, onClose, children, className = "" }: ModalProps) {

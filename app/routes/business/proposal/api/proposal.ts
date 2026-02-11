@@ -28,6 +28,8 @@ export interface ProposalDetail {
     involvements: { id: number; name: string }[];
     usageRanges: { id: number; name: string }[];
   };
+  createdAt: string;
+  snsAccount?: string;
 }
 
 export const getProposalDetail = async (proposalId: string): Promise<ProposalDetail> => {
@@ -69,12 +71,13 @@ export const getBrandDetail = async (brandId: number | string): Promise<BrandDet
 export interface AppliedCampaignDetail {
   campaignId: number;
   campaignApplyId: number;
-  brandId: number;     
+  brandId: number;
   brandName: string;
   campaignTitle: string;
   campaignReason: string;
   status: "REVIEWING" | "MATCHED" | "REJECTED" | "CANCELED";
   creatorId?: string;
+
 }
 
 export const getAppliedCampaignDetail = async (campaignId: string): Promise<AppliedCampaignDetail> => {
@@ -94,9 +97,9 @@ export const getAppliedCampaignDetail = async (campaignId: string): Promise<Appl
       const errorMessage = error.response?.data?.message || "지원 상세 데이터 로드 실패";
       throw new Error(errorMessage);
     }
-    
+
     if (error instanceof Error) throw error;
-    
+
     throw new Error("알 수 없는 에러가 발생했습니다.");
   }
 };
@@ -119,10 +122,10 @@ export const rejectCampaignProposal = async (
   rejectReason: string
 ): Promise<ApiResponse<string>> => {
   try {
-    
+
     const response = await axiosInstance.patch<ApiResponse<string>>(
       `/v1/campaigns/proposal/${campaignProposalId}/reject`,
-      { rejectReason } 
+      { rejectReason }
     );
     return response.data;
   } catch (error) {
@@ -151,7 +154,6 @@ export const cancelCampaignProposal = async (
 };
 
 // 캠페인 지원 취소 API
-
 export const cancelCampaignApply = async (
   campaignApplyId: string | number
 ): Promise<ApiResponse<string>> => {
@@ -164,6 +166,42 @@ export const cancelCampaignApply = async (
     console.error("지원 취소 실패:", error);
     if (error instanceof AxiosError) {
       const errorMessage = error.response?.data?.message || "지원 취소에 실패했습니다.";
+      throw new Error(errorMessage);
+    }
+    throw error;
+  }
+};
+
+// 캠페인 제안 수정 API
+export const updateProposal = async (
+  campaignProposalId: string | number,
+  requestData: {
+    brandId: number;
+    creatorId: number;
+    campaignId: number | null;
+    campaignName: string;
+    description: string;
+    formats: { id: number }[];
+    categories: { id: number; customValue?: string }[];
+    tones: { id: number }[];
+    involvements: { id: number }[];
+    usageRanges: { id: number }[];
+    rewardAmount: number;
+    productId: number;
+    startDate: string;
+    endDate: string;
+  }
+): Promise<ApiResponse<string>> => {
+  try {
+    const response = await axiosInstance.patch<ApiResponse<string>>(
+      `/v1/campaigns/proposal/${campaignProposalId}/re-request`,
+      requestData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("제안 수정 실패:", error);
+    if (error instanceof AxiosError) {
+      const errorMessage = error.response?.data?.message || "제안 수정에 실패했습니다.";
       throw new Error(errorMessage);
     }
     throw error;

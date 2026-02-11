@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import ProductListCard from "../components/ProductListCard";
+import { LayoutContext } from "../../layout-context";
 import { fetchSponsorProductList } from "../../brand-detail/api/api";
 
 type SponsorProduct = {
@@ -50,10 +51,20 @@ export default function SponsorableContent() {
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
 
+  const layout = useContext(LayoutContext);
+
   const canFetch = useMemo(
     () => Number.isFinite(brandId) && (brandId ?? 0) > 0,
     [brandId],
   );
+
+  // ✅ 헤더 숨김: “헤더만” 숨기고 화면(Outlet)은 계속 보여야 함
+  useEffect(() => {
+    if (!layout?.setHideHeader) return;
+
+    layout.setHideHeader(true);
+    return () => layout.setHideHeader(false);
+  }, [layout]);
 
   useEffect(() => {
     if (!canFetch || !brandId) return;
@@ -65,13 +76,19 @@ export default function SponsorableContent() {
         setLoading(true);
         setErrorText(null);
 
-        const list = await fetchSponsorProductList({ brandId: String(brandId) });
+        const list = await fetchSponsorProductList({
+          brandId: String(brandId),
+        });
         if (cancelled) return;
 
         setProducts(toUiProducts(list));
       } catch (e: unknown) {
         if (cancelled) return;
-        setErrorText(e instanceof Error ? e.message : "협찬 가능 제품을 불러오지 못했어요.");
+        setErrorText(
+          e instanceof Error
+            ? e.message
+            : "협찬 가능 제품을 불러오지 못했어요.",
+        );
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -82,26 +99,54 @@ export default function SponsorableContent() {
     };
   }, [brandId, canFetch]);
 
+  const goDetail = (product: SponsorProduct) => {
+    if (!brandId || !Number.isFinite(brandId) || brandId <= 0) return;
+    if (!Number.isFinite(product.id) || product.id <= 0) return;
+
+    navigate(
+      `/products/sponsorable/detail?brandId=${brandId}&productId=${product.id}`,
+      {
+        state: {
+          brandId,
+          brandName,
+          heroImageUrl: product.imageUrl,
+          productName: product.title,
+        },
+      },
+    );
+  };
+
   return (
     <div className="w-full h-full overflow-hidden">
-      <div className="mx-auto w-full max-w-[430px] h-full overflow-hidden flex flex-col bg-grad-auth">
+      <div className="w-full h-full overflow-hidden flex flex-col bg-grad-auth">
         <div className="shrink-0">
-          <NavigationHeader title="협찬 가능 제품" onBack={() => navigate(-1)} />
+          <NavigationHeader
+            title="협찬 가능 제품"
+            onBack={() => navigate(-1)}
+          />
         </div>
 
         <div className="shrink-0 px-5 pt-4">
-          <div className="text-callout1 text-core-1 truncate">{brandName || "브랜드"}</div>
-          <div className="mt-1 text-title1 text-text-black truncate">협찬 가능 리스트</div>
+          <div className="text-callout1 text-core-1 truncate">
+            {brandName || "브랜드"}
+          </div>
+          <div className="mt-1 text-title1 text-text-black truncate">
+            협찬 가능 리스트
+          </div>
         </div>
 
         <div className="flex-1 min-h-0 px-5 pb-6 overflow-y-auto">
           <div className="mt-4 space-y-3">
             {loading && (
-              <div className="py-10 text-center text-callout1 text-text-gray2">불러오는 중…</div>
+              <div className="py-10 text-center text-callout1 text-text-gray2">
+                불러오는 중…
+              </div>
             )}
 
             {!loading && errorText && (
-              <div className="py-10 text-center text-callout1 text-text-gray2">{errorText}</div>
+              <div className="py-10 text-center text-callout1 text-text-gray2">
+                {errorText}
+              </div>
             )}
 
             {!loading && !errorText && products.length === 0 && (
@@ -118,7 +163,7 @@ export default function SponsorableContent() {
                   title={p.title}
                   subtitle={p.subtitle}
                   imageUrl={p.imageUrl}
-                  onClick={() => {}}
+                  onClick={() => goDetail(p)}
                 />
               ))}
           </div>

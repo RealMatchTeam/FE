@@ -1,7 +1,6 @@
-import Modal from "../../../../../components/common/Modal";
-import Button from "../../../../../components/common/Button";
-import CheckCircleIcon from "../../../../../assets/icon/icon-check-circle.svg";
-
+import Modal from "../../../components/common/Modal";
+import Button from "../../../components/common/Button";
+import CheckCircleIcon from "../../../assets/icon/icon-check-circle.svg";
 
 interface ProposalModalProps {
     isOpen: boolean;
@@ -37,22 +36,20 @@ export default function ProposalModal({
                     </button>
                 )}
 
-                {/* 중앙 아이콘 및 텍스트 영역: 화면 정가운데 위치 위해 flex-1 justify-center 적용 */}
                 <div className="flex-1 flex flex-col items-center justify-center w-full">
                     <img src={CheckCircleIcon} alt="" className="w-16 h-16 mb-6" />
 
                     <h3 className="text-callout3 text-text-black text-center">
-                        {isConfirm ? "캠페인을 제안하시겠습니까?" : "제안하기 완료"}
+                        {isConfirm ? "지원하시겠습니까?" : "지원 완료"}
                     </h3>
 
                     {!isConfirm && (
                         <p className="text-title7 text-text-gray3 text-center mt-2 whitespace-pre-wrap">
-                            비즈니스 메뉴에서{"\n"}제안정보를 확인해 주세요
+                            비즈니스 메뉴에서{"\n"}지원정보를 확인해 주세요
                         </p>
                     )}
                 </div>
 
-                {/* 하단 버튼 영역 */}
                 <div className="flex gap-3 w-full mt-auto">
                     {isConfirm ? (
                         <>
@@ -70,7 +67,7 @@ export default function ProposalModal({
                                 className="flex-[4] h-11 text-title7 rounded-xl"
                                 onClick={onConfirm}
                             >
-                                제안하기
+                                지원하기
                             </Button>
                         </>
                     ) : (

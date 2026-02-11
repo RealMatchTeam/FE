@@ -133,3 +133,43 @@ export type SponsorProductsApiResponse = {
   message: string;
   result: SponsorProductDto[];
 };
+
+export type SponsorAvailableItem = {
+  itemId: number;
+  availableType: string; // 백엔드 enum 나오면 union으로 좁히기
+  availableQuantity: number;
+  availableSize: number;
+  sizeUnit: string; // "ml", "g" 등
+};
+
+export type SponsorInfo = {
+  items: SponsorAvailableItem[];
+  shippingType: string; // 백엔드 enum 나오면 union으로 좁히기
+};
+
+export type SponsorProductAction = {
+  canProposeCampaign: boolean;
+  proposeCampaignCtaText: string;
+};
+
+export type SponsorProductDetailResult = {
+  brandId: number;
+  brandName: string;
+
+  productId: number;
+  productName: string;
+  productDescription: string;
+
+  productImageUrls: string[];
+  categories: string[];
+
+  sponsorInfo: SponsorInfo;
+  action: SponsorProductAction;
+};
+
+export type SponsorProductDetailApiResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: SponsorProductDetailResult;
+};

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LoginLogo from "../../../assets/logo/login-logo.png";
+import LoginLogo from "../../../assets/logo/login-logo.svg";
 import { SocialLoginSection } from "./components/SocialLoginSection";
 
 function LoginContent() {
@@ -14,7 +14,11 @@ function LoginContent() {
     <div className="flex flex-col items-center justify-center min-h-screen px-6 py-6 bg-grad-auth">
       {/* 로고 영역 */}
       <div className="flex flex-col items-center mb-12">
-        <img src={LoginLogo} alt="Real Match Logo" className="mb-4" />
+        <img
+          src={LoginLogo}
+          alt="Real Match Logo"
+          className="mb-4"
+        />
       </div>
 
       {/* 소셜 로그인 */}

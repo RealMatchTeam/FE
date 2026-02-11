@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useMatchResultStore } from "../../../../stores/matching-result";
 import { useAuthStore } from "../../../../stores/auth-store";
-import MainIcon from "../../../../assets/MainIcon.svg";
+import MainIcon from "../../../../assets/MainIcon.png";
 import Button from "../../../../components/common/Button";
 
 type Brand = {

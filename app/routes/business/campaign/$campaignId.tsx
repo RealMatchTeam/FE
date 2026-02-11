@@ -44,7 +44,7 @@ export default function CampaignContent() {
   return (
     <div className="flex flex-col w-full min-h-screen bg-[var(--color-bluegray-1)]">
       {/* Header */}
-      <header className="h-[56px] w-full bg-white border-b border-gray-100">
+      <header className="sticky top-0 z-50 h-[56px] w-full bg-white border-b border-gray-100">
         <div className="relative flex items-center justify-center h-full px-4">
           <button
             type="button"

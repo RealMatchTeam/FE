@@ -57,45 +57,45 @@ export default function BottomTab() {
   const currentPath = location.pathname;
 
   return (
-    <nav className="w-full shrink-0 bg-white border-t border-text-gray5 safe-area-bottom">
+    <nav className="sticky bottom-0 z-50 w-full shrink-0 bg-white border-t border-text-gray5 safe-area-bottom">
       <div className="mx-auto w-full max-w-[430px]">
         <div className="grid grid-cols-5 items-center h-[66px] px-2">
-        {tabs.map((tab) => {
-          let isActive = currentPath === tab.path;
-          if (tab.path === "/matching/brand" && currentPath.startsWith("/matching")) {
-            isActive = true;
-          }
-          if (tab.path === "/business/calendar" && currentPath.startsWith("/business")) {
-            isActive = true;
-          }
-          const isHome = tab.path === "/";
-          if (isHome && (currentPath === "/" || currentPath.startsWith("/home") || currentPath.startsWith("/pre"))) {
-            isActive = true;
-          }
-          return (
-            <Link
-              key={tab.path}
-              to={tab.path}
-              className="transition-colors w-full h-full"
-            >
-              <div className="flex flex-col items-center justify-center gap-1 h-full">
-                <img
-                  src={isActive ? tab.iconSelected : tab.icon}
-                  alt={tab.label}
-                  className="w-6 h-6"
-                />
-                <span
-                  className={`text-callout4 whitespace-nowrap ${isActive
-                    ? "text-core-1 font-semibold"
-                    : "text-text-gray3"
-                    }`}
-                >
-                  {tab.label}
-                </span>
-              </div>
-            </Link>
-          );
-        })}
+          {tabs.map((tab) => {
+            let isActive = currentPath === tab.path;
+            if (tab.path === "/matching/brand" && currentPath.startsWith("/matching")) {
+              isActive = true;
+            }
+            if (tab.path === "/business/calendar" && (currentPath.startsWith("/business") || currentPath === "/chat/resuggest")) {
+              isActive = true;
+            }
+            const isHome = tab.path === "/";
+            if (isHome && (currentPath === "/" || currentPath.startsWith("/home") || currentPath.startsWith("/pre"))) {
+              isActive = true;
+            }
+            return (
+              <Link
+                key={tab.path}
+                to={tab.path}
+                className="transition-colors w-full h-full"
+              >
+                <div className="flex flex-col items-center justify-center gap-1 h-full">
+                  <img
+                    src={isActive ? tab.iconSelected : tab.icon}
+                    alt={tab.label}
+                    className="w-6 h-6"
+                  />
+                  <span
+                    className={`text-callout4 whitespace-nowrap ${isActive
+                      ? "text-core-1 font-semibold"
+                      : "text-text-gray3"
+                      }`}
+                  >
+                    {tab.label}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

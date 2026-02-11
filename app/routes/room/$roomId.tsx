@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import ChattingRoom from "./chatting-room";
+import ChattingRoom from "./page";
 
 export default function RoomEntry() {
   console.log("params:", useParams());

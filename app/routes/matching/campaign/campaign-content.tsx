@@ -144,7 +144,7 @@ export default function CampaignContent() {
     // 로딩 중
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full bg-core-2">
+            <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
                 <div className="text-lg text-text-gray3">로딩 중...</div>
             </div>
         );
@@ -158,12 +158,13 @@ export default function CampaignContent() {
             message={`매칭된 기업이 없어요\n매칭 검사를 먼저 진행해주세요`}
             showButton={true}
             buttonText="매칭 검사하기"
+            contentClassName="pb-14"
         />
     }
 
     // 매칭 결과가 있을 때
     return (
-        <div className="flex flex-col h-full bg-core-2">
+        <div className="flex flex-col h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
             {/* 뷰티/패션 필터 & 검색창 */}
             <CampaignFilterBar
                 category={category}
@@ -203,7 +204,7 @@ export default function CampaignContent() {
                             applicants={campaign.applicants}
                             isLiked={campaign.isLiked}
                             onLike={() => toggleLike(campaign.id)}
-                            onClick={() => navigate(`/business/campaign/${campaign.id}`)}
+                            onClick={() => navigate(`/campaign?campaignId=${campaign.id}&brandId=${campaign.brandId}&domain=${category.toLowerCase()}`)}
                             logoUrl={campaign.logoUrl || `/dummy-logo-${campaign.id}.png`}
                             dDay={campaign.dDay}
                         />

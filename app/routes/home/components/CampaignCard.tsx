@@ -12,21 +12,21 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
   const applicantsBadge = item.progressText ? `${item.progressText}명` : "";
 
   return (
-    <div onClick={onClick} className="w-[118px] shrink-0 cursor-pointer text-left">
-      <div className="relative aspect-square rounded-xl border border-core-2 bg-white">
+    <div onClick={onClick} className="w-29.5 shrink-0 cursor-pointer text-left">
+      <div className="relative aspect-square rounded-xl border border-core-2 bg-white overflow-hidden">
         <div className="absolute left-2 right-2 top-2 flex items-center justify-between">
           <div className="flex h-6 min-w-0 items-center">
-            <div className="ml-[6px] flex items-center overflow-visible -translate-x-[6px] -translate-y-[6px]">
+            <div className="ml-1.5 flex items-center overflow-visible -translate-x-1.5 -translate-y-1.5">
               {applicantsBadge ? <BadgePill text={applicantsBadge} /> : null}
 
               {item.ddayLabel ? (
                 <span
                   className="
-                    ml-[4px]
-                    inline-flex h-4 max-w-[38px] items-center justify-center truncate
+                    ml-1
+                    inline-flex h-4 max-w-9.5 items-center justify-center truncate
                     rounded-[5px]
                     px-1
-                    text-title5 font-semibold leading-[14px]
+                    text-title5 leading-3.5
                     text-core-1
                     bg-white
                     border border-core-1
@@ -42,7 +42,7 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
 
           <div
             onClick={(e) => e.stopPropagation()}
-            className="grid h-6 w-6 place-items-center translate-x-[6px] -translate-y-[6px]"
+            className="grid h-6 w-6 place-items-center translate-x-1.5 -translate-y-1.5"
           >
             <HeartButton
               defaultPressed={!!item.isLiked}
@@ -51,18 +51,16 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
           </div>
         </div>
 
-        <div className="flex h-full items-center justify-center px-3">
+        <div className="flex h-full items-center justify-center object-cover">
           {item.logoUrl ? (
             <img
               src={item.logoUrl}
               alt={item.brandName}
               draggable={false}
-              className="block max-h-[28px] max-w-[78%] object-contain pointer-events-none select-none"
+              className="block h-full w-full object-contain pointer-events-none select-none"
             />
           ) : (
-            <div className="text-[16px] font-semibold tracking-tight">
-              {item.brandName}
-            </div>
+            <div className="text-title7 tracking-tight">{item.brandName}</div>
           )}
         </div>
       </div>
@@ -75,10 +73,14 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
           </div>
         </div>
 
-        <div className="mt-0.5 text-title5 text-text-gray3">{item.descText ?? ""}</div>
+        <div className="mt-0.5 text-title5 text-text-gray3">
+          {item.descText ?? ""}
+        </div>
 
         {item.rewardText ? (
-          <div className="mt-0.5 text-title5 font-medium text-core-1">{item.rewardText}</div>
+          <div className="mt-0.5 text-callout2 text-core-1">
+            {item.rewardText}
+          </div>
         ) : null}
       </div>
     </div>

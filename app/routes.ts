@@ -27,11 +27,9 @@ export default [
   layout("routes/_main.tsx", [
     index("routes/home/index.tsx"),
 
-
     route("pre", "routes/home/pre.tsx"),
-  route("home", "routes/home/after.tsx"),
+    route("home", "routes/home/after.tsx"),
 
-  
     route("matching", "routes/matching/route.tsx", [
       route("brand", "routes/matching/brand/route.tsx"),
       route("campaign", "routes/matching/campaign/route.tsx"),
@@ -40,6 +38,10 @@ export default [
     route("matching/suggest", "routes/matching/suggest/route.tsx", [
       index("routes/matching/suggest/index.tsx"),
       route("create", "routes/matching/suggest/create/route.tsx"),
+    ]),
+
+    route("matching/apply", "routes/matching/apply/route.tsx", [
+      index("routes/matching/apply/index.tsx"),
     ]),
 
     route("matching/test", "routes/matching/test/route.tsx", [
@@ -53,13 +55,16 @@ export default [
       route("calendar", "routes/business/calendar/route.tsx"),
       route("proposal", "routes/business/proposal/route.tsx"),
       route("rejection", "routes/business/rejection/route.tsx"),
+      
     ]),
 
-    route("chat", "routes/chat/route.tsx"),
+    route("chat", "routes/chat/route.tsx", [
+      route("resuggest", "routes/chat/resuggest/route.tsx"),
+    ]),
 
-    route("rooms", "routes/rooms/route.tsx", [
-      route("brand/:brandId", "routes/rooms/$brandId.tsx"),
-      route(":roomId", "routes/rooms/$roomId.tsx"),
+    route("rooms", "routes/room/route.tsx", [
+      route("brand/:brandId", "routes/room/$brandId.tsx"),
+      route(":roomId", "routes/room/$roomId.tsx"),
     ]),
 
     route("mypage", "routes/mypage/route.tsx", [
@@ -76,13 +81,16 @@ export default [
       route("terms", "routes/mypage/terms/route.tsx"),
     ]),
 
-route("products/sponsorable", "routes/brand-detail/sponsorable/route.tsx"),
+    route("products/sponsorable", "routes/brand-detail/sponsorable/route.tsx"),
 
+    route(
+      "products/sponsorable/detail",
+      "routes/brand-detail/sponsorable/detail/route.tsx",
+    ),
 
     route("notification", "routes/notification/route.tsx"),
     route("brand", "routes/brand-detail/route.tsx"),
     route("campaign", "routes/campaign-detail/route.tsx"),
-
   ]),
 
   // Campaign detail route (without main layout)

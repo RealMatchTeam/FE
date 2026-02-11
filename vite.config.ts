@@ -32,7 +32,9 @@ export default defineConfig({
     sourcemap: false,
     minify: "esbuild",
     target: "esnext",
+    assetsInlineLimit: 0,
   },
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg'],
   resolve: {
     alias: {
       "@utils": path.resolve(__dirname, "app/utils"),

@@ -1,5 +1,6 @@
 import { formatKoreanDateTime } from "@utils/dateTime";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
+import type { ChatRoomCard } from "../api/chat";
 
 export default function ChatListCard({ room }: { room: ChatRoomCard }) {
   const { dateText, timeText } = formatKoreanDateTime(room.lastMessageAt);
@@ -47,7 +48,7 @@ export default function ChatListCard({ room }: { room: ChatRoomCard }) {
             >
               협업 중
             </span>
-            )}
+          )}
         </div>
 
         {/* 2줄 미리보기 */}
