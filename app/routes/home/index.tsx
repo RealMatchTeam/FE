@@ -1,9 +1,11 @@
-import { Navigate, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { getMyPage } from "../mypage/api/mypage";
 import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
 import { useAuthStore } from "../../stores/auth-store";
 import { tokenStorage } from "../../lib/token";
+import HomeContent from "./home-content";
+import HomeAfterMatch from "./home-after-match";
 
 export default function HomeIndex() {
   const location = useLocation();
@@ -56,21 +58,29 @@ export default function HomeIndex() {
   useEffect(() => {
     if (resolvedHasMatchingTest !== true) return;
 
+    let isMounted = true;
+
     (async () => {
       try {
         const { count } = await getMatchingBrands();
+        if (!isMounted) return;
         setHasMatch(count > 0);
       } catch (error: unknown) {
+        if (!isMounted) return;
         if (error instanceof MatchingTestRequiredError) setHasMatch(false);
         else setHasMatch(false);
       }
     })();
-  }, [resolvedHasMatchingTest, location.state]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [resolvedHasMatchingTest]);
 
   const effectiveHasMatch = resolvedHasMatchingTest !== true ? null : hasMatch;
 
   if (resolvedHasMatchingTest === false) {
-    return <Navigate to="/pre" replace />;
+    return <HomeContent />;
   }
 
   if (resolvedHasMatchingTest === null || effectiveHasMatch === null) {
@@ -84,5 +94,5 @@ export default function HomeIndex() {
     );
   }
 
-  return <Navigate to={hasMatch ? "/home" : "/pre"} replace />;
+  return <HomeAfterMatch />;
 }

@@ -5,7 +5,6 @@ type RealMatchHeaderProps = {
   /** 뒤로가기 버튼 노출 여부 */
   title?: string;
   showBack?: boolean;
-  /** 뒤로가기 클릭 시 동작 커스텀 (없으면 navigate({to: ".."}) 시도 후 history.back) */
   onBack?: () => void;
 };
 
@@ -23,7 +22,7 @@ export default function RealMatchHeader({
   };
 
   return (
-    <header className="sticky top-0 z-50 h-[60px] w-full bg-white">
+    <header className="sticky top-0 z-50 w-full bg-white shrink-0 border-b border-black/5 h-[100px] py-[18px]">
       <div className="grid h-full w-full grid-cols-3 items-center px-4">
         {/* Left: Back */}
         <div className="flex items-center">
@@ -34,7 +33,7 @@ export default function RealMatchHeader({
               aria-label="뒤로가기"
               className="flex h-9 w-9 items-center justify-center rounded-full active:bg-black/5"
             >
-              {/* iOS 느낌 chevron */}
+              {/* chevron */}
               <svg
                 width="22"
                 height="22"
@@ -64,13 +63,9 @@ export default function RealMatchHeader({
             src={RealMatchLogo}
             alt="Real Match"
             draggable={false}
-            className="h-[21.5px]"
           />
         </button>
       </div>
-
-      {/* 하단 얇은 divider (스크린샷의 라인 느낌) */}
-      <div className="h-px w-full bg-black/5" />
     </header>
   );
 }
