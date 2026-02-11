@@ -53,6 +53,7 @@ export default [
       route("calendar", "routes/business/calendar/route.tsx"),
       route("proposal", "routes/business/proposal/route.tsx"),
       route("rejection", "routes/business/rejection/route.tsx"),
+      
     ]),
 
     route("chat", "routes/chat/route.tsx"),
