@@ -10,6 +10,7 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { getMatchingCampaigns, getTagNamesByCategory, toggleCampaignLike, type MatchingCampaign } from "../api/matching";
 
 export default function CampaignContent() {
@@ -145,7 +146,7 @@ export default function CampaignContent() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
-                <div className="text-lg text-text-gray3">로딩 중...</div>
+                <LoadingSpinner />
             </div>
         );
     }
@@ -212,7 +213,7 @@ export default function CampaignContent() {
 
                     {/* 무한 스크롤 트리거 & 로딩 */}
                     <div ref={ref} className="h-10 flex items-center justify-center">
-                        {isFetchingNextPage && <div className="text-sm text-gray-500">더 불러오는 중...</div>}
+                        {isFetchingNextPage && <LoadingSpinner className="py-4" size={80} />}
                     </div>
                 </div>
             </div>

@@ -4,6 +4,7 @@ import NavigationHeader from "../../../../components/common/NavigateHeader";
 import { LayoutContext } from "../../../layout-context";
 import Button from "../../../../components/common/Button";
 import { fetchSponsorProductDetail } from "../../api/api";
+import LoadingSpinner from "../../../../components/common/LoadingSpinner";
 
 type SponsorAvailableItem = {
   itemId: number;
@@ -193,9 +194,7 @@ export default function SponsorableDetailContent() {
         {/* 스크롤 영역 */}
         <main className="flex-1 min-h-0 overflow-y-auto bg-bg-w">
           {loading && (
-            <div className="px-5 py-16 text-center text-callout1 text-text-gray2">
-              불러오는 중…
-            </div>
+            <LoadingSpinner className="py-16" />
           )}
 
           {!loading && errorText && (

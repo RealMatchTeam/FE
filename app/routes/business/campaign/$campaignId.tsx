@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import Button from "../../../components/common/Button";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
@@ -37,7 +38,7 @@ export default function CampaignContent() {
     loadData();
   }, [campaignId]);
 
-  if (!data) return <div className="p-10 text-center">로딩 중...</div>;
+  if (!data) return <LoadingSpinner className="py-10" />;
 
   const formatTags = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
 

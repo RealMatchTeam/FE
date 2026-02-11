@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { tokenStorage } from "../../lib/token";
 import NavigationHeader from "../../components/common/NavigateHeader";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ChatComposer from "./components/ChatComposer";
 import AttachmentSheet, { type AttachmentAction } from "./components/AttachmentSheet";
 import useKeyboardOffset from "../../hooks/KeyboardOffset";
@@ -137,7 +138,7 @@ export default function ChattingRoom({ roomId }: Props) {
     return (
       <div className="h-screen-full bg-white">
         <NavigationHeader title="채팅" onBack={() => history.back()} />
-        <div className="p-6 text-text-gray3">로그인 정보 불러오는 중...</div>
+        <LoadingSpinner className="py-6" />
       </div>
     );
   }

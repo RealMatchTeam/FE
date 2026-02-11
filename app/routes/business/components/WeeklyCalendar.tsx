@@ -47,7 +47,7 @@ export default function WeeklyCalendar({ events }: WeeklyCalendarProps) {
       const start = parseISO(event.startDate);
       const end = parseISO(event.endDate);
 
-      // 이번 주 내 시작/종료 위치 (0~6)
+      // 이번 주 내 시작/종료 위치
       const displayStart = start < weekStart ? 0 : differenceInDays(startOfDay(start), startOfDay(weekStart));
       const displayEnd = end > weekEnd ? 6 : differenceInDays(startOfDay(end), startOfDay(weekStart));
 
@@ -64,6 +64,7 @@ export default function WeeklyCalendar({ events }: WeeklyCalendarProps) {
   }, [events, weekStart, weekEnd]);
 
   const currentVisibleMaxIndex = useMemo(() => {
+    if (positionedEvents.length === 0) return -1;
     const visibleIndices = positionedEvents.map(event => {
       const isVisible = event.originalIndex < 3 || 
         Array.from({ length: event.displayEnd - event.displayStart + 1 }, (_, i) => 
@@ -113,16 +114,17 @@ export default function WeeklyCalendar({ events }: WeeklyCalendarProps) {
         })}
       </div>
 
-      {/* 스케줄 바 레이어 (최대 2개 표시) */}
-      <div 
-        className="relative mx-1 transition-all duration-300 ease-in-out" 
-        style={{ height: `${(currentVisibleMaxIndex + 1) * 28}px`, minHeight: '56px' }}
-      >
-        {positionedEvents.map((event) => {
-          const isVisible = event.originalIndex < 3 || 
-            Array.from({ length: event.displayEnd - event.displayStart + 1 }, (_, i) => 
-              format(addDays(weekStart, event.displayStart + i), "yyyy-MM-dd")
-            ).some(date => expandedDates.has(date));
+      {/* 스케줄 바 레이어 */}
+      {positionedEvents.length > 0 && (
+        <div 
+          className="relative mx-1 transition-all duration-300 ease-in-out" 
+          style={{ height: `${(currentVisibleMaxIndex + 1) * 28}px`, minHeight: '56px' }}
+        >
+          {positionedEvents.map((event) => {
+            const isVisible = event.originalIndex < 3 || 
+              Array.from({ length: event.displayEnd - event.displayStart + 1 }, (_, i) => 
+                format(addDays(weekStart, event.displayStart + i), "yyyy-MM-dd")
+              ).some(date => expandedDates.has(date));
 
           return (
             <div
@@ -134,7 +136,8 @@ export default function WeeklyCalendar({ events }: WeeklyCalendarProps) {
                 left: `calc(${event.left} + 2px)`, 
                 width: `calc(${event.width} - 4px)`, 
                 top: event.top,
-                zIndex: isVisible ? 10 : 0
+                zIndex: isVisible ? 10 : 0,
+                background: 'linear-gradient(90deg, #CBCBF5 0%, #6666E5 50.96%, #CBCBF5 100%)'
               }}
             >
               {event.brandName}
@@ -142,9 +145,13 @@ export default function WeeklyCalendar({ events }: WeeklyCalendarProps) {
           );
         })}
       </div>
+      )}
 
-      {/* +N 표시 레이어 (날짜별 그리드 하단) */}
-      <div className="grid grid-cols-7 pt-1 border-t border-gray-50">
+
+
+      {/* +N 표시 레이어 */}
+      {positionedEvents.length > 0 && (
+      <div className={`grid grid-cols-7 pt-1 ${positionedEvents.length > 0 ? 'border-t border-gray-50' : ''}`}>
         {weekDates.map((dateObj) => {
           const dateStr = format(dateObj, "yyyy-MM-dd");
           const dayEvents = events.filter(e => e.startDate <= dateStr && e.endDate >= dateStr);
@@ -164,6 +171,7 @@ export default function WeeklyCalendar({ events }: WeeklyCalendarProps) {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

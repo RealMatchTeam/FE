@@ -26,25 +26,21 @@ export default function CreatorProfileCard({
   const summary = storeType || model.summary?.trim() || "크리에이터";
 
   return (
-    <section className=" text-[var(--color-text-black)]">
-      <div className="text-title1 font-semibold">
-        크리에이터 님의 프로필
+    <section className=" text-text-black mt-5 mx-4 mb-2.5">
+      <div className="text-center text-title3 leading-5">
+        <div>
+          <span>{name}</span> 님은
+        </div>
+
+        <div>
+          <span className="text-title6 text-(--color-core-1) mr-1">
+            {summary}
+          </span>
+          입니다
+        </div>
       </div>
-<div className="mt-4 text-center text-title3 leading-5">
-  <div>
-    <span>{name}</span> 님은
-  </div>
 
-  <div className="font-medium">
-    <span className="text-title6 text-[var(--color-core-1)] mr-1">
-      {summary}
-    </span>
-    입니다
-  </div>
-</div>
-
-
-      <div className="mt-5 flex items-end justify-between px-1">
+      <div className="mt-6 flex items-center justify-between gap-4">
         <IconBlock
           icon={beautyIcon}
           label="뷰티 특성"
@@ -62,33 +58,32 @@ export default function CreatorProfileCard({
         />
       </div>
 
-<button
-  type="button"
-  onClick={onMyProfileClick}
-  disabled={!onMyProfileClick}
-  className="
-    mx-auto mt-5 block
-    w-[140px] h-[38px]
+      <button
+        type="button"
+        onClick={onMyProfileClick}
+        disabled={!onMyProfileClick}
+        className="
+    mx-auto mt-6 block
+    w-35 h-9.5
     rounded-[26px]
 bg-grad-1    
-p-[10px]
+p-2.5
     shadow-[0_8px_20px_rgba(182,185,255,0.35)]
     disabled:opacity-50
     transition
   "
->
-  <div
-    className="
+      >
+        <div
+          className="
       flex h-full w-full items-center justify-center
       rounded-[20px]
       text-title7 font-semibold
       text-white
     "
-  >
-    내 프로필 가기
-  </div>
-</button>
-
+        >
+          내 프로필 가기
+        </div>
+      </button>
     </section>
   );
 }
@@ -111,8 +106,8 @@ function IconBlock({
       disabled={!clickable}
       className="flex w-[33.33%] flex-col items-center disabled:cursor-default"
     >
-      <img src={icon} alt={label} className="h-[100px] w-auto object-contain" />
-      <div className="mt-2 text-center text-title3 text-[var(--color-text-gray1)]">
+      <img src={icon} alt={label} className="h-25 w-auto object-contain" />
+      <div className="mt-2 text-center text-title3 text-text-gray1">
         {label}
       </div>
     </button>
