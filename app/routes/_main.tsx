@@ -51,7 +51,7 @@ export default function MainLayout() {
     >
       <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
         {!hideHeader && (
-          <header className={`sticky top-0 z-50 w-full bg-white shrink-0 h-20 py-2.5 ${isPWA ? 'mt-10' : ''}`}>
+          <header className={`sticky top-0 z-50 w-full bg-white shrink-0 h-15 py-2 ${isPWA ? 'mt-6' : ''}`}>
             <div className="grid h-full w-full grid-cols-3 items-center">
               <div />
               <button

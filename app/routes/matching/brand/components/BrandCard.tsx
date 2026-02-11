@@ -23,7 +23,7 @@ export default function BrandCard({
     return (
         <div onClick={onClick} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer">
             {/* 왼쪽: 이미지 */}
-            <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
+            <div className="mr-3 flex-shrink-0 flex flex-col items-center gap-2">
                 <BrandLogo src={logoUrl} alt={name} />
             </div>
 
