@@ -9,6 +9,7 @@ export default defineConfig({
     global: "globalThis",
   },
   server: {
+    host: '0.0.0.0',
     port: 5173,
     hmr: {
       overlay: false,

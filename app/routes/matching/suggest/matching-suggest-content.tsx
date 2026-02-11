@@ -5,6 +5,7 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import { CheckIcon } from "../../auth/components/CheckIcon";
 import NewSuggestIcon from "../../../assets/icon/new-suggest.svg";
 import ExistSuggestIcon from "../../../assets/icon/exist-suggest.svg";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { useCampaignProposalStore } from "../../../stores/campaign-proposal";
 import {
   getRecruitingCampaigns,
@@ -129,7 +130,7 @@ export default function MatchingSuggestContent() {
           {/* 캠페인 목록 (스크롤 영역) */}
           <div className="flex-1 overflow-y-auto px-5 pt-2.5 pb-4 flex flex-col gap-2.5">
             {isLoading ? (
-              <div className="text-center py-8 text-text-gray2">로딩 중</div>
+              <LoadingSpinner className="py-8" />
             ) : recruitingCampaigns.length === 0 ? (
               <div className="text-center py-8 text-text-gray2">
                 모집중인 캠페인이 없습니다

@@ -45,7 +45,7 @@ export function ContentCategorySection({
         </div>
       </div>
 
-      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[35%] md:h-[30%] lg:h-[40%] lg:w-[35%] lg:max-w-none">
+      <FilterBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} className="h-[45%] md:h-[50%] lg:h-[50%] lg:w-[40%] lg:max-w-none">
         <div className="flex flex-col h-full px-5 pb-6">
           {/* 헤더 */}
           <div className="flex justify-between items-center py-5.5">

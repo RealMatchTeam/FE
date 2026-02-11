@@ -7,6 +7,8 @@ type ProfileSectionProps = {
   gender?: string | null;
   age?: number | null;
   contentCategories?: string[] | null;
+  onEditImage?: () => void;
+  isUploadingImage?: boolean;
 };
 
 export default function ProfileSection({
@@ -15,6 +17,8 @@ export default function ProfileSection({
   gender,
   age,
   contentCategories,
+  onEditImage,
+  isUploadingImage,
 }: ProfileSectionProps) {
   const profileImage = profileImageUrl ?? mypageDefault;
   const displayName = nickname || "비비";
@@ -52,6 +56,8 @@ export default function ProfileSection({
 
           <button
             type="button"
+            disabled={isUploadingImage}
+            onClick={onEditImage}
             className="absolute -right-[2px] -bottom-[2px] w-[18px] h-[18px] rounded-full bg-white grid place-items-center shadow active:scale-95 transition"
             aria-label="프로필 수정"
           >

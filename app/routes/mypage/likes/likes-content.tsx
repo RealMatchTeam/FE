@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import FilterBottomSheet from "../../business/components/FilterBottomSheet";
 import FilterButton from "../../../components/common/FilterButton";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { axiosInstance } from "../../../api/axios";
 
 type BrandLike = {
@@ -11,44 +13,30 @@ type BrandLike = {
   name: string;
   tags: string[];
   matchRate: number;
+  likeCount: number;
   isLiked: boolean;
   logoUrl?: string | null;
 };
 
-type BrandScrap = {
+type FavoriteBrandDto = {
   brandId: number;
   brandName: string;
-  brandLogo?: string | null;
-  matchingRate: number;
-  hashtags: string[];
-  isScraped: boolean;
+  brandLogoUrl?: string | null;
+  matchingRatio: number;
+  likeCount: number;
+  tags: string[];
 };
 
-type CampaignScrap = {
-  campaignId: number;
-  brandName: string;
-  campaignTitle: string;
-  brandLogo?: string | null;
-  matchingRate: number;
-  reward: number;
-  dDay: number;
-  currentApplicants: number;
-  totalRecruits: number;
-  isScraped: boolean;
+type FavoriteBrandListResponseDto = {
+  count: number;
+  brands: FavoriteBrandDto[];
 };
 
-type MyScrapResponseDto = {
-  type: string;
-  totalCount: number;
-  brandList?: BrandScrap[];
-  campaignList?: CampaignScrap[];
-};
-
-type CustomResponseMyScrapResponseDto = {
+type CustomResponseFavoriteBrandListResponseDto = {
   isSuccess: boolean;
   code: string;
   message: string;
-  result: MyScrapResponseDto;
+  result: FavoriteBrandListResponseDto;
 };
 
 type CampaignLike = {
@@ -56,20 +44,52 @@ type CampaignLike = {
   brand: string;
   title: string;
   matchRate: number;
+  likeCount: number;
   reward: number;
   dday: string;
+  ddayValue: number;
   applicants: string;
   isLiked: boolean;
   logoUrl?: string | null;
 };
 
-const SORT_PARAM_MAP: Record<string, string> = {
-  "정렬 필터": "matchingRate",
-  "매칭률 순": "matchingRate",
-  "인기 순": "popularity",
-  "신규 순": "latest",
-  "금액 순": "reward",
-  "마감 순": "dDay",
+type FavoriteCampaignDto = {
+  campaignId: number;
+  brandName: string;
+  campaignTitle: string;
+  brandLogoUrl?: string | null;
+  matchingRatio: number;
+  likeCount: number;
+  rewardAmount: number;
+  quota: number;
+  dday: number;
+};
+
+type FavoriteCampaignListResponseDto = {
+  count: number;
+  campaigns: FavoriteCampaignDto[];
+};
+
+type CustomResponseFavoriteCampaignListResponseDto = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: FavoriteCampaignListResponseDto;
+};
+
+const BRAND_SORT_PARAM_MAP: Record<string, string> = {
+  "정렬 필터": "MATCH_SCORE",
+  "매칭률 순": "MATCH_SCORE",
+  "인기 순": "POPULARITY",
+  "신규 순": "NEWEST",
+};
+
+const CAMPAIGN_SORT_PARAM_MAP: Record<string, string> = {
+  "정렬 필터": "MATCH_SCORE",
+  "매칭률 순": "MATCH_SCORE",
+  "인기 순": "POPULARITY",
+  "금액 순": "REWARD_AMOUNT",
+  "마감 순": "D_DAY",
 };
 
 export default function MyPageLikes() {
@@ -82,6 +102,8 @@ export default function MyPageLikes() {
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
 
+  useHideBottomTab(isFilterOpen);
+
   const getSortButtonLabel = () => sortOption;
 
   const brandLikes = useMemo(() => {
@@ -91,7 +113,7 @@ export default function MyPageLikes() {
       return list.sort((a, b) => b.matchRate - a.matchRate);
     }
     if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
+      return list.sort((a, b) => b.likeCount - a.likeCount);
     }
     if (sortOption === "신규 순") {
       return list.sort((a, b) => b.id - a.id);
@@ -106,13 +128,13 @@ export default function MyPageLikes() {
       return list.sort((a, b) => b.matchRate - a.matchRate);
     }
     if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
+      return list.sort((a, b) => b.likeCount - a.likeCount);
     }
     if (sortOption === "금액 순") {
       return list.sort((a, b) => b.reward - a.reward);
     }
     if (sortOption === "마감 순") {
-      return list.sort((a, b) => a.id - b.id);
+      return list.sort((a, b) => a.ddayValue - b.ddayValue);
     }
     return list;
   }, [sortOption, campaignLikesApi]);
@@ -122,44 +144,69 @@ export default function MyPageLikes() {
     const fetchScrap = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance.get<CustomResponseMyScrapResponseDto>(
-          "/api/v1/users/me/scrap",
-          {
-            params: {
-              type: activeTab === "brand" ? "brand" : "campaign",
-              sort: SORT_PARAM_MAP[sortOption] ?? "matchingRate",
-            },
-          },
-        );
-        if (!isMounted) return;
-        if (!res.data?.isSuccess) {
-          throw new Error(res.data?.message || "찜 목록 조회 실패");
-        }
-        const result = res.data.result;
         if (activeTab === "brand") {
+          const res =
+            await axiosInstance.get<CustomResponseFavoriteBrandListResponseDto>(
+              "/api/v1/users/me/favorites/brand",
+              {
+                params: {
+                  sort: BRAND_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                },
+              },
+            );
+          if (!isMounted) return;
+          if (!res.data?.isSuccess) {
+            throw new Error(res.data?.message || "찜 목록 조회 실패");
+          }
+          const result = res.data.result;
           const mapped =
-            result.brandList?.map((b) => ({
+            result.brands?.map((b) => ({
               id: b.brandId,
               name: b.brandName,
-              tags: b.hashtags ?? [],
-              matchRate: b.matchingRate ?? 0,
-              isLiked: Boolean(b.isScraped),
-              logoUrl: b.brandLogo ?? null,
+              tags: b.tags ?? [],
+              matchRate: b.matchingRatio ?? 0,
+              likeCount: b.likeCount ?? 0,
+              isLiked: true,
+              logoUrl: b.brandLogoUrl ?? null,
             })) ?? [];
           setBrandLikesApi(mapped);
         } else {
+          const res =
+            await axiosInstance.get<CustomResponseFavoriteCampaignListResponseDto>(
+              "/api/v1/users/me/favorites/campaign",
+              {
+                params: {
+                  sort: CAMPAIGN_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                },
+              },
+            );
+          if (!isMounted) return;
+          if (!res.data?.isSuccess) {
+            throw new Error(res.data?.message || "찜 목록 조회 실패");
+          }
+          const result = res.data.result;
           const mapped =
-            result.campaignList?.map((c) => ({
-              id: c.campaignId,
-              brand: c.brandName,
-              title: c.campaignTitle,
-              matchRate: c.matchingRate ?? 0,
-              reward: c.reward ?? 0,
-              dday: c.dDay === 0 ? "D-Day" : `D-${c.dDay}`,
-              applicants: `${c.currentApplicants}/${c.totalRecruits}명`,
-              isLiked: Boolean(c.isScraped),
-              logoUrl: c.brandLogo ?? null,
-            })) ?? [];
+            result.campaigns?.map((c) => {
+              const dday =
+                c.dday === 0
+                  ? "D-Day"
+                  : c.dday > 0
+                    ? `D-${c.dday}`
+                    : `D+${Math.abs(c.dday)}`;
+              return {
+                id: c.campaignId,
+                brand: c.brandName,
+                title: c.campaignTitle,
+                matchRate: c.matchingRatio ?? 0,
+                likeCount: c.likeCount ?? 0,
+                reward: c.rewardAmount ?? 0,
+                dday,
+                ddayValue: c.dday ?? 0,
+                applicants: c.quota ? `${c.quota}명` : "-",
+                isLiked: true,
+                logoUrl: c.brandLogoUrl ?? null,
+              };
+            }) ?? [];
           setCampaignLikesApi(mapped);
         }
       } catch (error) {
@@ -263,9 +310,7 @@ export default function MyPageLikes() {
             </div>
 
             {loading ? (
-              <div className="py-10 text-center text-[#9B9BA1] text-[14px]">
-                로딩 중...
-              </div>
+              <LoadingSpinner className="py-10" />
             ) : (
             <div className="mt-4 space-y-4">
               {activeTab === "brand"
@@ -321,10 +366,10 @@ export default function MyPageLikes() {
                   ? campaignLikes.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className="bg-white rounded-[14px] border border-[#E8E8FB] px-[12px] py-[12px] flex gap-4 items-start"
+                      className="bg-white rounded-[10px] border border-[#E8E8FB] px-[10px] pt-[10px] pb-[6px] flex gap-4 items-start"
                     >
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="w-[96px] h-[96px] rounded-[12px] border border-[#E8E8FB] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
                           {campaign.logoUrl ? (
                             <img
                               src={campaign.logoUrl}
@@ -335,11 +380,11 @@ export default function MyPageLikes() {
                             campaign.brand
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-3 py-1 rounded-full border border-[#6D6AFE] text-[#6D6AFE] text-[12px]">
+                        <div className="flex items-center gap-1">
+                          <span className="px-[2px] py-1 rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.dday}
                           </span>
-                          <span className="px-3 py-1 rounded-full bg-[#EEF0FF] text-[#6D6AFE] text-[12px]">
+                          <span className="px-[2px] py-1 rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.applicants}
                           </span>
                         </div>
@@ -347,11 +392,11 @@ export default function MyPageLikes() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <div className="text-[20px] font-semibold text-[#171718] truncate">
+                          <div className="text-[16px] leading-[20px] font-semibold text-[#171718] truncate">
                             {campaign.brand}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <div className="text-[#6D6AFE] text-[16px] font-semibold">
+                            <div className="text-[#6D6AFE] text-[12px] leading-[16px] font-medium">
                               매칭률 {campaign.matchRate}%
                             </div>
                             <button
@@ -364,10 +409,10 @@ export default function MyPageLikes() {
                             </button>
                           </div>
                         </div>
-                        <div className="mt-2 text-[16px] text-[#171718] truncate">
+                        <div className="mt-[2px] text-[14px] leading-[20px] font-medium text-[#171718] truncate">
                           {campaign.title}
                         </div>
-                        <div className="mt-2 text-[14px] text-[#6D6AFE] font-semibold">
+                        <div className="text-[11px] leading-[16px] text-[#6666E5] font-medium">
                           원고료: {campaign.reward.toLocaleString()}원
                         </div>
                       </div>
@@ -388,6 +433,7 @@ export default function MyPageLikes() {
           onClose={() => setIsFilterOpen(false)}
           onApply={(filter) => setSortOption(filter)}
           currentFilter={sortOption}
+          className="h-[100dvh]"
           filters={
             activeTab === "brand"
               ? ["매칭률 순", "인기 순", "신규 순"]

@@ -14,6 +14,7 @@ import InputSheet from "../components/InputSheet";
 import SelectSheet from "../components/SelectSheet";
 import CheckDropdown from "../components/CheckDropdown";
 import Button from "../../../../components/common/Button";
+import LoadingSpinner from "../../../../components/common/LoadingSpinner";
 
 import type { ContentTags, TagItem } from "../_shared/tags/tags.types";
 
@@ -152,9 +153,7 @@ export default function MatchingTestStep3Content({
       <MatchingTestTopBar step={3} totalSteps={3} onBack={onBack} />
 
       {tagsLoading ? (
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
+        <LoadingSpinner className="py-10" />
       ) : tagsError ? (
         <div className="px-6 py-10 text-sm text-red-500">{tagsError}</div>
       ) : null}

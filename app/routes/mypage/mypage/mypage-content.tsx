@@ -50,14 +50,14 @@ export default function MyPageContent() {
     <MyPageHome
       hasMatchingTest={hasMatchingTest}
       user={{
-        name: me?.name ?? "비비",
-        roleText: me?.roleText ?? "홍길동",
+        name: me?.name ?? "이름",
+        roleText: me?.roleText ?? "닉네임",
         email: me?.email ?? "example@gmail.com",
         avatarUrl: me?.avatarUrl ?? mypageDefault,
       }}
       onGoMatchingTest={() => navigate("/matching/test/step1")}
-      onOpenProfileCard={() => navigate( "/mypage/profileCard")}
-      onOpenLikes={() => navigate( "/mypage/likes")}
+      onOpenProfileCard={() => navigate("/mypage/profileCard")}
+      onOpenLikes={() => navigate("/mypage/likes")}
       onOpenEditProfile={() => navigate("/mypage/edit")}
       onOpenNotifications={() => navigate("/mypage/notification")}
       onOpenTerms={() => navigate("/mypage/terms")} // policy/terms
