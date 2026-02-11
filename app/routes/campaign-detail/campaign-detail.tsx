@@ -19,6 +19,7 @@ import type {
 } from "../campaign-detail/types";
 
 import informationIconUrl from "../../assets/information-icon.svg?url";
+import CampaignDetailSkeleton from "./components/CampaignDetailSkeleton";
 
 type Props = {
   brandData: BrandDetailData;
@@ -217,11 +218,7 @@ export default function CampaignDetailContent({
   }
 
   if (!campaign) {
-    return (
-      <div className="w-full bg-bg-w">
-        <div className="px-5 py-6 text-callout1 text-text-gray2">로딩중...</div>
-      </div>
-    );
+    return <CampaignDetailSkeleton />;
   }
 
   const campaignImage = campaign.imageUrl ?? heroUrl;
