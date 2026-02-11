@@ -155,7 +155,12 @@ export default function MyPageHome({
         </div>
         <Divider />
 
-        <MenuButton label="알림 설정" onClick={onOpenNotifications} py={16} />
+        <MenuButton
+          label="알림 설정"
+          onClick={onOpenNotifications}
+          py={16}
+          disableActiveBg
+        />
         <Divider />
 
         <MenuButton
@@ -169,6 +174,7 @@ export default function MyPageHome({
             )
           }
           py={11}
+          disableActiveBg
         />
         <Divider />
 
@@ -180,7 +186,7 @@ export default function MyPageHome({
           <button
             type="button"
             onClick={onOpenTerms}
-            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black transition-colors active:bg-[#E6E6EB]"
+            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black"
           >
             약관
           </button>
@@ -188,7 +194,7 @@ export default function MyPageHome({
           <button
             type="button"
             onClick={onOpenPrivacy}
-            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black transition-colors active:bg-[#E6E6EB]"
+            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black"
           >
             개인정보 처리 방침
           </button>
@@ -200,6 +206,7 @@ export default function MyPageHome({
           label="로그아웃"
           onClick={() => setOpenLogout(true)}
           py={16}
+          disableActiveBg
         />
         <Divider />
 
@@ -208,6 +215,7 @@ export default function MyPageHome({
           onClick={() => setOpenWithdraw(true)}
           muted={true}
           py={16}
+          disableActiveBg
         />
       </div>
 
