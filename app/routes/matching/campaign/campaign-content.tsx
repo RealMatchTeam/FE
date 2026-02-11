@@ -10,7 +10,7 @@ import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
-import { getMatchingCampaigns, getTagNamesByCategory, toggleCampaignLike, type MatchingCampaign, MatchingTestRequiredError } from "../api/matching";
+import { getMatchingCampaigns, getTagNamesByCategory, toggleCampaignLike, type MatchingCampaign } from "../api/matching";
 
 export default function CampaignContent() {
     const [searchParams] = useSearchParams();

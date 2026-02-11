@@ -1,4 +1,3 @@
-import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { getMyPage } from "../mypage/api/mypage";
 import { getMatchingBrands, MatchingTestRequiredError } from "../matching/api/matching";
@@ -8,7 +7,6 @@ import HomeContent from "./home-content";
 import HomeAfterMatch from "./home-after-match";
 
 export default function HomeIndex() {
-  const location = useLocation();
   const [hasMatch, setHasMatch] = useState<boolean | null>(null);
 
   const me = useAuthStore((s) => s.me);
