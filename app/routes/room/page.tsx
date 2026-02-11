@@ -16,6 +16,8 @@ import useChatLayout from "./hooks/useChatLayout";
 import useChatStomp from "./hooks/useChatStomp";
 import useChatActions from "./hooks/useChatActions";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
+import CampaignListBottomSheet from "../chat/components/CampaignListBottomSheet";
+import { getMyCollaborations } from "../business/calendar/api/calendar";
 
 type Props = {
   roomId: number;
@@ -25,7 +27,11 @@ export default function ChattingRoom({ roomId }: Props) {
   const navigate = useNavigate();
   const kb = useKeyboardOffset();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isCampaignSheetOpen, setIsCampaignSheetOpen] = useState(false);
   const [text, setText] = useState("");
+  const [canResuggest, setCanResuggest] = useState(false);
+
+  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -77,6 +83,24 @@ export default function ChattingRoom({ roomId }: Props) {
     inputRef,
   });
 
+  // 재제안 가능 여부 확인 (나의 제안 내역이 있는지)
+  useEffect(() => {
+    const checkResuggest = async () => {
+      try {
+        const today = new Date().toISOString().split("T")[0];
+        const data = await getMyCollaborations({
+          type: "SENT",
+          status: "REVIEWING",
+          endDate: today,
+        });
+        setCanResuggest(data && data.length > 0);
+      } catch (error) {
+        console.error("Failed to check resuggest status:", error);
+      }
+    };
+    checkResuggest();
+  }, []);
+
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
   const isCollaborating = detail?.isCollaborating ?? false;
@@ -86,32 +110,18 @@ export default function ChattingRoom({ roomId }: Props) {
   const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
-  const hasProposal = !!detail?.campaignSummary;
-  const setProposalData = useCampaignProposalStore((s) => s.setProposalData);
-
-  const handleSuggest = () => {
-    if (!detail) return;
-    setProposalData({
-      brandId: detail.opponentUserId,
-      campaignId: detail.campaignSummary?.campaignId ?? 0,
-      domain: "beauty",
-      brandName: detail.opponentName,
-      campaignTitle: detail.campaignSummary?.campaignTitle,
-    });
-    navigate("/matching/suggest");
-  };
 
   const actions: AttachmentAction[] = useMemo(
     () => [
       {
         key: "suggest",
-        label: hasProposal ? "재 제안" : "제안하기",
-        icon: hasProposal ? "refresh" : "suggest",
+        label: canResuggest ? "재 제안" : "제안 하기",
+        icon: canResuggest ? "refresh" : "suggest",
       },
       { key: "image", label: "이미지", icon: "image" },
       { key: "file", label: "첨부파일", icon: "file" },
     ],
-    [hasProposal],
+    [canResuggest],
   );
 
   if (!token) {
@@ -163,9 +173,8 @@ export default function ChattingRoom({ roomId }: Props) {
         ref={listRef}
         className="overflow-y-auto px-4 py-5 transition-all duration-300"
         style={{
-          height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px - ${
-            isSheetOpen ? sheetHeight : 0
-          }px - ${kb}px)`,
+          height: `calc(100vh - 60px - 49px - ${summaryBarHeight}px - ${isSheetOpen ? sheetHeight : 0
+            }px - ${kb}px)`,
         }}
       >
         <div className="w-full">
@@ -203,12 +212,39 @@ export default function ChattingRoom({ roomId }: Props) {
         actions={actions}
         onClose={() => setIsSheetOpen(false)}
         onAction={(key) => {
-          if (key === "suggest") handleSuggest();
           if (key === "image") imageInputRef.current?.click();
           if (key === "file") fileInputRef.current?.click();
+          if (key === "suggest") {
+            if (canResuggest) {
+              setIsCampaignSheetOpen(true);
+            } else {
+              navigate("/matching/suggest");
+            }
+          }
           setIsSheetOpen(false);
         }}
         height={sheetHeight}
+      />
+
+      <CampaignListBottomSheet
+        isOpen={isCampaignSheetOpen}
+        onClose={() => setIsCampaignSheetOpen(false)}
+        onSelect={(campaign) => {
+          setProposalData({
+            proposalId: campaign.proposalId,
+            campaignId: campaign.campaignId,
+            brandId: campaign.brandId,
+            campaignTitle: campaign.title,
+            campaignDescription: campaign.description,
+            rewardAmount: campaign.rewardAmount,
+            product: String(campaign.productId),
+            startDate: campaign.startDate ?? undefined,
+            endDate: campaign.endDate ?? undefined,
+            contentTags: campaign.contentTags,
+            domain: "test",
+          });
+          navigate("/chat/resuggest");
+        }}
       />
     </div>
   );

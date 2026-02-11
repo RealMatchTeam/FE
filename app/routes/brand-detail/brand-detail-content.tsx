@@ -136,6 +136,7 @@ export default function BrandDetailContent({ data }: Props) {
       campaignId: 0,
       domain: domain || "beauty",
       brandName: data.name,
+      products: (data.products ?? []).map((p) => ({ id: p.id, name: p.title })),
     });
 
     navigate("/matching/suggest");

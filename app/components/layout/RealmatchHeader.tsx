@@ -23,7 +23,7 @@ export default function RealMatchHeader({
   };
 
   return (
-    <header className="h-[60px] w-full bg-white">
+    <header className="sticky top-0 z-50 h-[60px] w-full bg-white">
       <div className="grid h-full w-full grid-cols-3 items-center px-4">
         {/* Left: Back */}
         <div className="flex items-center">

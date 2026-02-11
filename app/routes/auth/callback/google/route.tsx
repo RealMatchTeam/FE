@@ -22,6 +22,7 @@ export default function GoogleCallback() {
     const refreshToken = searchParams.get("refreshToken") || searchParams.get("refresh_token");
 
     if (accessToken && refreshToken) {
+      console.log("[Google Callback] Tokens received, storing and navigating...");
       tokenStorage.setTokens(accessToken, refreshToken);
       localStorage.setItem("lastLoginProvider", "google");
 

@@ -8,6 +8,7 @@ interface BrandCardProps {
     isLiked?: boolean;
     logoUrl?: string;
     onLike?: () => void;
+    onClick?: () => void;
 }
 
 export default function BrandCard({
@@ -16,10 +17,11 @@ export default function BrandCard({
     tags,
     isLiked = false,
     logoUrl,
-    onLike
+    onLike,
+    onClick
 }: BrandCardProps) {
     return (
-        <div className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm">
+        <div onClick={onClick} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px] shadow-sm cursor-pointer">
             {/* 왼쪽: 이미지 */}
             <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
                 <BrandLogo src={logoUrl} alt={name} />
@@ -34,7 +36,7 @@ export default function BrandCard({
                             <h3 className="text-title1 text-text-black truncate">{name}</h3>
                             <div className="flex items-center gap-2">
                                 <span className="text-core-1"><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></span>
-                                <button onClick={onLike} className="flex-shrink-0 cursor-pointer">
+                                <button onClick={(e) => { e.stopPropagation(); onLike?.(); }} className="flex-shrink-0 cursor-pointer">
                                     {isLiked ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 14" fill="none">
                                             <path d="M14.7663 1.169C14.3753 0.798396 13.9111 0.504403 13.4002 0.303821C12.8893 0.10324 12.3417 0 11.7887 0C11.2357 0 10.6881 0.10324 10.1772 0.303821C9.66629 0.504403 9.20211 0.798396 8.81116 1.169L7.9998 1.93779L7.18843 1.169C6.39874 0.420752 5.32768 0.000387845 4.21089 0.000387853C3.09409 0.000387861 2.02303 0.420752 1.23334 1.169C0.443646 1.91726 8.32078e-09 2.93211 0 3.99029C-8.32078e-09 5.04848 0.443646 6.06333 1.23334 6.81159L7.9998 13.2229L14.7663 6.81159C15.1574 6.44115 15.4677 6.00133 15.6794 5.51724C15.891 5.03315 16 4.51429 16 3.99029C16 3.4663 15.891 2.94744 15.6794 2.46335C15.4677 1.97926 15.1574 1.53944 14.7663 1.169Z" fill="#B7B7F3" />

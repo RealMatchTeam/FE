@@ -5,24 +5,26 @@ interface EmptyMatchStateProps {
   message?: string;
   showButton?: boolean;
   buttonText?: string;
+  contentClassName?: string;
 }
 
 export default function EmptyMatchState({
   message = "매칭된 기업이 없어요",
   showButton = false,
-  buttonText = "매칭률 검사하기"
+  buttonText = "매칭률 검사하기",
+  contentClassName,
 }: EmptyMatchStateProps) {
   return (
     <div className="relative h-full bg-gradient-to-b from-[#F6F7FF] to-white overflow-hidden">
       {/* Body */}
-      <main className="flex flex-col items-center justify-center text-center h-full">
+      <main className={`flex flex-col items-center justify-center text-center h-full ${contentClassName ?? ""}`}>
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center px-6">
             {/* 일러스트 */}
             <img
               src={MainIcon}
               alt="매칭 없음"
-              className="h-auto w-[210px] select-none"
+              className="h-auto w-[160px] select-none"
               draggable={false}
             />
 

@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import Button from "../../../components/common/Button";
 import ProfileSelector from "../components/ProfileSelector";
 import TextArea from "../../../components/form/TextArea";
 import ProposalModal from "../components/ProposalModal";
+import { useCampaignProposalStore } from "../../../stores/campaign-proposal";
+import { useAuthStore } from "../../../stores/auth-store";
+import { applyToCampaign } from "../api/matching";
 
 export default function MatchingApplyContent() {
     const navigate = useNavigate();
@@ -11,14 +15,34 @@ export default function MatchingApplyContent() {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
+    const proposalData = useCampaignProposalStore((state) => state.proposalData);
+    const snsAccount = useCampaignProposalStore((state) => state.snsAccount);
+    const me = useAuthStore((state) => state.me);
+
     const handleApplyClick = () => {
+        if (!reason.trim()) {
+            toast.warning("지원이유를 입력해주세요.");
+            return;
+        }
         setIsConfirmModalOpen(true);
     };
 
-    const handleConfirmApply = () => {
-        // TODO: 지원하기 API 호출 로직 구현
+    const handleConfirmApply = async () => {
+        if (!proposalData?.campaignId) {
+            toast.error("캠페인 정보가 없습니다.");
+            return;
+        }
+
         setIsConfirmModalOpen(false);
         setIsSuccessModalOpen(true);
+
+        try {
+            await applyToCampaign(proposalData.campaignId, reason);
+        } catch (error) {
+            console.error("지원 실패:", error);
+            toast.error("캠페인 지원에 실패했습니다. 다시 시도해주세요.");
+            setIsSuccessModalOpen(false);
+        }
     };
 
     const handleCancel = () => {
@@ -27,20 +51,23 @@ export default function MatchingApplyContent() {
 
     const handleSuccessClose = () => {
         setIsSuccessModalOpen(false);
-        navigate("/business/calendar"); // 성공 후 이동할 페이지 (디자인 참고)
+        navigate("/business/calendar");
     };
 
     return (
         <div className="flex flex-col flex-1 h-full px-5 pt-10 pb-[36px] gap-8">
             {/* 캠페인 제목 */}
             <h2 className="text-title8 text-text-black">
-                ‘글로우 쿠션’ 신제품 론칭 리뷰 지원
+                {proposalData?.campaignTitle ? `‘${proposalData.campaignTitle}’ 지원` : "캠페인 지원"}
             </h2>
 
             {/* 제출 프로필 섹션 */}
             <div className="flex flex-col gap-3">
                 <label className="text-title3 text-text-black">제출 프로필</label>
-                <ProfileSelector username="@ivveeee" onClick={() => console.log("프로필 변경")} />
+                <ProfileSelector
+                    username={snsAccount ? `@${snsAccount}` : (me?.roleText ?? me?.name ?? "@unknown")}
+                    onClick={() => navigate("/mypage/profileCard")}
+                />
             </div>
 
             {/* 지원이유 섹션 */}

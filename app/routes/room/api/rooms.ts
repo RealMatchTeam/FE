@@ -41,6 +41,7 @@ export async function createOrGetDirectRoom(body: {
 
 export interface ChatRoomDetailResponse {
   roomId: number;
+  brandId: number;
   opponentUserId: number;
   opponentName: string;
   opponentProfileImageUrl: string | null;
@@ -105,7 +106,7 @@ export interface ChatAttachment {
 
 export type ProposalStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
 export type ProposalDirection = "NONE" | "BRAND_TO_CREATOR" | "CREATOR_TO_BRAND";
-export type NoticeStatus = "CANCELED" | "MATCHED" | "REVIEWING" | "REJECTED" | "NONE" ;
+export type NoticeStatus = "CANCELED" | "MATCHED" | "REVIEWING" | "REJECTED" | "NONE";
 
 export type ProposalCardPayload = {
   proposalId: number;
@@ -137,7 +138,7 @@ export type ProposalStatusNoticePayload = {
   proposalId: number;
   actorUserId: number;
   processedAt: string; // ISO string
-  proposalStatus: NoticeStatus; 
+  proposalStatus: NoticeStatus;
 };
 
 export type ApplyStatusNoticePayload = {
@@ -149,41 +150,41 @@ export type ApplyStatusNoticePayload = {
 
 export type SystemMessage =
   | {
-      schemaVersion: number;
-      kind: "PROPOSAL_CARD";
-      payload: ProposalCardPayload;
-    }
+    schemaVersion: number;
+    kind: "PROPOSAL_CARD";
+    payload: ProposalCardPayload;
+  }
   | {
-      schemaVersion: number;
-      kind: "RE_PROPOSAL_CARD";
-      payload: ProposalCardPayload; 
-    }
+    schemaVersion: number;
+    kind: "RE_PROPOSAL_CARD";
+    payload: ProposalCardPayload;
+  }
   | {
-      schemaVersion: number;
-      kind: "APPLY_CARD";
-      payload: ApplyCardPayload;
-    }
+    schemaVersion: number;
+    kind: "APPLY_CARD";
+    payload: ApplyCardPayload;
+  }
   | {
-      schemaVersion: number;
-      kind: "MATCHED_CAMPAIGN_CARD";
-      payload: MatchedCampaignCardPayload;
-    }
+    schemaVersion: number;
+    kind: "MATCHED_CAMPAIGN_CARD";
+    payload: MatchedCampaignCardPayload;
+  }
   | {
-      schemaVersion: number;
-      kind: "PROPOSAL_STATUS_NOTICE";
-      payload: ProposalStatusNoticePayload;
-    }
+    schemaVersion: number;
+    kind: "PROPOSAL_STATUS_NOTICE";
+    payload: ProposalStatusNoticePayload;
+  }
   | {
-      schemaVersion: number;
-      kind: "APPLY_STATUS_NOTICE";
-      payload: ApplyStatusNoticePayload;
-    };
+    schemaVersion: number;
+    kind: "APPLY_STATUS_NOTICE";
+    payload: ApplyStatusNoticePayload;
+  };
 
 
 type GetChatMessagesParams = {
   roomId: number;
-  cursor?: string; 
-  size?: number;  
+  cursor?: string;
+  size?: number;
 };
 
 export async function getChatMessages({

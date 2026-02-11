@@ -11,6 +11,7 @@ import {
   type RecruitingCampaign,
 } from "../api/matching";
 import { toast } from "sonner";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 
 export default function MatchingSuggestContent() {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export default function MatchingSuggestContent() {
     null,
   );
   const [isLoading, setIsLoading] = useState(false);
+
+  useHideBottomTab(isSheetOpen);
 
   const handleNewCampaign = () => {
     navigate("/matching/suggest/create?type=new");
@@ -113,52 +116,54 @@ export default function MatchingSuggestContent() {
         onClose={handleSheetClose}
         className="h-[50%]"
       >
-        {/* 헤더 */}
-        <div className="px-5 pt-6 pb-4">
-          <div className="flex items-center gap-2">
-            <img src={ExistSuggestIcon} alt="" className="w-6 h-6" />
-            <h3 className="text-title2 text-text-black">기존 캠페인 제안</h3>
-          </div>
-        </div>
-        <div className="w-[90%] mx-auto border-b border-core-2" />
-
-        {/* 캠페인 목록 */}
-        <div className="px-5 pt-2.5 pb-20 flex flex-col gap-2.5">
-          {isLoading ? (
-            <div className="text-center py-8 text-text-gray2">로딩 중</div>
-          ) : recruitingCampaigns.length === 0 ? (
-            <div className="text-center py-8 text-text-gray2">
-              모집중인 캠페인이 없습니다
+        <div className="flex flex-col h-full">
+          {/* 헤더 */}
+          <div className="px-5 pt-6 pb-4">
+            <div className="flex items-center gap-2">
+              <img src={ExistSuggestIcon} alt="" className="w-6 h-6" />
+              <h3 className="text-title2 text-text-black">기존 캠페인 제안</h3>
             </div>
-          ) : (
-            recruitingCampaigns.map((campaign) => (
-              <label
-                key={campaign.campaignId}
-                className="flex items-center gap-2.5 cursor-pointer"
-              >
-                <div onClick={() => handleToggleCampaign(campaign.campaignId)}>
-                  <CheckIcon
-                    checked={selectedCampaignId === campaign.campaignId}
-                  />
-                </div>
-                <span className="text-title3 text-text-gray1">
-                  {campaign.title}
-                </span>
-              </label>
-            ))
-          )}
-        </div>
+          </div>
+          <div className="w-[90%] mx-auto border-b border-core-2" />
 
-        {/* 선택 완료 버튼 */}
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-white">
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleSheetSubmit}
-            className="text-title7 w-[327px] h-[44px] flex items-center justify-center gap-[10px]"
-          >
-            선택 완료
-          </Button>
+          {/* 캠페인 목록 (스크롤 영역) */}
+          <div className="flex-1 overflow-y-auto px-5 pt-2.5 pb-4 flex flex-col gap-2.5">
+            {isLoading ? (
+              <div className="text-center py-8 text-text-gray2">로딩 중</div>
+            ) : recruitingCampaigns.length === 0 ? (
+              <div className="text-center py-8 text-text-gray2">
+                모집중인 캠페인이 없습니다
+              </div>
+            ) : (
+              recruitingCampaigns.map((campaign) => (
+                <label
+                  key={campaign.campaignId}
+                  className="flex items-center gap-2.5 cursor-pointer"
+                >
+                  <div onClick={() => handleToggleCampaign(campaign.campaignId)}>
+                    <CheckIcon
+                      checked={selectedCampaignId === campaign.campaignId}
+                    />
+                  </div>
+                  <span className="text-title3 text-text-gray1">
+                    {campaign.title}
+                  </span>
+                </label>
+              ))
+            )}
+          </div>
+
+          {/* 선택 완료 버튼 (바닥 고정) */}
+          <div className="flex items-center justify-center py-4 px-5 bg-white">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleSheetSubmit}
+              className="text-title7 w-full h-[44px] flex items-center justify-center gap-[10px]"
+            >
+              선택 완료
+            </Button>
+          </div>
         </div>
       </FilterBottomSheet>
     </>
