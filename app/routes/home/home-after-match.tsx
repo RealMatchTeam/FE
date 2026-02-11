@@ -539,7 +539,7 @@ export default function HomeAfterMatchPage() {
               onMore={goCampaignList}
             />
 
-            <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
+            <div className="-mr-5 mt-3 flex gap-0.5 overflow-x-auto pb-2 pr-5">
               {popularCampaigns.map((campaign, i) => {
                 const safeCampaignId = getCampaignId(campaign);
                 if (!safeCampaignId) return null;
