@@ -27,7 +27,7 @@ export default function FilterBottomSheet({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-end">
+    <div className="fixed inset-0 z-60 flex flex-col items-center justify-end">
 
       <div 
         className="absolute inset-0 bg-black/40" 
@@ -37,14 +37,14 @@ export default function FilterBottomSheet({
       {/* 바텀 시트 본체 */}
       <div 
         className={[
-          "relative bg-[var(--color-bg-w)] rounded-t-[24px] overflow-hidden animate-slide-up w-full max-w-[430px] h-[530px] flex flex-col",
+          "relative bg-[var(--color-bg-w)] rounded-t-[12px] overflow-hidden animate-slide-up w-full max-w-[480px] h-[500px] flex flex-col",
           className ?? "",
         ].join(" ")}
       >
         {/* 헤더 영역 */}
-        <div className="px-4 pt-8 pb-4">
-          <div className="inline-block border-b-2 border-[var(--color-core-1)] pb-1">
-            <span className="text-title7 text-[var(--color-text-black)]">{title}</span>
+        <div className="px-6 pt-5">
+          <div className="px-1 inline-block border-b-2 border-[var(--color-core-1)] pb-1">
+            <span className="text-[14px] leading-[20px] font-medium text-[var(--color-text-black)]">{title}</span>
           </div>
         </div>
         
@@ -57,7 +57,7 @@ export default function FilterBottomSheet({
                 onClick={() => setSelected(filter)}
                 className={`text-title3 transition-colors whitespace-nowrap ${
                   selected === filter 
-                    ? "text-[var(--color-text-black)] font-bold" 
+                    ? "text-[var(--color-text-black)]" 
                     : "text-[var(--color-text-gray3)]"
                 }`}
               >
@@ -74,7 +74,7 @@ export default function FilterBottomSheet({
               onApply(selected);
               onClose();
             }}
-            className="w-full py-4 bg-[var(--color-core-1)] text-white rounded-xl text-title1 active:opacity-90"
+            className="w-full h-[48px] py-4 bg-[var(--color-core-1)] text-white rounded-xl text-title1 active:opacity-90"
           >
             적용하기
           </button>

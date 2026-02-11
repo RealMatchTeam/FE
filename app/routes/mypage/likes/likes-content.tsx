@@ -318,9 +318,9 @@ export default function MyPageLikes() {
                   ? brandLikes.map((brand) => (
                     <div
                       key={brand.id}
-                      className="bg-white rounded-[14px] border border-[#E8E8FB] px-[10px] py-[10px] flex gap-4 items-center h-[100px]"
+                      className="bg-white rounded-[14px] px-[10px] py-[10px] flex gap-4 items-center h-[100px]"
                     >
-                      <div className="w-[80px] h-[80px] rounded-[12px] border border-[#E8E8FB] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
+                      <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
                         {brand.logoUrl ? (
                           <img
                             src={brand.logoUrl}
@@ -338,12 +338,17 @@ export default function MyPageLikes() {
                             {brand.name}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <div className="text-[#6D6AFE] text-[14px] font-semibold">
-                              매칭률 {brand.matchRate}%
+                            <div className="text-[#6D6AFE]">
+                              <span className="text-[12px] leading-[16px] font-medium">
+                                매칭률  {/*수정*/}
+                              </span>{" "}
+                              <span className="text-[16px] leading-[20px] font-semibold">
+                                {brand.matchRate}%
+                              </span>
                             </div>
                             <button
                               type="button"
-                              className="text-[#B7B7F3] text-[20px]"
+                              className="text-[#B7B7F3] text-[24px]"
                               aria-label="찜 해제"
                               onClick={() => toggleBrandLike(brand.id)}
                             >
@@ -366,7 +371,7 @@ export default function MyPageLikes() {
                   ? campaignLikes.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className="bg-white rounded-[10px] border border-[#E8E8FB] px-[10px] pt-[10px] pb-[6px] flex gap-4 items-start"
+                      className="bg-white rounded-[10px] border border-[#E8E8FB] px-[10px] pt-[10px] pb-[6px] flex gap-4 items-start h-[120px]"
                     >
                       <div className="flex flex-col items-center gap-1">
                         <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
@@ -380,28 +385,33 @@ export default function MyPageLikes() {
                             campaign.brand
                           )}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <span className="px-[2px] py-1 rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
+                        <div className="flex items-start gap-1"> {/*수정*/}
+                          <span className="px-[2px] py-[1px] rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.dday}
                           </span>
-                          <span className="px-[2px] py-1 rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
+                          <span className="px-[2px] py-[2px] rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.applicants}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 py-4">
                         <div className="flex items-start justify-between gap-2">
                           <div className="text-[16px] leading-[20px] font-semibold text-[#171718] truncate">
                             {campaign.brand}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <div className="text-[#6D6AFE] text-[12px] leading-[16px] font-medium">
-                              매칭률 {campaign.matchRate}%
+                            <div className="text-[#6D6AFE]">
+                              <span className="text-[12px] leading-[16px] font-medium">
+                                매칭률  {/*수정*/}
+                              </span>{" "}
+                              <span className="text-[16px] leading-[20px] font-semibold">
+                                {campaign.matchRate}%
+                              </span>
                             </div>
                             <button
                               type="button"
-                              className="text-[#B7B7F3] text-[22px] leading-none"
+                              className="text-[#B7B7F3] text-[24px] leading-none"
                               aria-label="찜 해제"
                               onClick={() => toggleCampaignLike(campaign.id)}
                             >
@@ -409,10 +419,10 @@ export default function MyPageLikes() {
                             </button>
                           </div>
                         </div>
-                        <div className="mt-[2px] text-[14px] leading-[20px] font-medium text-[#171718] truncate">
+                        <div className="mt-[3px] text-[14px] leading-[20px] font-medium text-[#171718] truncate"> {/*수정*/} 
                           {campaign.title}
                         </div>
-                        <div className="text-[11px] leading-[16px] text-[#6666E5] font-medium">
+                        <div className="mt-[1px] text-[11px] leading-[16px] text-[#6666E5] font-medium"> {/*수정*/}
                           원고료: {campaign.reward.toLocaleString()}원
                         </div>
                       </div>
