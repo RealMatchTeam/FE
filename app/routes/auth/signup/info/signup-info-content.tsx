@@ -220,13 +220,13 @@ function SignUpInfoContent() {
           size="lg"
           fullWidth
           onClick={handleNext}
-          className={`mt-auto md:mt-10 ${!socialNicknameValue ||
-              !socialBirthDateValue ||
-              !socialGenderValue ||
-              !socialNicknameSuccess ||
-              selectedCategories.length === 0
-              ? "opacity-50"
-              : ""
+          className={`mt-6 mb-6 md:mt-10 md:mb-0 ${!socialNicknameValue ||
+            !socialBirthDateValue ||
+            !socialGenderValue ||
+            !socialNicknameSuccess ||
+            selectedCategories.length === 0
+            ? "opacity-50"
+            : ""
             }`}
         >
           다음
