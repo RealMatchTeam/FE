@@ -440,7 +440,7 @@ export default function HomeAfterMatchPage() {
 
     return (
       <div className="min-h-screen bg-white">
-        <div className="bg-white px-5 pt-6 pb-[calc(116px+env(safe-area-inset-bottom))]">
+        <div className="bg-white px-5 pt-0 pb-[calc(116px+env(safe-area-inset-bottom))]">
           <BannerCarousel />
 
           <CategoryTabs value={category} onChange={setCategory} />
