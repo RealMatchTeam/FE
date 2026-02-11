@@ -1,17 +1,13 @@
-// stores/auth-store.ts
 import { create } from "zustand";
 import { tokenStorage } from "../lib/token";
 
 export type AuthUser = {
-  // optional로 둠
   id?: string;
 
   name?: string;
-  roleText?: string; // "홍길동" 같은 라벨
+  roleText?: string;
   email?: string;
   avatarUrl?: string;
-
-  // MyPageContent에서 쓰는 필드명 그대로
   matchingTestDone?: boolean;
 };
 

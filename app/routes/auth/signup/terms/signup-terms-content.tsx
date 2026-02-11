@@ -158,7 +158,7 @@ function SignUpTermsContent() {
       <div className="flex flex-col flex-1 px-6 py-6">
 
         {/* 헤더 */}
-        <div className="flex-1">
+        <div className="flex flex-col">
           <h2 className="text-title text-text-black text-center mb-23.5">
             약관에 동의해주세요
           </h2>
@@ -188,7 +188,7 @@ function SignUpTermsContent() {
           />
 
           {/* 하위 항목들 (개인정보 이용 동의, 이메일/앱 푸시 수신 동의) */}
-          <div className="mt-4 px-12 mb-[94px] sm:mb-[80px] md:mb-[60px] lg:mb-[40px]">
+          <div className="mt-4 px-12 mb-8">
             <SubTermsSection
               privacyUsage={terms.privacyUsage}
               emailPush={terms.emailPush}
@@ -206,7 +206,7 @@ function SignUpTermsContent() {
           size="lg"
           fullWidth
           onClick={handleNext}
-          className={!requiredChecked ? "opacity-50" : ""}
+          className={`mt-auto md:mt-10 ${!requiredChecked ? "opacity-50" : ""}`}
         >
           다음
         </Button>

@@ -21,6 +21,8 @@ import ProfileSelector from "../../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
 import ProposalModal from "../../components/ProposalModal";
+import { CONTENT_FILTER } from "../../../../data/filter";
+import { TAG_NAME_BY_ID } from "../../../../data/tagNameById";
 import {
   campaignFormSchema,
   defaultCampaignFormValues,
@@ -163,21 +165,50 @@ export default function CreateCampaignContent() {
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
-  // 상세 페이지 API에서 받아온 데이터로 옵션 생성
   const tags = proposalData?.contentTags;
-  const formatOptions = (tags?.formats ?? []).map((t) => ({ value: String(t.id), label: t.name }));
-  const categoryOptions = (tags?.categories ?? []).map((t) => ({ value: String(t.id), label: t.name }));
-  const toneOptions = (tags?.tones ?? []).map((t) => ({ value: String(t.id), label: t.name }));
-  const involvementOptions = (tags?.involvements ?? []).map((t) => ({ value: String(t.id), label: t.name }));
-  const usageScopeOptions = (tags?.usageRanges ?? []).map((t) => ({ value: String(t.id), label: t.name }));
+
+  // 태그 이름으로 ID를 찾는 맵 생성
+  const ID_BY_TAG_NAME: Record<string, number> = Object.entries(TAG_NAME_BY_ID).reduce(
+    (acc, [id, name]) => ({ ...acc, [name]: Number(id) }),
+    {}
+  );
+
+  // 태그 매핑 보정
+  const getMappedId = (name: string) => {
+    if (name === "인스타 포스트") return 172;
+    if (name === "스토리&썰") return 178;
+    if (name === "가이드만 제공") return 187;
+    return ID_BY_TAG_NAME[name];
+  };
+
+  const getOptions = (campaignTags: { id?: number; name: string }[] | undefined, filterKeys: readonly string[]) => {
+    if (campaignTags && campaignTags.length > 0) {
+      return campaignTags.map((t) => ({
+        value: String((t.id ?? getMappedId(t.name)) || t.name),
+        label: t.name,
+      }));
+    }
+    return filterKeys.map((name) => ({
+      value: String(getMappedId(name) || name),
+      label: name,
+    }));
+  };
+
+  const formatOptions = getOptions(tags?.formats, CONTENT_FILTER.형식);
+  const categoryOptions = getOptions(tags?.categories, CONTENT_FILTER.종류);
+  const toneOptions = getOptions(tags?.tones, CONTENT_FILTER.톤);
+  const involvementOptions = getOptions(tags?.involvements, CONTENT_FILTER.관여도);
+  const usageScopeOptions = getOptions(tags?.usageRanges, CONTENT_FILTER["활용 범위"]);
+
   const sponsorProductOptions = proposalData?.product
     ? [{ value: proposalData.product, label: proposalData.product }]
-    : [];
+    : (proposalData?.products ?? []).map((p) => ({ value: String(p.id), label: p.name }));
 
   // ID로 label 찾기 헬퍼 함수
   const findLabel = (options: { value: string; label: string }[], value?: string) => {
     if (!value) return undefined;
-    return options.find((opt) => opt.value === value)?.label;
+    const found = options.find((opt) => opt.value === value);
+    return found?.label || value;
   };
 
 

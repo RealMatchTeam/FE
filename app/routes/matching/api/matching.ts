@@ -441,7 +441,7 @@ export interface CreateCampaignProposalRequest {
   campaignName: string;
   description: string;
   formats: { id: number }[];
-  categories: { id: number }[];
+  categories: { id: number; customValue?: string }[];
   tones: { id: number }[];
   involvements: { id: number }[];
   usageRanges: { id: number }[];
@@ -476,6 +476,25 @@ export const createCampaignProposal = async (
     return response.data.result.proposalId;
   } catch (error: unknown) {
     console.error("캠페인 제안 실패:", error);
+    throw error;
+  }
+};
+
+export const reRequestCampaignProposal = async (
+  proposalId: number,
+  data: CreateCampaignProposalRequest,
+): Promise<void> => {
+  try {
+    const response = await apiClient.post(
+      `/v1/campaigns/proposal/${proposalId}/re-request`,
+      data,
+    );
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "캠페인 재제안에 실패했습니다.");
+    }
+  } catch (error: unknown) {
+    console.error("캠페인 재제안 실패:", error);
     throw error;
   }
 };
@@ -596,6 +615,194 @@ export const getRecruitingCampaigns = async (
     return response.data.result.campaigns || [];
   } catch (error: unknown) {
     console.error("모집중인 캠페인 조회 실패:", error);
+    throw error;
+  }
+};
+
+export interface ExistingCampaign {
+  campaignId: number;
+  title: string;
+}
+
+interface ExistingCampaignsResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    campaigns: ExistingCampaign[];
+  };
+}
+
+export const getExistingCampaigns = async (
+  brandId: number,
+): Promise<ExistingCampaign[]> => {
+  try {
+    const response = await apiClient.get<ExistingCampaignsResponse>(
+      `/api/v1/brands/${brandId}/existing-campaigns`,
+    );
+
+    if (!response.data?.isSuccess) {
+      throw new Error(response.data?.message || "기존 캠페인 목록 조회 실패");
+    }
+
+    return response.data.result.campaigns || [];
+  } catch (error: unknown) {
+    console.error("기존 캠페인 목록 조회 실패:", error);
+    throw error;
+  }
+};
+
+export interface ApplyCampaignRequest {
+  reason: string;
+}
+
+interface ApplyCampaignResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: unknown;
+}
+
+export interface AppliedCampaignDetail {
+  campaignId: number;
+  campaignApplyId: number;
+  brandId: number;
+  brandName: string;
+  campaignTitle: string;
+  campaignReason: string;
+  status: "REVIEWING" | "MATCHED" | "REJECTED" | "CANCELED";
+  creatorId?: string;
+  contentTags?: CampaignContentTags;
+}
+
+export const getAppliedCampaignDetail = async (campaignId: number | string): Promise<AppliedCampaignDetail> => {
+  try {
+    const response = await apiClient.get<AppliedCampaignDetail>(
+      `/api/v1/campaigns/${campaignId}/apply/me`
+    );
+
+    const data = response.data as unknown as { isSuccess?: boolean; message?: string };
+    if (data && data.isSuccess === false) {
+      throw new Error(data.message || "지원 상세 조회 실패");
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    console.error("지원 상세 조회 실패:", error);
+    throw error;
+  }
+};
+
+export const applyToCampaign = async (
+  campaignId: number,
+  reason: string,
+): Promise<void> => {
+  try {
+    const response = await apiClient.post<ApplyCampaignResponse>(
+      `/api/v1/campaigns/${campaignId}/apply`,
+      { reason },
+    );
+
+    if (!response.data?.isSuccess) {
+      throw new Error(response.data?.message || "캠페인 지원에 실패했습니다.");
+    }
+  } catch (error: unknown) {
+    console.error("캠페인 지원 실패:", error);
+    throw error;
+  }
+};
+
+export interface ApiTagItem {
+  id: number;
+  name: string;
+}
+
+export interface CampaignContentTags {
+  formats: ApiTagItem[];
+  categories: ApiTagItem[];
+  tones: ApiTagItem[];
+  involvements: ApiTagItem[];
+  usageRanges: ApiTagItem[];
+}
+
+export interface CampaignDetail {
+  campaignId: number;
+  title: string;
+  description: string;
+  imageUrl: string | null;
+  category: "BEAUTY" | "FASHION";
+  product: string;
+  rewardAmount: number;
+  startDate: string;
+  endDate: string;
+  recruitStartDate: string;
+  recruitEndDate: string;
+  dday: number;
+  quota: number;
+  contentTags: CampaignContentTags;
+}
+
+interface CampaignDetailResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: CampaignDetail;
+}
+
+export interface ProposalDetail {
+  proposalId: number;
+  brandId: number;
+  creatorId: number;
+  title: string;
+  description: string;
+  rewardAmount: number;
+  productId: number;
+  startDate: string | null;
+  endDate: string | null;
+  status: string;
+  refusalReason: string | null;
+  createdAt: string;
+  contentTags: CampaignContentTags;
+  campaignId?: number;
+}
+
+interface ProposalDetailResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: ProposalDetail;
+}
+
+export const getProposalDetail = async (proposalId: number): Promise<ProposalDetail> => {
+  try {
+    const response = await apiClient.get<ProposalDetailResponse>(
+      `/v1/campaigns/proposal/${proposalId}`,
+    );
+
+    if (!response.data?.isSuccess) {
+      throw new Error(response.data?.message || "제안 상세 조회 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("제안 상세 조회 실패:", error);
+    throw error;
+  }
+};
+
+export const getCampaignDetail = async (campaignId: number): Promise<CampaignDetail> => {
+  try {
+    const response = await apiClient.get<CampaignDetailResponse>(
+      `/api/v1/campaigns/${campaignId}`
+    );
+
+    if (!response.data?.isSuccess) {
+      throw new Error(response.data?.message || "캠페인 상세 조회 실패");
+    }
+
+    return response.data.result;
+  } catch (error: unknown) {
+    console.error("캠페인 상세 조회 실패:", error);
     throw error;
   }
 };

@@ -2,13 +2,15 @@ import { create } from "zustand";
 
 export interface CampaignProposalData {
   brandId: number;
-  campaignId: number;
+  campaignId?: number;
   domain: string;
   brandName?: string;
   campaignTitle?: string;
   campaignDescription?: string;
   rewardAmount?: number;
   product?: string;
+  productId?: number;
+  products?: { id: string; name: string }[];
   startDate?: string;
   endDate?: string;
   contentTags?: {
@@ -18,6 +20,7 @@ export interface CampaignProposalData {
     involvements?: { name: string; id?: number }[];
     usageRanges?: { name: string; id?: number }[];
   };
+  proposalId?: number;
 }
 
 type CampaignProposalStore = {

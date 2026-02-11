@@ -8,21 +8,15 @@ import type {
 } from "../types/auth";
 
 interface SignupState {
-  // 약관 동의
   terms: TermAgreementDto[];
-  // 역할
   role: Role | null;
-  // 기본 정보
   nickname: string;
   birth: string; // YYYY-MM-DD
   gender: Gender | null;
-  // 추가 정보
   age: number | null;
   contentCategoryIds: number[];
-  // 목적
   signupPurposeIds: number[];
 
-  // Actions
   setTerms: (terms: TermAgreementDto[]) => void;
   setRole: (role: Role) => void;
   setBasicInfo: (nickname: string, birth: string, gender: Gender) => void;

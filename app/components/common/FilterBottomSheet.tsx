@@ -13,7 +13,6 @@ export default function FilterBottomSheet({ isOpen, onClose, children, className
 
     useEffect(() => {
         if (isOpen) {
-            // Use setTimeout to avoid direct setState in effect
             const timer = setTimeout(() => setShouldRender(true), 0);
             return () => clearTimeout(timer);
         }
