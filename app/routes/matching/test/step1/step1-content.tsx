@@ -121,7 +121,7 @@ export default function MatchingTestContent({
         })}
       </main>
 
-      <div className="sticky bottom-0 bg-white px-6 pt-3 pb-6">
+      <div className="sticky bottom-0 bg-white px-6 pt-6 pb-6">
         <Button
           variant="primary"
           size="lg"
