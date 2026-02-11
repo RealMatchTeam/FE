@@ -10,7 +10,7 @@ import TraitsSection from "../components/profileCard/TraitsSection";
 import CampaignsSection from "../components/profileCard/CampaignsSection";
 import { axiosInstance } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
-import { uploadAttachment } from "app/routes/rooms/api/attachments";
+import { uploadAttachment } from "app/routes/room/api/attachments";
 
 const compressImage = (
   file: File,
