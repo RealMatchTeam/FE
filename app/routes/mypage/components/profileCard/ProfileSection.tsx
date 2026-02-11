@@ -28,10 +28,7 @@ export default function ProfileSection({
     if (!gender) return "성별";
     return gender;
   }, [gender]);
-  const ageLabel =
-    age != null && Number.isFinite(age)
-      ? `${age}세`
-      : "나이";
+  const ageLabel = age != null && Number.isFinite(age) ? `${age}세` : "나이";
   const interestLabel = contentCategories?.length
     ? contentCategories.join(", ")
     : "";
@@ -41,7 +38,7 @@ export default function ProfileSection({
       {/* profile summary */}
       <div className="flex items-center gap-4 mt-[10px]">
         <div className="relative">
-          <div className="relative w-[50px] h-[50px] rounded-[20px] border border-[#E6E6F3] bg-gray-200 overflow-hidden">
+          <div className="relative w-13 h-13 rounded-[20px] border border-[#E6E6F3] bg-gray-200 overflow-hidden">
             {/* 프로필 이미지 */}
             {profileImage ? (
               <img
