@@ -113,7 +113,11 @@ export function buildMatchPayload(): MatchesRequest {
           ),
         },
       },
-      typeTags: requireNonEmpty(step3Chips.contentType, "content.typeTags"),
+      typeTags: requireNonEmpty(step3Chips.contentFormat, "content.typeTags"),
+      categoryTags: requireNonEmpty(
+        step3Chips.contentType,
+        "content.categoryTags",
+      ),
       toneTags: requireNonEmpty(step3Chips.contentTone, "content.toneTags"),
       prefferedInvolvementTags: requireNonEmpty(
         step3Chips.contentHardness,

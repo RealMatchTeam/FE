@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import type {
-  Step3ChipKey,
-  Step3ChipsState,
-  Step3SelectKey,
-  Step3SelectedState,
+import {
+  useMatchingTestStore,
+  type Step3ChipKey,
+  type Step3ChipsState,
+  type Step3SelectKey,
+  type Step3SelectedState,
 } from "../../../../stores/matching-test";
 
 import MatchingTestTopBar from "../components/MatchingTestHeader";
@@ -168,7 +169,7 @@ export default function MatchingTestStep3Content({
           <h2 className="text-title2 text-text-black mb-2">SNS 정보</h2>
 
           <div className="text-title4 text-text-gray3">
-            SNS 주소를 입력해주세요
+            주 SNS 주소를 입력해주세요
           </div>
           <div className="mt-2">
             <FormField
@@ -203,7 +204,7 @@ export default function MatchingTestStep3Content({
             />
           </div>
 
-          <div className="mt-4 text-title4 text-text-gray3">
+          <div className="mt-4 text-callout1 text-text-gray3">
             평균 영상 길이 및 조회수를 선택해주세요
           </div>
           <div className="mt-2 grid grid-cols-2 gap-3 items-stretch">
@@ -229,7 +230,14 @@ export default function MatchingTestStep3Content({
                 key={t.id}
                 label={t.name}
                 isSelected={step3Chips.contentFormat.includes(t.id)}
-                onToggle={() => onToggleChip("contentFormat", t.id)}
+                onToggle={() => {
+                  onToggleChip("contentType", t.id);
+
+                  console.log(
+                    "현재 step3Chips:",
+                    useMatchingTestStore.getState().step3Chips,
+                  );
+                }}
               />
             ))}
           </ChipRow>
