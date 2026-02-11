@@ -154,8 +154,11 @@ export default function NotificationContent() {
                         ))}
                     </div>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center py-20 text-text-gray4">
-                        <p>표시할 알림이 없습니다.</p>
+                    <div className="flex flex-col items-center justify-center min-h-[75vh]">
+                        <img src={emptyImg} alt="" className="h-[160px] w-[160px] select-none" />
+                        <p className="font-medium text-[14px] text-[#5B5D6B] text-center mt-2">
+                            받은 알림이 없어요
+                        </p>
                     </div>
                 )}
             </div>
