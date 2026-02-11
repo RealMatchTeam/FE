@@ -55,6 +55,7 @@ export default function MatchingTestStep3Page() {
     const lenOk = step3Selected.videoLength.length >= 1;
     const viewsOk = step3Selected.views.length >= 1;
 
+    const formatOk = step3Chips.contentFormat.length >= 1;
     const typeOk = step3Chips.contentType.length >= 1;
     const toneOk = step3Chips.contentTone.length >= 1;
     const invOk = step3Chips.contentHardness.length >= 1;
@@ -66,6 +67,7 @@ export default function MatchingTestStep3Page() {
       ageOk &&
       lenOk &&
       viewsOk &&
+      formatOk &&
       typeOk &&
       toneOk &&
       invOk &&

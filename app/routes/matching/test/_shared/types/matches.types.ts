@@ -35,6 +35,7 @@ export type MatchesRequest = {
       };
     };
     typeTags: number[];
+    categoryTags: number[];
     toneTags: number[];
     prefferedInvolvementTags: number[];
     prefferedCoverageTags: number[];

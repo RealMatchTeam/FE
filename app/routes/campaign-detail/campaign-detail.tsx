@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
 import Button from "../../components/common/Button";
 
 import BrandHero from "../brand-detail/components/BrandHero";
-import BrandInfo from "../brand-detail/components/BrandInfo";
-import BrandActionBar from "../brand-detail/components/BrandActionBar";
 import OngoingCampaignSection from "../brand-detail/components/OngoingCampaignSection";
 
 import { tokenStorage } from "../../lib/token";
@@ -18,7 +17,6 @@ import type {
   CampaignDetailApiResponse,
 } from "../campaign-detail/types";
 
-import informationIconUrl from "../../assets/information-icon.svg?url";
 import CampaignDetailSkeleton from "./components/CampaignDetailSkeleton";
 
 type Props = {
@@ -124,10 +122,10 @@ export default function CampaignDetailContent({
       { label: "설명", value: campaign.description || "-" },
       { label: "개수 및 길이", value: campaign.videoSpec || "-" },
       { label: "콘텐츠 형식", chips: joinTagNames(tags?.formats) },
-      { label: "카테고리", chips: joinTagNames(tags?.categories) },
-      { label: "톤", chips: joinTagNames(tags?.tones) },
-      { label: "참여도", chips: joinTagNames(tags?.involvements) },
-      { label: "사용 범위", chips: joinTagNames(tags?.usageRanges) },
+      { label: "콘텐츠 종류", chips: joinTagNames(tags?.categories) },
+      { label: "콘텐츠 톤", chips: joinTagNames(tags?.tones) },
+      { label: "콘텐츠 관여도", chips: joinTagNames(tags?.involvements) },
+      { label: "콘텐츠 활용범위", chips: joinTagNames(tags?.usageRanges) },
     ];
   }, [campaign]);
 
@@ -232,85 +230,147 @@ export default function CampaignDetailContent({
 
   if (campaignError) {
     return (
-      <div className="w-full bg-bg-w">
-        <div className="px-5 py-6 text-callout1 text-error">
-          {campaignError}
+      <div className="min-h-dvh bg-bluegray-1">
+        <div className="mx-auto w-full max-w-[760px] px-4 py-6">
+          <div className="rounded-2xl bg-bg-w p-5 text-callout1 text-error">
+            {campaignError}
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!campaign) {
-    return <CampaignDetailSkeleton />;
-  }
+  if (!campaign) return <CampaignDetailSkeleton />;
 
   const campaignImage = campaign.imageUrl ?? heroUrl;
 
   return (
-    <div className="w-full bg-bg-w">
-      <div className="w-full bg-bg-w">
+    <div className="min-h-dvh bg-bluegray-1">
+      {/* responsive frame: mobile full-bleed, web centered card */}
+      <div className="mx-auto w-full max-w-[760px] bg-bg-w md:my-6 md:overflow-hidden md:rounded-2xl md:shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+        {/* HERO (이미 있는 컴포넌트 유지) */}
         <BrandHero
           heroImageUrl={heroUrl}
           logoImageUrl={brandData.logoImageUrl}
           logoText={brandData.logoText ?? ""}
         />
 
-        <div className="px-5 pb-10">
-          <BrandInfo
-            name={brandData.name}
-            matchRate={brandData.matchRate}
-            hashtags={(brandData.hashtags ?? []).slice(0, 2)}
-            description={brandData.description}
-          />
+        {/* INFO CARD (Figma: white section, 16px padding) */}
+        <div className="bg-bg-w px-4 pb-6 pt-3 sm:px-5 md:px-6">
+          <div className="flex flex-col gap-3">
+            {/* 상단: 브랜드명 + 매칭률 */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-[20px] font-semibold leading-[26px] text-text-black">
+                  {brandData.name}
+                </div>
+                <div className="mt-1 line-clamp-1 text-[14px] font-medium leading-5 text-text-gray2">
+                  {(brandData.hashtags ?? [])
+                    .slice(0, 3)
+                    .map((t) => `#${t}`)
+                    .join(" ")}
+                </div>
+              </div>
 
-          <div className="mt-2 flex h-9 items-center gap-2 text-title3 text-core-1">
-            <MetaItem
-              icon={
-                <img
-                  src={informationIconUrl}
-                  alt=""
-                  className="block h-4 w-4 select-none"
-                  draggable={false}
-                />
-              }
-              text={toDdayText(campaign.dday)}
-            />
-
-            <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">{campaign.quota}명</span>
-            <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">
-              {toKoreanCategory(campaign.category)}
-            </span>
-          </div>
-
-          <BrandActionBar
-            isHearted={isHearted}
-            onChat={handleChat}
-            onSuggest={handleSuggest}
-            onToggleHeart={handleToggleHeart}
-          />
-
-          <div className="my-4 h-px w-full bg-bluegray-2" />
-
-          <section>
-            <div className="mt-4 overflow-hidden rounded-2xl bg-bluegray-1">
-              <img
-                src={campaignImage}
-                alt="campaign"
-                className="h-[280px] w-full object-cover"
-                draggable={false}
-              />
+              <div className="shrink-0 text-right">
+                <div className="text-[12px] font-medium leading-4 text-core-1">
+                  매칭률
+                </div>
+                <div className="mt-0.5 text-[20px] font-semibold leading-[26px] text-core-1">
+                  {Number.isFinite(brandData.matchRate)
+                    ? `${brandData.matchRate}%`
+                    : "-"}
+                </div>
+              </div>
             </div>
 
-            <div className="mt-3 text-center text-title1 text-text-black">
+            {/* 한 줄 소개 */}
+            <div className="text-[14px] font-medium leading-5 text-core-4">
+              {brandData.description ?? "-"}
+            </div>
+
+            {/* 모집 상태 메타 (Figma 스타일) */}
+            <div className="flex items-center gap-2 text-core-1">
+              <span className="inline-flex h-[18px] w-[16px] items-center justify-center">
+                <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border-[1.5px] border-core-1">
+                  <span className="text-[13px] font-semibold leading-none text-core-1">
+                    i
+                  </span>
+                </span>
+              </span>
+
+              <div className="flex items-center gap-2 text-[16px] font-semibold leading-5 text-core-1">
+                <span>{toDdayText(campaign.dday)}</span>
+                <span className="h-4 w-px bg-core-3/60" />
+                <span>{campaign.quota}명</span>
+                <span className="h-4 w-px bg-core-3/60" />
+                <span>{toKoreanCategory(campaign.category)}</span>
+              </div>
+            </div>
+
+            {/* 액션 버튼 3개 (Figma: 채팅/제안 + 하트) */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleChat}
+                className="h-[30px] w-[150px] rounded-[6px] bg-bluegray-1 px-4 text-[14px] font-medium leading-5 text-text-black md:w-[180px]"
+              >
+                채팅하기
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSuggest}
+                className="h-[30px] flex-1 rounded-[6px] bg-bluegray-1 px-4 text-[14px] font-medium leading-5 text-text-black"
+              >
+                제안하기
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={isHearted}
+                onClick={handleToggleHeart}
+                className="grid h-[30px] w-[30px] place-items-center rounded-[6px] bg-bluegray-1"
+              >
+                {/* 단순 하트(디자인 토큰에 맞춰 최소 구현) */}
+                <span
+                  className={[
+                    "inline-block h-5 w-5",
+                    isHearted ? "text-core-2" : "text-core-3",
+                  ].join(" ")}
+                >
+                  {isHearted ? "♥" : "♡"}
+                </span>
+              </button>
+            </div>
+
+            <div className="h-px w-full bg-bluegray-2" />
+          </div>
+
+          {/* 캠페인 이미지 (Figma: 중앙 정사각형, max 334) */}
+          <section className="py-6">
+            <div className="mx-auto w-full max-w-[334px]">
+              <div className="aspect-square overflow-hidden rounded-2xl bg-bluegray-1">
+                <img
+                  src={campaignImage}
+                  alt="campaign"
+                  className="h-full w-full object-cover"
+                  draggable={false}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 text-center text-[20px] font-semibold leading-[26px] text-text-black">
               {campaign.title}
             </div>
           </section>
 
-          <section className="py-5">
-            <div className="text-title1 text-text-black">상세 설명</div>
-            <div className="mt-3 space-y-2 text-callout1 text-text-gray3">
+          {/* 상세 설명 */}
+          <section className="pb-6">
+            <div className="text-[16px] font-semibold leading-5 text-core-4">
+              상세 설명
+            </div>
+            <div className="mt-3 space-y-2 text-[14px] font-medium leading-5 text-core-4">
               {detailRows.map((row) => (
                 <DetailRow
                   key={row.label}
@@ -321,25 +381,32 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="my-6 mx-auto w-3/4 border-t border-bluegray-2" />
+          {/* 중간 구분선 (Figma: 짧은 라인) */}
+          <div className="mx-auto my-2 h-px w-[254px] bg-bluegray-2" />
 
-          <section className="py-1">
-            <div className="text-title1 text-text-black">콘텐츠</div>
-            <div className="mt-3 space-y-4 text-callout1 text-text-gray3">
+          {/* 콘텐츠 */}
+          <section className="py-6">
+            <div className="text-[16px] font-semibold leading-5 text-core-4">
+              콘텐츠
+            </div>
+
+            <div className="mt-4 space-y-4 text-[14px] font-medium leading-5 text-core-4">
               {contentRows.map((row) => (
-                <div key={row.label} className="flex gap-4">
-                  <div className="w-[84px] shrink-0 text-text-gray2">
+                <div key={row.label} className="flex gap-2">
+                  <div className="w-[92px] shrink-0 text-text-gray2">
                     {row.label}
                   </div>
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     {"value" in row && row.value ? (
-                      <div className="whitespace-pre-line">{row.value}</div>
+                      <div className="whitespace-pre-line break-words">
+                        {row.value}
+                      </div>
                     ) : (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {(row.chips ?? []).map((c) => (
                           <span
                             key={c}
-                            className="inline-flex items-center rounded-full border border-bluegray-2 bg-bg-w px-3 py-1 text-callout1 text-text-gray3"
+                            className="inline-flex items-center rounded-full border border-bluegray-2 bg-bg-w px-2 py-1 text-[12px] font-medium leading-4 text-core-4"
                           >
                             {c}
                           </span>
@@ -355,22 +422,27 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="mt-8">
-            <Button
-              type="button"
-              variant="primary"
-              size="lg"
-              withLogo
-              fullWidth
-              onClick={handleApply}
-            >
-              지원하기
-            </Button>
+          {/* 하단 버튼 (Figma: 16px 좌우, 52px 높이, 라운드 12) */}
+          <div className="pb-8">
+            <div className="sticky bottom-0 -mx-4 bg-bg-w px-4 pb-[max(24px,env(safe-area-inset-bottom))] pt-3 sm:-mx-5 sm:px-5 md:static md:mx-0 md:px-0 md:pb-0">
+              <Button
+                type="button"
+                variant="primary"
+                size="lg"
+                withLogo
+                fullWidth
+                onClick={handleApply}
+              >
+                지원하기
+              </Button>
+            </div>
           </div>
+        </div>
 
-          <DividerBlock />
-
-          <OngoingCampaignSection campaigns={ongoing} onMore={() => { }} />
+        {/* 진행 중인 다른 캠페인 */}
+        <div className="h-2 bg-bluegray-1" />
+        <div className="bg-bg-w px-4 py-9 sm:px-5 md:px-6">
+          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
         </div>
       </div>
     </div>
@@ -379,24 +451,11 @@ export default function CampaignDetailContent({
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex gap-4">
-      <div className="w-[84px] shrink-0 text-text-gray2">{label}</div>
-      <div className="whitespace-pre-line">{value}</div>
+    <div className="flex items-start gap-2">
+      <div className="w-[92px] shrink-0 text-text-gray2">{label}</div>
+      <div className="min-w-0 flex-1 whitespace-pre-line break-words text-core-4">
+        {value}
+      </div>
     </div>
-  );
-}
-
-function DividerBlock() {
-  return <div className="-mx-5 mt-5 h-2 bg-bluegray-1" />;
-}
-
-function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
-  return (
-    <span className="flex items-center gap-2">
-      {icon ? (
-        <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
-      ) : null}
-      <span className="leading-none">{text}</span>
-    </span>
   );
 }
