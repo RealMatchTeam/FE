@@ -452,14 +452,14 @@ export default function HomeAfterMatchPage() {
 
           <CategoryTabs value={category} onChange={setCategory} />
 
-          <section className="mt-6">
+          <section className="mt-8">
             <SectionHeader
               title="매칭률 높은 브랜드"
               subtitle="이런 브랜드가 매칭률이 가장 높아요!"
               onMore={goBrandList}
             />
 
-            <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+            <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
               {brands.map((brand, i) => (
                 <BrandCard
                   key={`brand-${brand.id}-${i}`}
@@ -484,14 +484,14 @@ export default function HomeAfterMatchPage() {
               ))}
             </div>
           </section>
-          <section className="mt-7">
+          <section className="mt-15">
             <SectionHeader
               title="매칭률 높은 캠페인"
               subtitle="이런 캠페인이 매칭률이 가장 높아요!"
               onMore={goCampaignList}
             />
 
-            <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+            <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
               {campaigns.map((campaign, i) => {
                 const safeCampaignId = getCampaignId(campaign);
                 if (!safeCampaignId) return null;
@@ -522,7 +522,6 @@ export default function HomeAfterMatchPage() {
               })}
             </div>
           </section>
-
           {profileModel && (
             <div className="mt-8">
               <CreatorProfileCard
@@ -540,7 +539,7 @@ export default function HomeAfterMatchPage() {
               onMore={goCampaignList}
             />
 
-            <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+            <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
               {popularCampaigns.map((campaign, i) => {
                 const safeCampaignId = getCampaignId(campaign);
                 if (!safeCampaignId) return null;
@@ -551,7 +550,7 @@ export default function HomeAfterMatchPage() {
                     item={{
                       id: String(safeCampaignId),
                       brandName: campaign.brandName,
-                      matchRate: campaign.matchRate || 0,
+                      matchRate: 0,
                       descText: campaign.name || campaign.title || "",
                       rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
                       ddayLabel:

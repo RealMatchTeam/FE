@@ -26,7 +26,10 @@ export default function CreatorProfileCard({
   const summary = storeType || model.summary?.trim() || "크리에이터";
 
   return (
-    <section className=" text-text-black mt-5 mx-4 mb-2.5">
+    <section className="text-text-black mt-5 mb-20">
+      <div className="text-title1 font-semibold mt-18 mx-2 mb-8">
+        <h1>크레이터 님의 프로필</h1>
+      </div>
       <div className="text-center text-title3 leading-5">
         <div>
           <span>{name}</span> 님은
@@ -40,7 +43,7 @@ export default function CreatorProfileCard({
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-4">
+      <div className="mt-6 flex items-center justify-center gap-0 mx-4">
         <IconBlock
           icon={beautyIcon}
           label="뷰티 특성"
@@ -106,7 +109,7 @@ function IconBlock({
       disabled={!clickable}
       className="flex w-[33.33%] flex-col items-center disabled:cursor-default"
     >
-      <img src={icon} alt={label} className="h-25 w-auto object-contain" />
+      <img src={icon} alt={label} className="h-35 w-auto object-contain" />
       <div className="mt-2 text-center text-title3 text-text-gray1">
         {label}
       </div>
