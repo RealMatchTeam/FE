@@ -28,17 +28,16 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
 
 export default function MatchingTabSection({ subTab, setSubTab, receivedCount, keyword, setKeyword }: Props) {
   const [isSearching, setIsSearching] = useState(false);
-  const [query, setQuery] = useState(keyword); // 초기값으로 keyword 사용
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // 캠페인 검색 함수
   const fetchCampaigns = async () => {
-    if (!query.trim()) return; // 검색어가 비어있으면 종료
+    if (!keyword.trim()) return;
     setIsLoading(true);
     try {
       const data = await searchCollaborations({
-        keyword: query, // 브랜드명 검색
+        keyword: keyword.trim(),
         type: subTab.toUpperCase() as "APPLIED" | "SENT" | "RECEIVED",
       });
       setCampaigns(data || []);
@@ -51,18 +50,12 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
 
   // 검색 상태에 따라 캠페인 검색
   useEffect(() => {
-    if (isSearching) {
+    if (isSearching && keyword.trim()) {
       fetchCampaigns();
     } else {
-      setCampaigns([]); 
+      setCampaigns([]);
     }
-  }, [isSearching, query, subTab]);
-
-
-  // 검색어가 변경될 때 setKeyword 호출
-  useEffect(() => {
-    setKeyword(query);
-  }, [query, setKeyword]);
+  }, [isSearching, keyword, subTab]);
 
   if (isSearching) {
     return (
@@ -75,11 +68,11 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
               autoFocus
               className="flex-1 bg-transparent mx-2 outline-none text-body1 text-center placeholder:text-text-gray3"
               placeholder="브랜드명 입력"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)} // query 업데이트
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
             />
-            <button 
-              onClick={() => { setIsSearching(false); setQuery(""); }}
+            <button
+              onClick={() => { setIsSearching(false); setKeyword(""); }}
               className="flex-shrink-0"
             >
               <img src={closeIcon} alt="close" />
@@ -99,7 +92,7 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
               </div>
             ))
           ) : (
-            !isLoading && query && <div className="text-center py-10 text-text-gray4">검색 결과가 없습니다.</div>
+            !isLoading && keyword && <div className="text-center py-10 text-text-gray4">검색 결과가 없습니다.</div>
           )}
         </div>
       </div>

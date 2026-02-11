@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -69,58 +69,14 @@ export default function CreateCampaignContent() {
     defaultValues: defaultCampaignFormValues,
   });
 
-  const location = useLocation();
-
-  // URL에서 선택한 캠페인 정보를 가져와서 폼에 채우기
+  // 폼 초기화 - 모든 데이터 소스를 한 번에 처리
   useEffect(() => {
     if (type !== "existing") return;
 
-    const brandIdParam = searchParams.get("brandId");
-    const campaignIdParam = searchParams.get("campaignId");
-
-    if (!brandIdParam || !campaignIdParam) return;
-
-    const brandId = Number(brandIdParam);
-    const campaignId = Number(campaignIdParam);
-
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
-    if (!Number.isFinite(campaignId) || campaignId <= 0) return;
-
     let alive = true;
 
-    (async () => {
-      try {
-        const campaigns = await getRecruitingCampaigns(brandId);
-        if (!alive) return;
-
-        const selectedCampaign = campaigns.find((c) => c.campaignId === campaignId);
-        if (!selectedCampaign) return;
-
-        // 선택한 캠페인 정보를 폼에 반영
-        setValue("campaignName", selectedCampaign.title);
-        setValue("fee", selectedCampaign.rewardAmount.toString());
-
-        // dday를 사용해 종료 날짜 계산
-        const today = new Date();
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + selectedCampaign.dday);
-
-        setValue("startDate", today.toISOString().split("T")[0]);
-        setValue("endDate", endDate.toISOString().split("T")[0]);
-
-        setSelectedCampaign(selectedCampaign);
-      } catch (error) {
-        console.error("모집중인 캠페인 조회 실패:", error);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, [type, searchParams, setValue]);
-
-  useEffect(() => {
-    if (type === "existing" && proposalData) {
+    // proposalData가 있으면 우선 사용
+    if (proposalData) {
       setValue("campaignName", proposalData.campaignTitle || "");
       setValue("description", proposalData.campaignDescription || "");
 
@@ -145,23 +101,51 @@ export default function CreateCampaignContent() {
       setValue("sponsorProduct", proposalData.product || "");
       setValue("startDate", proposalData.startDate || "");
       setValue("endDate", proposalData.endDate || "");
-    } else if (type === "existing" && location.state?.campaign) {
-      const campaign = location.state.campaign;
-      setValue("campaignName", campaign.title || "");
-      setValue("description", campaign.description || "");
-
-      if (campaign.contentTags?.formats?.length > 0) setValue("format", campaign.contentTags.formats[0].name);
-      if (campaign.contentTags?.categories?.length > 0) setValue("category", campaign.contentTags.categories[0].name);
-      if (campaign.contentTags?.tones?.length > 0) setValue("tone", campaign.contentTags.tones[0].name);
-      if (campaign.contentTags?.involvements?.length > 0) setValue("involvement", campaign.contentTags.involvements[0].name);
-      if (campaign.contentTags?.usageRanges?.length > 0) setValue("usageScope", campaign.contentTags.usageRanges[0].name);
-
-      setValue("fee", campaign.rewardAmount?.toString() || "");
-      setValue("sponsorProduct", campaign.productId?.toString() || "");
-      setValue("startDate", campaign.startDate || "");
-      setValue("endDate", campaign.endDate || "");
+      return;
     }
-  }, [type, proposalData, location.state, setValue]);
+
+    // URL 파라미터로 캠페인 조회
+    const brandIdParam = searchParams.get("brandId");
+    const campaignIdParam = searchParams.get("campaignId");
+
+    if (brandIdParam && campaignIdParam) {
+      const brandId = Number(brandIdParam);
+      const campaignId = Number(campaignIdParam);
+
+      if (Number.isFinite(brandId) && brandId > 0 && Number.isFinite(campaignId) && campaignId > 0) {
+        (async () => {
+          try {
+            const campaigns = await getRecruitingCampaigns(brandId);
+            if (!alive) return;
+
+            const selectedCampaign = campaigns.find((c) => c.campaignId === campaignId);
+            if (!selectedCampaign) return;
+
+            // 선택한 캠페인 정보를 폼에 반영
+            setValue("campaignName", selectedCampaign.title);
+            setValue("fee", selectedCampaign.rewardAmount.toString());
+
+            // dday를 사용해 종료 날짜 계산
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + selectedCampaign.dday);
+
+            setValue("startDate", today.toISOString().split("T")[0]);
+            setValue("endDate", endDate.toISOString().split("T")[0]);
+
+            setSelectedCampaign(selectedCampaign);
+          } catch (error) {
+            console.error("모집중인 캠페인 조회 실패:", error);
+          }
+        })();
+      }
+    }
+
+    return () => {
+      alive = false;
+    };
+    // proposalData와 searchParams만 의존성에 포함 (location.state 제거)
+  }, [type, proposalData, searchParams, setValue]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
