@@ -124,8 +124,8 @@ export default function MatchingResultContent() {
   };
 
   return (
-    <div className="w-full overflow-hidden bg-[linear-gradient(180deg,#EAEAFF_0%,#EFEFFE_39%,#FAFAFD_100%)] h-[calc(100dvh-80px-67px)]">
-      <div className="mx-auto h-full w-full max-w-[560px]">
+    <div className="w-full bg-[linear-gradient(180deg,#EAEAFF_0%,#EFEFFE_39%,#FAFAFD_100%)] min-h-[calc(100dvh-80px-67px)] flex">
+      <div className="mx-auto w-full max-w-[560px] flex flex-col flex-1">
         <div className="h-full flex flex-col">
           <div className="flex-1 flex flex-col items-center justify-center px-5 sm:px-6 md:px-8">
             <div className="w-full flex flex-col items-center gap-6">
