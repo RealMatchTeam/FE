@@ -46,7 +46,7 @@ export function SortFilterSheet<T extends string = SortOption>({
       />
 
       {/* 시트 */}
-      <div className="fixed left-1/2 -translate-x-1/2 bottom-[0px] w-full max-w-[480px] h-[530px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
+      <div className="fixed left-1/2 -translate-x-1/2 bottom-[0px] w-full max-w-[480px] h-[500px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col">
         <div className="w-full max-w-[480px] h-[70px] fixed left-1/2 -translate-x-1/2">
           <div className="px-4 text-medium text-text-black mb-3">{title}</div>
 
@@ -68,7 +68,7 @@ export function SortFilterSheet<T extends string = SortOption>({
         <div className="flex justify-center py-6">
           <button
             onClick={onApply}
-            className="w-full max-w-[360px] h-11 rounded-[12px] bg-[#6666E5] text-white text-SemiBold"
+            className="px-6 w-full h-11 rounded-[12px] bg-[#6666E5] text-white text-SemiBold"
           >
             {applyLabel}
           </button>
