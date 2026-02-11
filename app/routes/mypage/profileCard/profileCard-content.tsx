@@ -3,6 +3,7 @@ import ConfirmModal from "../components/mypage/ConfirmModal";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import ProfileSection from "../components/profileCard/ProfileSection";
 import SnsSection from "../components/profileCard/SnsSection";
 import MatchingSection from "../components/profileCard/MatchingSection";
@@ -11,6 +12,8 @@ import CampaignsSection from "../components/profileCard/CampaignsSection";
 import { axiosInstance } from "../../../api/axios";
 import { tokenStorage } from "../../../lib/token";
 import { uploadAttachment } from "../../room/api/attachments";
+import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
+import closeIcon from "../../../assets/cancel.svg";
 
 const compressImage = (
   file: File,
@@ -67,6 +70,21 @@ const compressImage = (
     };
   });
 
+const INSTAGRAM_PREFIX = "https://www.instagram.com/";
+
+const extractInstagramId = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  const withoutAt = trimmed.replace(/^@/, "");
+  const match = withoutAt.match(/instagram\.com\/([^/?#]+)/i);
+  if (match?.[1]) return match[1];
+
+  return withoutAt;
+};
+
+const isValidInstagramId = (id: string) => /^[A-Za-z0-9._]{0,30}$/.test(id);
+
 export default function ProfileCard() {
   useHideHeader(true);
 
@@ -78,6 +96,11 @@ export default function ProfileCard() {
   const [feature, setFeature] = useState<FeatureResult | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const [isSnsSheetOpen, setIsSnsSheetOpen] = useState(false);
+  const [snsInput, setSnsInput] = useState("");
+  const [isSavingSns, setIsSavingSns] = useState(false);
+
+  useHideBottomTab(isSnsSheetOpen);
 
   const onOpenReMatch = () => {
     setOpenReMatchModal(true);
@@ -95,6 +118,16 @@ export default function ProfileCard() {
   const handlePickImage = () => {
     if (isUploadingImage) return;
     imageInputRef.current?.click();
+  };
+
+  const openSnsSheet = () => {
+    setSnsInput(extractInstagramId(profileCard?.snsAccount ?? ""));
+    setIsSnsSheetOpen(true);
+  };
+
+  const closeSnsSheet = () => {
+    if (isSavingSns) return;
+    setIsSnsSheetOpen(false);
   };
 
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -139,6 +172,34 @@ export default function ProfileCard() {
     }
   };
 
+  const handleSaveSns = async () => {
+    const snsId = extractInstagramId(snsInput);
+    if (!isValidInstagramId(snsId) || isSavingSns) return;
+
+    try {
+      setIsSavingSns(true);
+      const response =
+        await axiosInstance.patch<CustomResponseMyProfileCardResponseDto>(
+          "/api/v1/users/me/instagram",
+          { snsAccount: snsId },
+        );
+
+      if (!response.data.isSuccess) {
+        throw new Error(response.data.message || "SNS 계정 변경 실패");
+      }
+
+      setProfileCard((prev) =>
+        prev ? { ...prev, snsAccount: snsId } : { snsAccount: snsId },
+      );
+
+      setIsSnsSheetOpen(false);
+    } catch (error) {
+      console.error("SNS 계정 변경 실패:", error);
+    } finally {
+      setIsSavingSns(false);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -174,6 +235,9 @@ export default function ProfileCard() {
 
   const nickname = profileCard?.nickname ?? null;
   const creatorType = profileCard?.matchingResult?.creatorType ?? null;
+  const snsId = extractInstagramId(snsInput);
+  const isSnsValid = isValidInstagramId(snsId);
+  const showSnsError = snsInput.trim().length > 0 && !isSnsValid;
 
   return (
     <div className="h-screen-full">
@@ -209,7 +273,10 @@ export default function ProfileCard() {
           <div className="w-full h-[10px] bg-[#F3F3FA]"></div>
 
           <div className="px-4">
-            <SnsSection snsAccount={profileCard?.snsAccount ?? null} />
+            <SnsSection
+              snsAccount={profileCard?.snsAccount ?? null}
+              onEdit={openSnsSheet}
+            />
             <div className="w-full h-[1px] bg-[#F3F3FA]"></div>
             <MatchingSection
               onOpenReMatch={onOpenReMatch}
@@ -253,6 +320,81 @@ export default function ProfileCard() {
             />
           ) : null}
 
+          {isSnsSheetOpen ? (
+            <FilterBottomSheet
+              isOpen={isSnsSheetOpen}
+              onClose={closeSnsSheet}
+              className="h-auto"
+            >
+              <div className="px-5 pt-5 pb-6">
+                <div className="flex items-center justify-between">
+                  <div className="text-title2 text-text-black">
+                    SNS 계정 수정
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeSnsSheet}
+                    aria-label="닫기"
+                    className="p-1 active:opacity-80"
+                  >
+                    <img src={closeIcon} alt="" className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="mt-4">
+                  <div
+                    className={[
+                      "flex items-center",
+                      "h-[52px]",
+                      "rounded-2xl",
+                      "border",
+                      "bg-white",
+                      "px-4",
+                      showSnsError ? "border-error" : "border-core-3",
+                    ].join(" ")}
+                  >
+                    <input
+                      autoFocus
+                      value={snsInput}
+                      onChange={(e) => setSnsInput(e.target.value)}
+                      placeholder="인스타그램 아이디 또는 URL"
+                      className={[
+                        "flex-1",
+                        "bg-transparent",
+                        "text-title3",
+                        "text-text-gray1",
+                        "outline-none",
+                        "placeholder:text-text-gray4",
+                      ].join(" ")}
+                    />
+                  </div>
+
+                  <div className="min-h-[18px] mt-2">
+                    {showSnsError ? (
+                      <p className="text-callout2 text-error">
+                        영문/숫자/._ 만 입력해주세요
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={!isSnsValid || isSavingSns}
+                  onClick={handleSaveSns}
+                  className={[
+                    "mt-8 w-full h-[52px] rounded-2xl text-title7 transition-opacity",
+                    !isSnsValid || isSavingSns
+                      ? "bg-bluegray-2 text-text-gray3"
+                      : "bg-core-1 text-white active:opacity-90",
+                  ].join(" ")}
+                >
+                  {isSavingSns ? "저장 중" : "변경 완료"}
+                </button>
+              </div>
+            </FilterBottomSheet>
+          ) : null}
+
           <div className="shrink-0 h-[66px]" />
         </div>
       </div>
@@ -285,6 +427,7 @@ type CustomResponseMyProfileCardResponseDto = {
   message: string;
   result: {
     profileImageUrl?: string;
+    snsAccount?: string;
   };
 };
 
