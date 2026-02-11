@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import MatchingTestTopBar from "../components/MatchingTestHeader";
 import SelectChip from "../components/SelectChip";
 import Button from "../../../../components/common/Button";
+import LoadingSpinner from "../../../../components/common/LoadingSpinner";
 
 import BottomSheet from "../components/BottomSheet";
 import InputSheet from "../components/InputSheet";
@@ -163,9 +164,7 @@ export default function MatchingTestStep2Content({
     return (
       <div className="w-full min-h-full bg-white flex flex-col">
         <MatchingTestTopBar step={2} totalSteps={3} onBack={onBack} />
-        <div className="px-6 py-10 text-sm text-text-gray3">
-          태그를 불러오는 중...
-        </div>
+        <LoadingSpinner className="py-10" />
       </div>
     );
   }

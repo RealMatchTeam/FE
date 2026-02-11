@@ -7,6 +7,7 @@ import { cancelCampaignProposal } from "./api/proposal";
 
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
@@ -58,7 +59,7 @@ export default function ProposalContent() {
         fetchData();
     }, [proposalId]);
 
-    if (isLoading) return <div className="p-10 text-center">로딩 중...</div>;
+    if (isLoading) return <LoadingSpinner className="py-10" />;
     if (!data) return <div className="p-10 text-center">데이터를 찾을 수 없습니다.</div>;
 
     const getTagNames = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
@@ -100,7 +101,7 @@ export default function ProposalContent() {
                     <CampaignBrandCard
                         showChatSection={false}
                         statusText={data.status}
-                        brandName={brand?.brandName || "브랜드명 로딩 중..."}
+                        brandName={brand?.brandName}
                         brandTags={brand?.brandTags || []}
                         brandImageUrl={brand?.brandImageUrl}
                     />

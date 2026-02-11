@@ -11,6 +11,7 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 export default function CalendarContent() {
   const navigate = useNavigate();
@@ -190,7 +191,7 @@ export default function CalendarContent() {
               </div>
               <div className="flex flex-col gap-4">
                 {isLoading ? (
-                  <p className="text-center py-10 text-text-gray3">로딩 중...</p>
+                  <LoadingSpinner className="py-10" />
                 ) : filteredList.length > 0 ? (
                   filteredList.map((cp) => (
                     <CampaignCard
@@ -237,7 +238,7 @@ export default function CalendarContent() {
 
               <div className="flex flex-col gap-4">
                 {isLoading ? (
-                  <p>로딩 중...</p>
+                  <LoadingSpinner className="py-6" size={80} />
                 ) : matchingList.length > 0 ? (
                   matchingList.map((item) => (
                     <MatchingCard
