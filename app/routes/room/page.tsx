@@ -15,6 +15,7 @@ import useChatRoomData from "./hooks/useChatRest";
 import useChatLayout from "./hooks/useChatLayout";
 import useChatStomp from "./hooks/useChatStomp";
 import useChatActions from "./hooks/useChatActions";
+import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 type Props = {
   roomId: number;
@@ -85,13 +86,32 @@ export default function ChattingRoom({ roomId }: Props) {
   const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
   const summaryBarHeight = isCollaborating ? 64 : 0;
 
+  const hasProposal = !!detail?.campaignSummary;
+  const setProposalData = useCampaignProposalStore((s) => s.setProposalData);
+
+  const handleSuggest = () => {
+    if (!detail) return;
+    setProposalData({
+      brandId: detail.opponentUserId,
+      campaignId: detail.campaignSummary?.campaignId ?? 0,
+      domain: "beauty",
+      brandName: detail.opponentName,
+      campaignTitle: detail.campaignSummary?.campaignTitle,
+    });
+    navigate("/matching/suggest");
+  };
+
   const actions: AttachmentAction[] = useMemo(
     () => [
-      { key: "suggest", label: "재 제안", icon: "refresh" },
+      {
+        key: "suggest",
+        label: hasProposal ? "재 제안" : "제안하기",
+        icon: hasProposal ? "refresh" : "suggest",
+      },
       { key: "image", label: "이미지", icon: "image" },
       { key: "file", label: "첨부파일", icon: "file" },
     ],
-    [],
+    [hasProposal],
   );
 
   if (!token) {
@@ -183,6 +203,7 @@ export default function ChattingRoom({ roomId }: Props) {
         actions={actions}
         onClose={() => setIsSheetOpen(false)}
         onAction={(key) => {
+          if (key === "suggest") handleSuggest();
           if (key === "image") imageInputRef.current?.click();
           if (key === "file") fileInputRef.current?.click();
           setIsSheetOpen(false);
