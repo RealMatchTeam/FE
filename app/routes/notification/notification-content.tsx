@@ -1,159 +1,163 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
+import { fetchNotifications, readAllNotifications, readNotification, type NotificationItem } from "./api/notification";
 
-interface Notification {
-  id: number;
-  date: string;
-  message: string;
-  status: "read" | "unread";
-  type: "proposal" | "matching";
-}
-
-const notificationsData: Notification[] = [
-  {
-    id: 1,
-    date: "26.01.06 (화)",
-    message: "[라운드랩]에서 새로운 캠페인 제안을 보냈어요. 지금 확인해보세요!",
-    status: "unread",
-    type: "proposal",
-  },
-  {
-    id: 2,
-    date: "26.01.06 (화)",
-    message: "[라운드랩]과의 캠페인이 매칭되었어요! 캠페인 상세 내용을 확인해 주세요.",
-    status: "read",
-    type: "matching",
-  },
-  {
-    id: 3,
-    date: "26.01.02 (금)",
-    message: "[마녀공장]과의 캠페인이 매칭되었어요! 캠페인 상세 내용을 확인해 주세요.",
-    status: "read",
-    type: "matching",
-  },
-  {
-    id: 4,
-    date: "25.12.29 (화)",
-    message: "[이즈앤트리] 캠페인이 완료되었어요. 정상 금액을 출금 신청할 수 있어요!",
-    status: "unread",
-    type: "proposal",
-  },
-];
-
-// 탭 버튼 컴포넌트
 function TabButton({ label, active, onClick, count }: { label: string; active: boolean; onClick: () => void; count?: number }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-4 py-2 rounded-lg text-[14px] font-bold transition-all flex items-center gap-1.5 ${
-        active 
-          ? "bg-core-1 text-white" 
-          : "bg-white border border-text-gray5 text-text-gray3"
-      }`}
-    >
-      {label}
-      {count !== undefined && count > 0 && (
-        <span className={`flex items-center justify-center rounded-full text-[10px] min-w-[18px] h-[18px] px-1 ${
-          active ? "bg-white text-core-1" : "bg-core-1 text-white"
-        }`}>
-          {count}
-        </span>
-      )}
-    </button>
-  );
+    return (
+        <button
+            onClick={onClick}
+            className={`px-4 py-2 rounded-lg text-[14px] font-bold transition-all flex items-center gap-1.5 ${active
+                ? "bg-core-1 text-white"
+                : "bg-white border border-text-gray5 text-text-gray3"
+                }`}
+        >
+            {label}
+            {count !== undefined && count > 0 && (
+                <span className={`flex items-center justify-center rounded-full text-[10px] min-w-[18px] h-[18px] px-1 ${active ? "bg-white text-core-1" : "bg-core-1 text-white"
+                    }`}>
+                    {count}
+                </span>
+            )}
+        </button>
+    );
 }
 
 export default function NotificationContent() {
-  const [notifications, setNotifications] = useState<Notification[]>(notificationsData);
-  const [activeTab, setActiveTab] = useState<"all" | "proposal" | "matching">("all");
+    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<"ALL" | "PROPOSAL" | "MATCHING">("ALL");
 
-  const filteredNotifications = useMemo(() => {
-    if (activeTab === "all") return notifications;
-    return notifications.filter((n) => n.type === activeTab);
-  }, [notifications, activeTab]);
+    const fetchNotificationsData = async () => {
+        setLoading(true);
+        try {
+            const data = await fetchNotifications(activeTab);
+            if (data.isSuccess) {
+                setNotifications(data.result.items);
+                setUnreadCount(data.result.unreadCount);
+            }
+        } catch (error) {
+            console.error("알림 목록 로딩 실패:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const unreadCount = notifications.filter(n => n.status === "unread").length;
+    useEffect(() => {
+        fetchNotificationsData();
+    }, [activeTab, fetchNotificationsData]);
 
-  const handleReadNotification = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, status: "read" } : n))
-    );
-  };
+    const handleReadAll = async () => {
+        try {
+            const data = await readAllNotifications();
+            if (data.isSuccess) {
+                setNotifications((prev) =>
+                    prev.map((n) => ({ ...n, isRead: true }))
+                );
+                setUnreadCount(0);
+            }
+        } catch (error) {
+            console.error("전체 읽기 처리 실패:", error);
+        }
+    };
 
-  const handleReadAll = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, status: "read" })));
-  };
+    const handleReadNotification = async (id: string, isRead: boolean) => {
+        if (isRead) return;
 
-  return (
-    <div className="flex flex-col w-full h-screen bg-grad-auth"> {/* 전체에 그라데이션 배경 설정 */}
-      {/* 헤더 섹션 */}
-      <div className="px-4 pt-6 pb-4 flex flex-col gap-4 border-b border-text-gray5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-[20px] font-bold text-text-black">알림</h1>
-          {unreadCount > 0 && (
-            <button 
-              onClick={handleReadAll}
-              className="text-[13px] font-medium text-text-gray3 underline"
-            >
-              전체 읽음 처리
-            </button>
-          )}
-        </div>
+        try {
+            const data = await readNotification(id);
+            if (data.isSuccess) {
+                // 해당 알림만 읽음 처리
+                setNotifications((prev) =>
+                    prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+                );
+                // 전체 미읽음 개수 감소
+                setUnreadCount((prev) => Math.max(0, prev - 1));
+            }
+        } catch (error) {
+            console.error("단건 읽기 처리 실패:", error);
+        }
+    };
 
-        {/* 탭 버튼 그룹 */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          <TabButton 
-            label="전체" 
-            active={activeTab === "all"} 
-            onClick={() => setActiveTab("all")} 
-            count={activeTab === "all" ? unreadCount : undefined}
-          />
-          <TabButton 
-            label="받은 제안" 
-            active={activeTab === "proposal"} 
-            onClick={() => setActiveTab("proposal")} 
-          />
-          <TabButton 
-            label="캠페인 매칭" 
-            active={activeTab === "matching"} 
-            onClick={() => setActiveTab("matching")} 
-          />
-        </div>
-      </div>
 
-      {/* 알림 목록 섹션 */}
-      <div className="flex-1 overflow-y-auto">
-        {filteredNotifications.length > 0 ? (
-          <div className="flex flex-col">
-            {filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                onClick={() => handleReadNotification(notification.id)}
-                className={`p-4 border-b border-gray-50 flex flex-col gap-1 transition-colors active:bg-gray-50 ${
-                  notification.status === "unread" ? "bg-blue-50/50" : ""
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-pretendard text-[16px] font-semibold text-core-1 leading-[20px]">
-                    {notification.date}
-                  </span>
-                  {notification.status === "unread" && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-core-1" />
-                  )}
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            year: '2-digit',
+            month: '2-digit',
+            day: '2-digit'
+        }).replace(/ /g, '').slice(0, -1);
+    };
+
+    return (
+        <div className="flex flex-col w-full h-screen bg-grad-auth">
+            <div className="px-4 pt-6 pb-4 flex flex-col gap-4 border-b border-text-gray5 bg-white">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-[20px] font-bold text-text-black">알림</h1>
+                    <button
+                        className="text-[13px] font-medium text-text-gray3 underline active:text-core-1 transition-colors"
+                        onClick={handleReadAll}
+                    >
+                        전체 읽기
+                    </button>
                 </div>
-                <p className={`text-[14px] leading-relaxed ${
-                  notification.status === "unread" ? "text-text-black font-semibold" : "text-text-gray2 font-medium"
-                }`}>
-                  {notification.message}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center py-20 text-text-gray4">
-            <p>표시할 알림이 없습니다.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    <TabButton
+                        label="전체"
+                        active={activeTab === "ALL"}
+                        onClick={() => setActiveTab("ALL")}
+                        count={activeTab === "ALL" ? unreadCount : undefined}
+                    />
+                    <TabButton
+                        label="받은 제안"
+                        active={activeTab === "PROPOSAL"}
+                        onClick={() => setActiveTab("PROPOSAL")}
+                    />
+                    <TabButton
+                        label="캠페인 매칭"
+                        active={activeTab === "MATCHING"}
+                        onClick={() => setActiveTab("MATCHING")}
+                    />
+                </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+                {loading ? (
+                    <div className="flex justify-center items-center h-40 text-text-gray3">로딩 중...</div>
+                ) : notifications.length > 0 ? (
+                    <div className="flex flex-col">
+                        {notifications.map((item) => (
+                            <div
+                                key={item.id}
+                                // 클릭 시 단건 읽기 함수 호출
+                                onClick={() => handleReadNotification(item.id, item.isRead)}
+                                className={`p-4 border-b border-gray-50 flex flex-col gap-1 transition-colors active:bg-gray-50 ${!item.isRead ? "bg-blue-50/50" : "bg-white"
+                                    }`}
+                            >
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className={`font-pretendard text-[14px] font-semibold leading-[20px] ${!item.isRead ? "text-core-1" : "text-text-gray3"
+                                        }`}>
+                                        {formatDate(item.createdAt)}
+                                    </span>
+                                    {!item.isRead && (
+                                        <div className="w-1.5 h-1.5 rounded-full bg-core-1" />
+                                    )}
+                                </div>
+                                <p className={`text-[14px] leading-relaxed transition-colors ${!item.isRead
+                                        ? "text-text-black font-semibold"
+                                        : "text-text-gray3 font-medium"
+                                    }`}>
+                                    {item.body}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center py-20 text-text-gray4">
+                        <p>표시할 알림이 없습니다.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
