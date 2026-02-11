@@ -153,7 +153,6 @@ export const cancelCampaignProposal = async (
 };
 
 // 캠페인 지원 취소 API
-
 export const cancelCampaignApply = async (
   campaignApplyId: string | number
 ): Promise<ApiResponse<string>> => {
