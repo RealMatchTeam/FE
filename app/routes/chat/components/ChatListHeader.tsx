@@ -18,7 +18,7 @@ export function ChatListHeader({
 
   return (
 
-    <div className="flex flex-col gap-4 border-b border-text-gray5">
+    <div className="flex flex-col gap-4">
 
       {/* 검색 입력창 */}
       <div className="flex items-center w-full bg-bg-w border border-core-2 rounded-[8px] px-3 py-2 overflow-hidden">
