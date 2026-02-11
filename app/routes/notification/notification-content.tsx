@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchNotifications, readAllNotifications, readNotification, type NotificationItem } from "./api/notification";
+import { fetchNotifications, readNotification, type NotificationItem } from "./api/notification";
 import { useHideHeader } from "../../hooks/useHideHeader";
 import NavigationHeader from "../../components/common/NavigateHeader";
 import emptyImg from "./../../assets/empty.png";
@@ -53,7 +53,7 @@ export default function NotificationContent() {
         fetchNotificationsData();
     }, [activeTab]);
 
-    const handleReadAll = async () => {
+    /*const handleReadAll = async () => {
         try {
             const data = await readAllNotifications();
             if (data.isSuccess) {
@@ -65,7 +65,7 @@ export default function NotificationContent() {
         } catch (error) {
             console.error("전체 읽기 처리 실패:", error);
         }
-    };
+    };*/
 
     const handleReadNotification = async (id: string, isRead: boolean) => {
         if (isRead) return;
