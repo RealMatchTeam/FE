@@ -70,8 +70,6 @@ const compressImage = (
     };
   });
 
-const INSTAGRAM_PREFIX = "https://www.instagram.com/";
-
 const extractInstagramId = (value: string) => {
   const trimmed = value.trim();
   if (!trimmed) return "";
