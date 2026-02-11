@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 
 interface MatchingHeaderProps {
     title: string;
@@ -7,15 +7,12 @@ interface MatchingHeaderProps {
 
 export default function MatchingHeader({ title, onBack }: MatchingHeaderProps) {
     const navigate = useNavigate();
-    const location = useLocation();
 
     const handleBack = () => {
         if (onBack) {
             onBack();
-        } else if (location.pathname.includes("/create")) {
-            navigate("/matching/suggest");
         } else {
-            navigate("/");
+            navigate(-1);
         }
     };
 
