@@ -28,6 +28,13 @@ export default function ProposalContent() {
 
     const proposalId = searchParams.get("proposalId");
 
+    const STATUS_TEXT_MAP: Record<string, string> = {
+        REVIEWING: "검토 중",
+        MATCHED: "매칭 완료",
+        REJECTED: "거절됨",
+        CANCELED: "취소됨",
+    };
+
     useEffect(() => {
         if (!proposalId) {
             setIsLoading(false);
@@ -100,7 +107,7 @@ export default function ProposalContent() {
                 <div className="px-4 py-6">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText={data.status}
+                        statusText={STATUS_TEXT_MAP[data.status] || data.status}
                         brandName={brand?.brandName}
                         brandTags={brand?.brandTags || []}
                         brandImageUrl={brand?.brandImageUrl}
