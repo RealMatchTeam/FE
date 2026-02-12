@@ -77,7 +77,6 @@ export default function CreateCampaignContent() {
     defaultValues: defaultCampaignFormValues,
   });
 
-  // 폼 초기화 - 모든 데이터 소스를 한 번에 처리
   useEffect(() => {
     // 신규 제안 시 폼 초기화
     if (type !== "existing") {
@@ -195,7 +194,6 @@ export default function CreateCampaignContent() {
     return found?.label || value;
   };
 
-
   const onSubmit = () => {
     // 폼 검증 후 확인 다이얼로그 표시
     setIsConfirmDialogOpen(true);
@@ -238,11 +236,9 @@ export default function CreateCampaignContent() {
       endDate: formData.endDate || "",
     };
 
-    // 낙관적 UI: 즉시 완료 모달로 전환
     setIsConfirmDialogOpen(false);
     setIsSuccessModalOpen(true);
 
-    // 백그라운드에서 API 호출
     createCampaignProposal(requestData).catch((error) => {
       console.error("캠페인 제안 실패:", error);
       toast.error("캠페인 제안에 실패했습니다. 다시 시도해주세요.");
