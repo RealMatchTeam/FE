@@ -16,12 +16,12 @@ export default function TraitModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4 py-5"
+      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-5 py-5"
       onClick={onClose}
     >
       <div
         className={[
-          "w-full max-w-[336px]",
+          "w-full",
           "bg-[#F3F4F8] rounded-[13px]",
           "relative",
         ].join(" ")}
