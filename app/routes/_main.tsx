@@ -54,11 +54,16 @@ export default function MainLayout() {
   }, [navigate]);
 
   useEffect(() => {
-    const accessToken = tokenStorage.getAccessToken();
-    if (accessToken) {
-      updateUnreadCount(); // 로그인 상태면 개수 조회
-    }
-  }, [location.pathname]); 
+  const accessToken = tokenStorage.getAccessToken();
+  
+  if (accessToken) {
+    const fetchCount = async () => {
+      await updateUnreadCount();
+    };
+    
+    fetchCount();
+  }
+}, [location.pathname]);
 
   return (
     <LayoutContext.Provider
