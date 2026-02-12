@@ -6,11 +6,13 @@ import { LayoutContext } from "../../layout-context";
 import { fetchSponsorProductList } from "../../brand-detail/api/api";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
-type SponsorProduct = {
-  id: number;
-  title: string;
-  subtitle: string;
+import type { SponsorProductsListDto } from "../../brand-detail/types";
+
+type UiSponsorProduct = {
+  productId: number;
+  productName: string;
   imageUrl: string;
+  subtitle: string;
 };
 
 type NavState = {
@@ -18,20 +20,53 @@ type NavState = {
   brandName?: string;
 };
 
-type SponsorProductListResponseDto = {
-  id: number;
-  name: string;
-  thumbnailImageUrl: string;
-  totalCount: number;
-  currentCount: number;
+const mapType = (t: string) => {
+  switch (t) {
+    case "FULL":
+      return "본품";
+    case "SAMPLE":
+      return "샘플";
+    default:
+      return t;
+  }
 };
 
-function toUiProducts(list: SponsorProductListResponseDto[]): SponsorProduct[] {
-  return list.map((p) => ({
-    id: p.id,
-    title: p.name,
-    subtitle: `${p.currentCount}/${p.totalCount}개 남음`,
-    imageUrl: p.thumbnailImageUrl,
+const buildSubtitle = (dto: SponsorProductsListDto) => {
+  const name = (dto.productName ?? "").toString();
+  const items = dto.sponsorInfo?.items ?? [];
+
+  if (!items.length) return "";
+
+  const parts = items
+    .map((it) => {
+      const type = mapType((it.availableType ?? "").toString().trim());
+
+      const qty =
+        typeof it.availableQuantity === "number" && it.availableQuantity > 0
+          ? `${it.availableQuantity}개`
+          : "";
+
+      const size =
+        typeof it.availableSize === "number" && it.availableSize > 0
+          ? `${it.availableSize}ml`
+          : "";
+
+      const left = [name, type, qty].filter(Boolean).join(" ").trim();
+      const right = size.trim();
+
+      return [left, right].filter(Boolean).join(" / ");
+    })
+    .filter(Boolean);
+
+  return parts.join(" / ");
+};
+
+function toUiProducts(list: SponsorProductsListDto[]): UiSponsorProduct[] {
+  return (list ?? []).map((p) => ({
+    productId: p.productId,
+    productName: p.productName ?? "",
+    imageUrl: p.thumbnailImageUrl ?? "",
+    subtitle: buildSubtitle(p),
   }));
 }
 
@@ -48,7 +83,7 @@ export default function SponsorableContent() {
     (Number.isFinite(brandIdFromQuery) ? brandIdFromQuery : undefined);
 
   const [brandName] = useState(state.brandName ?? "");
-  const [products, setProducts] = useState<SponsorProduct[]>([]);
+  const [products, setProducts] = useState<UiSponsorProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
 
@@ -59,7 +94,6 @@ export default function SponsorableContent() {
     [brandId],
   );
 
-  // ✅ 헤더 숨김: “헤더만” 숨기고 화면(Outlet)은 계속 보여야 함
   useEffect(() => {
     if (!layout?.setHideHeader) return;
 
@@ -80,15 +114,14 @@ export default function SponsorableContent() {
         const list = await fetchSponsorProductList({
           brandId: String(brandId),
         });
+
         if (cancelled) return;
 
-        setProducts(toUiProducts(list));
+        setProducts(toUiProducts(list as SponsorProductsListDto[]));
       } catch (e: unknown) {
         if (cancelled) return;
         setErrorText(
-          e instanceof Error
-            ? e.message
-            : "협찬 가능 제품을 불러오지 못했어요.",
+          e instanceof Error ? e.message : "협찬 가능 제품을 불러오지 못했어요.",
         );
       } finally {
         if (!cancelled) setLoading(false);
@@ -100,47 +133,44 @@ export default function SponsorableContent() {
     };
   }, [brandId, canFetch]);
 
-  const goDetail = (product: SponsorProduct) => {
+  const goDetail = (product: UiSponsorProduct) => {
     if (!brandId || !Number.isFinite(brandId) || brandId <= 0) return;
-    if (!Number.isFinite(product.id) || product.id <= 0) return;
+    if (!Number.isFinite(product.productId) || product.productId <= 0) return;
 
     navigate(
-      `/products/sponsorable/detail?brandId=${brandId}&productId=${product.id}`,
+      `/products/sponsorable/detail?brandId=${brandId}&productId=${product.productId}`,
       {
         state: {
           brandId,
           brandName,
           heroImageUrl: product.imageUrl,
-          productName: product.title,
+          productName: product.productName,
         },
       },
     );
   };
 
   return (
-    <div className="w-full h-full overflow-hidden">
-      <div className="w-full h-full overflow-hidden flex flex-col bg-grad-auth">
+    <div className="h-full w-full overflow-hidden">
+      <div className="flex h-full w-full flex-col bg-grad-auth overflow-hidden">
         <div className="shrink-0">
-          <NavigationHeader
-            title="협찬 가능 제품"
-            onBack={() => navigate(-1)}
-          />
+          <NavigationHeader title="협찬 가능 제품" onBack={() => navigate(-1)} />
         </div>
 
-        <div className="shrink-0 px-5 pt-4">
+        <div className="shrink-0 px-4 pt-6">
           <div className="text-callout1 text-core-1 truncate">
             {brandName || "브랜드"}
           </div>
-          <div className="mt-1 text-title1 text-text-black truncate">
-            협찬 가능 리스트
+          <div className="mt-1 flex h-5 items-center justify-between">
+            <div className="text-title1 text-text-black truncate">
+              협찬 가능 리스트
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 min-h-0 px-5 pb-6 overflow-y-auto">
-          <div className="mt-4 space-y-3">
-            {loading && (
-              <LoadingSpinner className="py-10" />
-            )}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2">
+          <div className="flex flex-col gap-2.5">
+            {loading && <LoadingSpinner className="py-10" />}
 
             {!loading && errorText && (
               <div className="py-10 text-center text-callout1 text-text-gray2">
@@ -158,8 +188,8 @@ export default function SponsorableContent() {
               !errorText &&
               products.map((p) => (
                 <ProductListCard
-                  key={p.id}
-                  title={p.title}
+                  key={p.productId}
+                  title={p.productName}
                   subtitle={p.subtitle}
                   imageUrl={p.imageUrl}
                   onClick={() => goDetail(p)}

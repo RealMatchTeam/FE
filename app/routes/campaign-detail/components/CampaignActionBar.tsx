@@ -7,7 +7,7 @@ type Props = {
   onToggleHeart: (next: boolean) => void;
 };
 
-export default function BrandActionBar({
+export default function CampaignActionBar({
   isHearted,
   onChat,
   onSuggest,
@@ -34,7 +34,7 @@ export default function BrandActionBar({
         제안하기
       </button>
 
-      <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[6px] bg-[#EBEEFB] p-[4px]">
+      <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[6px] bg-[#EBEEFB]">
         <HeartButton pressed={isHearted} onChange={onToggleHeart} />
       </div>
     </div>

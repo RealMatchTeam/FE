@@ -530,6 +530,9 @@ export default function MyPageLikes() {
           }
           title="정렬 필터"
           applyLabel="적용하기"
+          titleClassName="text-[14px] font-semibold"
+          optionClassName="text-[12px]"
+          applyButtonClassName="text-[13px] font-semibold"
         />
       </div>
     </div>

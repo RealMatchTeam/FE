@@ -5,9 +5,16 @@ import type { BrandOngoingCampaign } from "../types";
 type Props = {
   campaigns: BrandOngoingCampaign[];
   onMore?: () => void;
+  onCampaignClick?: (c: BrandOngoingCampaign) => void;
+  onLikeToggle?: (id: string) => void;
 };
 
-export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
+export default function OngoingCampaignSection({
+  campaigns,
+  onMore,
+  onCampaignClick,
+  onLikeToggle,
+}: Props) {
   const isEmpty = campaigns.length === 0;
 
   return (
@@ -41,7 +48,25 @@ export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
         <div className="mt-4 -mx-5 overflow-x-auto px-5 scrollbar-hide">
           <div className="flex gap-3">
             {campaigns.map((c) => (
-              <CampaignCard key={c.campaignId} item={toCampaignItem(c)} />
+              <div
+                key={c.campaignId}
+                role="button"
+                tabIndex={0}
+                onClick={() => onCampaignClick?.(c)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onCampaignClick?.(c);
+                  }
+                }}
+                className="text-left"
+              >
+                <CampaignCard
+                  item={toCampaignItem(c)}
+                  onClick={() => onCampaignClick?.(c)}
+                  onLikeToggle={onLikeToggle}
+                />
+              </div>
             ))}
           </div>
         </div>
