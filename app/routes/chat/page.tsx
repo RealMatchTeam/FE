@@ -87,6 +87,9 @@ export default function ChatPage() {
         onChange={setPendingSort}
         onClose={() => setIsSortOpen(false)}
         onApply={applySort}
+        titleClassName="text-[14px] font-semibold"
+        optionClassName="text-[12px]"
+        applyButtonClassName="text-[13px] font-semibold"
       />
     </div>
   );

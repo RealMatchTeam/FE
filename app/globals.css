@@ -259,6 +259,23 @@
     background: linear-gradient(135deg, #b7b7f3 0%, #6666e5 100%);
   }
 
+  /* NavigationHeader (PWA safe-area 대응) */
+  .nav-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    width: 100%;
+    background: #ffffff;
+  }
+
+  @media (display-mode: standalone) {
+    .nav-header {
+      padding-top: calc(10px + env(safe-area-inset-top));
+      height: calc(60px + env(safe-area-inset-top));
+    }
+  }
+
   .bg-grad-calendar-2 {
     background: linear-gradient(135deg, #a7b8fc 0%, #6666e5 100%);
   }

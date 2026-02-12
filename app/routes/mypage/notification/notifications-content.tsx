@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
@@ -31,7 +31,6 @@ export default function MyPageNotifications() {
   const [appPush, setAppPush] = useState(true);
   const [emailPush, setEmailPush] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const initialSettingsRef = useRef<NotificationSettingResponse | null>(null);
 
   useEffect(() => {
     const fetchSetting = async () => {
@@ -49,11 +48,6 @@ export default function MyPageNotifications() {
         setBenefitPush(Boolean(data.marketingConsent));
         setAppPush(Boolean(data.appPushEnabled));
         setEmailPush(Boolean(data.emailEnabled));
-        initialSettingsRef.current = {
-          marketingConsent: Boolean(data.marketingConsent),
-          appPushEnabled: Boolean(data.appPushEnabled),
-          emailEnabled: Boolean(data.emailEnabled),
-        };
       } catch (error) {
         console.error("Failed to load notification setting:", error);
       }
@@ -62,13 +56,7 @@ export default function MyPageNotifications() {
     fetchSetting();
   }, []);
 
-  const saveSettings = async () => {
-    const payload = {
-      marketingConsent: benefitPush,
-      appPushEnabled: appPush,
-      emailEnabled: emailPush,
-    };
-
+  const saveSettings = async (payload: NotificationSettingResponse) => {
     const response = await axiosInstance.put<CustomResponseString>(
       "/api/v1/users/me/notification-settings",
       payload,
@@ -78,30 +66,24 @@ export default function MyPageNotifications() {
       throw new Error(response.data.message || "알림 설정 변경 실패");
     }
 
-    initialSettingsRef.current = payload;
   };
 
-  const handleBack = async () => {
+  const updateSettings = async (next: NotificationSettingResponse) => {
     if (isSaving) return;
-
-    const initial = initialSettingsRef.current;
-    const hasChanges = initial
-      ? initial.marketingConsent !== benefitPush ||
-        initial.appPushEnabled !== appPush ||
-        initial.emailEnabled !== emailPush
-      : false;
-
-    if (!hasChanges) {
-      navigate(-1);
-      return;
-    }
+    const prev = {
+      marketingConsent: benefitPush,
+      appPushEnabled: appPush,
+      emailEnabled: emailPush,
+    };
 
     try {
       setIsSaving(true);
-      await saveSettings();
-      navigate(-1);
+      await saveSettings(next);
     } catch (error) {
       console.error("Failed to update notification setting:", error);
+      setBenefitPush(prev.marketingConsent);
+      setAppPush(prev.appPushEnabled);
+      setEmailPush(prev.emailEnabled);
     } finally {
       setIsSaving(false);
     }
@@ -110,11 +92,13 @@ export default function MyPageNotifications() {
   return (
     <div className="h-screen-full bg-[#F3F4F8]">
       <div className="w-full bg-white shadow-2xl flex flex-col">
-        <div className="h-[60px]">
-          <NavigationHeader title="알림 설정" onBack={handleBack} />
+        <div className="pt-[env(safe-area-inset-top)]">
+          <div className="h-[60px]">
+            <NavigationHeader title="알림 설정" onBack={() => navigate(-1)} />
+          </div>
         </div>
 
-        <div style={{ height: `calc(100vh - 60px - 67px)` }}>
+        <div style={{ height: `calc(100vh - 60px - 67px - env(safe-area-inset-top))` }}>
           <div className="bg-white px-4 py-6">
             {/* 혜택 푸시 */}
             <div className="mb-6">
@@ -136,7 +120,16 @@ export default function MyPageNotifications() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setBenefitPush((v) => !v)}
+                  disabled={isSaving}
+                  onClick={() => {
+                    const next = {
+                      marketingConsent: !benefitPush,
+                      appPushEnabled: appPush,
+                      emailEnabled: emailPush,
+                    };
+                    setBenefitPush(next.marketingConsent);
+                    updateSettings(next);
+                  }}
                   className={`relative w-[36px] h-[24px] rounded-full transition-colors ${
                     benefitPush ? "bg-[#6D6AFE]" : "bg-[#D4D4D9]"
                   }`}
@@ -162,7 +155,16 @@ export default function MyPageNotifications() {
                 <div className="text-[14px] leading-[20px] font-medium text-[#171718]">앱푸시</div>
                 <button
                   type="button"
-                  onClick={() => setAppPush((v) => !v)}
+                  disabled={isSaving}
+                  onClick={() => {
+                    const next = {
+                      marketingConsent: benefitPush,
+                      appPushEnabled: !appPush,
+                      emailEnabled: emailPush,
+                    };
+                    setAppPush(next.appPushEnabled);
+                    updateSettings(next);
+                  }}
                   className={`relative w-[36px] h-[24px] rounded-full transition-colors ${
                     appPush ? "bg-[#6D6AFE]" : "bg-[#D4D4D9]"
                   }`}
@@ -180,7 +182,16 @@ export default function MyPageNotifications() {
                 <div className="text-[14px] leading-[20px] font-medium text-[#171718] mb-[8px]">이메일</div>
                 <button
                   type="button"
-                  onClick={() => setEmailPush((v) => !v)}
+                  disabled={isSaving}
+                  onClick={() => {
+                    const next = {
+                      marketingConsent: benefitPush,
+                      appPushEnabled: appPush,
+                      emailEnabled: !emailPush,
+                    };
+                    setEmailPush(next.emailEnabled);
+                    updateSettings(next);
+                  }}
                   className={`relative w-[36px] h-[24px] rounded-full transition-colors ${
                     emailPush ? "bg-[#6D6AFE]" : "bg-[#D4D4D9]"
                   }`}
