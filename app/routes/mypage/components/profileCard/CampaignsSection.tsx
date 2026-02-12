@@ -53,10 +53,11 @@ export default function CampaignsSection() {
     let isMounted = true;
     const fetchData = async () => {
       try {
-        const res =
-          await axiosInstance.get<CollaborationResponse>("/api/v1/campaigns/collaborations/me");
+        const res = await axiosInstance.get<CollaborationResponse>(
+          "/api/v1/campaigns/collaborations/me",
+        );
         if (!isMounted) return;
-        setItems(res.data?.isSuccess ? res.data.result ?? [] : []);
+        setItems(res.data?.isSuccess ? (res.data.result ?? []) : []);
       } catch (error) {
         console.error("캠페인 조회 실패:", error);
         if (!isMounted) return;
@@ -79,7 +80,8 @@ export default function CampaignsSection() {
   }, [items, safePage]);
 
   const pageNumbers = useMemo(() => {
-    if (totalPages <= 4) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (totalPages <= 4)
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
     const start = Math.max(1, Math.min(safePage - 1, totalPages - 3));
     return [start, start + 1, start + 2, start + 3];
   }, [safePage, totalPages]);
@@ -87,7 +89,9 @@ export default function CampaignsSection() {
   return (
     <section className="py-6">
       <div className="flex items-center justify-between mb-[12px]">
-        <div className="text-[16px] leading-[20px] font-semibold text-black/80">진행한 캠페인</div>
+        <div className="text-[14px] leading-[20px] font-semibold text-black/80">
+          진행한 캠페인
+        </div>
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -117,9 +121,15 @@ export default function CampaignsSection() {
           <div className="divide-y divide-[#E8E8FB]">
             {pageItems.map((item, idx) => {
               const typeLabel = item.type ? typeLabelMap[item.type] : "";
-              const statusLabel = item.status ? statusLabelMap[item.status] : "";
-              const dateLabel = formatDate(item.endDate ?? item.startDate ?? undefined);
-              const rightLabel = [dateLabel, statusLabel].filter(Boolean).join(" ");
+              const statusLabel = item.status
+                ? statusLabelMap[item.status]
+                : "";
+              const dateLabel = formatDate(
+                item.endDate ?? item.startDate ?? undefined,
+              );
+              const rightLabel = [dateLabel, statusLabel]
+                .filter(Boolean)
+                .join(" ");
               const title = item.title ?? "";
               const brand = item.brandName ? `${item.brandName} - ` : "";
 
@@ -162,10 +172,19 @@ export default function CampaignsSection() {
               disabled={safePage === 1}
               aria-label="이전 페이지"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17 6L11.5 12L17 18" stroke="#5B5D6B" strokeWidth="1.5"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17 6L11.5 12L17 18"
+                  stroke="#5B5D6B"
+                  strokeWidth="1.5"
+                />
               </svg>
-
             </button>
 
             {pageNumbers.map((n) => (
@@ -189,10 +208,19 @@ export default function CampaignsSection() {
               disabled={safePage === totalPages}
               aria-label="다음 페이지"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 18L12.5 12L7 6" stroke="#5B5D6B" strokeWidth="1.5"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 18L12.5 12L7 6"
+                  stroke="#5B5D6B"
+                  strokeWidth="1.5"
+                />
               </svg>
-
             </button>
             <button
               type="button"
@@ -201,11 +229,24 @@ export default function CampaignsSection() {
               disabled={safePage === totalPages}
               aria-label="마지막 페이지"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 18L12.5 12L7 6" stroke="#5B5D6B" strokeWidth="1.5"/>
-                <path d="M13 18L18.5 12L13 6" stroke="#5B5D6B" strokeWidth="1.5"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 18L12.5 12L7 6"
+                  stroke="#5B5D6B"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M13 18L18.5 12L13 6"
+                  stroke="#5B5D6B"
+                  strokeWidth="1.5"
+                />
               </svg>
-
             </button>
           </div>
         </div>
