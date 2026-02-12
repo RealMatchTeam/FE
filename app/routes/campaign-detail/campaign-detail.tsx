@@ -128,15 +128,6 @@ export default function CampaignDetailContent({
         setCampaign(res.data.result);
         setIsCampaignLiked(res.data.result.like ?? false);
         setCampaignError(null);
-
-        const liked = (() => {
-          const r: unknown = res.data.result;
-          if (!r || typeof r !== "object") return false;
-          const rec = r as Record<string, unknown>;
-          return rec["isLiked"] === true;
-        })();
-
-        setIsCampaignLiked(liked);
       } catch {
         if (!alive) return;
         setCampaignError("캠페인 정보를 불러오지 못했어요.");
