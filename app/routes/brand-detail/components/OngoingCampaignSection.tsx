@@ -4,6 +4,7 @@ import type { BrandOngoingCampaign } from "../types";
 
 type Props = {
   campaigns: BrandOngoingCampaign[];
+  brandLogoUrl?: string;
   onMore?: () => void;
   onCampaignClick?: (c: BrandOngoingCampaign) => void;
   onLikeToggle?: (id: string) => void;
@@ -11,6 +12,7 @@ type Props = {
 
 export default function OngoingCampaignSection({
   campaigns,
+  brandLogoUrl,
   onMore,
   onCampaignClick,
   onLikeToggle,
@@ -62,7 +64,7 @@ export default function OngoingCampaignSection({
                 className="text-left"
               >
                 <CampaignCard
-                  item={toCampaignItem(c)}
+                  item={toCampaignItem(c, brandLogoUrl)}
                   onClick={() => onCampaignClick?.(c)}
                   onLikeToggle={onLikeToggle}
                 />

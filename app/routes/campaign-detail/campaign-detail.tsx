@@ -30,11 +30,6 @@ type OngoingCampaign = NonNullable<BrandDetailData["ongoingCampaigns"]>[number];
 const fmtMoney = (n?: number) =>
   Number.isFinite(n) ? `${Number(n).toLocaleString()}원` : "-";
 
-const formatDateOnly = (iso?: string) => {
-  if (!iso) return "-";
-  return iso.split("T")[0];
-};
-
 const joinTagNames = (items?: { name: string }[]) =>
   (items ?? []).map((x) => x.name).filter(Boolean);
 
@@ -89,6 +84,10 @@ export default function CampaignDetailContent({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const setProposalData = useCampaignProposalStore((s) => s.setProposalData);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [campaignId]);
 
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
 
@@ -175,20 +174,12 @@ export default function CampaignDetailContent({
       { label: "설명", value: campaign.description || "-" },
       { label: "개수 및 길이", value: campaign.videoSpec || "-" },
       { label: "콘텐츠 형식", chips: joinTagNames(tags?.formats) },
-      { label: "카테고리", chips: joinTagNames(tags?.categories) },
-      { label: "톤", chips: joinTagNames(tags?.tones) },
-      { label: "참여도", chips: joinTagNames(tags?.involvements) },
-      { label: "사용 범위", chips: joinTagNames(tags?.usageRanges) },
+      { label: "콘텐츠 종류", chips: joinTagNames(tags?.categories) },
+      { label: "컨톤체 톤", chips: joinTagNames(tags?.tones) },
+      { label: "콘텐츠 활용범위", chips: joinTagNames(tags?.usageRanges) },
+      { label: "콘텐츠 관려도", chips: joinTagNames(tags?.involvements) },
     ];
   }, [campaign]);
-
-  const ongoing = useMemo(
-    () =>
-      (brandData.ongoingCampaigns ?? []).filter(
-        (c) => c.campaignId !== campaignId,
-      ),
-    [brandData, campaignId],
-  );
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -483,35 +474,14 @@ export default function CampaignDetailContent({
           <section className="py-4 mx-4">
             <div className="text-title1 text-text-black">콘텐츠</div>
 
-            <div className="mt-2.5 space-y-3 text-callout1 text-text-gray3">
+            <div className="mt-2.5 space-y-3">
               {contentRows.map((row) => (
-                <div key={row.label} className="flex">
-                  <div className="w-21 shrink-0 text-title3 text-text-gray3">
-                    {row.label}
-                  </div>
-
-                  <div className="flex-1 gap-[14px]">
-                    {"value" in row && row.value ? (
-                      <div className="whitespace-pre-line text-title3 text-text-gray1">
-                        {row.value}
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {(row.chips ?? []).map((c) => (
-                          <span
-                            key={c}
-                            className="inline-flex items-center rounded-full border border-core-2 bg-bg-w px-2 py-1 text-callout1 text-text-gray1"
-                          >
-                            {c}
-                          </span>
-                        ))}
-                        {(!row.chips || row.chips.length === 0) && (
-                          <span>-</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <DetailRow
+                  key={row.label}
+                  label={row.label}
+                  value={row.value}
+                  chips={row.chips}
+                />
               ))}
             </div>
           </section>
@@ -536,6 +506,7 @@ export default function CampaignDetailContent({
 
           <OngoingCampaignSection
             campaigns={ongoingCampaigns}
+            brandLogoUrl={brandData.logoImageUrl}
             onMore={() => {}}
             onCampaignClick={goOngoingCampaignDetail}
             onLikeToggle={handleOngoingLikeToggle}
@@ -546,12 +517,28 @@ export default function CampaignDetailContent({
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, value, chips }: { label: string; value?: string; chips?: string[] }) {
   return (
     <div className="flex gap-4">
-      <div className="w-21 shrink-0 text-title3 text-text-gray3">{label}</div>
-      <div className="whitespace-pre-line text-title3 text-text-gray1">
-        {value}
+      <div className="w-23 shrink-0 text-title3 text-text-gray3">{label}</div>
+      <div className="flex-1">
+        {value ? (
+          <div className="whitespace-pre-line text-title3 text-text-gray1">
+            {value}
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {(chips ?? []).map((c) => (
+              <span
+                key={c}
+                className="inline-flex items-center rounded-full border border-core-2 bg-bg-w px-2 py-1 text-callout1 text-text-gray1"
+              >
+                {c}
+              </span>
+            ))}
+            {(!chips || chips.length === 0) && <span className="text-title3 text-text-gray1">-</span>}
+          </div>
+        )}
       </div>
     </div>
   );
