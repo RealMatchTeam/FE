@@ -66,6 +66,7 @@ export default function SentCampaignContent() {
                         brandName={brand?.brandName}
                         brandTags={brand?.brandTags || []}
                         brandImageUrl={brand?.brandImageUrl}
+                        matchingRate={brand?.matchingRate}
                     />
 
                     <div className="flex justify-between items-center">

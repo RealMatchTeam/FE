@@ -4,6 +4,7 @@ export interface CampaignCollaboration {
   campaignId: number;
   proposalId: string | null;
   brandId : number;
+  brandUserId: number;
   brandName: string;
   thumbnailUrl: string;
   title: string;

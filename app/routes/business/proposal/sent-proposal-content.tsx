@@ -104,6 +104,7 @@ export default function ProposalContent() {
                         brandName={brand?.brandName}
                         brandTags={brand?.brandTags || []}
                         brandImageUrl={brand?.brandImageUrl}
+                        matchingRate={brand?.matchingRate}
                     />
 
                     <div className="flex flex-col gap-4">

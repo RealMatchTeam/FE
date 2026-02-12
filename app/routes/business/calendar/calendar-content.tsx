@@ -282,6 +282,7 @@ export default function CalendarContent() {
                       }
                       logo={item.thumbnailUrl}
                       brandId={item.brandId}
+                      brandUserId={item.brandUserId}
                       onClick={() => handleCardClick(item)}
                     />
                   ))

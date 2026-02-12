@@ -10,6 +10,7 @@ interface MatchingCardProps {
   actionLabel: string;
   logo?: string;
   brandId: number;
+  brandUserId: number;
   onClick?: () => void;
 }
 
@@ -20,6 +21,7 @@ export default function MatchingCard({
   actionLabel,
   logo,
   brandId,
+  brandUserId,
   onClick,
 }: MatchingCardProps) {
   const navigate = useNavigate();
@@ -43,8 +45,8 @@ export default function MatchingCard({
       navigate("/auth/login");
       return;
     }
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
-    navigate(`/rooms/brand/${brandId}`);
+    if (!Number.isFinite(brandUserId) || brandUserId <= 0) return;
+    navigate(`/rooms/brand/${brandUserId}`);
   };
 
   return (
