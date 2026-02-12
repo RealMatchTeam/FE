@@ -341,7 +341,7 @@ export default function MyPageEdit() {
               setOriginalNickname(nextNickname);
               setOriginalAddress(nextAddress);
               setOriginalDetailAddress(nextDetailAddress);
-              setSuccessMessage("주소 변경 완료");
+              setSuccessMessage("회원정보 변경 완료");
             } catch (error) {
               console.error("Failed to update address:", error);
               toast.error("주소 변경에 실패했습니다.");
@@ -477,7 +477,9 @@ export default function MyPageEdit() {
                 );
 
                 if (!response.data.isSuccess) {
-                  throw new Error(response.data.message || "회원정보 변경 실패");
+                  throw new Error(
+                    response.data.message || "회원정보 변경 실패",
+                  );
                 }
 
                 setNickname(nextNickname);

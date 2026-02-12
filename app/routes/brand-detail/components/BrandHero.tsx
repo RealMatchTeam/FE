@@ -35,8 +35,8 @@ export default function BrandHero({
         <img src={goBackIcon} alt="뒤로가기" className="h-6 w-6" />
       </button>
 
-      <div className="absolute -bottom-8 left-5 z-10">
-        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border border-[#E6E6F3] bg-white shadow-[0_8px_18px_rgba(0,0,0,0.12)]">
+      <div className="absolute -bottom-8 left-3 z-10">
+        <div className="grid h-18 w-18 place-items-center overflow-hidden rounded-[20px] border border-core-2 bg-white">
           {logoImageUrl ? (
             <img
               src={logoImageUrl}

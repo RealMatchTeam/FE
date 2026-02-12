@@ -1,14 +1,14 @@
 import type { CampaignItem } from "../../home/types";
 import type { BrandOngoingCampaign } from "../types";
 
-export function toCampaignItem(campaign: BrandOngoingCampaign): CampaignItem {
+export function toCampaignItem(campaign: BrandOngoingCampaign, brandLogoUrl?: string): CampaignItem {
 
   const ddayLabel = campaign.dday === 0 ? "D-DAY" : `D-${campaign.dday}`;
 
   const result: CampaignItem = {
     id: String(campaign.campaignId),
     brandName: campaign.brandName || "",
-    logoUrl: campaign.imageUrl || undefined,
+    logoUrl: brandLogoUrl || campaign.imageUrl || undefined,
     progressText: String(campaign.recruitQuota || 0),
     ddayLabel,
     descText: campaign.title || "",
