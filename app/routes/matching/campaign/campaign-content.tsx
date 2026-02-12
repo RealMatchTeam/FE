@@ -6,7 +6,7 @@ import FilterButton from "../../../components/common/FilterButton";
 import CampaignCard from "./components/CampaignCard";
 import { type CampaignCategory } from "../../../data/campaign";
 import CampaignFilterBar from "./components/CampaignFilterBar";
-import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
+import BottomSheet from "../../../components/common/BottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
@@ -23,6 +23,7 @@ export default function CampaignContent() {
     // 필터 상태
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortOption, setSortOption] = useState("매칭률 순");
+    const [sortApplied, setSortApplied] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // 검색 상태
@@ -129,6 +130,7 @@ export default function CampaignContent() {
     const handleFilterApply = (sort: string, tags: string[]) => {
         setSortOption(sort);
         setSelectedTags(tags);
+        setSortApplied(true);
     };
 
 
@@ -180,7 +182,7 @@ export default function CampaignContent() {
                     <div className="flex gap-2">
                         <FilterButton
                             label={sortOption}
-                            isActive={true}
+                            isActive={sortApplied}
                             onClick={() => setIsFilterOpen(true)}
                         />
                         <FilterButton
@@ -218,7 +220,11 @@ export default function CampaignContent() {
             </div>
 
             {/* 필터 바텀시트 */}
-            <FilterBottomSheet isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
+            <BottomSheet
+                open={isFilterOpen}
+                onClose={() => setIsFilterOpen(false)}
+                height={500}
+            >
                 <MatchingFilter
                     filterType="CONTENT"
                     selectedSort={sortOption}
@@ -226,7 +232,7 @@ export default function CampaignContent() {
                     onApply={handleFilterApply}
                     onClose={() => setIsFilterOpen(false)}
                 />
-            </FilterBottomSheet>
+            </BottomSheet>
         </div>
     );
 }
