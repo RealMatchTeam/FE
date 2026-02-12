@@ -1,5 +1,16 @@
 import { create } from "zustand";
 
+export interface RecruitingCampaignItem {
+  campaignId: number;
+  brandName: string;
+  title: string;
+  recruitQuota: number;
+  rewardAmount: number;
+  imageUrl?: string;
+  dday: number;
+  like?: boolean;
+}
+
 export interface CampaignProposalData {
   brandId: number;
   campaignId?: number;
@@ -28,6 +39,10 @@ type CampaignProposalStore = {
   setProposalData: (data: CampaignProposalData) => void;
   clearProposalData: () => void;
 
+  // 브랜드 상세에서 조회한 모집중 캠페인 목록
+  recruitingCampaigns: RecruitingCampaignItem[];
+  setRecruitingCampaigns: (campaigns: RecruitingCampaignItem[]) => void;
+
   // 사용자 프로필 정보
   snsAccount: string | null;
   setSnsAccount: (account: string) => void;
@@ -37,6 +52,9 @@ export const useCampaignProposalStore = create<CampaignProposalStore>((set) => (
   proposalData: null,
   setProposalData: (data) => set({ proposalData: data }),
   clearProposalData: () => set({ proposalData: null }),
+
+  recruitingCampaigns: [],
+  setRecruitingCampaigns: (campaigns) => set({ recruitingCampaigns: campaigns }),
 
   snsAccount: null,
   setSnsAccount: (account) => set({ snsAccount: account }),

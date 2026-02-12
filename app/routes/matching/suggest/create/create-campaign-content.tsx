@@ -21,8 +21,15 @@ import ProfileSelector from "../../components/ProfileSelector";
 import SelectBottomSheet from "./components/SelectBottomSheet";
 import DatePickerBottomSheet from "./components/DatePickerBottomSheet";
 import ProposalModal from "../../components/ProposalModal";
-import { CONTENT_FILTER } from "../../../../data/filter";
-import { TAG_NAME_BY_ID } from "../../../../data/tagNameById";
+import {
+  FORMAT_TAGS,
+  CATEGORY_TAGS,
+  TONE_TAGS,
+  INVOLVEMENT_TAGS,
+  USAGE_RANGE_TAGS,
+  PROPOSAL_TAG_ID_BY_NAME,
+  type ProposalTag,
+} from "../../../../data/proposalTags";
 import {
   campaignFormSchema,
   defaultCampaignFormValues,
@@ -62,6 +69,7 @@ export default function CreateCampaignContent() {
   const {
     control,
     setValue,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<CampaignFormData>({
@@ -71,14 +79,18 @@ export default function CreateCampaignContent() {
 
   // 폼 초기화 - 모든 데이터 소스를 한 번에 처리
   useEffect(() => {
-    if (type !== "existing") return;
+    // 신규 제안 시 폼 초기화
+    if (type !== "existing") {
+      reset(defaultCampaignFormValues);
+      return;
+    }
 
     let alive = true;
 
     // proposalData가 있으면 우선 사용
     if (proposalData) {
-      setValue("campaignName", proposalData.campaignTitle || "");
-      setValue("description", proposalData.campaignDescription || "");
+      if (proposalData.campaignTitle) setValue("campaignName", proposalData.campaignTitle);
+      if (proposalData.campaignDescription) setValue("description", proposalData.campaignDescription);
 
       // 태그 매핑 (ID를 문자열로 변환하여 사용)
       if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
@@ -97,14 +109,16 @@ export default function CreateCampaignContent() {
         setValue("usageScope", String(proposalData.contentTags.usageRanges[0].id));
       }
 
-      setValue("fee", proposalData.rewardAmount?.toString() || "");
-      setValue("sponsorProduct", proposalData.product || "");
-      setValue("startDate", proposalData.startDate || "");
-      setValue("endDate", proposalData.endDate || "");
+      const reward = proposalData.rewardAmount?.toString();
+      if (reward) setValue("fee", reward);
+
+      if (proposalData.product) setValue("sponsorProduct", proposalData.product);
+      if (proposalData.startDate) setValue("startDate", proposalData.startDate);
+      if (proposalData.endDate) setValue("endDate", proposalData.endDate);
       return;
     }
 
-    // URL 파라미터로 캠페인 조회
+    // URL 파라미터로 캠페인 조회 (기존 캠페인 제안 시)
     const brandIdParam = searchParams.get("brandId");
     const campaignIdParam = searchParams.get("campaignId");
 
@@ -144,45 +158,27 @@ export default function CreateCampaignContent() {
     return () => {
       alive = false;
     };
-    // proposalData와 searchParams만 의존성에 포함 (location.state 제거)
   }, [type, proposalData, searchParams, setValue]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
   const tags = proposalData?.contentTags;
 
-  // 태그 이름으로 ID를 찾는 맵 생성
-  const ID_BY_TAG_NAME: Record<string, number> = Object.entries(TAG_NAME_BY_ID).reduce(
-    (acc, [id, name]) => ({ ...acc, [name]: Number(id) }),
-    {}
-  );
-
-  // 태그 매핑 보정
-  const getMappedId = (name: string) => {
-    if (name === "인스타 포스트") return 172;
-    if (name === "스토리&썰") return 178;
-    if (name === "가이드만 제공") return 187;
-    return ID_BY_TAG_NAME[name];
-  };
-
-  const getOptions = (campaignTags: { id?: number; name: string }[] | undefined, filterKeys: readonly string[]) => {
+  const toOptions = (defaultTags: ProposalTag[], campaignTags?: { id?: number; name: string }[]) => {
     if (campaignTags && campaignTags.length > 0) {
       return campaignTags.map((t) => ({
-        value: String((t.id ?? getMappedId(t.name)) || t.name),
+        value: String(t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name] ?? t.name),
         label: t.name,
       }));
     }
-    return filterKeys.map((name) => ({
-      value: String(getMappedId(name) || name),
-      label: name,
-    }));
+    return defaultTags.map((t) => ({ value: String(t.id), label: t.name }));
   };
 
-  const formatOptions = getOptions(tags?.formats, CONTENT_FILTER.형식);
-  const categoryOptions = getOptions(tags?.categories, CONTENT_FILTER.종류);
-  const toneOptions = getOptions(tags?.tones, CONTENT_FILTER.톤);
-  const involvementOptions = getOptions(tags?.involvements, CONTENT_FILTER.관여도);
-  const usageScopeOptions = getOptions(tags?.usageRanges, CONTENT_FILTER["활용 범위"]);
+  const formatOptions = toOptions(FORMAT_TAGS, tags?.formats);
+  const categoryOptions = toOptions(CATEGORY_TAGS, tags?.categories);
+  const toneOptions = toOptions(TONE_TAGS, tags?.tones);
+  const involvementOptions = toOptions(INVOLVEMENT_TAGS, tags?.involvements);
+  const usageScopeOptions = toOptions(USAGE_RANGE_TAGS, tags?.usageRanges);
 
   const sponsorProductOptions = proposalData?.product
     ? [{ value: proposalData.product, label: proposalData.product }]

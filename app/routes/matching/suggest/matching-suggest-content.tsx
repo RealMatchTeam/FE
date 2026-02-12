@@ -6,21 +6,24 @@ import { CheckIcon } from "../../auth/components/CheckIcon";
 import NewSuggestIcon from "../../../assets/icon/new-suggest.svg";
 import ExistSuggestIcon from "../../../assets/icon/exist-suggest.svg";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
-import { useCampaignProposalStore } from "../../../stores/campaign-proposal";
+import { useCampaignProposalStore, type RecruitingCampaignItem } from "../../../stores/campaign-proposal";
 import {
   getRecruitingCampaigns,
-  type RecruitingCampaign,
 } from "../api/matching";
+import { apiClient } from "../../../api/axios";
+import type { CampaignDetailApiResponse } from "../../campaign-detail/types";
 import { toast } from "sonner";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 
 export default function MatchingSuggestContent() {
   const navigate = useNavigate();
   const proposalData = useCampaignProposalStore((state) => state.proposalData);
+  const storedRecruitingCampaigns = useCampaignProposalStore((state) => state.recruitingCampaigns);
+  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [recruitingCampaigns, setRecruitingCampaigns] = useState<
-    RecruitingCampaign[]
+    RecruitingCampaignItem[]
   >([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(
     null,
@@ -30,14 +33,28 @@ export default function MatchingSuggestContent() {
   useHideBottomTab(isSheetOpen);
 
   const handleNewCampaign = () => {
-    navigate("/matching/suggest/create?type=new");
+    const brandId = proposalData?.brandId;
+    const domain = proposalData?.domain || "beauty";
+
+    if (brandId) {
+      navigate(`/matching/suggest/create?type=new&brandId=${brandId}&domain=${domain}`);
+    } else {
+      navigate("/matching/suggest/create?type=new");
+    }
   };
 
   const handleExistingCampaign = async () => {
     if (proposalData?.brandId) {
-      setIsLoading(true);
       setIsSheetOpen(true);
 
+      // store에 이미 저장된 모집중 캠페인이 있으면 재사용
+      if (storedRecruitingCampaigns.length > 0) {
+        setRecruitingCampaigns(storedRecruitingCampaigns);
+        return;
+      }
+
+      // 없으면 API 호출
+      setIsLoading(true);
       try {
         const campaigns = await getRecruitingCampaigns(proposalData.brandId);
         setRecruitingCampaigns(campaigns);
@@ -59,21 +76,53 @@ export default function MatchingSuggestContent() {
     setSelectedCampaignId(id);
   };
 
-  const handleSheetSubmit = () => {
+  const handleSheetSubmit = async () => {
     if (!selectedCampaignId) {
       toast.error("캠페인을 선택해주세요");
       return;
     }
 
-    const selectedCampaign = recruitingCampaigns.find(
-      (c) => c.campaignId === selectedCampaignId,
-    );
-    if (!selectedCampaign || !proposalData) return;
+    if (!proposalData) return;
 
-    // 선택한 캠페인 정보와 함께 페이지 이동
-    navigate(
-      `/matching/suggest/create?type=existing&brandId=${proposalData.brandId}&campaignId=${selectedCampaignId}&domain=${proposalData.domain}`,
-    );
+    // 선택한 캠페인의 상세 정보를 조회하여 proposalData에 매핑
+    setIsLoading(true);
+    try {
+      const res = await apiClient.get<CampaignDetailApiResponse>(
+        `/api/v1/campaigns/${selectedCampaignId}`,
+      );
+
+      if (!res.data?.isSuccess) {
+        toast.error(res.data?.message || "캠페인 정보를 불러오지 못했어요.");
+        return;
+      }
+
+      const campaign = res.data.result;
+
+      setProposalData({
+        ...proposalData,
+        campaignId: selectedCampaignId,
+        campaignTitle: campaign.title,
+        campaignDescription: campaign.description,
+        rewardAmount: campaign.rewardAmount,
+        product: campaign.product,
+        startDate: campaign.startDate,
+        endDate: campaign.endDate,
+        contentTags: {
+          formats: campaign.contentTags?.formats,
+          categories: campaign.contentTags?.categories,
+          tones: campaign.contentTags?.tones,
+          involvements: campaign.contentTags?.involvements,
+          usageRanges: campaign.contentTags?.usageRanges,
+        },
+      });
+
+      setIsSheetOpen(false);
+      navigate("/matching/suggest/create?type=existing");
+    } catch {
+      toast.error("캠페인 정보를 불러오지 못했어요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSheetClose = () => {
