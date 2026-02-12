@@ -6,6 +6,9 @@ import type {
   BrandCampaignsApiResponse,
   SponsorProductDetailApiResponse,
   SponsorProductDetailResult,
+  SponsorProductsApiResponse,
+  SponsorProductsListDto,
+  ProductMiniCardItem,
 } from "../types";
 
 type BeautyResponseDto = {
@@ -60,21 +63,6 @@ type RecruitingCampaignsApiResponse = {
   result: { campaigns: RecruitingCampaignCardDto[] };
 };
 
-export type SponsorProductListResponseDto = {
-  id: number;
-  name: string;
-  thumbnailImageUrl: string;
-  totalCount: number;
-  currentCount: number;
-};
-
-type SponsorProductListApiResponse = {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: SponsorProductListResponseDto[];
-};
-
 type BrandCampaignDto =
   BrandCampaignsApiResponse["result"]["campaigns"][number];
 
@@ -113,10 +101,7 @@ function inferDomain(item: BrandDetailItemDto): BrandDomain {
   return item.fashionResponse ? "fashion" : "beauty";
 }
 
-function buildCategories(
-  domain: BrandDomain,
-  item: BrandDetailItemDto,
-): string[] {
+function buildCategories(domain: BrandDomain, item: BrandDetailItemDto): string[] {
   if (domain === "fashion") {
     const cats = unique(stripHash(item.fashionResponse?.categories));
     return cats.length ? cats : ["의류", "가방", "신발", "주얼리", "패션 소품"];
@@ -137,10 +122,8 @@ function buildTagSections(
     const brandStyle = unique(stripHash(f.brandStyle));
 
     const groups: TagGroup[] = [];
-    if (brandType.length)
-      groups.push({ label: "브랜드 종류", chips: brandType });
-    if (brandStyle.length)
-      groups.push({ label: "브랜드 스타일", chips: brandStyle });
+    if (brandType.length) groups.push({ label: "브랜드 종류", chips: brandType });
+    if (brandStyle.length) groups.push({ label: "브랜드 스타일", chips: brandStyle });
 
     return groups.length ? [{ title: "의류 태그", groups }] : [];
   }
@@ -158,25 +141,21 @@ function buildTagSections(
   if (cats.includes("스킨케어") || cats.includes("바디")) {
     const groups: TagGroup[] = [];
     if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
-    if (mainFunction.length)
-      groups.push({ label: "주요기능", chips: mainFunction });
+    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
     if (groups.length) sections.push({ title: "스킨케어 태그", groups });
   }
 
   if (cats.includes("메이크업")) {
     const groups: TagGroup[] = [];
-    if (makeUpStyle.length)
-      groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
     if (groups.length) sections.push({ title: "메이크업 태그", groups });
   }
 
   if (!sections.length) {
     const groups: TagGroup[] = [];
     if (skinType.length) groups.push({ label: "피부타입", chips: skinType });
-    if (mainFunction.length)
-      groups.push({ label: "주요기능", chips: mainFunction });
-    if (makeUpStyle.length)
-      groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
+    if (mainFunction.length) groups.push({ label: "주요기능", chips: mainFunction });
+    if (makeUpStyle.length) groups.push({ label: "메이크업 스타일", chips: makeUpStyle });
     return groups.length ? [{ title: "태그", groups }] : [];
   }
 
@@ -193,10 +172,10 @@ async function safeGet<T>(p: Promise<T>): Promise<T | null> {
 
 export async function fetchSponsorProductList(params: {
   brandId: string;
-}): Promise<SponsorProductListResponseDto[]> {
+}): Promise<SponsorProductsListDto[]> {
   const { brandId } = params;
 
-  const res = await apiClient.get<SponsorProductListApiResponse>(
+  const res = await apiClient.get<SponsorProductsApiResponse>(
     `/api/v1/brands/${brandId}/sponsor-products`,
   );
 
@@ -254,7 +233,7 @@ export async function fetchBrandDetail(params: {
         : resolvedDomain;
 
   const productsRes = await safeGet(
-    apiClient.get<SponsorProductListApiResponse>(
+    apiClient.get<SponsorProductsApiResponse>(
       `/api/v1/brands/${brandId}/sponsor-products`,
     ),
   );
@@ -271,9 +250,8 @@ export async function fetchBrandDetail(params: {
     ),
   );
 
-  const productList = productsRes?.data?.isSuccess
-    ? productsRes.data.result
-    : [];
+  const productList: SponsorProductsListDto[] =
+    productsRes?.data?.isSuccess ? productsRes.data.result ?? [] : [];
 
   const historyList = campaignsRes?.data?.isSuccess
     ? campaignsRes.data.result.campaigns
@@ -285,6 +263,19 @@ export async function fetchBrandDetail(params: {
   const recruitingList = recruitingRes?.data?.isSuccess
     ? recruitingRes.data.result.campaigns
     : [];
+
+  const products: ProductMiniCardItem[] = productList.map((p) => {
+    const fallback =
+      (p.productImageUrls ?? []).find(Boolean) ??
+      (p.thumbnailImageUrl ?? "") ??
+      "";
+
+    return {
+      productId: p.productId,
+      productName: p.productName ?? "",
+      thumbnailImageUrl: (p.thumbnailImageUrl ?? "") || fallback,
+    };
+  });
 
   return {
     id: brandId,
@@ -300,11 +291,16 @@ export async function fetchBrandDetail(params: {
     logoText: item.brandName,
     logoImageUrl: item.logoUrl,
 
+    homepageUrl: item.homepageUrl,
+    simpleIntro: item.simpleIntro,
+
     hashtags: unique(stripHash(item.brandDescriptionTags)),
     description: item.simpleIntro ?? "",
 
     categories: buildCategories(safeDomain, item),
     tagSections: buildTagSections(safeDomain, item),
+
+    isLiked: item.brandIsLiked,
 
     ongoingCampaigns: recruitingList.map((c) => ({
       campaignId: c.campaignId,
@@ -317,11 +313,7 @@ export async function fetchBrandDetail(params: {
       isLiked: false,
     })),
 
-    products: productList.map((p) => ({
-      id: String(p.id),
-      title: p.name,
-      imageUrl: p.thumbnailImageUrl || "",
-    })),
+    products,
 
     histories: historyList.map((c) => {
       const { text, highlight } = formatHistoryDate(c);

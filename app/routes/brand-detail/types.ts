@@ -120,18 +120,18 @@ export type BrandCampaignsApiResponse = {
   };
 };
 
+export type SponsorShippingType = "CREATOR_PAY" | "BRAND_PAY" | string;
+
 export type SponsorAvailableItem = {
   itemId: number;
   availableType: string;
   availableQuantity: number;
   availableSize: number;
-  sizeUnit?: string;
-  shippingType?: string;
+  shippingType: SponsorShippingType;
 };
 
 export type SponsorInfo = {
   items: SponsorAvailableItem[];
-  shippingType?: string;
 };
 
 export type SponsorProductsListDto = {
@@ -152,24 +152,17 @@ export type SponsorProductsApiResponse = {
   result: SponsorProductsListDto[];
 };
 
-export type SponsorProductAction = {
-  canProposeCampaign: boolean;
-  proposeCampaignCtaText: string;
-};
-
 export type SponsorProductDetailResult = {
   brandId: number;
   brandName: string;
 
   productId: number;
   productName: string;
-  productDescription: string;
 
   productImageUrls: string[];
   categories: string[];
 
   sponsorInfo: SponsorInfo;
-  action: SponsorProductAction;
 };
 
 export type SponsorProductDetailApiResponse = {
