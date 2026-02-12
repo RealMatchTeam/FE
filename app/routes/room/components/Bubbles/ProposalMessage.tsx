@@ -20,14 +20,16 @@ type ApplyCardProps = BaseProps & {
 
 type Props = ProposalCardProps | ApplyCardProps;
 
-export default function ProposalMessage({
-  kind,
-  createdAt,
-  avatarSrc,
-  campaignName, 
-  bodyText,
-  proposalDirection,
-}: Props) {
+export default function ProposalMessage(props: Props) {
+  const {
+    kind,
+    createdAt,
+    avatarSrc,
+    campaignName,
+    bodyText,
+    proposalDirection,
+  } = props;
+  const proposalId = kind === "APPLY_CARD" ? (props as ApplyCardProps).applyId : (props as ProposalCardProps).proposalId;
   const timeText = createdAt ?? "";
   const navigate = useNavigate();
 
@@ -58,7 +60,7 @@ export default function ProposalMessage({
                   </div>
                   <button
                     type="button"
-                    onClick={() => navigate("/proposal?type=sent")}
+                    onClick={() => navigate(`/business/proposal?type=sent&proposalId=${proposalId}`)}
                     className="w-6 h-6 grid place-items-center text-gray2"
                     aria-label="expand"
                   >
@@ -129,7 +131,7 @@ export default function ProposalMessage({
 
                     <button
                       type="button"
-                      onClick={() => navigate("/proposal?type=received")}
+                      onClick={() => navigate(`/business/proposal?type=received&proposalId=${proposalId}`)}
                       className="w-6 h-6 grid place-items-center text-gray2"
                       aria-label="expand"
                     >
