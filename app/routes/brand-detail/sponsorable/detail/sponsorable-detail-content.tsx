@@ -85,7 +85,10 @@ function formatItems(productName: string, items: SponsorAvailableItem[]) {
     .join(" / ");
 }
 
-function formatSubtitleNoQty(productName: string, items: SponsorAvailableItem[]) {
+function formatSubtitleNoQty(
+  productName: string,
+  items: SponsorAvailableItem[],
+) {
   const name = (productName ?? "").toString();
 
   return (items ?? [])
@@ -227,7 +230,10 @@ export default function SponsorableDetailContent() {
     <div className="h-full w-full overflow-hidden bg-bg-w">
       <div className="relative flex h-full w-full flex-col overflow-hidden bg-bg-w">
         <div className="shrink-0 bg-bg-w">
-          <NavigationHeader title="협찬 가능 제품" onBack={() => navigate(-1)} />
+          <NavigationHeader
+            title="협찬 가능 제품"
+            onBack={() => navigate(-1)}
+          />
         </div>
         <div className="h-px w-full bg-core-2" />
 

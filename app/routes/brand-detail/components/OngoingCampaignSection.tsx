@@ -28,26 +28,34 @@ export default function OngoingCampaignSection({
           <button
             type="button"
             onClick={onMore}
-            className="grid h-8 w-8 place-items-center rounded-full text-text-gray2"
+            className="mt-0.5 grid h-6 w-6 place-items-center"
             aria-label="more"
           >
-            <span className="text-[18px] leading-none">›</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="#9B9BA1"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         ) : null}
       </div>
 
       {isEmpty ? (
-        <div className="flex h-[126px] w-full flex-col justify-center items-start">
-          <div className="flex w-full flex-col items-start gap-[14px] pt-[50px] pb-[60px]">
-            <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-              <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
+        <div className="flex h-31.5 w-full flex-col justify-center items-start">
+          <div className="flex w-full flex-col items-start gap-3.5 pt-15 pb-15">
+            <div className="flex w-full flex-col items-center justify-center gap-2.5">
+              <div className="w-40 text-center text-callout1 text-text-gray2">
                 진행 중인 다른 캠페인이 없어요
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="mt-4 -mx-5 overflow-x-auto px-5 scrollbar-hide">
+        <div className="mt-4 -mx-4 overflow-x-auto px-5 scrollbar-hide">
           <div className="flex gap-3">
             {campaigns.map((c) => (
               <div

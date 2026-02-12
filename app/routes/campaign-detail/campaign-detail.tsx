@@ -146,7 +146,10 @@ export default function CampaignDetailContent({
       { label: "모집인원", value: `${campaign.quota}명` },
       { label: "우대사항", value: campaign.preferredSkills || "-" },
       { label: "제품협찬", value: campaign.product || "-" },
-      { label: "원고료", value: `${fmtMoney(campaign.rewardAmount)} (VAT포함)` },
+      {
+        label: "원고료",
+        value: `${fmtMoney(campaign.rewardAmount)} (VAT포함)`,
+      },
       { label: "일정", value: campaign.schedule || "-" },
       // {
       //   label: "모집기간",
@@ -509,7 +512,15 @@ export default function CampaignDetailContent({
   );
 }
 
-function DetailRow({ label, value, chips }: { label: string; value?: string; chips?: string[] }) {
+function DetailRow({
+  label,
+  value,
+  chips,
+}: {
+  label: string;
+  value?: string;
+  chips?: string[];
+}) {
   return (
     <div className="flex gap-4">
       <div className="w-23 shrink-0 text-title3 text-text-gray3">{label}</div>
@@ -528,7 +539,9 @@ function DetailRow({ label, value, chips }: { label: string; value?: string; chi
                 {c}
               </span>
             ))}
-            {(!chips || chips.length === 0) && <span className="text-title3 text-text-gray1">-</span>}
+            {(!chips || chips.length === 0) && (
+              <span className="text-title3 text-text-gray1">-</span>
+            )}
           </div>
         )}
       </div>
