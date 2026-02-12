@@ -1,32 +1,27 @@
 import { useState, useEffect } from "react";
-import { fetchNotifications, readNotification, type NotificationItem } from "./api/notification";
+import { fetchNotifications, readNotification, readAllNotifications, type NotificationItem as NotificationType } from "./api/notification";
 import { useHideHeader } from "../../hooks/useHideHeader";
 import NavigationHeader from "../../components/common/NavigateHeader";
 import emptyImg from "./../../assets/empty.png";
 import { useNavigate } from "react-router-dom";
+import NotificationItem from "./components/NotificationItem";
 
-function TabButton({ label, active, onClick, count }: { label: string; active: boolean; onClick: () => void; count?: number }) {
+function TabButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void; count?: number }) {
     return (
         <button
             onClick={onClick}
-            className={`px-[10px] py-[6px] rounded-[8px] text-[14px] font-medium transition-all flex items-center gap-1.5 ${active
+            className={`px-[10px] py-[6px] rounded-[8px] text-title2 font-medium transition-all flex items-center gap-1.5 ${active
                 ? "bg-core-1 text-white"
                 : "bg-white border border-[#E6E6F3] text-text-gray3"
                 }`}
         >
             {label}
-            {count !== undefined && count > 0 && (
-                <span className={`flex items-center justify-center rounded-full text-[10px] min-w-[18px] h-[18px] px-1 ${active ? "bg-white text-core-1" : "bg-core-1 text-white"
-                    }`}>
-                    {count}
-                </span>
-            )}
         </button>
     );
 }
 
 export default function NotificationContent() {
-    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+    const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<"ALL" | "PROPOSAL" | "MATCHING">("ALL");
@@ -53,19 +48,19 @@ export default function NotificationContent() {
         fetchNotificationsData();
     }, [activeTab]);
 
-    /*const handleReadAll = async () => {
+    // 전체 읽기 핸들러
+    const handleReadAll = async () => {
+        if (unreadCount === 0) return;
         try {
             const data = await readAllNotifications();
             if (data.isSuccess) {
-                setNotifications((prev) =>
-                    prev.map((n) => ({ ...n, isRead: true }))
-                );
+                setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
                 setUnreadCount(0);
             }
         } catch (error) {
             console.error("전체 읽기 처리 실패:", error);
         }
-    };*/
+    };
 
     const handleReadNotification = async (id: string, isRead: boolean) => {
         if (isRead) return;
@@ -85,16 +80,20 @@ export default function NotificationContent() {
         }
     };
 
+    const groupedNotifications = notifications.reduce((acc: { [key: string]: NotificationType[] }, item) => {
+        const date = item.createdAt.split('T')[0];
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(item);
+        return acc;
+    }, {});
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ko-KR', {
-            year: '2-digit',
-            month: '2-digit',
-            day: '2-digit'
-        }).replace(/ /g, '').slice(0, -1);
+    const sortedDates = Object.keys(groupedNotifications).sort((a, b) => b.localeCompare(a));
+
+    const formatGroupDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        return `${date.getFullYear().toString().slice(2)}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')} (${days[date.getDay()]})`;
     };
-
     return (
         <div className="h-screen-full bg-grad-auth ">
             <div className="h-[60px]">
@@ -107,7 +106,6 @@ export default function NotificationContent() {
                         label="전체"
                         active={activeTab === "ALL"}
                         onClick={() => setActiveTab("ALL")}
-                        count={activeTab === "ALL" ? unreadCount : undefined}
                     />
                     <TabButton
                         label="받은 제안"
@@ -122,37 +120,34 @@ export default function NotificationContent() {
                 </div>
             </div>
 
-            <div
-                className="overflow-y-auto"
-                style={{ height: `calc(100vh - 60px - 67px - 60px)` }}
-            >
+            <div className="overflow-y-auto pb-10" style={{ height: `calc(100vh - 127px)` }}>
                 {loading ? (
-                    <div className="flex justify-center items-center h-40 text-text-gray3">로딩 중...</div>
-                ) : notifications.length > 0 ? (
+                    <div className="flex justify-center items-center h-40 text-text-gray3 text-callout1">로딩 중...</div>
+                ) : sortedDates.length > 0 ? (
                     <div className="flex flex-col">
-                        {notifications.map((item) => (
-                            <div
-                                key={item.id}
-                                // 클릭 시 단건 읽기 함수 호출
-                                onClick={() => handleReadNotification(item.id, item.isRead)}
-                                className={`p-4 border-b border-gray-50 flex flex-col gap-1 transition-colors active:bg-gray-50 ${!item.isRead ? "bg-blue-50/50" : "bg-white"
-                                    }`}
-                            >
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className={`font-pretendard text-[14px] font-semibold leading-[20px] ${!item.isRead ? "text-core-1" : "text-text-gray3"
-                                        }`}>
-                                        {formatDate(item.createdAt)}
+                        {sortedDates.map((date, index) => (
+                            <div key={date} className="flex flex-col">
+                                <div className="px-4 py-3 flex justify-between items-center">
+                                    <span className="text-title1 font-bold text-text-black">
+                                        {formatGroupDate(date)}
                                     </span>
-                                    {!item.isRead && (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-core-1" />
+                                    {/* 첫 번째 날짜 그룹(최신)에만 '전체 읽기' 노출 */}
+                                    {index === 0 && (
+                                        <button
+                                            onClick={handleReadAll}
+                                            className="text-callout1 text-core-1 active:scale-95 transition-all"
+                                        >
+                                            전체 읽기
+                                        </button>
                                     )}
                                 </div>
-                                <p className={`text-[14px] leading-relaxed transition-colors ${!item.isRead
-                                        ? "text-text-black font-semibold"
-                                        : "text-text-gray3 font-medium"
-                                    }`}>
-                                    {item.body}
-                                </p>
+                                {groupedNotifications[date].map((item) => (
+                                    <NotificationItem
+                                        key={item.id}
+                                        item={item}
+                                        onClick={handleReadNotification}
+                                    />
+                                ))}
                             </div>
                         ))}
                     </div>

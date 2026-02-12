@@ -1,22 +1,25 @@
 import { useNavigate } from "react-router";
 import RealMatchLogo from "../../assets/logo/realmatch-logo-line.png"
+import bellIcon from "../../assets/icon/icon-bell.svg";
+import redDot from "../../assets/icon/red-dot.svg";
 
 type RealMatchHeaderProps = {
   /** 뒤로가기 버튼 노출 여부 */
   title?: string;
   showBack?: boolean;
   onBack?: () => void;
+  hasNotification?: boolean;
 };
 
 export default function RealMatchHeader({
   showBack = true,
   onBack,
+  hasNotification = true,
 }: RealMatchHeaderProps) {
   const navigate = useNavigate();
 
   const handleBack = () => {
     if (onBack) return onBack();
-
     // 브라우저 히스토리 뒤로가기
     navigate(-1);
   };
@@ -53,18 +56,42 @@ export default function RealMatchHeader({
           ) : null}
         </div>
 
-        {/* Center: Logo + Text (정중앙 고정) */}
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className="flex items-center justify-center gap-2"
-        >
-          <img
-            src={RealMatchLogo}
-            alt="Real Match"
-            draggable={false}
-          />
-        </button>
+        {/* Center: Logo + Text */}
+        <div className="flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="flex items-center justify-center gap-2"
+          >
+            <img src={RealMatchLogo} alt="Real Match" draggable={false} />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-end">
+          <button
+            type="button"
+            onClick={() => navigate("/notification")}
+            className="relative flex h-9 w-9 items-center justify-center rounded-full active:bg-black/5"
+          >
+            {/* 벨 아이콘 */}
+            <img 
+              src={bellIcon} 
+              alt="알림" 
+              className="w-6 h-6 object-contain"
+              onError={(e) => console.error("벨 아이콘 로드 실패:", e)} 
+            />
+
+            {/* 알림이 있을 때만 빨간 점 노출 */}
+            {hasNotification === true && (
+              <img 
+                src={redDot} 
+                alt="" 
+                className="absolute top-[8px] right-[8px] w-2 h-2" 
+                onError={(e) => console.error("레드닷 로드 실패:", e)}
+              />
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );
