@@ -28,14 +28,14 @@ export default function CampaignBrandCard({
             <img src={brandImageUrl} alt={brandName} className="w-full h-full object-cover" />
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col justify-center gap-1">
             <div className="flex items-center gap-1">
-              <h2 className="text-title1 text-text-black">
+              <h2 className="text-title1 text-text-black leading-tight">
                 {brandName || "브랜드명"}
               </h2>
               <img src={arrowRightIcon} alt="arrow"/>
             </div>
-            <p className="text-callout1 text-text-gray3 mt-3">
+            <p className="text-callout1 text-text-gray3 mt-1">
               {brandTags && brandTags.length > 0 
                 ? brandTags.map(tag => `#${tag}`).join(" ") 
                 : "#태그정보없음"}
@@ -43,7 +43,7 @@ export default function CampaignBrandCard({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end justify-center h-[64px]">
           <div className="flex items-baseline gap-1">
             <span className="text-title5 text-core-1">매칭률</span>
             <span className="text-title6 text-core-1">{matchingRate || 0}%</span>

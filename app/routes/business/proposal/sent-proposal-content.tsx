@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { getProposalDetail, type ProposalDetail} from "./api/proposal";
+import { getProposalDetail, type ProposalDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import { getProfileCard, type ProfileCard } from "./api/user";
 import { cancelCampaignProposal } from "./api/proposal";
@@ -30,9 +30,9 @@ export default function ProposalContent() {
 
     useEffect(() => {
         if (!proposalId) {
-        setIsLoading(false);
-        return;
-    }
+            setIsLoading(false);
+            return;
+        }
 
         const fetchData = async () => {
             console.log("실제 넘길 ID:", proposalId);
@@ -46,7 +46,7 @@ export default function ProposalContent() {
                     setBrand(brandResult);
                 }
 
-                const profileResult = await getProfileCard(); 
+                const profileResult = await getProfileCard();
                 setProfileCard(profileResult);
 
 
@@ -66,21 +66,21 @@ export default function ProposalContent() {
 
     const handleCancel = async () => {
         if (!proposalId) return;
-        
+
         if (!window.confirm("제안을 취소하시겠습니까?")) return;
 
         try {
             const response = await cancelCampaignProposal(proposalId);
-            
+
             if (response.isSuccess) {
                 alert("캠페인 제안을 취소했습니다.");
-                navigate(-1); 
+                navigate(-1);
             }
         } catch (error: unknown) {
             console.error("제안 취소 실패:", error);
-            
+
             let errorMessage = "취소 중 오류가 발생했습니다.";
-            
+
             if (error instanceof Error) {
                 errorMessage = error.message;
             } else if (typeof error === "string") {
@@ -113,7 +113,10 @@ export default function ProposalContent() {
                         <div className="flex flex-col gap-2">
                             <p className="text-title3 text-text-gray2">제안 프로필</p>
 
-                            <div className="w-full p-4 bg-bluegray-2 rounded-2xl flex justify-between items-center border border-core-70">
+                            <div
+                                onClick={() => navigate("/mypage/profileCard")}
+                                className="w-full p-4 bg-bluegray-2 rounded-2xl flex justify-between items-center border border-core-70 cursor-pointer active:scale-[0.98] transition-all"
+                            >
                                 <div className="flex items-center gap-3">
                                     <div className="flex items-center justify-center">
                                         <img src={profileIcon} alt="profile" />
@@ -204,16 +207,16 @@ export default function ProposalContent() {
                 </div>
 
                 <div className="px-4 py-5 flex justify-end bg-bg-w">
-            {/* 상태가 REVIEWING일 때만 취소 버튼 */}
-            {data.status === "REVIEWING" && (
-                <button 
-                    onClick={handleCancel} 
-                    className="px-4 py-2 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
-                >
-                    취소하기
-                </button>
-            )}
-        </div>
+                    {/* 상태가 REVIEWING일 때만 취소 버튼 */}
+                    {data.status === "REVIEWING" && (
+                        <button
+                            onClick={handleCancel}
+                            className="px-4 py-2 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
+                        >
+                            취소하기
+                        </button>
+                    )}
+                </div>
             </main>
         </div>
     );
