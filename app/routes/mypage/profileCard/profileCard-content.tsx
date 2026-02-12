@@ -157,10 +157,11 @@ export default function ProfileCard() {
         throw new Error(response.data.message || "프로필 이미지 변경 실패");
       }
 
-      setProfileCard((prev) =>
-        prev
-          ? { ...prev, profileImageUrl: uploaded.accessUrl }
-          : { profileImageUrl: uploaded.accessUrl },
+      const profileRes = await axiosInstance.get<ProfileCardResponse>(
+        "/api/v1/users/me/profile-card",
+      );
+      setProfileCard(
+        profileRes.data?.isSuccess ? profileRes.data.result : null,
       );
     } catch (error) {
       console.error("프로필 이미지 업로드 실패:", error);

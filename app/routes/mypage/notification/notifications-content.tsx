@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
@@ -31,6 +31,7 @@ export default function MyPageNotifications() {
   const [appPush, setAppPush] = useState(true);
   const [emailPush, setEmailPush] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const initialSettingsRef = useRef<NotificationSettingResponse | null>(null);
 
   useEffect(() => {
     const fetchSetting = async () => {
@@ -48,6 +49,11 @@ export default function MyPageNotifications() {
         setBenefitPush(Boolean(data.marketingConsent));
         setAppPush(Boolean(data.appPushEnabled));
         setEmailPush(Boolean(data.emailEnabled));
+        initialSettingsRef.current = {
+          marketingConsent: Boolean(data.marketingConsent),
+          appPushEnabled: Boolean(data.appPushEnabled),
+          emailEnabled: Boolean(data.emailEnabled),
+        };
       } catch (error) {
         console.error("Failed to load notification setting:", error);
       }
@@ -56,14 +62,59 @@ export default function MyPageNotifications() {
     fetchSetting();
   }, []);
 
+  const saveSettings = async () => {
+    const payload = {
+      marketingConsent: benefitPush,
+      appPushEnabled: appPush,
+      emailEnabled: emailPush,
+    };
+
+    const response = await axiosInstance.put<CustomResponseString>(
+      "/api/v1/users/me/notification-settings",
+      payload,
+    );
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message || "알림 설정 변경 실패");
+    }
+
+    initialSettingsRef.current = payload;
+  };
+
+  const handleBack = async () => {
+    if (isSaving) return;
+
+    const initial = initialSettingsRef.current;
+    const hasChanges = initial
+      ? initial.marketingConsent !== benefitPush ||
+        initial.appPushEnabled !== appPush ||
+        initial.emailEnabled !== emailPush
+      : false;
+
+    if (!hasChanges) {
+      navigate(-1);
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await saveSettings();
+      navigate(-1);
+    } catch (error) {
+      console.error("Failed to update notification setting:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="h-screen-full bg-[#F3F4F8]">
       <div className="w-full bg-white shadow-2xl flex flex-col">
         <div className="h-[60px]">
-          <NavigationHeader title="알림 설정" onBack={() => navigate(-1)} />
+          <NavigationHeader title="알림 설정" onBack={handleBack} />
         </div>
 
-        <div style={{ height: `calc(100vh - 60px - 67px - 82px)` }}>
+        <div style={{ height: `calc(100vh - 60px - 67px)` }}>
           <div className="bg-white px-4 py-6">
             {/* 혜택 푸시 */}
             <div className="mb-6">
@@ -156,53 +207,6 @@ export default function MyPageNotifications() {
           </div>
         </div>
 
-        <div
-          className="
-            sticky bottom-0
-            w-full h-[82px]
-            bg-white
-            px-4
-            flex items-center
-            pb-[env(safe-area-inset-bottom)]
-          "
-        >
-          <button
-            type="button"
-            disabled={isSaving}
-            className="
-              w-full h-[52px]
-              rounded-[14px]
-              bg-[#6666E5]
-              text-white text-[15px]
-              font-semibold
-            "
-            onClick={async () => {
-              try {
-                setIsSaving(true);
-                const payload = {
-                  marketingConsent: benefitPush,
-                  appPushEnabled: appPush,
-                  emailEnabled: emailPush,
-                };
-
-                const response = await axiosInstance.put<CustomResponseString>(
-                  "/api/v1/users/me/notification-settings",
-                  payload,
-                );
-
-                if (!response.data.isSuccess) {
-                  throw new Error(response.data.message || "알림 설정 변경 실패");
-                }
-              } catch (error) {
-                console.error("Failed to update notification setting:", error);
-              } finally {
-                setIsSaving(false);
-              }
-            }}
-          >
-            설정 완료
-          </button>
-        </div>
       </div>
     </div>
   );

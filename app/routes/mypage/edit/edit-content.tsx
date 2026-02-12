@@ -6,6 +6,7 @@ import { useHideHeader } from "../../../hooks/useHideHeader";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import { axiosInstance } from "../../../api/axios";
+import SuccessModal from "../../../components/common/SuccessModal";
 
 type DaumPostcodeData = {
   address?: string;
@@ -77,7 +78,9 @@ export default function MyPageEdit() {
   const [isNickChecking, setIsNickChecking] = useState(false);
   const [isAddressSaving, setIsAddressSaving] = useState(false);
   const [isNickSaving, setIsNickSaving] = useState(false);
-  useHideBottomTab(isNickSheetOpen);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const isSuccessOpen = Boolean(successMessage);
+  useHideBottomTab(isNickSheetOpen || isSuccessOpen);
 
   useEffect(() => {
     const fetchMyEditInfo = async () => {
@@ -338,6 +341,7 @@ export default function MyPageEdit() {
               setOriginalNickname(nextNickname);
               setOriginalAddress(nextAddress);
               setOriginalDetailAddress(nextDetailAddress);
+              setSuccessMessage("주소 변경 완료");
             } catch (error) {
               console.error("Failed to update address:", error);
               toast.error("주소 변경에 실패했습니다.");
@@ -481,6 +485,7 @@ export default function MyPageEdit() {
                 setOriginalAddress(nextAddress);
                 setOriginalDetailAddress(nextDetailAddress);
                 setIsNickSheetOpen(false);
+                setSuccessMessage("닉네임 변경 완료");
               } catch (error) {
                 console.error("Failed to update nickname:", error);
               } finally {
@@ -492,6 +497,12 @@ export default function MyPageEdit() {
           </button>
         </div>
       </FilterBottomSheet>
+
+      <SuccessModal
+        isOpen={isSuccessOpen}
+        onClose={() => setSuccessMessage(null)}
+        title={successMessage ?? ""}
+      />
     </div>
   );
 }
