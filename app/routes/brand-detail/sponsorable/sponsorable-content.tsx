@@ -121,7 +121,9 @@ export default function SponsorableContent() {
       } catch (e: unknown) {
         if (cancelled) return;
         setErrorText(
-          e instanceof Error ? e.message : "협찬 가능 제품을 불러오지 못했어요.",
+          e instanceof Error
+            ? e.message
+            : "협찬 가능 제품을 불러오지 못했어요.",
         );
       } finally {
         if (!cancelled) setLoading(false);
@@ -154,7 +156,10 @@ export default function SponsorableContent() {
     <div className="h-full w-full overflow-hidden">
       <div className="flex h-full w-full flex-col bg-grad-auth overflow-hidden">
         <div className="shrink-0">
-          <NavigationHeader title="협찬 가능 제품" onBack={() => navigate(-1)} />
+          <NavigationHeader
+            title="협찬 가능 제품"
+            onBack={() => navigate(-1)}
+          />
         </div>
 
         <div className="shrink-0 px-4 pt-6">
