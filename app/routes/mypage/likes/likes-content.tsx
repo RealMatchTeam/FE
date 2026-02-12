@@ -312,7 +312,7 @@ export default function MyPageLikes() {
   return (
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
       <div className="w-full shadow-2xl flex flex-col">
-        <div className="h-[60px]">
+        <div className="min-h-[60px]">
           <NavigationHeader
             title="내 찜"
             titleClassName="font-semibold"
@@ -530,6 +530,9 @@ export default function MyPageLikes() {
           }
           title="정렬 필터"
           applyLabel="적용하기"
+          titleClassName="text-[14px] font-semibold"
+          optionClassName="text-[12px]"
+          applyButtonClassName="text-[13px] font-semibold"
         />
       </div>
     </div>

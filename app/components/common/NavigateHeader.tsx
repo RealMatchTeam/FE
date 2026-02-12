@@ -16,9 +16,7 @@ export default function NavigationHeader({
   const bg = bgClassName ?? "bg-[#FFFFFF]";
 
   return (
-    <div
-      className={`h-[60px] flex items-center bg-[#FFFFFF] px-4 py-[10px] ${bg}`}
-    >
+    <div className={`nav-header ${bg}`}>
       <button
         type="button"
         onClick={onBack}
@@ -43,7 +41,9 @@ export default function NavigationHeader({
       </button>
 
       <div className="flex-1 text-center">
-        <div className={`text-title1 text-semiblod ${titleClassName ?? ""}`}>
+        <div
+          className={`text-title1 font-semibold text-black ${titleClassName ?? ""}`}
+        >
           {title}
         </div>
       </div>

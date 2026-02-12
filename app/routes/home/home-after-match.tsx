@@ -231,8 +231,9 @@ export default function HomeAfterMatchPage() {
     const brandId = getBrandIdFromCampaign(c);
     if (!campaignId || !brandId) return;
 
+    const rate = c.matchRate || 0;
     navigate(
-      `/campaign?brandId=${brandId}&campaignId=${campaignId}&domain=${category}`,
+      `/campaign?brandId=${brandId}&campaignId=${campaignId}&domain=${category}&matchRate=${rate}`,
     );
   };
 

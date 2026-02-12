@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { cn } from "../../../lib/utils";
 import FilterChip from "../../../components/common/FilterChip";
-import Button from "../../../components/common/Button";
 import {
     SORT_OPTIONS,
     CAMPAIGN_SORT_OPTIONS,
@@ -75,12 +74,12 @@ export default function MatchingFilter({
     };
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full pt-[20px] px-4">
             {/* 메인 탭 */}
-            <div className="flex">
+            <div className="flex mb-3 pt-2 pl-2">
                 <button
                     type="button"
-                    className="py-3 px-4 text-title3 cursor-pointer transition-colors text-text-black"
+                    className="text-medium cursor-pointer transition-colors text-text-black"
                     onClick={() => setMainTab("정렬 필터")}
                 >
                     <span className={mainTab === "정렬 필터" ? "pb-3 border-b-2 border-core-1" : ""}>
@@ -89,7 +88,7 @@ export default function MatchingFilter({
                 </button>
                 <button
                     type="button"
-                    className="py-3 px-4 text-title3 cursor-pointer transition-colors text-text-black"
+                    className="ml-6 text-medium cursor-pointer transition-colors text-text-black"
                     onClick={() => setMainTab(filterTabName)}
                 >
                     <span className={mainTab === filterTabName ? "pb-3 border-b-2 border-core-1" : ""}>
@@ -99,16 +98,16 @@ export default function MatchingFilter({
             </div>
 
             {/* 컨텐츠 영역 */}
-            <div className="flex-1 px-4 text-[14px]">
+            <div className="flex-1 text-[14px]">
                 {mainTab === "정렬 필터" ? (
                     /* 정렬 필터 */
-                    <div className="flex gap-4 bg-bluegray-1 -mx-4 px-4 py-3">
+                    <div className="flex gap-6 bg-[#F3F4F8] -mx-4 px-4 pl-6 py-3">
                         {sortOptions.map((option) => (
                             <button
                                 key={option}
                                 type="button"
                                 className={cn(
-                                    "cursor-pointer transition-colors text-title3 font-[14px]",
+                                    "cursor-pointer transition-colors text-title3",
                                     currentSort === option
                                         ? "text-text-black"
                                         : "text-text-gray3"
@@ -123,7 +122,7 @@ export default function MatchingFilter({
                     /* 카테고리 필터 */
                     <div className="flex flex-col gap-4">
                         {/* 서브 탭 */}
-                        <div className="flex gap-4 overflow-x-auto bg-bluegray-1 -mx-4 px-4 py-3">
+                        <div className="flex gap-6 overflow-x-auto bg-[#F3F4F8] -mx-4 px-4 pl-6 py-3">
                             {subTabs.map((tab) => (
                                 <button
                                     key={tab}
@@ -166,14 +165,13 @@ export default function MatchingFilter({
             </div>
 
             {/* 적용하기 버튼 */}
-            <div className="p-4 pb-8">
-                <Button
-                    variant="primary"
-                    className="w-full text-title7"
+            <div className="flex justify-center py-6">
+                <button
+                    className="w-full h-11 rounded-[12px] bg-[#6666E5] text-white text-title7"
                     onClick={handleApply}
                 >
                     적용하기
-                </Button>
+                </button>
             </div>
         </div>
     );

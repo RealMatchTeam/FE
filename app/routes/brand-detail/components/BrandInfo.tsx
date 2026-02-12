@@ -12,7 +12,7 @@ export default function BrandInfo({
   description,
 }: Props) {
   return (
-    <div className="pt-10">
+    <div className="pt-11.5">
       <div className="flex items-center justify-between">
         <div className="text-title text-text-black">{name}</div>
 
@@ -25,7 +25,7 @@ export default function BrandInfo({
         </div>
       </div>
 
-      <div className=" text-title3 text-text-gray3">
+      <div className="my-1 text-title3 text-text-gray3">
         {hashtags
           .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
           .join(" ")}

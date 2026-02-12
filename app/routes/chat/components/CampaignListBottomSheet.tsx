@@ -92,7 +92,6 @@ export default function CampaignListBottomSheet({ isOpen, onClose, onSelect }: P
             selectedValues={[]}
             onSubmit={handleSubmit}
             multiSelect={false}
-            hasCustomInput={false}
         />
     );
 }

@@ -5,6 +5,7 @@ import CheckCircleIcon from "../../../assets/icon/icon-check-circle.svg";
 interface ProposalModalProps {
     isOpen: boolean;
     type: "confirm" | "success";
+    variant?: "apply" | "suggest";
     onClose: () => void;
     onConfirm?: () => void;
 }
@@ -12,10 +13,12 @@ interface ProposalModalProps {
 export default function ProposalModal({
     isOpen,
     type,
+    variant = "apply",
     onClose,
     onConfirm,
 }: ProposalModalProps) {
     const isConfirm = type === "confirm";
+    const isSuggest = variant === "suggest";
 
     return (
         <Modal
@@ -40,7 +43,9 @@ export default function ProposalModal({
                     <img src={CheckCircleIcon} alt="" className="w-16 h-16 mb-6" />
 
                     <h3 className="text-callout3 text-text-black text-center">
-                        {isConfirm ? "지원하시겠습니까?" : "지원 완료"}
+                        {isConfirm
+                            ? (isSuggest ? "캠페인을 제안하시겠습니까?" : "지원하시겠습니까?")
+                            : (isSuggest ? "제안하기 완료" : "지원 완료")}
                     </h3>
 
                     {!isConfirm && (

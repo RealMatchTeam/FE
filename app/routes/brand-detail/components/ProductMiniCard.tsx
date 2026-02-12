@@ -1,31 +1,31 @@
 export type ProductMiniCardItem = {
-  id: string;
-  title: string;
-  imageUrl: string;
+  productId: number;
+  productName: string;
+  thumbnailImageUrl: string;
 };
 
 type Props = {
   item: ProductMiniCardItem;
+  onClick?: () => void; 
 };
 
-function ellipsis10(text: string) {
-  if (!text) return "";
-  return text.length > 10 ? `${text.slice(0, 10)}...` : text;
-}
-
-export default function ProductMiniCard({ item }: Props) {
+export default function ProductMiniCard({ item, onClick }: Props) {
   return (
-    <div className="w-[118px] shrink-0">
+    <div
+      className="w-[150px] md:w-[170px] lg:w-[190px] shrink-0 mt-2 mb-2.5 cursor-pointer"
+      onClick={onClick}
+      role="button"
+    >
       <div className="aspect-square overflow-hidden rounded-2xl bg-bluegray-2">
         <img
-          src={item.imageUrl}
-          alt={item.title}
+          src={item.thumbnailImageUrl}
+          alt={item.productName}
           className="h-full w-full object-cover"
         />
       </div>
 
-      <div className="mt-2 text-[12px] font-medium text-text-black">
-        {ellipsis10(item.title)}
+      <div className="mt-2 line-clamp-1 text-title1 text-text-black">
+        {item.productName}
       </div>
     </div>
   );

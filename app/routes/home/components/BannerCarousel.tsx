@@ -1,25 +1,29 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { CategoryKey } from "../types";
-import bannerBeauty from "../../../assets/home-banner/banner-beauty.svg";
-import bannerFashion from "../../../assets/home-banner/banner-fashion.svg";
+import bannerBeauty1 from "../../../assets/home-banner/banner-beauty-1.svg";
+import bannerBeauty2 from "../../../assets/home-banner/banner-beauty-2.svg";
+import bannerBeauty3 from "../../../assets/home-banner/banner-beauty-3.svg";
+import bannerFashion1 from "../../../assets/home-banner/banner-fashion-1.svg";
+import bannerFashion2 from "../../../assets/home-banner/banner-fashion-2.svg";
+import bannerFashion3 from "../../../assets/home-banner/banner-fashion-3.svg";
 
 const INTERVAL = 3000;
 
 interface BannerItem {
-  src: string | null;
+  src: string;
   alt: string;
 }
 
 const beautyBanners: BannerItem[] = [
-  { src: bannerBeauty, alt: "뷰티 배너 1" },
-  { src: null, alt: "뷰티 배너 2" },
-  { src: null, alt: "뷰티 배너 3" },
+  { src: bannerBeauty1, alt: "뷰티 배너 1" },
+  { src: bannerBeauty2, alt: "뷰티 배너 2" },
+  { src: bannerBeauty3, alt: "뷰티 배너 3" },
 ];
 
 const fashionBanners: BannerItem[] = [
-  { src: bannerFashion, alt: "패션 배너 1" },
-  { src: null, alt: "패션 배너 2" },
-  { src: null, alt: "패션 배너 3" },
+  { src: bannerFashion1, alt: "패션 배너 1" },
+  { src: bannerFashion2, alt: "패션 배너 2" },
+  { src: bannerFashion3, alt: "패션 배너 3" },
 ];
 
 export default function BannerCarousel({ category }: { category: CategoryKey }) {
@@ -55,17 +59,11 @@ export default function BannerCarousel({ category }: { category: CategoryKey }) 
         >
           {banners.map((banner, i) => (
             <div key={`${category}-${i}`} className="w-full shrink-0">
-              {banner.src ? (
-                <img
-                  src={banner.src}
-                  alt={banner.alt}
-                  className="h-62.5 w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-62.5 w-full items-center justify-center bg-bluegray-2 text-text-gray3">
-                  준비중
-                </div>
-              )}
+              <img
+                src={banner.src}
+                alt={banner.alt}
+                className="h-62.5 w-full object-cover"
+              />
             </div>
           ))}
         </div>

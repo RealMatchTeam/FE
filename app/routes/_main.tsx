@@ -44,7 +44,7 @@ export default function MainLayout() {
 
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const accessToken = tokenStorage.getAccessToken();

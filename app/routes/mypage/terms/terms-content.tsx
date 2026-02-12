@@ -53,7 +53,7 @@ export default function MyPageTerms() {
   return (
     <div className="h-screen-full bg-[#F3F4F8]">
       <div className="w-full bg-white shadow-2xl flex flex-col">
-        <div className="h-[60px]">
+        <div className="min-h-[60px]">
           <NavigationHeader title="서비스 이용 약관" onBack={() => navigate(-1)} />
         </div>
 
