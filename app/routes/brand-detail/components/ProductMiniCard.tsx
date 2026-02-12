@@ -9,15 +9,10 @@ type Props = {
   onClick?: () => void; 
 };
 
-const ellipsis10 = (text?: string | null) => {
-  const safe = (text ?? "").toString();
-  return safe.length > 10 ? `${safe.slice(0, 10)}...` : safe;
-};
-
 export default function ProductMiniCard({ item, onClick }: Props) {
   return (
     <div
-      className="w-[120px] md:w-[140px] lg:w-[160px] shrink-0 mt-2 mb-2.5 cursor-pointer"
+      className="w-[150px] md:w-[170px] lg:w-[190px] shrink-0 mt-2 mb-2.5 cursor-pointer"
       onClick={onClick}
       role="button"
     >
@@ -29,8 +24,8 @@ export default function ProductMiniCard({ item, onClick }: Props) {
         />
       </div>
 
-      <div className="mt-2 text-title1 text-text-black">
-        {ellipsis10(item.productName)}
+      <div className="mt-2 line-clamp-1 text-title1 text-text-black">
+        {item.productName}
       </div>
     </div>
   );

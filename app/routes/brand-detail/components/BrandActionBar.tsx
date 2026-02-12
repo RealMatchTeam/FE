@@ -1,4 +1,5 @@
 import HeartButton from "../../home/components/HeartButton";
+import proposalIconUrl from "../../../assets/campaign-proposal-icon.svg";
 
 type Props = {
   isHearted: boolean;
@@ -26,8 +27,9 @@ export default function BrandActionBar({
       <button
         type="button"
         onClick={onSuggest}
-        className="flex h-[30px] flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 text-title3 text-text-black"
+        className="flex h-[30px] flex-1 items-center justify-center gap-1.5 rounded-[6px] bg-[#EBEEFB] px-4 text-title3 text-text-black"
       >
+        <img src={proposalIconUrl} alt="" className="h-4 w-4 select-none" draggable={false} />
         제안하기
       </button>
 
