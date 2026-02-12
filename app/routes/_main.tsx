@@ -6,15 +6,28 @@ import Logo from "../assets/logo/realmatch-logo-line.png";
 import bellIcon from "../assets/icon/icon-bell.svg";
 import redDot from "../assets/icon/red-dot.svg";
 import { tokenStorage } from "../lib/token";
+import { fetchUnreadCount } from "../routes/notification/api/notification";
 
 export default function MainLayout() {
   const [hideBottomTab, setHideBottomTab] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
   const [disableScroll, setDisableScroll] = useState(false);
   const [isPWA, setIsPWA] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const mainRef = useRef<HTMLElement>(null);
+
+  const updateUnreadCount = async () => {
+    try {
+      const data = await fetchUnreadCount();
+      if (data.isSuccess) {
+        setUnreadCount(data.result.count);
+      }
+    } catch (error) {
+      console.error("미읽음 알림 조회 실패:", error);
+    }
+  };
 
   // PWA 감지
   useEffect(() => {
@@ -39,6 +52,18 @@ export default function MainLayout() {
       navigate("/auth/login");
     }
   }, [navigate]);
+
+  useEffect(() => {
+  const accessToken = tokenStorage.getAccessToken();
+  
+  if (accessToken) {
+    const fetchCount = async () => {
+      await updateUnreadCount();
+    };
+    
+    fetchCount();
+  }
+}, [location.pathname]);
 
   return (
     <LayoutContext.Provider
@@ -75,11 +100,13 @@ export default function MainLayout() {
                     alt="알림"
                     className="w-6 h-6 object-contain"
                   />
+                  {unreadCount > 0 && (
                   <img
                     src={redDot}
                     alt=""
                     className="absolute top-[8px] right-[8px] w-2 h-2"
                   />
+                )}
                 </button>
               </div>
             </div>
