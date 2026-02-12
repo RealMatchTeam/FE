@@ -187,6 +187,7 @@ export default function CampaignContent() {
                             label={getFilterButtonLabel()}
                             isActive={selectedTags.length > 0}
                             onClick={() => setIsFilterOpen(true)}
+                            className="bg-transparent border-core-1"
                         />
                     </div>
                 </div>

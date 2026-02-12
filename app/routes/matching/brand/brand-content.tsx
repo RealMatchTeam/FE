@@ -179,6 +179,7 @@ export default function BrandContent() {
                             label={getFilterButtonLabel()}
                             isActive={selectedTags.length > 0}
                             onClick={() => { setFilterOpenTab("filter"); setIsFilterOpen(true); }}
+                            className="bg-transparent border-core-1"
                         />
                     </div>
                 </div>
