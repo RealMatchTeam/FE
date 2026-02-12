@@ -235,8 +235,7 @@ export default function BrandDetailContent({ data }: Props) {
           (p) => {
             const fallback =
               (p.productImageUrls ?? []).find(Boolean) ??
-              (p.thumbnailImageUrl ?? "") ??
-              "";
+              (p.thumbnailImageUrl ?? "");
 
             return {
               productId: p.productId,

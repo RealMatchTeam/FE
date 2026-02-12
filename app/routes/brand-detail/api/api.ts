@@ -267,8 +267,7 @@ export async function fetchBrandDetail(params: {
   const products: ProductMiniCardItem[] = productList.map((p) => {
     const fallback =
       (p.productImageUrls ?? []).find(Boolean) ??
-      (p.thumbnailImageUrl ?? "") ??
-      "";
+      (p.thumbnailImageUrl ?? "");
 
     return {
       productId: p.productId,
