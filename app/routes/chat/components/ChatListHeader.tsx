@@ -49,10 +49,10 @@ export function ChatListHeader({
         {/* 정렬 버튼 - 텍스트는 sortLabel */}
         <button
           onClick={onClickSort}
-          className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-Pretendard ${
+          className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-medium text-[#5B5D6B] ${
             isFiltered
               ? "border-core-70 text-core-1 bg-core-70"
-              : "border-core-2 text-gray-2 bg-white text-title3"
+              : "border-core-2 text-gray-2 bg-white text-medium"
           }`}
         >
           {sortLabel}
