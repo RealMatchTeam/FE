@@ -22,7 +22,7 @@ export default function CampaignContent() {
 
     // 필터 상태
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [sortOption, setSortOption] = useState("정렬 필터");
+    const [sortOption, setSortOption] = useState("매칭률 순");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // 검색 상태
@@ -131,9 +131,7 @@ export default function CampaignContent() {
         setSelectedTags(tags);
     };
 
-    const getSortButtonLabel = () => {
-        return sortOption;
-    };
+
 
     const getFilterButtonLabel = () => {
         if (selectedTags.length > 0) {
@@ -181,14 +179,15 @@ export default function CampaignContent() {
                     <h2 className="text-title1 mb-4">캠페인 리스트</h2>
                     <div className="flex gap-2">
                         <FilterButton
-                            label={getSortButtonLabel()}
-                            isActive={sortOption !== "정렬 필터"}
+                            label={sortOption}
+                            isActive={true}
                             onClick={() => setIsFilterOpen(true)}
                         />
                         <FilterButton
                             label={getFilterButtonLabel()}
                             isActive={selectedTags.length > 0}
                             onClick={() => setIsFilterOpen(true)}
+                            className="bg-transparent border-core-1"
                         />
                     </div>
                 </div>

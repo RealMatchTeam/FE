@@ -30,9 +30,13 @@ import {
     type CampaignFormData,
 } from "../../matching/suggest/create/schema";
 import {
-    CONTENT_FILTER,
-} from "../../../data/filter";
-import { TAG_NAME_BY_ID } from "../../../data/tagNameById";
+    FORMAT_TAGS,
+    CATEGORY_TAGS,
+    TONE_TAGS,
+    INVOLVEMENT_TAGS,
+    USAGE_RANGE_TAGS,
+    PROPOSAL_TAG_ID_BY_NAME,
+} from "../../../data/proposalTags";
 
 export default function ReSuggestContent() {
     const navigate = useNavigate();
@@ -73,20 +77,6 @@ export default function ReSuggestContent() {
         mode: "onChange",
     });
 
-    // 태그 이름으로 ID를 찾는 맵 생성
-    const ID_BY_TAG_NAME: Record<string, number> = Object.entries(TAG_NAME_BY_ID).reduce(
-        (acc, [id, name]) => ({ ...acc, [name]: Number(id) }),
-        {}
-    );
-
-    // 태그 매핑 보정
-    const getMappedId = (name: string) => {
-        if (name === "인스타 포스트" || name === "인스타 포스터") return 172;
-        if (name === "스토리&썰" || name === "스토리/썰") return 178;
-        if (name === "가이드만 제공" || name === "가이드 라인만 제공") return 187;
-        return ID_BY_TAG_NAME[name];
-    };
-
     // 초기 값 채우기
     useEffect(() => {
         if (proposalData) {
@@ -95,27 +85,27 @@ export default function ReSuggestContent() {
 
             if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
                 const t = proposalData.contentTags.formats[0];
-                const id = t.id ?? getMappedId(t.name);
+                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
                 if (id) setValue("format", String(id));
             }
             if (proposalData.contentTags?.categories && proposalData.contentTags.categories.length > 0) {
                 const t = proposalData.contentTags.categories[0];
-                const id = t.id ?? getMappedId(t.name);
+                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
                 if (id) setValue("category", String(id));
             }
             if (proposalData.contentTags?.tones && proposalData.contentTags.tones.length > 0) {
                 const t = proposalData.contentTags.tones[0];
-                const id = t.id ?? getMappedId(t.name);
+                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
                 if (id) setValue("tone", String(id));
             }
             if (proposalData.contentTags?.involvements && proposalData.contentTags.involvements.length > 0) {
                 const t = proposalData.contentTags.involvements[0];
-                const id = t.id ?? getMappedId(t.name);
+                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
                 if (id) setValue("involvement", String(id));
             }
             if (proposalData.contentTags?.usageRanges && proposalData.contentTags.usageRanges.length > 0) {
                 const t = proposalData.contentTags.usageRanges[0];
-                const id = t.id ?? getMappedId(t.name);
+                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
                 if (id) setValue("usageScope", String(id));
             }
 
@@ -140,35 +130,22 @@ export default function ReSuggestContent() {
 
     const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
-    const getOptions = (filterKeys: readonly string[]) => {
-        return filterKeys.map((name) => ({
-            value: String(getMappedId(name) || name),
-            label: name,
-        }));
-    };
-
-    const formatOptions = getOptions(CONTENT_FILTER.형식);
-    const categoryOptions = getOptions(CONTENT_FILTER.종류);
-    const toneOptions = getOptions(CONTENT_FILTER.톤);
-    const involvementOptions = getOptions(CONTENT_FILTER.관여도);
-    const usageScopeOptions = getOptions(CONTENT_FILTER["활용 범위"]);
+    const formatOptions = FORMAT_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
+    const categoryOptions = CATEGORY_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
+    const toneOptions = TONE_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
+    const involvementOptions = INVOLVEMENT_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
+    const usageScopeOptions = USAGE_RANGE_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
 
     const sponsorProductOptions = proposalData?.product
         ? [{ value: proposalData.product, label: proposalData.product }]
-        : (proposalData?.products ?? []).map((p) => ({ value: String(p.id), label: p.name }));
+        : (proposalData?.products ?? [])
+            .filter((p) => p.id && p.name)
+            .map((p) => ({ value: String(p.id), label: p.name }));
 
     const findLabel = (options: { value: string; label: string }[], value?: string) => {
         if (!value) return undefined;
         const option = options.find((opt) => opt.value === value);
-        if (option) return option.label;
-
-        // Fallback to global tag mapping if value is a numeric ID
-        const numericId = Number(value);
-        if (!isNaN(numericId) && TAG_NAME_BY_ID[numericId]) {
-            return TAG_NAME_BY_ID[numericId];
-        }
-
-        return "";
+        return option?.label || "";
     };
 
     const onSubmit = () => {
@@ -466,6 +443,7 @@ export default function ReSuggestContent() {
                 selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
                 onSubmit={(values) => setValue("sponsorProduct", values[0] || "", { shouldValidate: true })}
                 multiSelect={false}
+                hasCustomInput={true}
             />
             <DatePickerBottomSheet
                 isOpen={isStartDateSheetOpen}

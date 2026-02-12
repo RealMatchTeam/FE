@@ -154,13 +154,13 @@ export default function MatchingSuggestContent() {
             )}
           </div>
 
-          {/* 선택 완료 버튼 (바닥 고정) */}
-          <div className="flex items-center justify-center py-4 px-5 bg-white">
+          {/* 선택 완료 버튼 */}
+          <div className="flex items-center justify-center py-4 bg-white">
             <Button
               variant="primary"
               size="lg"
               onClick={handleSheetSubmit}
-              className="text-title7 w-full h-[44px] flex items-center justify-center gap-[10px]"
+              className="text-title7 w-[90%] h-[44px] flex items-center justify-center gap-[10px] rounded-[12px]"
             >
               선택 완료
             </Button>

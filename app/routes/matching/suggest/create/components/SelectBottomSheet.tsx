@@ -27,7 +27,7 @@ export default function SelectBottomSheet({
   selectedValues,
   onSubmit,
   multiSelect = false,
-  hasCustomInput = true,
+  hasCustomInput = false,
 }: SelectBottomSheetProps) {
   const [selected, setSelected] = useState<string[]>(selectedValues);
   const [customInput, setCustomInput] = useState("");
@@ -112,7 +112,7 @@ export default function SelectBottomSheet({
           variant="primary"
           size="lg"
           onClick={handleSubmit}
-          className="text-title7 w-[327px] h-[44px] flex items-center justify-center gap-[10px]"
+          className="text-title7 w-[90%] h-[44px] flex items-center justify-center gap-[10px] rounded-[12px]"
         >
           선택 완료
         </Button>
