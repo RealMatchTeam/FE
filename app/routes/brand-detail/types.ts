@@ -17,9 +17,9 @@ export type BrandOngoingCampaign = {
 };
 
 export type ProductMiniCardItem = {
-  id: string;
-  title: string;
-  imageUrl: string;
+  productId: number;
+  productName: string;
+  thumbnailImageUrl: string;
 };
 
 export type HistoryRowItem = {
@@ -99,6 +99,7 @@ export type BrandDetailData = {
   histories: HistoryRowItem[];
   historiesHasNext?: boolean;
 };
+
 export type BrandCampaignStatus = "UPCOMING" | "RECRUITING" | "CLOSED";
 
 export type BrandCampaignDto = {
@@ -119,32 +120,36 @@ export type BrandCampaignsApiResponse = {
   };
 };
 
-export type SponsorProductDto = {
-  id: number;
-  name: string;
+export type SponsorAvailableItem = {
+  itemId: number;
+  availableType: string;
+  availableQuantity: number;
+  availableSize: number;
+  sizeUnit?: string;
+  shippingType?: string;
+};
+
+export type SponsorInfo = {
+  items: SponsorAvailableItem[];
+  shippingType?: string;
+};
+
+export type SponsorProductsListDto = {
   thumbnailImageUrl: string;
-  totalCount: number;
-  currentCount: number;
+  brandId: number;
+  brandName: string;
+  productId: number;
+  productName: string;
+  productImageUrls: string[];
+  categories: string[];
+  sponsorInfo: SponsorInfo;
 };
 
 export type SponsorProductsApiResponse = {
   isSuccess: boolean;
   code: string;
   message: string;
-  result: SponsorProductDto[];
-};
-
-export type SponsorAvailableItem = {
-  itemId: number;
-  availableType: string; // 백엔드 enum 나오면 union으로 좁히기
-  availableQuantity: number;
-  availableSize: number;
-  sizeUnit: string; // "ml", "g" 등
-};
-
-export type SponsorInfo = {
-  items: SponsorAvailableItem[];
-  shippingType: string; // 백엔드 enum 나오면 union으로 좁히기
+  result: SponsorProductsListDto[];
 };
 
 export type SponsorProductAction = {

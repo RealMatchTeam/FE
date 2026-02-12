@@ -53,7 +53,7 @@ export default function OngoingCampaignSection({
       {isEmpty ? (
         <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
           <div className="flex h-[126px] w-full flex-col items-start justify-center">
-            <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[50px]">
+            <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
               <div className="flex w-full flex-col items-center justify-center gap-[10px]">
                 <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
                   진행한 캠페인이 없어요
