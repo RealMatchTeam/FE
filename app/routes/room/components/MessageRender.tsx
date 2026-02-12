@@ -79,6 +79,7 @@ export default function MessageRenderer({
               campaignName={sys.payload.campaignName}
               bodyText={sys.payload.campaignSummary}
               proposalDirection={sys.payload.proposalDirection}
+              proposalStatus={sys.payload.proposalStatus}
             />
           )
 

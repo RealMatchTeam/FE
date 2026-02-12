@@ -1,5 +1,5 @@
 export const CHAT_NOTICE_TEXT = {
-  PROPOSAL_ACCEPTED: "제안이 수락되었습니다.\n협업을 시작해 주세요.",
+  PROPOSAL_ACCEPTED: "캠페인이 매칭 되었습니다.\n협업을 시작해 주세요.",
   PROPOSAL_REJECTED: "제안이 수락되지 않았습니다.\n다른 협업 기회를 확인해보세요.",
   PROPOSAL_CANCELED: "제안이 취소되었습니다.\n다른 협업 기회를 확인해보세요.",
 
