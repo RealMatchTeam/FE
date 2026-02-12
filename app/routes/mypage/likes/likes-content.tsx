@@ -98,9 +98,8 @@ export default function MyPageLikes() {
   const [activeTab, setActiveTab] = useState<"brand" | "campaign">("brand");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [brandSortOption, setBrandSortOption] = useState(DEFAULT_SORT_LABEL);
-  const [campaignSortOption, setCampaignSortOption] = useState(
-    DEFAULT_SORT_LABEL,
-  );
+  const [campaignSortOption, setCampaignSortOption] =
+    useState(DEFAULT_SORT_LABEL);
   const [brandSortApplied, setBrandSortApplied] = useState(false);
   const [campaignSortApplied, setCampaignSortApplied] = useState(false);
   const [pendingSort, setPendingSort] = useState(DEFAULT_SORT_LABEL);
@@ -450,7 +449,7 @@ export default function MyPageLikes() {
                       key={campaign.id}
                       className="bg-white rounded-[10px] border border-[#E8E8FB] px-[10px] pt-[10px] pb-[6px] flex gap-4 items-start h-[120px]"
                     >
-                      <div className="flex flex-col items-center gap-1">
+                      <div className="flex flex-col items-left gap-1">
                         <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
                           {campaign.logoUrl ? (
                             <img
@@ -462,7 +461,7 @@ export default function MyPageLikes() {
                             campaign.brand
                           )}
                         </div>
-                        <div className="flex items-start gap-1">
+                        <div className="flex items- gap-1">
                           {" "}
                           {/*수정*/}
                           <span className="px-[2px] py-[1px] rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
