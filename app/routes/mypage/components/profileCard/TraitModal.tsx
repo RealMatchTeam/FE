@@ -100,7 +100,7 @@ export default function TraitModal({
           </div>
 
           {/* sections */}
-          <div className="space-y-[14px]">
+          <div className="space-y-[14px] ml-2.5">
             {trait.sections.map((section, i) => (
               <div key={i}>
                 <div className="text-callout1 text-core-1">
