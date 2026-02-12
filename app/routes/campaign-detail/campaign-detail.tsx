@@ -84,6 +84,7 @@ export default function CampaignDetailContent({
         }
 
         setCampaign(res.data.result);
+        setIsCampaignLiked(res.data.result.like ?? false);
         setCampaignError(null);
       } catch {
         if (!alive) return;
@@ -103,14 +104,14 @@ export default function CampaignDetailContent({
       { label: "모집인원", value: `${campaign.quota}명` },
       { label: "우대사항", value: campaign.preferredSkills || "-" },
       { label: "제품협찬", value: campaign.product || "-" },
-      { label: "원고료", value: fmtMoney(campaign.rewardAmount) },
+      { label: "원고료", value: `${fmtMoney(campaign.rewardAmount)} (VAT포함)` },
       { label: "일정", value: campaign.schedule || "-" },
-      {
-        label: "모집기간",
-        value: `${formatDateOnly(campaign.recruitStartDate)} ~ ${formatDateOnly(
-          campaign.recruitEndDate,
-        )}`,
-      },
+      // {
+      //   label: "모집기간",
+      //   value: `${formatDateOnly(campaign.recruitStartDate)} ~ ${formatDateOnly(
+      //     campaign.recruitEndDate,
+      //   )}`,
+      // },
     ];
   }, [campaign]);
 
@@ -254,7 +255,7 @@ export default function CampaignDetailContent({
   const campaignImage = campaign.imageUrl ?? heroUrl;
 
   return (
-    <div className="w-full bg-bg-w">
+    <div className="w-full overflow-x-hidden bg-bg-w">
       <div className="w-full bg-bg-w">
         <BrandHero
           heroImageUrl={heroUrl}
@@ -262,7 +263,7 @@ export default function CampaignDetailContent({
           logoText={brandData.logoText ?? ""}
         />
 
-        <div className="px-5">
+        <div className="px-3">
           <BrandInfo
             name={brandData.name}
             matchRate={brandData.matchRate}
@@ -276,7 +277,7 @@ export default function CampaignDetailContent({
                 <img
                   src={informationIconUrl}
                   alt=""
-                  className="block h-4 w-4 select-none"
+                  className="block h-4 w- select-none"
                   draggable={false}
                 />
               }
@@ -301,7 +302,7 @@ export default function CampaignDetailContent({
           <div className="my-4 h-px w-full bg-core-2" />
 
           <section>
-            <div className="my-6 overflow-hidden bg-bluegray-1">
+            <div className="my-6 mx-2 overflow-hidden bg-bluegray-1">
               <img
                 src={campaignImage}
                 alt="campaign"
@@ -315,9 +316,9 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <section className="py-6.5">
-            <div className="text-title1 text-text-black">상세 설명</div>
-            <div className="mt-2.5 space-y-2.5">
+          <section className="py-5 mx-4">
+            <div className="text-title1 text-text-black my-3">상세 설명</div>
+            <div className="mt-2.5 space-y-3">
               {detailRows.map((row) => (
                 <DetailRow
                   key={row.label}
@@ -328,12 +329,12 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="my-6 mx-auto w-3/4 border-t border-core-2" />
+          <div className="my-2 mx-auto w-3/4 border-t border-core-2" />
 
-          <section className="py-6">
+          <section className="py-4 mx-4">
             <div className="text-title1 text-text-black">콘텐츠</div>
 
-            <div className="mt-2.5 space-y-2.5 text-callout1 text-text-gray3">
+            <div className="mt-2.5 space-y-3 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
                 <div key={row.label} className="flex">
                   <div className="w-21 shrink-0 text-title3 text-text-gray3">
@@ -366,7 +367,7 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="mt-6 mb-9">
+          <div className="mt-6 mb-9 mx-2">
             <button
               type="button"
               onClick={handleApply}
@@ -404,7 +405,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
-    <span className="flex items-center gap-2">
+    <span className="flex items-center gap-1">
       {icon ? (
         <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
       ) : null}
