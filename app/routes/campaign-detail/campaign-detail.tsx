@@ -402,7 +402,7 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="my-3.5 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
+          <div className="my-3 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
             <MetaItem
               icon={
                 <img
