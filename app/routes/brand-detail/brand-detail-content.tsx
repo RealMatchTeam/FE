@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import BrandHero from "./components/BrandHero";
@@ -172,29 +172,49 @@ export default function BrandDetailContent({ data }: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const brandId = Number(searchParams.get("brandId"));
+  const validBrandId = Number.isFinite(brandId) && brandId > 0;
+
   const setProposalData = useCampaignProposalStore(
     (state) => state.setProposalData,
   );
 
-  const [ongoingCampaigns, setOngoingCampaigns] = useState<OngoingCampaign[]>(
-    data.ongoingCampaigns ?? [],
+  const baseOngoingCampaigns = useMemo<OngoingCampaign[]>(
+    () => data.ongoingCampaigns ?? [],
+    [data.ongoingCampaigns],
   );
 
-  useEffect(() => {
-    setOngoingCampaigns(data.ongoingCampaigns ?? []);
-  }, [data.ongoingCampaigns]);
+  const [ongoingLikeOverrides, setOngoingLikeOverrides] = useState<
+    Record<number, boolean>
+  >({});
+
+  const ongoingCampaigns = useMemo<OngoingCampaign[]>(() => {
+    if (baseOngoingCampaigns.length === 0) return [];
+    const overrides = ongoingLikeOverrides;
+
+    return baseOngoingCampaigns.map((c) => {
+      const cid = getCampaignIdFromOngoing(c);
+      if (!cid) return c;
+
+      if (Object.prototype.hasOwnProperty.call(overrides, cid)) {
+        return { ...(c as object), isLiked: overrides[cid] } as OngoingCampaign;
+      }
+      return c;
+    });
+  }, [baseOngoingCampaigns, ongoingLikeOverrides]);
 
   const ongoingLikeInFlight = useRef<Set<number>>(new Set());
 
-  const [sponsorProducts, setSponsorProducts] = useState<ProductMiniCardItem[]>(
-    [],
+  const [sponsorProductsRaw, setSponsorProductsRaw] = useState<
+    ProductMiniCardItem[]
+  >([]);
+
+  const sponsorProducts = useMemo<ProductMiniCardItem[]>(
+    () => (validBrandId ? sponsorProductsRaw : []),
+    [validBrandId, sponsorProductsRaw],
   );
 
   useEffect(() => {
-    if (!Number.isFinite(brandId) || brandId <= 0) {
-      setSponsorProducts([]);
-      return;
-    }
+    if (!validBrandId) return;
 
     let alive = true;
 
@@ -207,7 +227,7 @@ export default function BrandDetailContent({ data }: Props) {
         if (!alive) return;
 
         if (!res.data?.isSuccess) {
-          setSponsorProducts([]);
+          setSponsorProductsRaw([]);
           return;
         }
 
@@ -226,17 +246,17 @@ export default function BrandDetailContent({ data }: Props) {
           },
         );
 
-        setSponsorProducts(mapped);
+        setSponsorProductsRaw(mapped);
       } catch {
         if (!alive) return;
-        setSponsorProducts([]);
+        setSponsorProductsRaw([]);
       }
     })();
 
     return () => {
       alive = false;
     };
-  }, [brandId]);
+  }, [brandId, validBrandId]);
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -244,7 +264,7 @@ export default function BrandDetailContent({ data }: Props) {
       navigate("/auth/login");
       return;
     }
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
     navigate(`/rooms/brand/${brandId}`);
   };
 
@@ -254,7 +274,7 @@ export default function BrandDetailContent({ data }: Props) {
       navigate("/auth/login");
       return;
     }
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
 
     const domain = searchParams.get("domain");
 
@@ -263,7 +283,7 @@ export default function BrandDetailContent({ data }: Props) {
       campaignId: 0,
       domain: domain || "beauty",
       brandName: data.name,
-      products: (sponsorProducts ?? []).map((p) => ({
+      products: sponsorProducts.map((p) => ({
         id: String(p.productId),
         name: p.productName,
       })),
@@ -273,7 +293,7 @@ export default function BrandDetailContent({ data }: Props) {
   };
 
   const handleGoSponsorableProducts = () => {
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
 
     navigate(`/products/sponsorable?brandId=${brandId}`, {
       state: {
@@ -285,7 +305,7 @@ export default function BrandDetailContent({ data }: Props) {
   };
 
   const handleSponsorableProductClick = (productId: number) => {
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
     if (!Number.isFinite(productId) || productId <= 0) return;
 
     navigate(
@@ -300,7 +320,7 @@ export default function BrandDetailContent({ data }: Props) {
   };
 
   const handleToggleHeart = async () => {
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
 
     const prev = isHearted;
     const next = !prev;
@@ -325,7 +345,7 @@ export default function BrandDetailContent({ data }: Props) {
         : "beauty";
 
     const brandIdNum =
-      Number.isFinite(brandId) && brandId > 0
+      validBrandId
         ? brandId
         : Number.isFinite(Number(data.id)) && Number(data.id) > 0
           ? Number(data.id)
@@ -364,13 +384,7 @@ export default function BrandDetailContent({ data }: Props) {
       (currentItem as unknown as { isLiked?: boolean }).isLiked ?? false;
     const next = !prev;
 
-    setOngoingCampaigns((prevList) =>
-      prevList.map((c) => {
-        const eachId = getCampaignIdFromOngoing(c);
-        if (eachId !== clickedId) return c;
-        return { ...(c as object), isLiked: next } as OngoingCampaign;
-      }),
-    );
+    setOngoingLikeOverrides((m) => ({ ...m, [cid]: next }));
 
     ongoingLikeInFlight.current.delete(cid);
   };
@@ -457,7 +471,7 @@ export default function BrandDetailContent({ data }: Props) {
             />
           </div>
 
-          <div className="mt-4 mb-3 h-px w-full bg-core-2" />
+          <div className="mb-3 mt-4 h-px w-full bg-core-2" />
 
           <div className="py-9">
             <section className="pb-5">
@@ -483,9 +497,7 @@ export default function BrandDetailContent({ data }: Props) {
                       </div>
                     ) : null}
 
-                    <div
-                      className={showTitle ? "mt-2 space-y-1.5" : "space-y-1.5"}
-                    >
+                    <div className={showTitle ? "mt-2 space-y-1.5" : "space-y-1.5"}>
                       {(sec.groups ?? []).map((g, gi) => (
                         <TagGroup
                           key={`${sec.title}-${g.label}-${gi}`}
@@ -520,94 +532,93 @@ export default function BrandDetailContent({ data }: Props) {
           <DividerBlock />
 
           <section className="py-9">
-  <div className="text-title1 text-text-black">캠페인 내역</div>
+            <div className="text-title1 text-text-black">캠페인 내역</div>
 
-  {histories.length === 0 ? (
-    <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
-      <div className="flex h-[126px] w-full flex-col items-start justify-center">
-        <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
-          <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-            <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
-              진행한 캠페인이 없어요
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ) : (
-    <>
-      <div className="mt-3">
-        {pageItems.map((h) => (
-          <HistoryRow key={h.id} item={h} />
-        ))}
-      </div>
+            {histories.length === 0 ? (
+              <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
+                <div className="flex h-[126px] w-full flex-col items-start justify-center">
+                  <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
+                    <div className="flex w-full flex-col items-center justify-center gap-[10px]">
+                      <div className="w-[113px] text-center text-callout1 text-text-gray2">
+                        진행한 캠페인이 없어요
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="mt-3">
+                  {pageItems.map((h) => (
+                    <HistoryRow key={h.id} item={h} />
+                  ))}
+                </div>
 
-      <div className="my-5 flex items-center justify-center gap-3">
-        {page > GROUP_SIZE && (
-          <button
-            type="button"
-            onClick={goPrevGroup}
-            className="grid h-7 w-7 place-items-center text-text-gray3"
-          >
-            <DoubleArrowLeftIcon />
-          </button>
-        )}
+                <div className="my-5 flex items-center justify-center gap-3">
+                  {page > GROUP_SIZE && (
+                    <button
+                      type="button"
+                      onClick={goPrevGroup}
+                      className="grid h-7 w-7 place-items-center text-text-gray3"
+                    >
+                      <DoubleArrowLeftIcon />
+                    </button>
+                  )}
 
-        <button
-          type="button"
-          onClick={goPrev}
-          disabled={!canPrev}
-          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-        >
-          <ArrowLeftIcon />
-        </button>
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    disabled={!canPrev}
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+                  >
+                    <ArrowLeftIcon />
+                  </button>
 
-        <div className="flex items-center gap-3">
-          {displayPages.map((p) => {
-            const disabledPage = p > totalPages && !hasNext;
-            const active = p === page;
+                  <div className="flex items-center gap-3">
+                    {displayPages.map((p) => {
+                      const disabledPage = p > totalPages && !hasNext;
+                      const active = p === page;
 
-            return (
-              <button
-                key={p}
-                type="button"
-                onClick={() => !disabledPage && goPage(p)}
-                disabled={disabledPage}
-                className={
-                  active
-                    ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
-                    : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
-                }
-                style={active ? { backgroundColor: "#A9ADFF" } : undefined}
-              >
-                {p}
-              </button>
-            );
-          })}
-        </div>
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => !disabledPage && goPage(p)}
+                          disabled={disabledPage}
+                          className={
+                            active
+                              ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
+                              : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
+                          }
+                          style={active ? { backgroundColor: "#A9ADFF" } : undefined}
+                        >
+                          {p}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-        <button
-          type="button"
-          onClick={goNext}
-          disabled={!canNext}
-          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-        >
-          <ArrowRightIcon />
-        </button>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    disabled={!canNext}
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+                  >
+                    <ArrowRightIcon />
+                  </button>
 
-        <button
-          type="button"
-          onClick={goNextGroup}
-          disabled={!canNextGroup}
-          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-        >
-          <DoubleArrowRightIcon />
-        </button>
-      </div>
-    </>
-  )}
-</section>
-
+                  <button
+                    type="button"
+                    onClick={goNextGroup}
+                    disabled={!canNextGroup}
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+                  >
+                    <DoubleArrowRightIcon />
+                  </button>
+                </div>
+              </>
+            )}
+          </section>
         </div>
       </div>
     </div>
@@ -615,5 +626,5 @@ export default function BrandDetailContent({ data }: Props) {
 }
 
 function DividerBlock() {
-  return <div className="-mx-5 h-2.5 bg-bluegray-1" />;
+  return <div className="-mx-4 h-2.5 bg-bluegray-1" />;
 }

@@ -55,8 +55,8 @@ export default function OngoingCampaignSection({
           <div className="flex h-[126px] w-full flex-col items-start justify-center">
             <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
               <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-                <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
-                  진행한 캠페인이 없어요
+                <div className=" text-center text-callout1 text-text-gray2">
+                  진행 중인 캠페인이 없어요
                 </div>
               </div>
             </div>
