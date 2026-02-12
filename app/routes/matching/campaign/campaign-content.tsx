@@ -205,7 +205,7 @@ export default function CampaignContent() {
                             applicants={campaign.applicants}
                             isLiked={campaign.isLiked}
                             onLike={() => toggleLike(campaign.id)}
-                            onClick={() => navigate(`/campaign?campaignId=${campaign.id}&brandId=${campaign.brandId}&domain=${category.toLowerCase()}`)}
+                            onClick={() => navigate(`/campaign?campaignId=${campaign.id}&brandId=${campaign.brandId}&domain=${category.toLowerCase()}&matchRate=${campaign.matchingRatio || campaign.matchRate || 0}`)}
                             logoUrl={campaign.logoUrl || `/dummy-logo-${campaign.id}.png`}
                             dDay={campaign.dDay}
                         />
