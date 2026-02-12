@@ -10,7 +10,7 @@ interface MatchingCardProps {
   actionLabel: string;
   logo?: string;
   brandId: number;
-  brandUserId: number;
+  brandUserId?: number;
   onClick?: () => void;
 }
 
@@ -45,8 +45,9 @@ export default function MatchingCard({
       navigate("/auth/login");
       return;
     }
-    if (!Number.isFinite(brandUserId) || brandUserId <= 0) return;
-    navigate(`/rooms/brand/${brandUserId}`);
+    const chatId = brandUserId ?? brandId;
+    if (!Number.isFinite(chatId) || chatId <= 0) return;
+    navigate(`/rooms/brand/${chatId}`);
   };
 
   return (
