@@ -4,6 +4,7 @@ import type { BrandOngoingCampaign } from "../types";
 
 type Props = {
   campaigns: BrandOngoingCampaign[];
+  brandLogoUrl?: string;
   onMore?: () => void;
   onCampaignClick?: (c: BrandOngoingCampaign) => void;
   onLikeToggle?: (id: string) => void;
@@ -11,6 +12,7 @@ type Props = {
 
 export default function OngoingCampaignSection({
   campaigns,
+  brandLogoUrl,
   onMore,
   onCampaignClick,
   onLikeToggle,
@@ -18,46 +20,28 @@ export default function OngoingCampaignSection({
   const isEmpty = campaigns.length === 0;
 
   return (
-    <section className="py-9">
+    <section className="pt-9 pb-9 px-2">
       <div className="flex items-center justify-between">
-        <div className="text-title1 text-text-black">진행 중인 캠페인</div>
+        <div className="text-title1 text-text-black">진행 중인 다른 캠페인</div>
 
-        {onMore ? (
+        {!isEmpty && onMore ? (
           <button
             type="button"
             onClick={onMore}
-            className="mt-0.5 grid h-6 w-6 place-items-center text-[var(--color-text-gray3)]"
+            className="grid h-8 w-8 place-items-center rounded-full text-text-gray2"
             aria-label="more"
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M9 18L15 12L9 6"
-                stroke="#9B9BA1"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <span className="text-[18px] leading-none">›</span>
           </button>
-        ) : (
-          <div className="h-6 w-6" />
-        )}
+        ) : null}
       </div>
 
       {isEmpty ? (
-        <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
-          <div className="flex h-[126px] w-full flex-col items-start justify-center">
-            <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
-              <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-                <div className=" text-center text-callout1 text-text-gray2">
-                  진행 중인 캠페인이 없어요
-                </div>
+        <div className="flex h-[126px] w-full flex-col justify-center items-start">
+          <div className="flex w-full flex-col items-start gap-[14px] pt-[50px] pb-[60px]">
+            <div className="flex w-full flex-col items-center justify-center gap-[10px]">
+              <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
+                진행 중인 다른 캠페인이 없어요
               </div>
             </div>
           </div>
@@ -80,7 +64,7 @@ export default function OngoingCampaignSection({
                 className="text-left"
               >
                 <CampaignCard
-                  item={toCampaignItem(c)}
+                  item={toCampaignItem(c, brandLogoUrl)}
                   onClick={() => onCampaignClick?.(c)}
                   onLikeToggle={onLikeToggle}
                 />

@@ -30,11 +30,6 @@ type OngoingCampaign = NonNullable<BrandDetailData["ongoingCampaigns"]>[number];
 const fmtMoney = (n?: number) =>
   Number.isFinite(n) ? `${Number(n).toLocaleString()}원` : "-";
 
-const formatDateOnly = (iso?: string) => {
-  if (!iso) return "-";
-  return iso.split("T")[0];
-};
-
 const joinTagNames = (items?: { name: string }[]) =>
   (items ?? []).map((x) => x.name).filter(Boolean);
 
@@ -90,6 +85,10 @@ export default function CampaignDetailContent({
   const [searchParams] = useSearchParams();
   const setProposalData = useCampaignProposalStore((s) => s.setProposalData);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [campaignId]);
+
   const heroUrl = brandData.brandImages?.[0] ?? brandData.heroImageUrl;
 
   const [isCampaignLiked, setIsCampaignLiked] = useState(false);
@@ -127,16 +126,8 @@ export default function CampaignDetailContent({
         }
 
         setCampaign(res.data.result);
+        setIsCampaignLiked(res.data.result.like ?? false);
         setCampaignError(null);
-
-        const liked = (() => {
-          const r: unknown = res.data.result;
-          if (!r || typeof r !== "object") return false;
-          const rec = r as Record<string, unknown>;
-          return rec["isLiked"] === true;
-        })();
-
-        setIsCampaignLiked(liked);
       } catch {
         if (!alive) return;
         setCampaignError("캠페인 정보를 불러오지 못했어요.");
@@ -155,14 +146,14 @@ export default function CampaignDetailContent({
       { label: "모집인원", value: `${campaign.quota}명` },
       { label: "우대사항", value: campaign.preferredSkills || "-" },
       { label: "제품협찬", value: campaign.product || "-" },
-      { label: "원고료", value: fmtMoney(campaign.rewardAmount) },
+      { label: "원고료", value: `${fmtMoney(campaign.rewardAmount)} (VAT포함)` },
       { label: "일정", value: campaign.schedule || "-" },
-      {
-        label: "모집기간",
-        value: `${formatDateOnly(campaign.recruitStartDate)} ~ ${formatDateOnly(
-          campaign.recruitEndDate,
-        )}`,
-      },
+      // {
+      //   label: "모집기간",
+      //   value: `${formatDateOnly(campaign.recruitStartDate)} ~ ${formatDateOnly(
+      //     campaign.recruitEndDate,
+      //   )}`,
+      // },
     ];
   }, [campaign]);
 
@@ -174,10 +165,10 @@ export default function CampaignDetailContent({
       { label: "설명", value: campaign.description || "-" },
       { label: "개수 및 길이", value: campaign.videoSpec || "-" },
       { label: "콘텐츠 형식", chips: joinTagNames(tags?.formats) },
-      { label: "카테고리", chips: joinTagNames(tags?.categories) },
-      { label: "톤", chips: joinTagNames(tags?.tones) },
-      { label: "참여도", chips: joinTagNames(tags?.involvements) },
-      { label: "사용 범위", chips: joinTagNames(tags?.usageRanges) },
+      { label: "콘텐츠 종류", chips: joinTagNames(tags?.categories) },
+      { label: "컨톤체 톤", chips: joinTagNames(tags?.tones) },
+      { label: "콘텐츠 활용범위", chips: joinTagNames(tags?.usageRanges) },
+      { label: "콘텐츠 관려도", chips: joinTagNames(tags?.involvements) },
     ];
   }, [campaign]);
 
@@ -395,7 +386,7 @@ export default function CampaignDetailContent({
   const campaignImage = campaign.imageUrl ?? heroUrl;
 
   return (
-    <div className="w-full bg-bg-w">
+    <div className="w-full overflow-x-hidden bg-bg-w">
       <div className="w-full bg-bg-w">
         <BrandHero
           heroImageUrl={heroUrl}
@@ -403,7 +394,7 @@ export default function CampaignDetailContent({
           logoText={brandData.logoText ?? ""}
         />
 
-        <div className="px-5">
+        <div className="px-3">
           <BrandInfo
             name={brandData.name}
             matchRate={brandData.matchRate}
@@ -411,13 +402,13 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="my-3.5 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
+          <div className="my-3 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
             <MetaItem
               icon={
                 <img
                   src={informationIconUrl}
                   alt=""
-                  className="block h-4 w-4 select-none"
+                  className="block h-4 w- select-none"
                   draggable={false}
                 />
               }
@@ -439,10 +430,10 @@ export default function CampaignDetailContent({
             onToggleHeart={handleToggleHeart}
           />
 
-          <div className="my-4 h-px w-full bg-core-2" />
+          <div className="my-3 h-px w-full bg-core-2" />
 
           <section>
-            <div className="my-6 overflow-hidden bg-bluegray-1">
+            <div className="my-6 mx-2 overflow-hidden bg-bluegray-1">
               <img
                 src={campaignImage}
                 alt="campaign"
@@ -456,9 +447,9 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <section className="pt-6 pb-6.5">
-            <div className="text-title1 text-text-black">상세 설명</div>
-            <div className="mt-3 space-y-2.5">
+          <section className="py-4 mx-4">
+            <div className="text-title1 text-text-black my-3">상세 설명</div>
+            <div className="mt-2.5 space-y-3">
               {detailRows.map((row) => (
                 <DetailRow
                   key={row.label}
@@ -469,45 +460,24 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="mx-auto w-3/4 border-t border-core-2" />
+          <div className="my-2 mx-auto w-3/4 border-t border-core-2" />
 
-          <section className="py-6">
+          <section className="py-4 mx-4">
             <div className="text-title1 text-text-black">콘텐츠</div>
 
-            <div className="mt-3 space-y-2.5 text-callout1 text-text-gray3">
+            <div className="mt-2.5 space-y-3">
               {contentRows.map((row) => (
-                <div key={row.label} className="flex">
-                  <div className="w-21 shrink-0 text-title3 text-text-gray3">
-                    {row.label}
-                  </div>
-
-                  <div className="flex-1 gap-[14px]">
-                    {"value" in row && row.value ? (
-                      <div className="whitespace-pre-line text-title3 text-text-gray1">
-                        {row.value}
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {(row.chips ?? []).map((c) => (
-                          <span
-                            key={c}
-                            className="inline-flex items-center rounded-full border border-core-2 bg-bg-w px-2 py-1 text-callout1 text-text-gray1"
-                          >
-                            {c}
-                          </span>
-                        ))}
-                        {(!row.chips || row.chips.length === 0) && (
-                          <span>-</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <DetailRow
+                  key={row.label}
+                  label={row.label}
+                  value={row.value}
+                  chips={row.chips}
+                />
               ))}
             </div>
           </section>
 
-          <div className="mt-6 mb-9">
+          <div className="mt-6 mb-9 mx-2">
             <button
               type="button"
               onClick={handleApply}
@@ -527,6 +497,7 @@ export default function CampaignDetailContent({
 
           <OngoingCampaignSection
             campaigns={ongoingCampaigns}
+            brandLogoUrl={brandData.logoImageUrl}
             onMore={() => {}}
             onCampaignClick={goOngoingCampaignDetail}
             onLikeToggle={handleOngoingLikeToggle}
@@ -537,12 +508,28 @@ export default function CampaignDetailContent({
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, value, chips }: { label: string; value?: string; chips?: string[] }) {
   return (
     <div className="flex gap-4">
-      <div className="w-21 shrink-0 text-title3 text-text-gray3">{label}</div>
-      <div className="whitespace-pre-line text-title3 text-text-gray1">
-        {value}
+      <div className="w-23 shrink-0 text-title3 text-text-gray3">{label}</div>
+      <div className="flex-1">
+        {value ? (
+          <div className="whitespace-pre-line text-title3 text-text-gray1">
+            {value}
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {(chips ?? []).map((c) => (
+              <span
+                key={c}
+                className="inline-flex items-center rounded-full border border-core-2 bg-bg-w px-2 py-1 text-callout1 text-text-gray1"
+              >
+                {c}
+              </span>
+            ))}
+            {(!chips || chips.length === 0) && <span className="text-title3 text-text-gray1">-</span>}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -550,7 +537,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
-    <span className="flex items-center gap-2">
+    <span className="flex items-center gap-1">
       {icon ? (
         <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
       ) : null}

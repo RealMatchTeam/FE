@@ -21,6 +21,7 @@ export default function CampaignDetailRoute() {
   const brandIdParam = searchParams.get("brandId");
   const domainParam = searchParams.get("domain");
   const campaignIdParam = searchParams.get("campaignId");
+  const matchRateParam = searchParams.get("matchRate");
 
   const campaignId = useMemo(() => {
     const n = campaignIdParam ? Number(campaignIdParam) : NaN;
@@ -104,7 +105,14 @@ export default function CampaignDetailRoute() {
           brandId: String(resolvedBrandId),
           domain: resolvedDomain ?? undefined,
         });
+
         if (!alive) return;
+
+        const paramRate = matchRateParam ? Number(matchRateParam) : NaN;
+        if (Number.isFinite(paramRate) && paramRate > 0) {
+          res.matchRate = paramRate;
+        }
+
         setData(res);
         setError(null);
       } catch {

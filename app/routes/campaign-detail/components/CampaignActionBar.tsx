@@ -14,11 +14,12 @@ export default function CampaignActionBar({
   onToggleHeart,
 }: Props) {
   return (
-    <div className="flex w-full items-center gap-2">
+    
+    <div className="inline-flex w-full items-center gap-2">
       <button
         type="button"
         onClick={onChat}
-        className="flex h-[30px] flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 text-title3 text-text-black"
+        className="flex flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 py-1.5 text-title3 font-medium leading-[20px] text-text-black"
       >
         채팅하기
       </button>
@@ -26,7 +27,7 @@ export default function CampaignActionBar({
       <button
         type="button"
         onClick={onSuggest}
-        className="flex h-[30px] flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 text-title3 text-text-black"
+        className="flex flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 py-1.5 text-title3 font-medium leading-[20px] text-text-black"
       >
         제안하기
       </button>
