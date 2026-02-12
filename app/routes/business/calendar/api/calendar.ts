@@ -13,6 +13,7 @@ export interface CampaignCollaboration {
   endDate: string;
   keyword?: string;
   type: "APPLIED" | "SENT" | "RECEIVED";
+  category?: string;
 }
 
 interface CollaborationResponse {
