@@ -432,9 +432,11 @@ export default function MyPageLikes() {
                               </button>
                             </div>
                           </div>
-                          <div className="mt-2 text-[13px] text-[#8B8D99] truncate">
-                            {brand.tags.join(" ")}
-                          </div>
+                        <div className="mt-2 text-[13px] text-[#8B8D99] truncate">
+                          {brand.tags.length > 0
+                            ? brand.tags.map((tag) => `#${tag}`).join(" ")
+                            : ""}
+                        </div>
                         </div>
                       </div>
                     ))
