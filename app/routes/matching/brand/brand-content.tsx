@@ -5,7 +5,7 @@ import FilterButton from "../../../components/common/FilterButton";
 import BrandCard from "./components/BrandCard";
 import { type BrandCategory } from "../../../data/brand";
 import BrandFilterBar from "./components/BrandFilterBar";
-import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
+import BottomSheet from "../../../components/common/BottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
@@ -22,6 +22,7 @@ export default function BrandContent() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filterOpenTab, setFilterOpenTab] = useState<"sort" | "filter">("sort");
     const [sortOption, setSortOption] = useState("매칭률 순");
+    const [sortApplied, setSortApplied] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // 검색 상태
@@ -114,6 +115,7 @@ export default function BrandContent() {
     const handleFilterApply = (sort: string, tags: string[]) => {
         setSortOption(sort);
         setSelectedTags(tags);
+        setSortApplied(true);
     };
 
 
@@ -172,7 +174,7 @@ export default function BrandContent() {
                     <div className="flex gap-2">
                         <FilterButton
                             label={sortOption}
-                            isActive={true}
+                            isActive={sortApplied}
                             onClick={() => { setFilterOpenTab("sort"); setIsFilterOpen(true); }}
                         />
                         <FilterButton
@@ -202,7 +204,11 @@ export default function BrandContent() {
             </div>
 
             {/* 필터 바텀시트 */}
-            <FilterBottomSheet isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
+            <BottomSheet
+                open={isFilterOpen}
+                onClose={() => setIsFilterOpen(false)}
+                height={500}
+            >
                 <MatchingFilter
                     filterType={category}
                     selectedSort={sortOption}
@@ -211,7 +217,7 @@ export default function BrandContent() {
                     onClose={() => setIsFilterOpen(false)}
                     initialTab={filterOpenTab}
                 />
-            </FilterBottomSheet>
+            </BottomSheet>
         </div>
     );
 }

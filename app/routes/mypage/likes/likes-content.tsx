@@ -6,6 +6,7 @@ import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { axiosInstance } from "../../../api/axios";
 import SortFilterSheet from "../../chat/components/ChatSortFilterSheet";
+import FilterButton from "../../../components/common/FilterButton";
 
 type BrandLike = {
   id: number;
@@ -358,31 +359,11 @@ export default function MyPageLikes() {
               <div className="text-[16px] leading-[20px] font-semibold text-black">
                 {activeTab === "brand" ? "브랜드 리스트" : "캠페인 리스트"}
               </div>
-              <button
-                type="button"
+              <FilterButton
+                label={getSortButtonLabel()}
+                isActive={isFiltered}
                 onClick={openSortSheet}
-                className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-Pretendard ${
-                  isFiltered
-                    ? "border-core-3 text-core-1 bg-core-2"
-                    : "border-core-2 text-text-gray2 bg-white text-title3"
-                }`}
-              >
-                {getSortButtonLabel()}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className={`w-6 h-6 ${isFiltered ? "text-core-1" : "text-text-gray2"}`}
-                >
-                  <path
-                    d="M6 8L10 12L14 8"
-                    stroke="currentColor"
-                    strokeWidth="1.0"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+              />
             </div>
 
             {loading ? (
@@ -530,9 +511,6 @@ export default function MyPageLikes() {
           }
           title="정렬 필터"
           applyLabel="적용하기"
-          titleClassName="text-[14px] font-semibold"
-          optionClassName="text-[12px]"
-          applyButtonClassName="text-[13px] font-semibold"
         />
       </div>
     </div>
