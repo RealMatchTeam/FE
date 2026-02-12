@@ -14,7 +14,7 @@ export default function CategoryTabs({
   ];
 
   return (
-    <div className="relative h-12.5 w-full bg-white">
+    <div className="relative -mx-5 h-12.5 w-[calc(100%+40px)] bg-white">
       <div className="flex h-full items-center px-4">
         {tabs.map((t) => {
           const active = t.key === value;
@@ -37,7 +37,7 @@ export default function CategoryTabs({
 
       <div className="absolute bottom-0 left-0 right-0 h-px bg-black/10" />
 
-      <div className="absolute bottom-0 left-0 right-0 px-4">
+      <div className="absolute bottom-0 left-0 right-0 px-0">
         <div
           className="h-0.5 w-1/2 bg-(--color-success) transition-transform"
           style={{

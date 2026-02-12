@@ -1,15 +1,29 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import type { CategoryKey } from "../types";
 import bannerBeauty from "../../../assets/home-banner/banner-beauty.svg";
 import bannerFashion from "../../../assets/home-banner/banner-fashion.svg";
 
 const INTERVAL = 3000;
 
-export default function BannerCarousel() {
-  const banners = [
-    { src: bannerBeauty, alt: "뷰티 배너" },
-    { src: bannerFashion, alt: "패션 배너" },
-    { src: null, alt: "준비중 배너" },
-  ];
+interface BannerItem {
+  src: string | null;
+  alt: string;
+}
+
+const beautyBanners: BannerItem[] = [
+  { src: bannerBeauty, alt: "뷰티 배너 1" },
+  { src: null, alt: "뷰티 배너 2" },
+  { src: null, alt: "뷰티 배너 3" },
+];
+
+const fashionBanners: BannerItem[] = [
+  { src: bannerFashion, alt: "패션 배너 1" },
+  { src: null, alt: "패션 배너 2" },
+  { src: null, alt: "패션 배너 3" },
+];
+
+export default function BannerCarousel({ category }: { category: CategoryKey }) {
+  const banners = category === "beauty" ? beautyBanners : fashionBanners;
 
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -40,7 +54,7 @@ export default function BannerCarousel() {
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {banners.map((banner, i) => (
-            <div key={i} className="w-full shrink-0">
+            <div key={`${category}-${i}`} className="w-full shrink-0">
               {banner.src ? (
                 <img
                   src={banner.src}
