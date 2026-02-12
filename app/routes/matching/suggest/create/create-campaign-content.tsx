@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createCampaignProposal, getRecruitingCampaigns, type RecruitingCampaign } from "../../api/matching";
+import { createCampaignProposal, getCampaignDetail } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
 import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 import { useAuthStore } from "../../../../stores/auth-store";
@@ -45,7 +45,6 @@ export default function CreateCampaignContent() {
   const me = useAuthStore((state) => state.me);
 
   // 바텀시트 상태
-  const [selectedCampaign, setSelectedCampaign] = useState<RecruitingCampaign | null>(null);
 
   // 각 필드별 바텀시트 상태
   const [isFormatSheetOpen, setIsFormatSheetOpen] = useState(false);
@@ -118,37 +117,42 @@ export default function CreateCampaignContent() {
     }
 
     // URL 파라미터로 캠페인 조회 (기존 캠페인 제안 시)
-    const brandIdParam = searchParams.get("brandId");
     const campaignIdParam = searchParams.get("campaignId");
 
-    if (brandIdParam && campaignIdParam) {
-      const brandId = Number(brandIdParam);
+    if (campaignIdParam) {
       const campaignId = Number(campaignIdParam);
 
-      if (Number.isFinite(brandId) && brandId > 0 && Number.isFinite(campaignId) && campaignId > 0) {
+      if (Number.isFinite(campaignId) && campaignId > 0) {
         (async () => {
           try {
-            const campaigns = await getRecruitingCampaigns(brandId);
+            const detail = await getCampaignDetail(campaignId);
             if (!alive) return;
 
-            const selectedCampaign = campaigns.find((c) => c.campaignId === campaignId);
-            if (!selectedCampaign) return;
+            setValue("campaignName", detail.title);
+            setValue("description", detail.description);
+            setValue("fee", detail.rewardAmount.toString());
+            setValue("sponsorProduct", detail.product);
+            if (detail.startDate) setValue("startDate", detail.startDate);
+            if (detail.endDate) setValue("endDate", detail.endDate);
 
-            // 선택한 캠페인 정보를 폼에 반영
-            setValue("campaignName", selectedCampaign.title);
-            setValue("fee", selectedCampaign.rewardAmount.toString());
-
-            // dday를 사용해 종료 날짜 계산
-            const today = new Date();
-            const endDate = new Date(today);
-            endDate.setDate(today.getDate() + selectedCampaign.dday);
-
-            setValue("startDate", today.toISOString().split("T")[0]);
-            setValue("endDate", endDate.toISOString().split("T")[0]);
-
-            setSelectedCampaign(selectedCampaign);
+            if (detail.contentTags?.formats?.length > 0) {
+              setValue("format", String(detail.contentTags.formats[0].id));
+            }
+            if (detail.contentTags?.categories?.length > 0) {
+              setValue("category", String(detail.contentTags.categories[0].id));
+            }
+            if (detail.contentTags?.tones?.length > 0) {
+              setValue("tone", String(detail.contentTags.tones[0].id));
+            }
+            if (detail.contentTags?.involvements?.length > 0) {
+              setValue("involvement", String(detail.contentTags.involvements[0].id));
+            }
+            if (detail.contentTags?.usageRanges?.length > 0) {
+              setValue("usageScope", String(detail.contentTags.usageRanges[0].id));
+            }
           } catch (error) {
-            console.error("모집중인 캠페인 조회 실패:", error);
+            console.error("캠페인 상세 조회 실패:", error);
+            toast.error("캠페인 정보를 불러오지 못했습니다");
           }
         })();
       }
@@ -216,7 +220,7 @@ export default function CreateCampaignContent() {
       : proposalData?.brandId || 1;
 
     const campaignId = type === "existing"
-      ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || selectedCampaign?.campaignId || null))
+      ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || null))
       : null;
 
     const requestData = {
@@ -246,7 +250,7 @@ export default function CreateCampaignContent() {
   };
 
   // 선택된 캠페인 이름 가져오기
-  const selectedCampaignName = selectedCampaign?.title;
+  const selectedCampaignName = formValues.campaignName;
 
   const title =
     type === "existing" && selectedCampaignName
@@ -505,6 +509,7 @@ export default function CreateCampaignContent() {
       <ProposalModal
         isOpen={isConfirmDialogOpen}
         type="confirm"
+        variant="suggest"
         onClose={() => setIsConfirmDialogOpen(false)}
         onConfirm={handleConfirmSubmit}
       />
@@ -513,6 +518,7 @@ export default function CreateCampaignContent() {
       <ProposalModal
         isOpen={isSuccessModalOpen}
         type="success"
+        variant="suggest"
         onClose={() => navigate("/business/calendar")}
       />
     </div>

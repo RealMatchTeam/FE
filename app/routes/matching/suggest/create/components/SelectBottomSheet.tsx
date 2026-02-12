@@ -112,7 +112,7 @@ export default function SelectBottomSheet({
           variant="primary"
           size="lg"
           onClick={handleSubmit}
-          className="text-title7 w-full h-[44px] flex items-center justify-center gap-[10px]"
+          className="text-title7 w-[90%] h-[44px] flex items-center justify-center gap-[10px] rounded-[12px]"
         >
           선택 완료
         </Button>

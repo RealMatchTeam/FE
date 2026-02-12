@@ -11,11 +11,10 @@ const truncateLabel = (text: string, maxLength = 10) => {
 export default function FilterButton({ label, isActive, className = "", ...props }: FilterButtonProps) {
     return (
         <button
-            className={`flex items-center gap-1 px-[10px] py-1 rounded-[60px] border transition-colors cursor-pointer ${
-                isActive
-                    ? "border-core-1 bg-core-1/10 text-core-1"
-                    : "border-[#E6E6F3] bg-white text-text-gray2"
-            } ${className}`}
+            className={`flex items-center gap-1 px-2.5 py-1 h-7 rounded-[60px] border transition-colors cursor-pointer ${isActive
+                ? "border-core-1 bg-core-1/10 text-core-1"
+                : "border-[#E6E6F3] bg-white text-text-gray2"
+                } ${className}`}
             {...props}
         >
             {truncateLabel(label)}
