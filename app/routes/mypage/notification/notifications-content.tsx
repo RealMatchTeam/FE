@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import { axiosInstance } from "../../../api/axios";
+import SuccessModal from "../../../components/common/SuccessModal";
 
 type NotificationSettingResponse = {
   marketingConsent: boolean;
@@ -31,6 +32,7 @@ export default function MyPageNotifications() {
   const [appPush, setAppPush] = useState(true);
   const [emailPush, setEmailPush] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSetting = async () => {
@@ -193,6 +195,7 @@ export default function MyPageNotifications() {
                 if (!response.data.isSuccess) {
                   throw new Error(response.data.message || "알림 설정 변경 실패");
                 }
+                setSuccessMessage("알림 설정 완료");
               } catch (error) {
                 console.error("Failed to update notification setting:", error);
               } finally {
@@ -204,6 +207,12 @@ export default function MyPageNotifications() {
           </button>
         </div>
       </div>
+
+      <SuccessModal
+        isOpen={Boolean(successMessage)}
+        onClose={() => setSuccessMessage(null)}
+        title={successMessage ?? ""}
+      />
     </div>
   );
 }
