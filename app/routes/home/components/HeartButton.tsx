@@ -13,10 +13,15 @@ export default function HeartButton({
     onChange?.(!pressed);
   };
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    toggle();
+  };
+
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={handleClick}
       aria-label={pressed ? "좋아요 취소" : "좋아요"}
       className={[
         "inline-flex h-6 w-6 items-center justify-center",

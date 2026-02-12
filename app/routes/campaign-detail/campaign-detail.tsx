@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MiniLogo from "../../assets/logo/mini-logo.svg";
 import BrandHero from "../brand-detail/components/BrandHero";
 import BrandInfo from "../brand-detail/components/BrandInfo";
-import CampaingActionBar from "./components/CampaignActionBar";
+import CampaignActionBar from "./components/CampaignActionBar";
 import OngoingCampaignSection from "../brand-detail/components/OngoingCampaignSection";
 
 import { tokenStorage } from "../../lib/token";
@@ -24,6 +24,8 @@ type Props = {
   brandData: BrandDetailData;
   campaignId: number;
 };
+
+type OngoingCampaign = NonNullable<BrandDetailData["ongoingCampaigns"]>[number];
 
 const fmtMoney = (n?: number) =>
   Number.isFinite(n) ? `${Number(n).toLocaleString()}원` : "-";
@@ -49,6 +51,37 @@ const toDdayText = (dday?: number) => {
   return `D-${dday}`;
 };
 
+const getNumberField = (
+  obj: unknown,
+  keys: readonly string[],
+): number | null => {
+  if (!obj || typeof obj !== "object") return null;
+  const rec = obj as Record<string, unknown>;
+  for (const k of keys) {
+    const v = rec[k];
+    if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+  }
+  return null;
+};
+
+const getNestedNumberField = (
+  obj: unknown,
+  outerKey: string,
+  innerKeys: readonly string[],
+): number | null => {
+  if (!obj || typeof obj !== "object") return null;
+  const rec = obj as Record<string, unknown>;
+  const nested = rec[outerKey];
+  return getNumberField(nested, innerKeys);
+};
+
+const getCampaignIdFromOngoing = (c: OngoingCampaign): number | null =>
+  getNumberField(c, ["campaignId", "campaign_id", "id"]);
+
+const getBrandIdFromOngoing = (c: OngoingCampaign): number | null =>
+  getNumberField(c, ["brandId", "brand_id"]) ??
+  getNestedNumberField(c, "brand", ["brandId", "id"]);
+
 export default function CampaignDetailContent({
   brandData,
   campaignId,
@@ -63,6 +96,16 @@ export default function CampaignDetailContent({
 
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
   const [campaignError, setCampaignError] = useState<string | null>(null);
+
+  const [ongoingCampaigns, setOngoingCampaigns] = useState<OngoingCampaign[]>(
+    brandData.ongoingCampaigns ?? [],
+  );
+
+  useEffect(() => {
+    setOngoingCampaigns(brandData.ongoingCampaigns ?? []);
+  }, [brandData.ongoingCampaigns]);
+
+  const ongoingLikeInFlight = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     let alive = true;
@@ -85,6 +128,15 @@ export default function CampaignDetailContent({
 
         setCampaign(res.data.result);
         setCampaignError(null);
+
+        const liked = (() => {
+          const r: unknown = res.data.result;
+          if (!r || typeof r !== "object") return false;
+          const rec = r as Record<string, unknown>;
+          return rec["isLiked"] === true;
+        })();
+
+        setIsCampaignLiked(liked);
       } catch {
         if (!alive) return;
         setCampaignError("캠페인 정보를 불러오지 못했어요.");
@@ -129,8 +181,6 @@ export default function CampaignDetailContent({
     ];
   }, [campaign]);
 
-  const ongoing = useMemo(() => brandData.ongoingCampaigns ?? [], [brandData]);
-
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
@@ -139,6 +189,7 @@ export default function CampaignDetailContent({
     }
     navigate(`/rooms/brand/${brandData.id}`);
   };
+
   const handleToggleHeart = async (next: boolean) => {
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
@@ -161,6 +212,67 @@ export default function CampaignDetailContent({
       }
     } catch {
       setIsCampaignLiked(prev);
+    }
+  };
+
+  const handleOngoingLikeToggle = async (id: string) => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+
+    const clickedId = Number(id);
+    if (!Number.isFinite(clickedId) || clickedId <= 0) return;
+
+    const currentItem = ongoingCampaigns.find((c) => {
+      const cid = getCampaignIdFromOngoing(c);
+      return cid === clickedId;
+    });
+    if (!currentItem) return;
+
+    const cid = getCampaignIdFromOngoing(currentItem);
+    if (!cid) return;
+
+    if (ongoingLikeInFlight.current.has(cid)) return;
+    ongoingLikeInFlight.current.add(cid);
+
+    const prev =
+      (currentItem as unknown as { isLiked?: boolean }).isLiked ?? false;
+    const next = !prev;
+
+    setOngoingCampaigns((prevList) =>
+      prevList.map((c) => {
+        const eachId = getCampaignIdFromOngoing(c);
+        if (eachId !== clickedId) return c;
+        return { ...(c as object), isLiked: next } as OngoingCampaign;
+      }),
+    );
+
+    try {
+      const serverStatus = await toggleCampaignLike(cid);
+      if (typeof serverStatus === "boolean") {
+        setOngoingCampaigns((prevList) =>
+          prevList.map((c) => {
+            const eachId = getCampaignIdFromOngoing(c);
+            if (eachId !== clickedId) return c;
+            return {
+              ...(c as object),
+              isLiked: serverStatus,
+            } as OngoingCampaign;
+          }),
+        );
+      }
+    } catch {
+      setOngoingCampaigns((prevList) =>
+        prevList.map((c) => {
+          const eachId = getCampaignIdFromOngoing(c);
+          if (eachId !== clickedId) return c;
+          return { ...(c as object), isLiked: prev } as OngoingCampaign;
+        }),
+      );
+    } finally {
+      ongoingLikeInFlight.current.delete(cid);
     }
   };
 
@@ -237,6 +349,35 @@ export default function CampaignDetailContent({
     navigate("/matching/apply");
   };
 
+  const goOngoingCampaignDetail = (c: OngoingCampaign) => {
+    const cid = getCampaignIdFromOngoing(c);
+    if (!cid) return;
+
+    const domainParam = searchParams.get("domain");
+    const domain =
+      domainParam === "fashion" || domainParam === "beauty"
+        ? domainParam
+        : "beauty";
+
+    const bidFromItem = getBrandIdFromOngoing(c);
+    const brandIdFromQuery = Number(searchParams.get("brandId"));
+    const fallbackBrandId = Number(brandData.id);
+
+    const brandIdNum =
+      bidFromItem ??
+      (Number.isFinite(brandIdFromQuery) && brandIdFromQuery > 0
+        ? brandIdFromQuery
+        : Number.isFinite(fallbackBrandId) && fallbackBrandId > 0
+          ? fallbackBrandId
+          : null);
+
+    if (!brandIdNum) return;
+
+    navigate(
+      `/campaign?brandId=${brandIdNum}&campaignId=${cid}&domain=${domain}`,
+    );
+  };
+
   if (campaignError) {
     return (
       <div className="w-full bg-bg-w">
@@ -291,7 +432,7 @@ export default function CampaignDetailContent({
             </span>
           </div>
 
-          <CampaingActionBar
+          <CampaignActionBar
             isHearted={isCampaignLiked}
             onChat={handleChat}
             onSuggest={handleSuggest}
@@ -310,14 +451,14 @@ export default function CampaignDetailContent({
               />
             </div>
 
-            <div className=" text-center text-title text-text-black">
+            <div className="text-center text-title text-text-black">
               {campaign.title}
             </div>
           </section>
 
-          <section className="py-6.5">
+          <section className="pt-6 pb-6.5">
             <div className="text-title1 text-text-black">상세 설명</div>
-            <div className="mt-2.5 space-y-2.5">
+            <div className="mt-3 space-y-2.5">
               {detailRows.map((row) => (
                 <DetailRow
                   key={row.label}
@@ -328,12 +469,12 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <div className="my-6 mx-auto w-3/4 border-t border-core-2" />
+          <div className="mx-auto w-3/4 border-t border-core-2" />
 
           <section className="py-6">
             <div className="text-title1 text-text-black">콘텐츠</div>
 
-            <div className="mt-2.5 space-y-2.5 text-callout1 text-text-gray3">
+            <div className="mt-3 space-y-2.5 text-callout1 text-text-gray3">
               {contentRows.map((row) => (
                 <div key={row.label} className="flex">
                   <div className="w-21 shrink-0 text-title3 text-text-gray3">
@@ -370,7 +511,7 @@ export default function CampaignDetailContent({
             <button
               type="button"
               onClick={handleApply}
-              className="inline-flex w-full h-13 items-center justify-center gap-2.5 rounded-xl bg-core-1"
+              className="inline-flex h-13 w-full items-center justify-center gap-2.5 rounded-xl bg-core-1"
             >
               <span className="flex items-center justify-center gap-2">
                 <img
@@ -384,7 +525,12 @@ export default function CampaignDetailContent({
             </button>
           </div>
 
-          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
+          <OngoingCampaignSection
+            campaigns={ongoingCampaigns}
+            onMore={() => {}}
+            onCampaignClick={goOngoingCampaignDetail}
+            onLikeToggle={handleOngoingLikeToggle}
+          />
         </div>
       </div>
     </div>

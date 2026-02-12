@@ -11,7 +11,7 @@ type SponsorAvailableItem = {
   availableType: string;
   availableQuantity: number;
   availableSize: number;
-  sizeUnit: string;
+  shippingType: string;
 };
 
 type SponsorProductDetailResult = {
@@ -19,16 +19,10 @@ type SponsorProductDetailResult = {
   brandName: string;
   productId: number;
   productName: string;
-  productDescription: string;
   productImageUrls: string[];
   categories: string[];
   sponsorInfo: {
     items: SponsorAvailableItem[];
-    shippingType: string;
-  };
-  action: {
-    canProposeCampaign: boolean;
-    proposeCampaignCtaText: string;
   };
 };
 
@@ -48,7 +42,7 @@ type NavState = {
 
 function Pill({ children }: { children: string }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-[var(--color-core-3)] px-3 py-1 text-callout1 text-white">
+    <span className="inline-flex items-center rounded-full bg-core-3 px-2 py-1 text-callout1 text-white">
       {children}
     </span>
   );
@@ -65,18 +59,48 @@ function mapType(t: string) {
   }
 }
 
-function formatItems(items: SponsorAvailableItem[]) {
-  return items
+function formatItems(productName: string, items: SponsorAvailableItem[]) {
+  const name = (productName ?? "").toString();
+
+  return (items ?? [])
     .map((it) => {
-      const type = mapType(it.availableType);
-      const qty = Number.isFinite(it.availableQuantity)
-        ? `${it.availableQuantity}개`
-        : "";
-      const size =
-        Number.isFinite(it.availableSize) && it.sizeUnit
-          ? `${it.availableSize}${it.sizeUnit}`
+      const type = mapType((it.availableType ?? "").toString().trim());
+
+      const qty =
+        typeof it.availableQuantity === "number" && it.availableQuantity > 0
+          ? `${it.availableQuantity}개`
           : "";
-      return `${type} ${qty}${size ? ` / ${size}` : ""}`.trim();
+
+      const size =
+        typeof it.availableSize === "number" && it.availableSize > 0
+          ? `${it.availableSize}ml`
+          : "";
+
+      const left = [name, type, qty].filter(Boolean).join(" ").trim();
+      const right = size.trim();
+
+      return [left, right].filter(Boolean).join(" / ");
+    })
+    .filter(Boolean)
+    .join(" / ");
+}
+
+function formatSubtitleNoQty(productName: string, items: SponsorAvailableItem[]) {
+  const name = (productName ?? "").toString();
+
+  return (items ?? [])
+    .map((it) => {
+      const type = mapType((it.availableType ?? "").toString().trim());
+
+      const size =
+        typeof it.availableSize === "number" && it.availableSize > 0
+          ? `${it.availableSize}ml`
+          : "";
+
+      const left = [name, type].filter(Boolean).join(" ").trim();
+      const right = size.trim();
+
+      return [left, right].filter(Boolean).join(" / ");
     })
     .filter(Boolean)
     .join(" · ");
@@ -91,6 +115,20 @@ function formatShipping(t: string) {
     default:
       return t;
   }
+}
+
+function resolveShipping(items: SponsorAvailableItem[]) {
+  const types = Array.from(
+    new Set(
+      (items ?? [])
+        .map((it) => (it.shippingType ?? "").toString().trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (types.length === 0) return "";
+  if (types.length === 1) return formatShipping(types[0]);
+  return types.map(formatShipping).join(" · ");
 }
 
 export default function SponsorableDetailContent() {
@@ -116,12 +154,8 @@ export default function SponsorableDetailContent() {
 
   useEffect(() => {
     if (!layout) return;
-
     layout.setHideHeader(true);
-
-    return () => {
-      layout.setHideHeader(false);
-    };
+    return () => layout.setHideHeader(false);
   }, [layout]);
 
   useEffect(() => {
@@ -169,33 +203,36 @@ export default function SponsorableDetailContent() {
   const heroUrl = state.heroImageUrl || data?.productImageUrls?.[0] || "";
 
   const itemsText = useMemo(() => {
-    const items = data?.sponsorInfo?.items ?? [];
-    return items.length ? formatItems(items) : "";
+    if (!data) return "";
+    const items = data.sponsorInfo?.items ?? [];
+    return items.length ? formatItems(data.productName, items) : "";
+  }, [data]);
+
+  const subtitleText = useMemo(() => {
+    if (!data) return "";
+    const items = data.sponsorInfo?.items ?? [];
+    return items.length ? formatSubtitleNoQty(data.productName, items) : "";
   }, [data]);
 
   const shippingText = useMemo(() => {
-    return data ? formatShipping(data.sponsorInfo?.shippingType ?? "") : "";
+    if (!data) return "";
+    const items = data.sponsorInfo?.items ?? [];
+    return resolveShipping(items);
   }, [data]);
 
-  const showButton = !!data?.action?.canProposeCampaign;
+  const showButton = true;
   const buttonText = "제안하기";
 
   return (
-    <div className="w-full h-full overflow-hidden">
-      <div className=" w-full h-full overflow-hidden bg-bg-w relative flex flex-col">
-        {/* 헤더 */}
+    <div className="h-full w-full overflow-hidden bg-bg-w">
+      <div className="relative flex h-full w-full flex-col overflow-hidden bg-bg-w">
         <div className="shrink-0 bg-bg-w">
-          <NavigationHeader
-            title="협찬 가능 제품"
-            onBack={() => navigate(-1)}
-          />
+          <NavigationHeader title="협찬 가능 제품" onBack={() => navigate(-1)} />
         </div>
+        <div className="h-px w-full bg-core-2" />
 
-        {/* 스크롤 영역 */}
-        <main className="flex-1 min-h-0 overflow-y-auto bg-bg-w">
-          {loading && (
-            <LoadingSpinner className="py-16" />
-          )}
+        <main className="min-h-0 flex-1 overflow-y-auto bg-bg-w">
+          {loading && <LoadingSpinner className="py-16" />}
 
           {!loading && errorText && (
             <div className="px-5 py-16 text-center text-callout1 text-text-gray2">
@@ -204,33 +241,47 @@ export default function SponsorableDetailContent() {
           )}
 
           {!loading && !errorText && data && (
-            <div className={showButton ? "pb-15" : "pb-6"}>
+            <div className="pb-6">
               {heroUrl ? (
-                <img
-                  src={heroUrl}
-                  alt={data.productName}
-                  className="h-[360px] w-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                />
+                <div className="relative h-[450px] w-full overflow-hidden bg-bluegray-1">
+                  <img
+                    src={heroUrl}
+                    alt={data.productName}
+                    className="h-full w-full object-cover"
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <div className="pointer-events-none absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2">
+                    <span className="h-[7px] w-[7px] rounded-full bg-white" />
+                    <span className="h-[7px] w-[7px] rounded-full bg-bg-w-60" />
+                    <span className="h-[7px] w-[7px] rounded-full bg-bg-w-60" />
+                  </div>
+                </div>
               ) : (
-                <div className="h-[360px] w-full bg-bluegray-1" />
+                <div className="h-[450px] w-full bg-bluegray-1" />
               )}
 
-              <div className="bg-bg-w px-5 pb-6 pt-5">
-                <div className="text-callout1 text-text-gray3">
-                  {data.brandName}
-                </div>
-                <div className="mt-2 text-title8 text-text-black">
-                  {data.productName}
-                </div>
-                <div className="mt-2 text-title3 text-text-gray2">
-                  {data.productDescription}
-                </div>
+              <div className="bg-bg-w px-4 pt-4">
+                <div className="w-full px-[5px]">
+                  <div className="text-callout1 text-text-gray3">
+                    {data.brandName}
+                  </div>
 
-                <div className="my-6 h-px w-full bg-bluegray-2" />
+                  <div className="mt-2 text-title1 text-text-black">
+                    {data.productName}
+                  </div>
 
-                <section>
+                  {subtitleText ? (
+                    <div className="mt-1 mb-3.5 text-callout1 text-text-gray1">
+                      {subtitleText}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+              <div className="h-px w-full bg-core-2" />
+
+              <div className="flex flex-col gap-5 bg-bg-w px-5 pb-6 pt-6">
+                <section className="px-[5px]">
                   <div className="text-title1 text-text-black">카테고리</div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(data.categories ?? []).map((c) => (
@@ -239,55 +290,56 @@ export default function SponsorableDetailContent() {
                   </div>
                 </section>
 
-                <section className="mt-8">
-                  <div className="text-title1 text-text-black">협찬 설명</div>
+                <section className="px-[5px]">
+                  <div className="text-title3 text-text-black">협찬 설명</div>
 
-                  <div className="mt-4 space-y-5">
-                    <div className="flex items-start gap-6">
-                      <div className="w-14 shrink-0 text-title3 text-text-gray3">
+                  <div className="mt-3 space-y-3">
+                    <div className="flex items-start gap-2">
+                      <div className="w-[92px] shrink-0 text-title3 text-text-gray3">
                         품목
                       </div>
-                      <div className="min-w-0 flex-1 text-title3 text-text-black">
+                      <div className="min-w-0 flex-1 text-title3 text-text-gray1">
                         {itemsText}
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-6">
-                      <div className="w-14 shrink-0 text-title3 text-text-gray3">
+                    <div className="flex items-start gap-2">
+                      <div className="w-[92px] shrink-0 text-title3 text-text-gray3">
                         배송
                       </div>
-                      <div className="min-w-0 flex-1 text-title3 text-text-black">
+                      <div className="min-w-0 flex-1 text-title3 text-text-gray1">
                         {shippingText}
                       </div>
                     </div>
                   </div>
                 </section>
               </div>
+
+              {/* ✅ 버튼 영역: 컨텐츠와 분리 (피그마: px-6 pt-14 pb-24) */}
+              {showButton && (
+                <div className="bg-bg-w px-6 pt-[14px] pb-6 safe-area-bottom">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                    onClick={() =>
+                      navigate("/matching/suggest/create", {
+                        state: {
+                          brandId: data?.brandId,
+                          productId: data?.productId,
+                          brandName: data?.brandName,
+                          productName: data?.productName,
+                        },
+                      })
+                    }
+                  >
+                    {buttonText}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </main>
-
-        {showButton && (
-          <div className="absolute bottom-0 w-full px-6 pb-6 pt-4 bg-bg-w safe-area-bottom">
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              onClick={() =>
-                navigate("/matching/suggest/create", {
-                  state: {
-                    brandId: data?.brandId,
-                    productId: data?.productId,
-                    brandName: data?.brandName,
-                    productName: data?.productName,
-                  },
-                })
-              }
-            >
-              {buttonText}
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

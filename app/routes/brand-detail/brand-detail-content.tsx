@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import BrandHero from "./components/BrandHero";
@@ -7,14 +7,17 @@ import BrandActionBar from "./components/BrandActionBar";
 import PillChip from "./components/PillChip";
 import TagGroup from "./components/TagGroup";
 import OngoingCampaignSection from "./components/OngoingCampaignSection";
-import ProductMiniCard from "./components/ProductMiniCard";
 import HistoryRow from "./components/HistoryRow";
+import SponsorableProductSection from "./components/SponsorableProductSection";
 
 import { tokenStorage } from "../../lib/token";
 import { toggleBrandLike } from "../matching/api/matching";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
+import { apiClient } from "../../api/axios";
+
 import type { BrandDetailData } from "./types";
+import type { ProductMiniCardItem } from "./components/ProductMiniCard";
 
 type Props = { data: BrandDetailData };
 
@@ -88,19 +91,79 @@ function DoubleArrowRightIcon() {
   );
 }
 
-type ProductWithSubtitle = {
-  id: number | string;
-  title: string;
-  imageUrl: string;
-  subtitle?: string;
+type TagGroupLike = { label: string; chips: unknown[] };
+type TagSectionLike = { title: string; groups: TagGroupLike[] };
+
+function normalizeChips(chips: unknown[]) {
+  return (chips ?? [])
+    .map((c) => {
+      if (typeof c === "string") return `s:${c}`;
+      if (typeof c === "number") return `n:${c}`;
+      if (c && typeof c === "object") {
+        const rec = c as Record<string, unknown>;
+        if (typeof rec.id === "number" || typeof rec.id === "string") {
+          return `id:${String(rec.id)}`;
+        }
+        if (typeof rec.name === "string") {
+          return `name:${rec.name}`;
+        }
+        return `o:${JSON.stringify(rec)}`;
+      }
+      return `u:${String(c)}`;
+    })
+    .sort();
+}
+
+function groupSignature(g: TagGroupLike) {
+  const chips = normalizeChips(g.chips).join("|");
+  return `label:${g.label}__chips:${chips}`;
+}
+
+function sectionGroupsSignature(sec: TagSectionLike) {
+  return (sec.groups ?? []).map(groupSignature).sort().join("||");
+}
+
+function shouldShowTitleByRules(sections: TagSectionLike[]) {
+  if (sections.length <= 1) return false;
+
+  const firstSig = sectionGroupsSignature(sections[0]);
+  const allSame = sections.every((s) => sectionGroupsSignature(s) === firstSig);
+  if (allSame) return false;
+
+  return true;
+}
+
+type OngoingCampaign = NonNullable<BrandDetailData["ongoingCampaigns"]>[number];
+
+const getNumberField = (
+  obj: unknown,
+  keys: readonly string[],
+): number | null => {
+  if (!obj || typeof obj !== "object") return null;
+  const rec = obj as Record<string, unknown>;
+  for (const k of keys) {
+    const v = rec[k];
+    if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+  }
+  return null;
 };
 
-function getSubtitle(p: unknown): string {
-  if (typeof p !== "object" || p === null) return "";
-  if (!("subtitle" in p)) return "";
-  const v = (p as Record<string, unknown>).subtitle;
-  return typeof v === "string" ? v : "";
-}
+const getCampaignIdFromOngoing = (c: OngoingCampaign): number | null =>
+  getNumberField(c, ["campaignId", "campaign_id", "id"]);
+
+type SponsorProductsListItem = {
+  productId: number;
+  productName: string;
+  thumbnailImageUrl?: string | null;
+  productImageUrls?: string[] | null;
+};
+
+type SponsorProductsApiResponse = {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: SponsorProductsListItem[];
+};
 
 export default function BrandDetailContent({ data }: Props) {
   const heroUrl = data.brandImages?.[0] ?? data.heroImageUrl;
@@ -109,7 +172,90 @@ export default function BrandDetailContent({ data }: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const brandId = Number(searchParams.get("brandId"));
-  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
+  const validBrandId = Number.isFinite(brandId) && brandId > 0;
+
+  const setProposalData = useCampaignProposalStore(
+    (state) => state.setProposalData,
+  );
+
+  const baseOngoingCampaigns = useMemo<OngoingCampaign[]>(
+    () => data.ongoingCampaigns ?? [],
+    [data.ongoingCampaigns],
+  );
+
+  const [ongoingLikeOverrides, setOngoingLikeOverrides] = useState<
+    Record<number, boolean>
+  >({});
+
+  const ongoingCampaigns = useMemo<OngoingCampaign[]>(() => {
+    if (baseOngoingCampaigns.length === 0) return [];
+    const overrides = ongoingLikeOverrides;
+
+    return baseOngoingCampaigns.map((c) => {
+      const cid = getCampaignIdFromOngoing(c);
+      if (!cid) return c;
+
+      if (Object.prototype.hasOwnProperty.call(overrides, cid)) {
+        return { ...(c as object), isLiked: overrides[cid] } as OngoingCampaign;
+      }
+      return c;
+    });
+  }, [baseOngoingCampaigns, ongoingLikeOverrides]);
+
+  const ongoingLikeInFlight = useRef<Set<number>>(new Set());
+
+  const [sponsorProductsRaw, setSponsorProductsRaw] = useState<
+    ProductMiniCardItem[]
+  >([]);
+
+  const sponsorProducts = useMemo<ProductMiniCardItem[]>(
+    () => (validBrandId ? sponsorProductsRaw : []),
+    [validBrandId, sponsorProductsRaw],
+  );
+
+  useEffect(() => {
+    if (!validBrandId) return;
+
+    let alive = true;
+
+    (async () => {
+      try {
+        const res = await apiClient.get<SponsorProductsApiResponse>(
+          `/api/v1/brands/${brandId}/sponsor-products`,
+        );
+
+        if (!alive) return;
+
+        if (!res.data?.isSuccess) {
+          setSponsorProductsRaw([]);
+          return;
+        }
+
+        const mapped: ProductMiniCardItem[] = (res.data.result ?? []).map(
+          (p) => {
+            const fallback =
+              (p.productImageUrls ?? []).find(Boolean) ??
+              (p.thumbnailImageUrl ?? "");
+
+            return {
+              productId: p.productId,
+              productName: p.productName ?? "",
+              thumbnailImageUrl: (p.thumbnailImageUrl ?? "") || fallback,
+            };
+          },
+        );
+
+        setSponsorProductsRaw(mapped);
+      } catch {
+        if (!alive) return;
+        setSponsorProductsRaw([]);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [brandId, validBrandId]);
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -117,7 +263,7 @@ export default function BrandDetailContent({ data }: Props) {
       navigate("/auth/login");
       return;
     }
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
     navigate(`/rooms/brand/${brandId}`);
   };
 
@@ -127,7 +273,7 @@ export default function BrandDetailContent({ data }: Props) {
       navigate("/auth/login");
       return;
     }
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
 
     const domain = searchParams.get("domain");
 
@@ -136,34 +282,44 @@ export default function BrandDetailContent({ data }: Props) {
       campaignId: 0,
       domain: domain || "beauty",
       brandName: data.name,
-      products: (data.products ?? []).map((p) => ({ id: p.id, name: p.title })),
+      products: sponsorProducts.map((p) => ({
+        id: String(p.productId),
+        name: p.productName,
+      })),
     });
 
     navigate("/matching/suggest");
   };
 
   const handleGoSponsorableProducts = () => {
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
 
     navigate(`/products/sponsorable?brandId=${brandId}`, {
       state: {
         brandId,
         brandName: data.name,
-        products: (data.products ?? []).map((p) => {
-          const pp = p as unknown as ProductWithSubtitle;
-          return {
-            id: Number(pp.id),
-            title: pp.title,
-            subtitle: getSubtitle(p),
-            imageUrl: pp.imageUrl,
-          };
-        }),
+        products: sponsorProducts,
       },
     });
   };
 
+  const handleSponsorableProductClick = (productId: number) => {
+    if (!validBrandId) return;
+    if (!Number.isFinite(productId) || productId <= 0) return;
+
+    navigate(
+      `/products/sponsorable/detail?brandId=${brandId}&productId=${productId}`,
+      {
+        state: {
+          brandId,
+          brandName: data.name,
+        },
+      },
+    );
+  };
+
   const handleToggleHeart = async () => {
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!validBrandId) return;
 
     const prev = isHearted;
     const next = !prev;
@@ -175,6 +331,61 @@ export default function BrandDetailContent({ data }: Props) {
     } catch {
       setIsHearted(prev);
     }
+  };
+
+  const goOngoingCampaignDetail = (c: OngoingCampaign) => {
+    const cid = getCampaignIdFromOngoing(c);
+    if (!cid) return;
+
+    const domainParam = searchParams.get("domain");
+    const domain =
+      domainParam === "fashion" || domainParam === "beauty"
+        ? domainParam
+        : "beauty";
+
+    const brandIdNum =
+      validBrandId
+        ? brandId
+        : Number.isFinite(Number(data.id)) && Number(data.id) > 0
+          ? Number(data.id)
+          : null;
+
+    if (!brandIdNum) return;
+
+    navigate(
+      `/campaign?brandId=${brandIdNum}&campaignId=${cid}&domain=${domain}`,
+    );
+  };
+
+  const handleOngoingLikeToggle = async (id: string) => {
+    const accessToken = tokenStorage.getAccessToken();
+    if (!accessToken) {
+      navigate("/auth/login");
+      return;
+    }
+
+    const clickedId = Number(id);
+    if (!Number.isFinite(clickedId) || clickedId <= 0) return;
+
+    const currentItem = ongoingCampaigns.find((c) => {
+      const cid = getCampaignIdFromOngoing(c);
+      return cid === clickedId;
+    });
+    if (!currentItem) return;
+
+    const cid = getCampaignIdFromOngoing(currentItem);
+    if (!cid) return;
+
+    if (ongoingLikeInFlight.current.has(cid)) return;
+    ongoingLikeInFlight.current.add(cid);
+
+    const prev =
+      (currentItem as unknown as { isLiked?: boolean }).isLiked ?? false;
+    const next = !prev;
+
+    setOngoingLikeOverrides((m) => ({ ...m, [cid]: next }));
+
+    ongoingLikeInFlight.current.delete(cid);
   };
 
   const PAGE_SIZE = 4;
@@ -198,6 +409,11 @@ export default function BrandDetailContent({ data }: Props) {
 
   const canPrevGroup = groupStart > 1;
 
+  const goPage = (p: number) => {
+    if (p < 1) return;
+    setPage(p);
+  };
+
   const goPrevGroup = () => {
     if (!canPrevGroup) return;
     goPage(groupStart - GROUP_SIZE);
@@ -209,11 +425,6 @@ export default function BrandDetailContent({ data }: Props) {
 
   const startIdx = (page - 1) * PAGE_SIZE;
   const pageItems = histories.slice(startIdx, startIdx + PAGE_SIZE);
-
-  const goPage = (p: number) => {
-    if (p < 1) return;
-    setPage(p);
-  };
 
   const goPrev = () => {
     if (!canPrev) return;
@@ -230,19 +441,19 @@ export default function BrandDetailContent({ data }: Props) {
     goPage(groupStart + GROUP_SIZE);
   };
 
+  const tagSections = (data.tagSections ?? []) as unknown as TagSectionLike[];
+  const showSectionTitle = shouldShowTitleByRules(tagSections);
+
   return (
     <div className="w-full bg-bg-w">
-      <div
-        className="w-full
- bg-bg-w"
-      >
+      <div className="w-full bg-bg-w">
         <BrandHero
           heroImageUrl={heroUrl}
           logoImageUrl={data.logoImageUrl}
           logoText={data.logoText ?? ""}
         />
 
-        <div className="px-5 pb-10">
+        <div className="px-4">
           <BrandInfo
             name={data.name}
             matchRate={data.matchRate}
@@ -250,182 +461,164 @@ export default function BrandDetailContent({ data }: Props) {
             description={data.description}
           />
 
-          <BrandActionBar
-            isHearted={isHearted}
-            onChat={handleChat}
-            onSuggest={handleSuggest}
-            onToggleHeart={handleToggleHeart}
-          />
+          <div className="mt-3.5">
+            <BrandActionBar
+              isHearted={isHearted}
+              onChat={handleChat}
+              onSuggest={handleSuggest}
+              onToggleHeart={handleToggleHeart}
+            />
+          </div>
 
-          <div className="my-4 h-px w-full bg-bluegray-2" />
+          <div className="mb-3 mt-4 h-px w-full bg-core-2" />
 
-          <section className="py-5">
-            <div className="text-title1 text-text-black">카테고리</div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(data.categories ?? []).map((c) => (
-                <PillChip key={c} variant="filled">
-                  {c}
-                </PillChip>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            {(data.tagSections ?? []).map((sec, idx) => (
-              <div key={`${sec.title}-${idx}`} className={idx ? "mt-6" : ""}>
-                <div className="text-title3 text-text-black">{sec.title}</div>
-                <div className="mt-4 space-y-4">
-                  {sec.groups.map((g) => (
-                    <TagGroup
-                      key={`${sec.title}-${g.label}`}
-                      label={g.label}
-                      chips={g.chips}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </section>
-
-          <DividerBlock />
-
-          {!data.ongoingCampaigns || data.ongoingCampaigns.length === 0 ? (
-            <section className="py-5">
-              <div className="text-title1 text-text-black">
-                진행 중인 캠페인
-              </div>
-              <div className="flex h-[180px] items-center justify-center">
-                <div className="text-callout1 text-text-gray2">
-                  진행 중인 캠페인이 없어요
-                </div>
+          <div className="py-9">
+            <section className="pb-5">
+              <div className="text-title1 text-text-black">카테고리</div>
+              <div className="mt-2.5 flex flex-wrap gap-1">
+                {(data.categories ?? []).map((c) => (
+                  <PillChip key={c} variant="filled">
+                    {c}
+                  </PillChip>
+                ))}
               </div>
             </section>
-          ) : (
-            <OngoingCampaignSection
-              campaigns={data.ongoingCampaigns}
-              onMore={() => {}}
-            />
-          )}
+
+            <section>
+              {(tagSections ?? []).map((sec, idx) => {
+                const showTitle = showSectionTitle;
+
+                return (
+                  <div key={`${sec.title}-${idx}`} className={idx ? "mt-5" : ""}>
+                    {showTitle ? (
+                      <div className="text-title3 text-text-black">
+                        {sec.title}
+                      </div>
+                    ) : null}
+
+                    <div className={showTitle ? "mt-2 space-y-1.5" : "space-y-1.5"}>
+                      {(sec.groups ?? []).map((g, gi) => (
+                        <TagGroup
+                          key={`${sec.title}-${g.label}-${gi}`}
+                          label={g.label}
+                          chips={g.chips as never}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          </div>
 
           <DividerBlock />
 
-          <section className="py-5">
-            <div className="flex items-center justify-between">
-              <div className="text-title1 text-text-black">협찬 가능 제품</div>
-              <button
-                type="button"
-                onClick={handleGoSponsorableProducts}
-                className="text-[18px] text-text-gray3"
-              >
-                ›
-              </button>
+          <OngoingCampaignSection
+            campaigns={ongoingCampaigns}
+            onMore={() => {}}
+            onCampaignClick={goOngoingCampaignDetail}
+            onLikeToggle={handleOngoingLikeToggle}
+          />
+
+          <DividerBlock />
+
+          <SponsorableProductSection
+            products={sponsorProducts}
+            onMore={handleGoSponsorableProducts}
+            onProductClick={handleSponsorableProductClick}
+          />
+
+          <DividerBlock />
+
+          <section className="py-9">
+  <div className="text-title1 text-text-black">캠페인 내역</div>
+
+  {histories.length === 0 ? (
+    <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
+      <div className="flex h-[126px] w-full flex-col items-start justify-center">
+        <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
+          <div className="flex w-full flex-col items-center justify-center gap-[10px]">
+            <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
+              진행한 캠페인이 없어요
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className="mt-3">
+        {pageItems.map((h) => (
+          <HistoryRow key={h.id} item={h} />
+        ))}
+      </div>
 
-            {!data.products || data.products.length === 0 ? (
-              <div className="flex h-[180px] items-center justify-center">
-                <div className="text-callout1 text-text-gray2">
-                  협찬 가능한 제품이 없어요.
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4 -mx-5 overflow-x-hidden">
-                <div className="px-5 overflow-x-auto scrollbar-hide">
-                  <div className="flex w-max gap-3">
-                    {data.products.map((p) => (
-                      <ProductMiniCard key={p.id} item={p} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
+      <div className="my-5 flex items-center justify-center gap-3">
+        {page > GROUP_SIZE && (
+          <button
+            type="button"
+            onClick={goPrevGroup}
+            className="grid h-7 w-7 place-items-center text-text-gray3"
+          >
+            <DoubleArrowLeftIcon />
+          </button>
+        )}
 
-          <DividerBlock />
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={!canPrev}
+          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+        >
+          <ArrowLeftIcon />
+        </button>
 
-          <section className="py-5">
-            <div className="text-title1 text-text-black">캠페인 내역</div>
+        <div className="flex items-center gap-3">
+          {displayPages.map((p) => {
+            const disabledPage = p > totalPages && !hasNext;
+            const active = p === page;
 
-            {histories.length === 0 ? (
-              <div className="flex h-[180px] items-center justify-center">
-                <div className="text-callout1 text-text-gray2">
-                  진행한 캠페인이 없어요
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="mt-3">
-                  {pageItems.map((h) => (
-                    <HistoryRow key={h.id} item={h} />
-                  ))}
-                </div>
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => !disabledPage && goPage(p)}
+                disabled={disabledPage}
+                className={
+                  active
+                    ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
+                    : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
+                }
+                style={active ? { backgroundColor: "#A9ADFF" } : undefined}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
 
-                <div className="mt-5 flex items-center justify-center gap-3">
-                  {page > GROUP_SIZE && (
-                    <button
-                      type="button"
-                      onClick={goPrevGroup}
-                      className="grid h-7 w-7 place-items-center text-text-gray3"
-                    >
-                      <DoubleArrowLeftIcon />
-                    </button>
-                  )}
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={!canNext}
+          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+        >
+          <ArrowRightIcon />
+        </button>
 
-                  <button
-                    type="button"
-                    onClick={goPrev}
-                    disabled={!canPrev}
-                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-                  >
-                    <ArrowLeftIcon />
-                  </button>
+        <button
+          type="button"
+          onClick={goNextGroup}
+          disabled={!canNextGroup}
+          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+        >
+          <DoubleArrowRightIcon />
+        </button>
+      </div>
+    </>
+  )}
+</section>
 
-                  <div className="flex items-center gap-3">
-                    {displayPages.map((p) => {
-                      const disabledPage = p > totalPages && !hasNext;
-                      const active = p === page;
-
-                      return (
-                        <button
-                          key={p}
-                          type="button"
-                          onClick={() => !disabledPage && goPage(p)}
-                          disabled={disabledPage}
-                          className={
-                            active
-                              ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
-                              : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
-                          }
-                          style={
-                            active ? { backgroundColor: "#A9ADFF" } : undefined
-                          }
-                        >
-                          {p}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    disabled={!canNext}
-                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-                  >
-                    <ArrowRightIcon />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={goNextGroup}
-                    disabled={!canNextGroup}
-                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-                  >
-                    <DoubleArrowRightIcon />
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
         </div>
       </div>
     </div>
@@ -433,5 +626,5 @@ export default function BrandDetailContent({ data }: Props) {
 }
 
 function DividerBlock() {
-  return <div className="-mx-5 mt-5 h-2 bg-bluegray-1" />;
+  return <div className="-mx-4 h-2.5 bg-bluegray-1" />;
 }
