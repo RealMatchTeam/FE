@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "../../../lib/utils";
 import FilterChip from "../../../components/common/FilterChip";
+import SelectChip from "../test/components/SelectChip";
 import {
     SORT_OPTIONS,
     CAMPAIGN_SORT_OPTIONS,
@@ -74,34 +75,42 @@ export default function MatchingFilter({
     };
 
     return (
-        <div className="flex flex-col h-full pt-[20px] px-4">
+        <div className="flex flex-col h-full">
             {/* 메인 탭 */}
-            <div className="flex mb-3 pt-2 pl-2">
-                <button
-                    type="button"
-                    className="text-medium cursor-pointer transition-colors text-text-black"
-                    onClick={() => setMainTab("정렬 필터")}
-                >
-                    <span className={mainTab === "정렬 필터" ? "pb-3 border-b-2 border-core-1" : ""}>
-                        정렬 필터
-                    </span>
-                </button>
-                <button
-                    type="button"
-                    className="ml-6 text-medium cursor-pointer transition-colors text-text-black"
-                    onClick={() => setMainTab(filterTabName)}
-                >
-                    <span className={mainTab === filterTabName ? "pb-3 border-b-2 border-core-1" : ""}>
-                        {filterTabName}
-                    </span>
-                </button>
+            <div className="px-4 pt-5">
+                <div className="flex gap-6">
+                    <button
+                        type="button"
+                        className={cn(
+                            "text-title3 font-semibold cursor-pointer transition-colors",
+                            mainTab === "정렬 필터" ? "text-text-black" : "text-text-gray3",
+                        )}
+                        onClick={() => setMainTab("정렬 필터")}
+                    >
+                        <span className={mainTab === "정렬 필터" ? "pb-3 border-b-2 border-core-1" : ""}>
+                            정렬 필터
+                        </span>
+                    </button>
+                    <button
+                        type="button"
+                        className={cn(
+                            "text-title3 font-semibold cursor-pointer transition-colors",
+                            mainTab === filterTabName ? "text-text-black" : "text-text-gray3",
+                        )}
+                        onClick={() => setMainTab(filterTabName)}
+                    >
+                        <span className={mainTab === filterTabName ? "pb-3 border-b-2 border-core-1" : ""}>
+                            {filterTabName}
+                        </span>
+                    </button>
+                </div>
             </div>
 
             {/* 컨텐츠 영역 */}
             <div className="flex-1 text-[14px]">
                 {mainTab === "정렬 필터" ? (
                     /* 정렬 필터 */
-                    <div className="flex gap-6 bg-[#F3F4F8] -mx-4 px-4 pl-6 py-3">
+                    <div className="mt-3 flex gap-6 bg-[#F3F4F8] px-4 py-3">
                         {sortOptions.map((option) => (
                             <button
                                 key={option}
@@ -120,9 +129,9 @@ export default function MatchingFilter({
                     </div>
                 ) : (
                     /* 카테고리 필터 */
-                    <div className="flex flex-col gap-4">
+                    <div className="mt-3 flex flex-col gap-4">
                         {/* 서브 탭 */}
-                        <div className="flex gap-6 overflow-x-auto bg-[#F3F4F8] -mx-4 px-4 pl-6 py-3">
+                        <div className="flex gap-6 overflow-x-auto bg-[#F3F4F8] px-4 py-3">
                             {subTabs.map((tab) => (
                                 <button
                                     key={tab}
@@ -141,7 +150,7 @@ export default function MatchingFilter({
                         </div>
 
                         {/* 태그 칩들 */}
-                        <div className="flex flex-wrap gap-2 items-center">
+                        <div className="flex flex-wrap gap-2 items-center px-4">
                             <button
                                 type="button"
                                 className="flex items-center justify-center cursor-pointer"
@@ -151,23 +160,36 @@ export default function MatchingFilter({
                                     <path d="M8.4 16.308L12 12.708L15.6 16.308L16.308 15.6L12.708 12L16.308 8.4L15.6 7.692L12 11.292L8.4 7.692L7.692 8.4L11.292 12L7.692 15.6L8.4 16.308ZM12.003 21C10.759 21 9.589 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21Z" fill="#B7B7F3" />
                                 </svg>
                             </button>
-                            {(filterData[subTab as keyof typeof filterData] as readonly string[]).map((tag) => (
-                                <FilterChip
-                                    key={tag}
-                                    label={tag}
-                                    selected={currentTags.includes(tag)}
-                                    onClick={() => toggleTag(tag)}
-                                />
-                            ))}
+                            {(filterData[subTab as keyof typeof filterData] as readonly string[]).map((tag) => {
+                                const selected = currentTags.includes(tag);
+                                if (filterType === "BEAUTY") {
+                                    return (
+                                        <SelectChip
+                                            key={tag}
+                                            label={tag}
+                                            isSelected={selected}
+                                            onToggle={() => toggleTag(tag)}
+                                        />
+                                    );
+                                }
+                                return (
+                                    <FilterChip
+                                        key={tag}
+                                        label={tag}
+                                        selected={selected}
+                                        onClick={() => toggleTag(tag)}
+                                    />
+                                );
+                            })}
                         </div>
                     </div>
                 )}
             </div>
 
             {/* 적용하기 버튼 */}
-            <div className="flex justify-center py-6">
+            <div className="px-4 pb-6">
                 <button
-                    className="w-full h-11 rounded-[12px] bg-[#6666E5] text-white text-title7"
+                    className="w-full h-11 rounded-[12px] bg-[#6666E5] text-white text-[13px] font-semibold"
                     onClick={handleApply}
                 >
                     적용하기

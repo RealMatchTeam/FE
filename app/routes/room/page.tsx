@@ -104,12 +104,10 @@ export default function ChattingRoom({ roomId }: Props) {
 
   const partnerName = detail?.opponentName ?? "";
   const partnerAvatarUrl = detail?.opponentProfileImageUrl ?? "";
-  const isCollaborating = detail?.isCollaborating ?? false;
-
   const collabTitle = detail?.campaignSummary?.campaignTitle ?? "";
   const collabSubtitle = detail?.campaignSummary?.brandName ?? "";
   const collabThumb = detail?.campaignSummary?.campaignImageUrl ?? partnerAvatarUrl;
-  const summaryBarHeight = isCollaborating ? 64 : 0;
+  const summaryBarHeight = detail?.campaignSummary ? 64 : 0;
 
 
   const actions: AttachmentAction[] = useMemo(
@@ -180,17 +178,21 @@ export default function ChattingRoom({ roomId }: Props) {
       >
         <div className="w-full">
           <div className="w-full space-y-2">
-            {messages.map((m) => {
+            {messages.map((m, idx) => {
               const isMe = m.senderType === "USER" && m.senderId === myUserId;
               const { dateText, timeText } = formatKoreanDateTime(m.createdAt);
               const messageKey = m.clientMessageId || m.messageId || `${m.roomId}-${m.createdAt}`;
+
+              const prev = idx > 0 ? messages[idx - 1] : null;
+              const isSameSender = prev && prev.senderId === m.senderId && prev.senderType === m.senderType;
+              const showAvatar = !isMe && !isSameSender;
 
               return (
                 <MessageRenderer
                   key={messageKey}
                   message={m}
                   timeText={`${dateText}\n${timeText}`}
-                  avatarSrc={isMe ? undefined : partnerAvatarUrl}
+                  avatarSrc={showAvatar ? partnerAvatarUrl : undefined}
                 />
               );
             })}

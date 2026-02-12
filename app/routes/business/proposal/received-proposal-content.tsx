@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useHideHeader } from "../../../hooks/useHideHeader";
+import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
 import Modal from "../../../components/common/Modal";
+import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
 import { getProposalDetail, approveCampaignProposal, rejectCampaignProposal, type ProposalDetail } from "./api/proposal";
@@ -33,7 +35,16 @@ export default function ReceivedProposalContent() {
 
     const [rejectReason, setRejectReason] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
     useHideHeader(true);
+    useHideBottomTab(modalType === "reject" || modalType === "rejectSuccess");
+
+    // 채팅에서 거절하기로 진입한 경우 자동으로 거절 모달 열기
+    useEffect(() => {
+        if (location.state?.openReject && !isLoading && proposal) {
+            setModalType("reject");
+        }
+    }, [location.state, isLoading, proposal]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -226,7 +237,52 @@ export default function ReceivedProposalContent() {
                 </button>
             </div>
 
-            <Modal isOpen={modalType !== "none"} onClose={closeModal} className="w-full max-w-[340px] p-8 px-6">
+            {/* 거절 바텀시트 */}
+            <FilterBottomSheet isOpen={modalType === "reject" || modalType === "rejectSuccess"} onClose={closeModal} className="h-[60%]">
+                {modalType === "reject" && (
+                    <div className="flex flex-col h-full px-6 pt-8 pb-6">
+                        <h3 className="text-[20px] font-bold text-text-black mb-6">{proposal?.title}</h3>
+
+                        <div className="flex flex-col gap-2 flex-1">
+                            <label className="text-[16px] font-bold text-text-black">거절 이유</label>
+                            <div className="relative">
+                                <textarea
+                                    value={rejectReason}
+                                    onChange={(e) => setRejectReason(e.target.value.slice(0, 500))}
+                                    placeholder="거절 이유를 입력해주세요"
+                                    className="w-full h-[140px] p-4 bg-white border border-text-gray5 rounded-[12px] text-body1 resize-none focus:outline-none focus:border-core-1"
+                                />
+                                <span className="absolute bottom-3 right-4 text-[12px] text-text-gray4">
+                                    {rejectReason.length}/500
+                                </span>
+                            </div>
+                            <p className="text-[12px] text-text-gray3">*거절 이유 작성은 선택사항 입니다</p>
+                        </div>
+
+                        <div className="flex w-full gap-3 mt-auto pt-6">
+                            <button onClick={closeModal} className="w-[110px] py-4 border border-core-3 rounded-[16px] text-core-1 font-bold shrink-0">취소하기</button>
+                            <button
+                                onClick={handleRejectSubmit}
+                                disabled={isProcessing}
+                                className="flex-1 py-4 bg-core-1 rounded-[16px] text-white font-bold disabled:bg-text-gray5"
+                            >
+                                {isProcessing ? "처리 중..." : "거절하기"}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {modalType === "rejectSuccess" && (
+                    <div className="flex flex-col items-center text-center px-6 py-10">
+                        <div className="mb-6"><img src={checkIcon} alt="check" className="w-[80px] h-[80px]" /></div>
+                        <h3 className="text-[22px] font-bold text-text-black mb-2">거절하기 완료</h3>
+                        <p className="text-[16px] text-text-gray3 mb-10">다른 협업을 확인해주세요</p>
+                        <button onClick={() => navigate(-1)} className="w-full py-4 bg-core-1 rounded-[16px] text-white font-bold">완료하기</button>
+                    </div>
+                )}
+            </FilterBottomSheet>
+
+            <Modal isOpen={modalType === "confirm" || modalType === "success"} onClose={closeModal} className="w-full max-w-[340px] p-8 px-6">
                 {/* 모달 */}
                 {modalType === "confirm" && (
                     <div className="flex flex-col items-center text-center">
@@ -253,47 +309,6 @@ export default function ReceivedProposalContent() {
                     </div>
                 )}
 
-                {modalType === "reject" && (
-                    <div className="flex flex-col w-full">
-                        <h3 className="text-[18px] font-bold text-text-black mb-6">비플레인 선크림 리뷰 콘텐츠</h3>
-
-                        <div className="flex flex-col gap-2 mb-8">
-                            <label className="text-[16px] font-bold text-text-black">거절 이유</label>
-                            <div className="relative">
-                                <textarea
-                                    value={rejectReason}
-                                    onChange={(e) => setRejectReason(e.target.value.slice(0, 500))}
-                                    placeholder="거절 이유를 입력해주세요"
-                                    className="w-full h-[160px] p-4 bg-white border border-text-gray5 rounded-[12px] text-body1 resize-none focus:outline-none focus:border-core-1"
-                                />
-                                <span className="absolute bottom-3 right-4 text-[12px] text-text-gray4">
-                                    {rejectReason.length}/500
-                                </span>
-                            </div>
-                            <p className="text-[12px] text-text-gray3">*거절 이유 작성은 선택사항 입니다</p>
-                        </div>
-
-                        <div className="flex w-full gap-3">
-                            <button onClick={closeModal} className="w-[90px] py-4 border border-core-3 rounded-[16px] text-core-1 font-bold">취소하기</button>
-                            <button
-                                onClick={handleRejectSubmit}
-                                disabled={isProcessing}
-                                className="flex-1 py-4 bg-core-1 rounded-[16px] text-white font-bold disabled:bg-text-gray5"
-                            >
-                                {isProcessing ? "처리 중..." : "거절하기"}
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {modalType === "rejectSuccess" && (
-                    <div className="flex flex-col items-center text-center py-4">
-                        <div className="mb-6"><img src={checkIcon} alt="check" className="w-[80px] h-[80px]" /></div>
-                        <h3 className="text-[22px] font-bold text-text-black mb-2">거절하기 완료</h3>
-                        <p className="text-[16px] text-text-gray3 mb-10">다른 협업을 확인해주세요</p>
-                        <button onClick={() => window.location.reload()} className="w-full py-4 bg-core-1 rounded-[16px] text-white font-bold">완료하기</button>
-                    </div>
-                )}
             </Modal>
         </div>
     );

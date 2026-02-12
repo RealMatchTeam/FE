@@ -1,3 +1,5 @@
+import BottomSheet from "../../../components/common/BottomSheet";
+import { cn } from "../../../lib/utils";
 import { SORT_LABEL, type SortOption } from "./ChatSortFilterConstant";
 
 // 정렬, 필터 옵션 (최신순/협업 중)
@@ -44,64 +46,51 @@ export function SortFilterSheet<T extends string = SortOption>({
   const sheetOptions = (options ?? DEFAULT_OPTIONS) as SortOptionItem<T>[];
 
   return (
-    <div className="fixed inset-0 z-50">
-      {/* 딤(배경) */}
-      <button
-        type="button"
-        aria-label="close"
-        className="absolute inset-0 bg-[#17171833]"
-        onClick={onClose}
-      />
-
-      {/* 시트 */}
-      <div
-        className={[
-          "fixed left-1/2 -translate-x-1/2 bottom-[0px] w-full max-w-[480px] h-[500px] bg-white rounded-t-[12px] pt-[20px] px-4 flex flex-col",
-          containerClassName ?? "",
-        ]
-          .join(" ")
-          .trim()}
-      >
-        <div className="w-full max-w-[480px] h-[70px] fixed left-1/2 -translate-x-1/2">
-          <div
-            className={["px-4 text-medium text-text-black mb-3", titleClassName ?? ""]
-              .join(" ")
-              .trim()}
-          >
-            {title}
-          </div>
-
-          <div className="bg-[#F3F4F8] px-4 py-3">
-            <div className="flex gap-6">
-              {sheetOptions.map((option) => (
-                <SortOptionButton
-                  key={option.value}
-                  label={option.label}
-                  active={value === option.value}
-                  onClick={() => onChange(option.value)}
-                  className={optionClassName}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="flex-1" />
-
-        <div className="flex justify-center py-6">
-          <button
-            onClick={onApply}
-            className={[
-              "px-6 w-full h-11 rounded-[12px] bg-[#6666E5] text-white text-SemiBold",
-              applyButtonClassName ?? "",
-            ]
-              .join(" ")
-              .trim()}
-          >
-            {applyLabel}
-          </button>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      height={500}
+      className={containerClassName}
+    >
+      <div className="px-4 pt-5">
+        <div
+          className={cn(
+            "text-title3 font-semibold text-text-black",
+            titleClassName,
+          )}
+        >
+          {title}
         </div>
       </div>
-    </div>
+
+      <div className="mt-3 bg-[#F3F4F8] px-4 py-3">
+        <div className="flex gap-6">
+          {sheetOptions.map((option) => (
+            <SortOptionButton
+              key={option.value}
+              label={option.label}
+              active={value === option.value}
+              onClick={() => onChange(option.value)}
+              className={optionClassName}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1" />
+
+      <div className="px-4 pb-6">
+        <button
+          onClick={onApply}
+          className={cn(
+            "w-full h-11 rounded-[12px] bg-[#6666E5] text-white text-[13px] font-semibold",
+            applyButtonClassName,
+          )}
+        >
+          {applyLabel}
+        </button>
+      </div>
+    </BottomSheet>
   );
 }
 
@@ -120,7 +109,7 @@ function SortOptionButton({
     <button
       onClick={onClick}
       className={[
-        "text-medium",
+        "text-title3",
         active ? "text-text-black" : "text-text-gray3",
         className ?? "",
       ]
