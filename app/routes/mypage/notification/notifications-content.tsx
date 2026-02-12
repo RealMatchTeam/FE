@@ -93,7 +93,7 @@ export default function MyPageNotifications() {
     <div className="h-screen-full bg-[#F3F4F8]">
       <div className="w-full bg-white shadow-2xl flex flex-col">
         <div className="pt-[env(safe-area-inset-top)]">
-          <div className="h-[60px]">
+          <div className="min-h-[60px]">
             <NavigationHeader title="알림 설정" onBack={() => navigate(-1)} />
           </div>
         </div>

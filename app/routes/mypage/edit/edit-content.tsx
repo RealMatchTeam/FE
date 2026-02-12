@@ -194,7 +194,7 @@ export default function MyPageEdit() {
   return (
     <div className="min-h-full w-full flex flex-col ">
       <div className="w-full flex flex-col flex-1">
-        <div className="h-[60px]">
+        <div className="min-h-[60px]">
           <NavigationHeader
             title="회원정보 설정"
             onBack={() => navigate(-1)}

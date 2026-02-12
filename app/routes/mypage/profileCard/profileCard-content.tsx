@@ -242,7 +242,7 @@ export default function ProfileCard() {
     <div className="h-screen-full">
       <div className="w-full bg-white shadow-2xl flex flex-col">
         {/* header */}
-        <div className="h-[60px]">
+        <div className="min-h-[60px]">
           <NavigationHeader
             title={"내 프로필 카드"}
             onBack={() => history.back()}
