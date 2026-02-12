@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import chatIcon from "../../../assets/chat-icon.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 
@@ -8,6 +9,8 @@ interface CampaignBrandCardProps {
   brandTags?: string[]; 
   brandImageUrl?: string; 
   matchingRate?: number;
+  brandId?: number | string;
+  category?: string;
 }
 
 export default function CampaignBrandCard({ 
@@ -16,8 +19,19 @@ export default function CampaignBrandCard({
   brandName,
   brandTags,
   brandImageUrl,
-  matchingRate // Props 
+  matchingRate,
+  brandId,
+  category
 }: CampaignBrandCardProps) {
+  const navigate = useNavigate(); 
+  const handleBrandClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    if (brandId && category) {
+      navigate(`/brand?brandId=${brandId}&domain=${category}`);
+    } else {
+      console.warn("brandId 또는 category 정보가 부족합니다.");
+    }
+  };
   return (
     <section className="bg-bg-w p-5 flex flex-col gap-4 -mx-4 -mt-6">
       {/* 상단 브랜드 정보 */}
@@ -28,14 +42,21 @@ export default function CampaignBrandCard({
             <img src={brandImageUrl} alt={brandName} className="w-full h-full object-cover" />
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col justify-center gap-1">
             <div className="flex items-center gap-1">
-              <h2 className="text-title1 text-text-black">
+              <h2 className="text-title1 text-text-black leading-tight">
                 {brandName || "브랜드명"}
               </h2>
-              <img src={arrowRightIcon} alt="arrow"/>
+              <button 
+                type="button"
+                onClick={handleBrandClick}
+                className="flex items-center justify-center active:scale-90 transition-transform p-1"
+                aria-label="브랜드 상세 보기"
+              >
+                <img src={arrowRightIcon} alt="arrow" />
+              </button>
             </div>
-            <p className="text-callout1 text-text-gray3 mt-3">
+            <p className="text-callout1 text-text-gray3 mt-1">
               {brandTags && brandTags.length > 0 
                 ? brandTags.map(tag => `#${tag}`).join(" ") 
                 : "#태그정보없음"}
@@ -43,7 +64,7 @@ export default function CampaignBrandCard({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end justify-center h-[64px]">
           <div className="flex items-baseline gap-1">
             <span className="text-title5 text-core-1">매칭률</span>
             <span className="text-title6 text-core-1">{matchingRate || 0}%</span>

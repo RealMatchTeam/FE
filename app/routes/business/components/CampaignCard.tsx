@@ -6,6 +6,8 @@ import Card from "../../../components/common/Card";
 
 interface CampaignCardProps {
   brand: string;
+  brandId?: string | number;
+  category?: string;
   title: string;
   startDate: string;
   endDate: string;
@@ -18,6 +20,8 @@ interface CampaignCardProps {
 
 export default function CampaignCard({
   brand,
+  brandId,
+  category = "beauty",
   title,
   startDate,
   endDate,
@@ -29,6 +33,14 @@ export default function CampaignCard({
 }: CampaignCardProps) {
   
   const navigate = useNavigate();
+
+  const handleBrandClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    if (brandId) {
+      // 2. 알려주신 경로 규칙 적용 (Query Parameter 방식)
+      navigate(`/brand?brandId=${brandId}&domain=${category}`);
+    }
+  };
 
   const handleDetailClick = () => {
     // 사용자가 제공한 라우팅 규칙에 따른 분기 로직
@@ -62,7 +74,10 @@ export default function CampaignCard({
         
         <div className="flex flex-col w-full gap-1">
           {/* 브랜드명 */}
-          <div className="flex items-center gap-1">
+          <div 
+            className="flex items-center gap-1 cursor-pointer w-fit" 
+            onClick={handleBrandClick}
+          >
             <span className="text-[17px] font-bold text-text-black leading-tight">
               {brand}
             </span>

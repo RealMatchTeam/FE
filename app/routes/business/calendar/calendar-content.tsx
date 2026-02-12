@@ -205,6 +205,8 @@ export default function CalendarContent() {
                       key={`${cp.campaignId}-${cp.proposalId}-${cp.status}`}
                       campaignId={cp.campaignId}
                       proposalId={cp.proposalId ?? undefined}
+                      brandId={cp.brandId}
+                      category={cp.category || "beauty"}
                       type={cp.type}
                       brand={cp.brandName}
                       title={cp.title}

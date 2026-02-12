@@ -92,7 +92,7 @@ export default function ReceivedProposalContent() {
     };
     const closeModal = () => {
         setModalType("none");
-        setRejectReason(""); 
+        setRejectReason("");
     };
 
     const handleRejectClick = () => setModalType("reject");
@@ -124,6 +124,13 @@ export default function ReceivedProposalContent() {
 
     const formatDate = (dateStr: string) => (dateStr || "").replace(/-/g, ". ");
 
+    const STATUS_TEXT_MAP: Record<string, string> = {
+        REVIEWING: "검토 중",
+        MATCHED: "매칭 완료",
+        REJECTED: "거절됨",
+        CANCELED: "취소됨",
+    };
+
     if (isLoading) return <LoadingSpinner className="py-10" />;
     if (!proposal) return <div className="p-10 text-center text-text-gray3 font-pretendard">데이터를 찾을 수 없습니다.</div>;
 
@@ -137,11 +144,13 @@ export default function ReceivedProposalContent() {
                 <div className="bg-[var(--color-bg-w)] px-4 py-6 flex flex-col gap-2">
                     <CampaignBrandCard
                         showChatSection={false}
-                        statusText={proposal.status === "MATCHED" ? "매칭 완료" : "검토 중"}
+                        statusText={STATUS_TEXT_MAP[proposal.status] || proposal.status}
                         brandName={brand?.brandName}
                         brandTags={brand?.brandTags}
                         brandImageUrl={brand?.brandImageUrl}
                         matchingRate={brand?.matchingRate}
+                        brandId={brand?.brandId || proposal.brandId}
+                        category={proposal.contentTags.categories[0]?.name || "beauty"}
                     />
                     <div>
                         <h2 className="text-title1 text-text-black">{proposal.title}</h2>
