@@ -43,7 +43,7 @@ export default function NavigationHeader({
       </button>
 
       <div className="flex-1 text-center">
-        <div className={`text-Title1 text-semiblod ${titleClassName ?? ""}`}>
+        <div className={`text-title1 text-semiblod ${titleClassName ?? ""}`}>
           {title}
         </div>
       </div>
