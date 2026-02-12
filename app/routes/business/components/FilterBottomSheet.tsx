@@ -49,8 +49,8 @@ export default function FilterBottomSheet({
         </div>
         
         {/* 필터 옵션 영역 */}
-        <div className="w-full bg-[var(--color-bluegray-1)] py-4">
-          <div className="flex items-center justify-start gap-8 px-4">
+        <div className="w-full h-[44px] bg-[var(--color-bluegray-1)]">
+          <div className="flex items-center justify-start gap-8 px-4 mt-3">
             {filterOptions.map((filter) => (
               <button
                 key={filter}
@@ -68,13 +68,13 @@ export default function FilterBottomSheet({
         </div>
 
         {/* 하단 적용하기 버튼 */}
-        <div className="mt-auto px-4 pb-10">
+        <div className="mt-auto px-4 py-6">
           <button
             onClick={() => {
               onApply(selected);
               onClose();
             }}
-            className="w-full h-[48px] py-4 bg-[var(--color-core-1)] text-white rounded-xl text-title1 active:opacity-90"
+            className="w-full h-[44px] bg-[var(--color-core-1)] text-white rounded-xl text-[15px] leading-[18px] font-semibold active:opacity-90"
           >
             적용하기
           </button>

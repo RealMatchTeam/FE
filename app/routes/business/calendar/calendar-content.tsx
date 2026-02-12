@@ -9,7 +9,6 @@ import CampaignCard from "../components/CampaignCard";
 import SectionTitle from "../components/SectionTitle";
 import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
-import dropdownIcon from "../../../assets/arrow-down.svg";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
@@ -26,6 +25,8 @@ export default function CalendarContent() {
 
   const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const isFiltered = activeFilter !== "전체";
 
   useEffect(() => {
     const fetchAllCampaigns = async () => {
@@ -144,7 +145,7 @@ export default function CalendarContent() {
       <div className="flex w-full bg-bg-w border-b border-text-gray5">
         <button
           onClick={() => setMainTab("collaboration")}
-          className={`flex-1 py-4 text-[16px] font-bold relative transition-colors ${mainTab === "collaboration" ? "text-core-1" : "text-text-gray3"
+          className={`flex-1 py-4 text-[16px] font-medium text-[16px] relative transition-colors ${mainTab === "collaboration" ? "text-core-1" : "text-text-gray3"
             }`}
         >
           협업 현황
@@ -154,7 +155,7 @@ export default function CalendarContent() {
         </button>
         <button
           onClick={() => setMainTab("matching")}
-          className={`flex-1 py-4 text-[16px] font-bold relative transition-colors ${mainTab === "matching" ? "text-core-1" : "text-text-gray3"
+          className={`flex-1 py-4 text-[16px] font-medium text-[16px] relative transition-colors ${mainTab === "matching" ? "text-core-1" : "text-text-gray3"
             }`}
         >
           매칭 현황
@@ -171,11 +172,11 @@ export default function CalendarContent() {
             {/* 주간 캘린더 연동 */}
             <section className="flex flex-col gap-3">
               <SectionTitle title="진행 중인 협업" />
-              <p className="text-title1 font-bold text-text-black">이번주 일정</p>
+              <p className="text-title1 font-semibold text-text-black">이번주 일정</p>
               <WeeklyCalendar events={calendarEvents} />
             </section>
             <section className="flex flex-col gap-3">
-              <p className="text-title1 font-bold text-text-black">이번달 일정</p>
+              <p className="text-title1 font-semibold text-text-black">이번달 일정</p>
               <MonthlyCalendar events={calendarEvents} />
             </section>
 
@@ -233,13 +234,32 @@ export default function CalendarContent() {
 
             <div className="flex flex-col gap-4 px-4 flex-1">
               <div className="flex items-center justify-between mb-1">
-                <h2 className="text-title1 font-bold text-text-black">매칭 현황</h2>
+                <h2 className="text-title1 font-semibold text-text-black">매칭 현황</h2>
                 <button
                   onClick={() => setIsFilterOpen(true)}
-                  className="flex items-center gap-1 px-3 py-1 border border-text-gray4 rounded-full bg-white active:bg-bluegray-2 transition-colors"
+                  className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-medium text-[#5B5D6B] ${
+                    isFiltered
+                      ? "border-core-70 text-core-1 bg-core-70"
+                      : "border-core-2 text-gray-2 bg-white"
+                  }`}
                 >
-                  <span className="text-callout1 text-text-gray2">{activeFilter}</span>
-                  <img src={dropdownIcon} alt="open filter" />
+                  {activeFilter}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className={`w-6 h-6 ${
+                      isFiltered ? "text-core-1" : "text-text-gray2"
+                    }`}
+                  >
+                    <path
+                      d="M6 8L10 12L14 8"
+                      stroke="currentColor"
+                      strokeWidth="1.0"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </button>
               </div>
 

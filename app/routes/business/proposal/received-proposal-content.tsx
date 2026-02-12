@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import Header from "../../../components/layout/Header";
+import { useNavigate } from "react-router-dom";
+import { useHideHeader } from "../../../hooks/useHideHeader";
+import NavigationHeader from "../../../components/common/NavigateHeader";
 
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
@@ -30,6 +32,8 @@ export default function ReceivedProposalContent() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const [rejectReason, setRejectReason] = useState("");
+    const navigate = useNavigate();
+    useHideHeader(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -114,7 +118,9 @@ export default function ReceivedProposalContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-[var(--color-bg-w)] font-pretendard relative">
-            <Header title="제안 보기" showBack={true} />
+            <div className="h-[60px]">
+                <NavigationHeader title="제안 보기" onBack={() => navigate(-1)} />
+            </div>
 
             <main className="flex flex-col bg-[var(--color-bluegray-1)]">
                 <div className="bg-[var(--color-bg-w)] px-4 py-6 flex flex-col gap-2">
