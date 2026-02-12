@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { tokenStorage } from "../../lib/token";
 import { createOrGetDirectRoom } from "./api/rooms";
 import NavigationHeader from "../../components/common/NavigateHeader";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function BrandEntry() {
   const navigate = useNavigate();
@@ -39,7 +40,14 @@ export default function BrandEntry() {
   return (
     <div className="h-screen-full bg-white">
       <NavigationHeader title="채팅" onBack={() => history.back()} />
-      <div className="p-6 text-text-gray3">채팅방을 여는 중...</div>
+      <div className="flex items-center justify-center h-[calc(100vh-60px)]">
+        <DotLottieReact
+          src="https://lottie.host/3f73ad11-39f7-41fd-84be-0df60e3ff73d/VFk3FfaUJV.lottie"
+          loop
+          autoplay
+          className="w-40 h-auto"
+        />
+      </div>
     </div>
   );
 }
