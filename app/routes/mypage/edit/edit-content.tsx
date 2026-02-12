@@ -477,7 +477,9 @@ export default function MyPageEdit() {
                 );
 
                 if (!response.data.isSuccess) {
-                  throw new Error(response.data.message || "회원정보 변경 실패");
+                  throw new Error(
+                    response.data.message || "회원정보 변경 실패",
+                  );
                 }
 
                 setNickname(nextNickname);

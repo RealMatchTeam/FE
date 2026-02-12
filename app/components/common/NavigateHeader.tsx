@@ -16,8 +16,8 @@ export default function NavigationHeader({
   const bg = bgClassName ?? "bg-[#FFFFFF]";
 
   return (
-    <div
-      className={`h-[60px] flex items-center bg-[#FFFFFF]  px-4 py-[10px] ${bg}`}
+    <header
+      className={`sticky top-0 z-50 w-full shrink-0 border-b border-black/5 bg-[#FFFFFF] h-[100px] py-[18px] px-4 safe-area-top ${bg}`}
     >
       <button
         type="button"
@@ -43,13 +43,15 @@ export default function NavigationHeader({
       </button>
 
       <div className="flex-1 text-center">
-        <div className={`text-Title1 text-semiblod ${titleClassName ?? ""}`}>
+        <div
+          className={`text-Title1 font-semibold text-black ${titleClassName ?? ""}`}
+        >
           {title}
         </div>
       </div>
 
       {/* 오른쪽 여백 맞추기 */}
       <div className="w-6" />
-    </div>
+    </header>
   );
 }
