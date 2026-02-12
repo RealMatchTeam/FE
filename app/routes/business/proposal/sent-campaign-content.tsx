@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { getProposalDetail, type ProposalDetail } from "./api/proposal";
+import { axiosInstance } from "../../../api/axios";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -19,6 +20,8 @@ export default function SentCampaignContent() {
 
     const [data, setData] = useState<ProposalDetail | null>(null);
     const [brand, setBrand] = useState<BrandSummary | null>(null);
+    const [brandUserId, setBrandUserId] = useState<string | null>(null);
+    const [brandCategory, setBrandCategory] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const proposalId = searchParams.get("proposalId");
@@ -38,6 +41,11 @@ export default function SentCampaignContent() {
                 if (proposalResult.brandId) {
                     const brandResult = await getBrandSummary(proposalResult.brandId);
                     setBrand(brandResult);
+                    const brandDetailRes = await axiosInstance.get(`/v1/brands/${proposalResult.brandId}`);
+                    const brandDetail = brandDetailRes.data?.result?.[0];
+                    setBrandUserId(brandDetail?.brandUserId ?? null);
+                    const category = brandDetail?.beautyResponse ? "beauty" : brandDetail?.fashionResponse ? "fashion" : null;
+                    setBrandCategory(category);
                 }
             } catch (error) {
                 console.error("캠페인 상세 조회 실패:", error);
@@ -67,6 +75,8 @@ export default function SentCampaignContent() {
                         brandTags={brand?.brandTags || []}
                         brandImageUrl={brand?.brandImageUrl}
                         matchingRate={brand?.matchingRate}
+                        brandId={data.brandId}
+                        category={brandCategory ?? undefined}
                     />
 
                     <div className="flex justify-between items-center">
@@ -76,7 +86,7 @@ export default function SentCampaignContent() {
                         </div>
                         {/* 채팅하기 버튼 */}
                         <button 
-                            onClick={() => navigate(`/chat/${data.brandId}`)}
+                            onClick={() => brandUserId && navigate(`/rooms/brand/${brandUserId}`)}
                             className="flex items-center gap-1.5 px-4 py-2 bg-bluegray-2 rounded-lg text-text-gray1 text-caption1 active:bg-bluegray-3 transition-colors"
                         >
                             <img src={chatIcon} alt="chat" className="w-4 h-4" />
@@ -111,15 +121,16 @@ export default function SentCampaignContent() {
                         }
                     >
                         <div className="flex flex-col gap-4">
+                            {/* 설명 - 닫혔을 때는 2줄 미리보기, 열리면 전체 */}
                             <div className="flex flex-col gap-2">
                                 <p className="text-caption2 text-text-gray3">설명</p>
-                                <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 leading-relaxed text-text-gray1">
+                                <div className={`w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 leading-relaxed text-text-gray1 ${!isContentOpen ? "line-clamp-2" : ""}`}>
                                     {data.description}
                                 </div>
                             </div>
 
                             {isContentOpen && (
-                                <div className="grid grid-cols-2 gap-4 animate-slide-up">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2">
                                         <ContentItem label="형식" value={getTagNames(data.contentTags.formats)} />
                                     </div>

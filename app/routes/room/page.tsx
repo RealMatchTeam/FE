@@ -142,7 +142,7 @@ export default function ChattingRoom({ roomId }: Props) {
   }
 
   return (
-    <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
+    <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB] overflow-x-hidden">
       <input
         ref={imageInputRef}
         type="file"
