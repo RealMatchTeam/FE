@@ -68,6 +68,7 @@ export type BrandDetailResponse = {
 export type BrandDetailData = {
   id: string;
   userId: number;
+  brandUserId?: string;
   domain: BrandDomain;
 
   name: string;

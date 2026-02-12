@@ -263,8 +263,8 @@ export default function BrandDetailContent({ data }: Props) {
       navigate("/auth/login");
       return;
     }
-    if (!validBrandId) return;
-    navigate(`/rooms/brand/${brandId}`);
+    if (!data.brandUserId) return;
+    navigate(`/rooms/brand/${data.brandUserId}`);
   };
 
   const handleSuggest = () => {
