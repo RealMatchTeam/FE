@@ -11,8 +11,8 @@ export default function GateModal({
       <div className="absolute inset-0 bg-black/45" />
 
       {/* modal */}
-      <div className="absolute left-1/2 top-1/2 w-[320px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl">
-        <div className="relative w-[270px] h-[24px]">
+      <div className="absolute left-1/2 top-1/2 w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white px-5 pt-4 pb-5 shadow-xl">
+        <div className="relative h-6">
           <button
             type="button"
             onClick={onClose}
@@ -23,8 +23,8 @@ export default function GateModal({
           </button>
         </div>  
 
-        <div className="flex flex-col items-center pt-8">
-          <div className="flex h-[64px] w-[64px] items-center justify-center rounded-full bg-[#5B5CEB]">
+        <div className="flex flex-col items-center">
+          <div className="mt-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#5B5CEB]">
             <span className="text-[28px] font-bold text-white">!</span>
           </div>
 

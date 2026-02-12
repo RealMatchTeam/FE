@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router";
 import type {
   CategoryKey,
@@ -14,8 +14,12 @@ import BrandCard from "./components/BrandCard";
 import CampaignCard from "./components/CampaignCard";
 import CreatorProfileCard from "./components/CreatorProfileCard";
 
+const TraitModal = lazy(() => import("../mypage/components/profileCard/TraitModal"));
+
 import { useMatchResultStore } from "../../stores/matching-result";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
+import { TRAITS } from "../mypage/components/profileCard/traitData";
+import { tagName } from "../../data/tagNameById";
 
 import {
   getMatchingBrands,
@@ -26,8 +30,7 @@ import {
   type MatchingCampaign,
 } from "../matching/api/matching";
 import { apiClient } from "../../api/axios";
-import bannerBeauty from "../../assets/home-banner/banner-beauty.svg";
-import bannerFashion from "../../assets/home-banner/banner-fashion.svg";
+import BannerCarousel from "./components/BannerCarousel";
 
 type ApiCategoryFilter = "ALL" | "FASHION" | "BEAUTY";
 type CampaignSort = "MATCH_SCORE" | "POPULARITY" | "REWARD_AMOUNT" | "D_DAY";
@@ -73,6 +76,7 @@ const getBrandIdFromCampaign = (c: MatchingCampaign): number | null => {
 export default function HomeAfterMatchPage() {
   const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("beauty");
+  const [selectedTraitType, setSelectedTraitType] = useState<"beauty" | "fashion" | "content" | null>(null);
 
   const [brands, setBrands] = useState<MatchingBrand[]>([]);
   const [campaigns, setCampaigns] = useState<MatchingCampaign[]>([]);
@@ -316,139 +320,259 @@ export default function HomeAfterMatchPage() {
     navigate(`/matching/campaign?type=${toTypeParam(category)}`);
   };
 
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white pb-[calc(116px+env(safe-area-inset-bottom))]">
-        <img
-          src={category === "beauty" ? bannerBeauty : bannerFashion}
-          alt="배너"
-          className="h-[250px] w-full object-cover"
-        />
+  const handleTraitClick = (type: "beauty" | "fashion" | "content") => {
+    setSelectedTraitType(type);
+  };
 
-        <CategoryTabs value={category} onChange={setCategory} />
+  const traitsData = useMemo(() => {
+    if (!feature) return TRAITS;
 
-        <section className="my-9 mx-4">
-          <SectionHeader
-            title="매칭률 높은 브랜드"
-            subtitle="이런 브랜드가 매칭률이 가장 높아요!"
-            onMore={goBrandList}
-          />
-          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto pb-2 px-4">
-            {brands.map((brand, i) => (
-              <BrandCard
-                key={`brand-${brand.id}-${i}`}
-                item={{
-                  id: String(brand.id),
-                  name: brand.name,
-                  logoUrl: brand.logoUrl,
-                  matchRate: brand.matchRate,
-                  subText: (brand.tags ?? [])
-                    .slice(0, 2)
-                    .map((t) => `#${t}`)
-                    .join(" "),
-                  badgeText: "모집중",
-                  domain: category,
-                  isLiked: brand.isLiked,
-                }}
-                onClick={() =>
-                  navigate(`/brand?brandId=${brand.id}&domain=${category}`)
-                }
-                onLikeToggle={handleBrandLikeToggle}
-              />
-            ))}
-          </div>
-        </section>
+    const beauty = feature.beautyType;
+    const fashion = feature.fashionType;
+    const content = feature.contentsType;
 
-        <section className="my-9 mx-4">
-          <SectionHeader
-            title="매칭률 높은 캠페인"
-            subtitle="이런 캠페인이 매칭률이 가장 높아요!"
-            onMore={goCampaignList}
-          />
-          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto pb-2 px-4">
-            {campaigns.map((campaign, i) => {
-              const safeCampaignId = getCampaignId(campaign);
-              if (!safeCampaignId) return null;
+    const names = (ids?: string | string[] | null) => {
+      if (!ids) return [];
+      const arr = Array.isArray(ids) ? ids : [ids];
+      return arr
+        .map((id) => tagName(Number(id)))
+        .filter((value): value is string => Boolean(value));
+    };
 
-              return (
-                <CampaignCard
-                  key={`match-${safeCampaignId}-${i}`}
+    return TRAITS.map((trait) => {
+      if (trait.id === "beauty") {
+        return {
+          ...trait,
+          topSummary: [
+            { label: "피부타입", value: names(beauty?.skinType).join(", ") },
+            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
+            {
+              label: "메이크업 스타일",
+              value: names(beauty?.makeupStyle).join(", "),
+            },
+          ],
+          sections: [
+            {
+              title: "관심 카테고리",
+              items: names(beauty?.interestCategories),
+            },
+            {
+              title: "관심 기능",
+              items: names(beauty?.interestFunctions),
+            },
+          ],
+        };
+      }
+
+      if (trait.id === "fashion") {
+        return {
+          ...trait,
+          topSummary: [
+            { label: "키/몸무게", value: names(fashion?.height).join(", ") },
+            { label: "체형", value: names(fashion?.bodyShape).join(", ") },
+            { label: "상의 사이즈", value: names(fashion?.topSize).join(", ") },
+            { label: "하의 사이즈", value: names(fashion?.bottomSize).join(", ") },
+          ],
+          sections: [
+            {
+              title: "관심 분야",
+              items: names(fashion?.interestFields),
+            },
+            {
+              title: "관심 스타일",
+              items: names(fashion?.interestStyles),
+            },
+            {
+              title: "관심 브랜드",
+              items: names(fashion?.interestBrands),
+            },
+          ],
+        };
+      }
+
+      if (trait.id === "content") {
+        return {
+          ...trait,
+          topSummary: [
+            {
+              label: "주 시청자 성별",
+              value: names(content?.viewerGender).join(", "),
+            },
+            {
+              label: "주 시청자 나이대",
+              value: names(content?.viewerAge).join(", "),
+            },
+            {
+              label: "평균 영상 길이",
+              value: names(content?.avgVideoLength).join(", "),
+            },
+            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
+          ],
+          sections: [
+            {
+              title: "콘텐츠 형식",
+              items: names(content?.contentFormats),
+            },
+            {
+              title: "브랜드 톤",
+              items: names(content?.contentTones),
+            },
+            {
+              title: "희망 관여도",
+              items: names(content?.desiredInvolvement),
+            },
+            {
+              title: "희망 활용 범위",
+              items: names(content?.desiredUsageScope),
+            },
+          ],
+        };
+      }
+
+      return trait;
+    });
+  }, [feature]);
+
+  const selectedTrait = useMemo(() => {
+    if (!selectedTraitType) return null;
+    return traitsData.find((t) => t.id === selectedTraitType) || null;
+  }, [selectedTraitType, traitsData]);
+
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="bg-white px-5 pt-0 pb-[calc(116px+env(safe-area-inset-bottom))]">
+          <BannerCarousel />
+
+          <CategoryTabs value={category} onChange={setCategory} />
+
+          <section className="mt-8">
+            <SectionHeader
+              title="매칭률 높은 브랜드"
+              subtitle="이런 브랜드가 매칭률이 가장 높아요!"
+              onMore={goBrandList}
+            />
+
+            <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
+              {brands.map((brand, i) => (
+                <BrandCard
+                  key={`brand-${brand.id}-${i}`}
                   item={{
-                    id: String(safeCampaignId),
-                    brandName: campaign.brandName,
-                    matchRate: campaign.matchRate || 0,
-                    descText: campaign.name || campaign.title || "",
-                    rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
-                    ddayLabel:
-                      campaign.dDay === 0
-                        ? "D-DAY"
-                        : campaign.dDay
-                          ? `D-${campaign.dDay}`
-                          : "",
-                    progressText: String(campaign.applicants),
-                    isLiked: campaign.isLiked,
-                    logoUrl: campaign.logoUrl,
+                    id: String(brand.id),
+                    name: brand.name,
+                    logoUrl: brand.logoUrl,
+                    matchRate: brand.matchRate,
+                    subText: (brand.tags ?? [])
+                      .slice(0, 2)
+                      .map((t) => `#${t}`)
+                      .join(" "),
+                    badgeText: "모집중",
+                    domain: category,
+                    isLiked: brand.isLiked,
                   }}
-                  onClick={() => goCampaignDetail(campaign)}
-                  onLikeToggle={handleCampaignLikeToggle}
+                  onClick={() =>
+                    navigate(`/brand?brandId=${brand.id}&domain=${category}`)
+                  }
+                  onLikeToggle={handleBrandLikeToggle}
                 />
-              );
-            })}
-          </div>
-        </section>
-
-        {profileModel && (
-          <section className="my-9 mx-4">
-            <div className="text-title1 text-text-black">
-              크리에이터 님의 프로필
+              ))}
             </div>
-            <div className="mt-4">
+          </section>
+          <section className="mt-15">
+            <SectionHeader
+              title="매칭률 높은 캠페인"
+              subtitle="이런 캠페인이 매칭률이 가장 높아요!"
+              onMore={goCampaignList}
+            />
+
+            <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
+              {campaigns.map((campaign, i) => {
+                const safeCampaignId = getCampaignId(campaign);
+                if (!safeCampaignId) return null;
+
+                return (
+                  <CampaignCard
+                    key={`match-${safeCampaignId}-${i}`}
+                    item={{
+                      id: String(safeCampaignId),
+                      brandName: campaign.brandName,
+                      matchRate: campaign.matchRate || 0,
+                      descText: campaign.name || campaign.title || "",
+                      rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
+                      ddayLabel:
+                        campaign.dDay === 0
+                          ? "D-DAY"
+                          : campaign.dDay
+                            ? `D-${campaign.dDay}`
+                            : "",
+                      progressText: String(campaign.applicants),
+                      isLiked: campaign.isLiked,
+                      logoUrl: campaign.logoUrl,
+                    }}
+                    onClick={() => goCampaignDetail(campaign)}
+                    onLikeToggle={handleCampaignLikeToggle}
+                  />
+                );
+              })}
+            </div>
+          </section>
+          {profileModel && (
+            <div className="mt-8">
               <CreatorProfileCard
                 model={profileModel}
                 onMyProfileClick={() => navigate("/mypage/profileCard")}
+                onTraitClick={handleTraitClick}
               />
             </div>
+          )}
+
+          <section className="mt-8 pb-5">
+            <SectionHeader
+              title="인기 캠페인"
+              subtitle="이런 캠페인이 인기가 많아요!"
+              onMore={goCampaignList}
+            />
+
+            <div className="-mr-5 mt-3 flex gap-0.5 overflow-x-auto pb-2 pr-5">
+              {popularCampaigns.map((campaign, i) => {
+                const safeCampaignId = getCampaignId(campaign);
+                if (!safeCampaignId) return null;
+
+                return (
+                  <CampaignCard
+                    key={`popular-${safeCampaignId}-${i}`}
+                    item={{
+                      id: String(safeCampaignId),
+                      brandName: campaign.brandName,
+                      matchRate: 0,
+                      descText: campaign.name || campaign.title || "",
+                      rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
+                      ddayLabel:
+                        campaign.dDay === 0
+                          ? "D-DAY"
+                          : campaign.dDay
+                            ? `D-${campaign.dDay}`
+                            : "",
+                      progressText: String(campaign.applicants),
+                      isLiked: campaign.isLiked,
+                      logoUrl: campaign.logoUrl,
+                    }}
+                    onClick={() => goCampaignDetail(campaign)}
+                    onLikeToggle={handleCampaignLikeToggle}
+                  />
+                );
+              })}
+            </div>
           </section>
+        </div>
+
+        {selectedTrait && (
+          <Suspense fallback={null}>
+            <TraitModal
+              trait={selectedTrait}
+              onClose={() => setSelectedTraitType(null)}
+            />
+          </Suspense>
         )}
-
-        <section className="my-9 mx-4">
-          <SectionHeader
-            title="인기 캠페인"
-            subtitle="이런 캠페인이 인기가 많아요!"
-            onMore={goCampaignList}
-          />
-          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto pb-2 px-4">
-            {popularCampaigns.map((campaign, i) => {
-              const safeCampaignId = getCampaignId(campaign);
-              if (!safeCampaignId) return null;
-
-              return (
-                <CampaignCard
-                  key={`popular-${safeCampaignId}-${i}`}
-                  item={{
-                    id: String(safeCampaignId),
-                    brandName: campaign.brandName,
-                    matchRate: campaign.matchRate || 0,
-                    descText: campaign.name || campaign.title || "",
-                    rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
-                    ddayLabel:
-                      campaign.dDay === 0
-                        ? "D-DAY"
-                        : campaign.dDay
-                          ? `D-${campaign.dDay}`
-                          : "",
-                    progressText: String(campaign.applicants),
-                    isLiked: campaign.isLiked,
-                    logoUrl: campaign.logoUrl,
-                  }}
-                  onClick={() => goCampaignDetail(campaign)}
-                  onLikeToggle={handleCampaignLikeToggle}
-                />
-              );
-            })}
-          </div>
-        </section>
       </div>
-    </div>
-  );
-}
+    );
+  }

@@ -1,13 +1,17 @@
+import type { ReactNode } from "react";
+
 type Props = {
-  title: string; // 텍스트
+  title: ReactNode; // 텍스트
   onBack?: () => void; //onBack={() => history.back()} 뒤로가기
   bgClassName?: string;
+  titleClassName?: string;
 };
 
 export default function NavigationHeader({
   title,
   onBack,
   bgClassName,
+  titleClassName,
 }: Props) {
   const bg = bgClassName ?? "bg-[#FFFFFF]";
 
@@ -39,7 +43,9 @@ export default function NavigationHeader({
       </button>
 
       <div className="flex-1 text-center">
-        <div className="text-Title1 text-black">{title}</div>
+        <div className={`text-Title1 text-semiblod ${titleClassName ?? ""}`}>
+          {title}
+        </div>
       </div>
 
       {/* 오른쪽 여백 맞추기 */}

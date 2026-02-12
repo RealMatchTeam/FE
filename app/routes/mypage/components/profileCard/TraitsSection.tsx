@@ -61,7 +61,10 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
           ...trait,
           previewLines: [
             { label: "피부 타입", value: names(beauty?.skinType).join(", ") },
-            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
+            {
+              label: "피부 밝기",
+              value: names(beauty?.skinBrightness).join(", "),
+            },
             {
               label: "메이크업 \n스타일",
               value: names(beauty?.makeupStyle).join(", "),
@@ -69,7 +72,10 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
           ],
           topSummary: [
             { label: "피부타입", value: names(beauty?.skinType).join(", ") },
-            { label: "피부 밝기", value: names(beauty?.skinBrightness).join(", ") },
+            {
+              label: "피부 밝기",
+              value: names(beauty?.skinBrightness).join(", "),
+            },
             {
               label: "메이크업 스타일",
               value: names(beauty?.makeupStyle).join(", "),
@@ -101,7 +107,10 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
             { label: "키/몸무게", value: names(fashion?.height).join(", ") },
             { label: "체형", value: names(fashion?.bodyShape).join(", ") },
             { label: "상의 사이즈", value: names(fashion?.topSize).join(", ") },
-            { label: "하의 사이즈", value: names(fashion?.bottomSize).join(", ") },
+            {
+              label: "하의 사이즈",
+              value: names(fashion?.bottomSize).join(", "),
+            },
           ],
           sections: [
             {
@@ -130,7 +139,10 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
               label: "평균 길이",
               value: names(content?.avgVideoLength).join(", "),
             },
-            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
+            {
+              label: "평균 조회수",
+              value: names(content?.avgViews).join(", "),
+            },
           ],
           topSummary: [
             {
@@ -145,7 +157,10 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
               label: "평균 영상 길이",
               value: names(content?.avgVideoLength).join(", "),
             },
-            { label: "평균 조회수", value: names(content?.avgViews).join(", ") },
+            {
+              label: "평균 조회수",
+              value: names(content?.avgViews).join(", "),
+            },
           ],
           sections: [
             {
@@ -195,8 +210,8 @@ export default function TraitsSection({ feature }: TraitsSectionProps) {
           </button>
         }
       >
-        <div className="overflow-x-auto overflow-y-visible snap-x snap-mandatory px-4 -my-4">
-          <div className="flex p-4">
+        <div className="overflow-x-auto overflow-y-visible snap-x snap-mandatory px-2 -my-4">
+          <div className="flex py-4">
             {traits.map((trait) => (
               <div
                 key={trait.id}

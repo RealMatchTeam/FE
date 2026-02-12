@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { axiosInstance } from "../../../../api/axios";
 import type { BrandDetail } from "../../../../data/brand";
 
@@ -158,15 +158,25 @@ export const cancelCampaignApply = async (
   campaignApplyId: string | number
 ): Promise<ApiResponse<string>> => {
   try {
+
+    const id = Number(campaignApplyId);
+    
     const response = await axiosInstance.patch<ApiResponse<string>>(
-      `/v1/campaigns/apply/${campaignApplyId}/cancel`
+      `/v1/campaigns/apply/${id}/cancel`
     );
     return response.data;
   } catch (error) {
-    console.error("지원 취소 실패:", error);
-    if (error instanceof AxiosError) {
-      const errorMessage = error.response?.data?.message || "지원 취소에 실패했습니다.";
-      throw new Error(errorMessage);
+    if (axios.isAxiosError(error)) {
+      // 서버에서 내려주는 구체적인 에러 객체 확인
+      const serverData = error.response?.data;
+      console.error("서버 에러 상세:", serverData);
+      
+      // 403 에러일 경우 구체적인 메시지 처리
+      if (error.response?.status === 403) {
+        throw new Error(serverData?.message || "지원 취소 권한이 없습니다. 본인이 지원한 내역인지 확인해주세요.");
+      }
+      
+      throw new Error(serverData?.message || "지원 취소 중 오류가 발생했습니다.");
     }
     throw error;
   }

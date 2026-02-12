@@ -3,10 +3,9 @@ import { useNavigate } from "react-router";
 import NavigationHeader from "../../../components/common/NavigateHeader";
 import { useHideHeader } from "../../../hooks/useHideHeader";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
-import FilterBottomSheet from "../../business/components/FilterBottomSheet";
-import FilterButton from "../../../components/common/FilterButton";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { axiosInstance } from "../../../api/axios";
+import SortFilterSheet from "../../chat/components/ChatSortFilterSheet";
 
 type BrandLike = {
   id: number;
@@ -95,49 +94,98 @@ const CAMPAIGN_SORT_PARAM_MAP: Record<string, string> = {
 export default function MyPageLikes() {
   useHideHeader(true);
   const navigate = useNavigate();
+  const DEFAULT_SORT_LABEL = "매칭률 순";
   const [activeTab, setActiveTab] = useState<"brand" | "campaign">("brand");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("매칭률 순");
+  const [brandSortOption, setBrandSortOption] = useState(DEFAULT_SORT_LABEL);
+  const [campaignSortOption, setCampaignSortOption] =
+    useState(DEFAULT_SORT_LABEL);
+  const [brandSortApplied, setBrandSortApplied] = useState(false);
+  const [campaignSortApplied, setCampaignSortApplied] = useState(false);
+  const [pendingSort, setPendingSort] = useState(DEFAULT_SORT_LABEL);
   const [loading, setLoading] = useState(false);
   const [brandLikesApi, setBrandLikesApi] = useState<BrandLike[]>([]);
   const [campaignLikesApi, setCampaignLikesApi] = useState<CampaignLike[]>([]);
 
   useHideBottomTab(isFilterOpen);
 
-  const getSortButtonLabel = () => sortOption;
+  const currentSortOption =
+    activeTab === "brand" ? brandSortOption : campaignSortOption;
+  const currentSortApplied =
+    activeTab === "brand" ? brandSortApplied : campaignSortApplied;
+  const getSortButtonLabel = () => currentSortOption;
+  const isFiltered = currentSortApplied;
+
+  const brandSortOptions = useMemo(
+    () =>
+      ["매칭률 순", "인기 순", "신규 순"].map((label) => ({
+        label,
+        value: label,
+      })),
+    [],
+  );
+  const campaignSortOptions = useMemo(
+    () =>
+      ["매칭률 순", "인기 순", "금액 순", "마감 순"].map((label) => ({
+        label,
+        value: label,
+      })),
+    [],
+  );
+
+  const openSortSheet = () => {
+    setPendingSort(currentSortOption);
+    setIsFilterOpen(true);
+  };
+
+  useEffect(() => {
+    if (!isFilterOpen) {
+      setPendingSort(currentSortOption);
+    }
+  }, [currentSortOption, isFilterOpen]);
+
+  const applySort = () => {
+    if (activeTab === "brand") {
+      setBrandSortOption(pendingSort);
+      setBrandSortApplied(true);
+    } else {
+      setCampaignSortOption(pendingSort);
+      setCampaignSortApplied(true);
+    }
+    setIsFilterOpen(false);
+  };
 
   const brandLikes = useMemo(() => {
-    const base = brandLikesApi;
-    const list = [...base];
-    if (sortOption === "매칭률 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
-    }
-    if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.likeCount - a.likeCount);
-    }
-    if (sortOption === "신규 순") {
-      return list.sort((a, b) => b.id - a.id);
-    }
-    return list;
-  }, [sortOption, brandLikesApi]);
+    return [...brandLikesApi].sort((a, b) => {
+      switch (brandSortOption) {
+        case "매칭률 순":
+          return b.matchRate - a.matchRate;
+        case "인기 순":
+          return b.likeCount - a.likeCount;
+        case "신규 순":
+          return b.id - a.id;
+        default:
+          return 0;
+      }
+    });
+  }, [brandSortOption, brandLikesApi]);
 
   const campaignLikes = useMemo(() => {
-    const base = campaignLikesApi;
-    const list = [...base];
-    if (sortOption === "매칭률 순") {
-      return list.sort((a, b) => b.matchRate - a.matchRate);
-    }
-    if (sortOption === "인기 순") {
-      return list.sort((a, b) => b.likeCount - a.likeCount);
-    }
-    if (sortOption === "금액 순") {
-      return list.sort((a, b) => b.reward - a.reward);
-    }
-    if (sortOption === "마감 순") {
-      return list.sort((a, b) => a.ddayValue - b.ddayValue);
-    }
-    return list;
-  }, [sortOption, campaignLikesApi]);
+    return [...campaignLikesApi].sort((a, b) => {
+      switch (campaignSortOption) {
+        case "매칭률 순":
+          return b.matchRate - a.matchRate;
+        case "인기 순":
+          return b.likeCount - a.likeCount;
+        case "금액 순":
+          return b.reward - a.reward;
+        case "마감 순":
+          return a.ddayValue - b.ddayValue;
+        default:
+          return 0;
+      }
+    });
+  }, [campaignSortOption, campaignLikesApi]);
 
   useEffect(() => {
     let isMounted = true;
@@ -150,7 +198,7 @@ export default function MyPageLikes() {
               "/api/v1/users/me/favorites/brand",
               {
                 params: {
-                  sort: BRAND_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                  sort: BRAND_SORT_PARAM_MAP[brandSortOption] ?? "MATCH_SCORE",
                 },
               },
             );
@@ -176,7 +224,9 @@ export default function MyPageLikes() {
               "/api/v1/users/me/favorites/campaign",
               {
                 params: {
-                  sort: CAMPAIGN_SORT_PARAM_MAP[sortOption] ?? "MATCH_SCORE",
+                  sort:
+                    CAMPAIGN_SORT_PARAM_MAP[campaignSortOption] ??
+                    "MATCH_SCORE",
                 },
               },
             );
@@ -225,7 +275,7 @@ export default function MyPageLikes() {
     return () => {
       isMounted = false;
     };
-  }, [activeTab, sortOption]);
+  }, [activeTab, brandSortOption, campaignSortOption]);
 
   const toggleBrandLike = async (brandId: number) => {
     setBrandLikesApi((prev) =>
@@ -243,14 +293,18 @@ export default function MyPageLikes() {
 
   const toggleCampaignLike = async (campaignId: number) => {
     setCampaignLikesApi((prev) =>
-      prev.map((c) => (c.id === campaignId ? { ...c, isLiked: !c.isLiked } : c)),
+      prev.map((c) =>
+        c.id === campaignId ? { ...c, isLiked: !c.isLiked } : c,
+      ),
     );
     try {
       await axiosInstance.post(`/api/v1/campaigns/${campaignId}/like`);
     } catch (error) {
       console.error("캠페인 좋아요 토글 실패:", error);
       setCampaignLikesApi((prev) =>
-        prev.map((c) => (c.id === campaignId ? { ...c, isLiked: !c.isLiked } : c)),
+        prev.map((c) =>
+          c.id === campaignId ? { ...c, isLiked: !c.isLiked } : c,
+        ),
       );
     }
   };
@@ -259,7 +313,11 @@ export default function MyPageLikes() {
     <div className="h-screen-full bg-gradient-to-b from-[#F6F6FF] via-[#F3F3FA] to-[#E8E8FB]">
       <div className="w-full shadow-2xl flex flex-col">
         <div className="h-[60px]">
-          <NavigationHeader title="내 찜" onBack={() => navigate(-1)} />
+          <NavigationHeader
+            title="내 찜"
+            titleClassName="font-semibold"
+            onBack={() => navigate(-1)}
+          />
         </div>
 
         <div className="bg-white border-b border-[#E8E8FB]">
@@ -300,80 +358,100 @@ export default function MyPageLikes() {
               <div className="text-[16px] leading-[20px] font-semibold text-black">
                 {activeTab === "brand" ? "브랜드 리스트" : "캠페인 리스트"}
               </div>
-              <FilterButton
-                label={getSortButtonLabel()}
-                isActive={sortOption !== "정렬 필터"}
-                onClick={() => {
-                  setIsFilterOpen(true);
-                }}
-              />
+              <button
+                type="button"
+                onClick={openSortSheet}
+                className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-Pretendard ${
+                  isFiltered
+                    ? "border-core-3 text-core-1 bg-core-2"
+                    : "border-core-2 text-text-gray2 bg-white text-title3"
+                }`}
+              >
+                {getSortButtonLabel()}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className={`w-6 h-6 ${isFiltered ? "text-core-1" : "text-text-gray2"}`}
+                >
+                  <path
+                    d="M6 8L10 12L14 8"
+                    stroke="currentColor"
+                    strokeWidth="1.0"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
 
             {loading ? (
               <LoadingSpinner className="py-10" />
             ) : (
-            <div className="mt-4 space-y-4">
-              {activeTab === "brand"
-                ? brandLikes.length > 0
-                  ? brandLikes.map((brand) => (
-                    <div
-                      key={brand.id}
-                      className="bg-white rounded-[14px] px-[10px] py-[10px] flex gap-4 items-center h-[100px]"
-                    >
-                      <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
-                        {brand.logoUrl ? (
-                          <img
-                            src={brand.logoUrl}
-                            alt={brand.name}
-                            className="w-full h-full object-contain rounded-[10px]"
-                          />
-                        ) : (
-                          brand.name
-                        )}
-                      </div>
+              <div className="mt-4 space-y-4">
+                {activeTab === "brand" ? (
+                  brandLikes.length > 0 ? (
+                    brandLikes.map((brand) => (
+                      <div
+                        key={brand.id}
+                        className="bg-white rounded-[14px] px-[10px] py-[10px] flex gap-4 items-center h-[100px]"
+                      >
+                        <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
+                          {brand.logoUrl ? (
+                            <img
+                              src={brand.logoUrl}
+                              alt={brand.name}
+                              className="w-full h-full object-contain rounded-[10px]"
+                            />
+                          ) : (
+                            brand.name
+                          )}
+                        </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="text-[18px] font-semibold text-[#171718] truncate">
-                            {brand.name}
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <div className="text-[#6D6AFE]">
-                              <span className="text-[12px] leading-[16px] font-medium">
-                                매칭률  {/*수정*/}
-                              </span>{" "}
-                              <span className="text-[16px] leading-[20px] font-semibold">
-                                {brand.matchRate}%
-                              </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[18px] font-semibold text-[#171718] truncate">
+                              {brand.name}
                             </div>
-                            <button
-                              type="button"
-                              className="text-[#B7B7F3] text-[24px]"
-                              aria-label="찜 해제"
-                              onClick={() => toggleBrandLike(brand.id)}
-                            >
-                              {brand.isLiked ? "♥" : "♡"}
-                            </button>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="text-[#6D6AFE]">
+                                <span className="text-[12px] leading-[16px] font-medium">
+                                  매칭률 {/*수정*/}
+                                </span>{" "}
+                                <span className="text-[16px] leading-[20px] font-semibold">
+                                  {brand.matchRate}%
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                className="text-[#B7B7F3] text-[24px]"
+                                aria-label="찜 해제"
+                                onClick={() => toggleBrandLike(brand.id)}
+                              >
+                                {brand.isLiked ? "♥" : "♡"}
+                              </button>
+                            </div>
                           </div>
-                        </div>
                         <div className="mt-2 text-[13px] text-[#8B8D99] truncate">
-                          {brand.tags.join(" ")}
+                          {brand.tags.length > 0
+                            ? brand.tags.map((tag) => `#${tag}`).join(" ")
+                            : ""}
+                        </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-                  : (
+                    ))
+                  ) : (
                     <div className="py-12 text-center text-[#9B9BA1] text-[14px]">
                       찜한 브랜드가 없습니다.
                     </div>
                   )
-                : campaignLikes.length > 0
-                  ? campaignLikes.map((campaign) => (
+                ) : campaignLikes.length > 0 ? (
+                  campaignLikes.map((campaign) => (
                     <div
                       key={campaign.id}
                       className="bg-white rounded-[10px] border border-[#E8E8FB] px-[10px] pt-[10px] pb-[6px] flex gap-4 items-start h-[120px]"
                     >
-                      <div className="flex flex-col items-center gap-1">
+                      <div className="flex flex-col items-left gap-1">
                         <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
                           {campaign.logoUrl ? (
                             <img
@@ -385,7 +463,9 @@ export default function MyPageLikes() {
                             campaign.brand
                           )}
                         </div>
-                        <div className="flex items-start gap-1"> {/*수정*/}
+                        <div className="flex items- gap-1">
+                          {" "}
+                          {/*수정*/}
                           <span className="px-[2px] py-[1px] rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.dday}
                           </span>
@@ -403,7 +483,7 @@ export default function MyPageLikes() {
                           <div className="flex items-center gap-2 shrink-0">
                             <div className="text-[#6D6AFE]">
                               <span className="text-[12px] leading-[16px] font-medium">
-                                매칭률  {/*수정*/}
+                                매칭률 {/*수정*/}
                               </span>{" "}
                               <span className="text-[16px] leading-[20px] font-semibold">
                                 {campaign.matchRate}%
@@ -419,37 +499,40 @@ export default function MyPageLikes() {
                             </button>
                           </div>
                         </div>
-                        <div className="mt-[3px] text-[14px] leading-[20px] font-medium text-[#171718] truncate"> {/*수정*/} 
+                        <div className="mt-[3px] text-[14px] leading-[20px] font-medium text-[#171718] truncate">
+                          {" "}
+                          {/*수정*/}
                           {campaign.title}
                         </div>
-                        <div className="mt-[1px] text-[11px] leading-[16px] text-[#6666E5] font-medium"> {/*수정*/}
+                        <div className="mt-[1px] text-[11px] leading-[16px] text-[#6666E5] font-medium">
+                          {" "}
+                          {/*수정*/}
                           원고료: {campaign.reward.toLocaleString()}원
                         </div>
                       </div>
                     </div>
                   ))
-                  : (
-                    <div className="py-12 text-center text-[#9B9BA1] text-[14px]">
-                      찜한 캠페인이 없습니다.
-                    </div>
-                  )}
-            </div>
+                ) : (
+                  <div className="py-12 text-center text-[#9B9BA1] text-[14px]">
+                    찜한 캠페인이 없습니다.
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
 
-        <FilterBottomSheet
-          isOpen={isFilterOpen}
+        <SortFilterSheet
+          open={isFilterOpen}
+          value={pendingSort}
+          onChange={setPendingSort}
           onClose={() => setIsFilterOpen(false)}
-          onApply={(filter) => setSortOption(filter)}
-          currentFilter={sortOption}
-          className="h-[100dvh]"
-          filters={
-            activeTab === "brand"
-              ? ["매칭률 순", "인기 순", "신규 순"]
-              : ["매칭률 순", "인기 순", "금액 순", "마감 순"]
+          onApply={applySort}
+          options={
+            activeTab === "brand" ? brandSortOptions : campaignSortOptions
           }
           title="정렬 필터"
+          applyLabel="적용하기"
         />
       </div>
     </div>

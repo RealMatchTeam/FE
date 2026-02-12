@@ -147,6 +147,7 @@ export default function MyPageNotifications() {
 
               <div className="text-[12px] text-[#9B9BA1] mt-3">
                 *알림을 통해 이벤트, 켐페인, 브랜드에 등에 관한 정보를 드려요
+                <br />
                 알림 허용을 통해 다양한 정보들을 받아 보세요
               </div>
             </div>

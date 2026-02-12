@@ -22,6 +22,7 @@ interface MatchingFilterProps {
     selectedTags: string[];
     onApply: (sort: string, tags: string[]) => void;
     onClose: () => void;
+    initialTab?: "sort" | "filter";
 }
 
 export default function MatchingFilter({
@@ -30,6 +31,7 @@ export default function MatchingFilter({
     selectedTags: initialTags,
     onApply,
     onClose,
+    initialTab,
 }: MatchingFilterProps) {
     const [currentSort, setCurrentSort] = useState<string>(initialSort);
     const [currentTags, setCurrentTags] = useState<string[]>(initialTags);
@@ -52,7 +54,7 @@ export default function MatchingFilter({
 
     const subTabs = Object.keys(filterData) as (BeautyFilterKey | FashionFilterKey | ContentFilterKey)[];
 
-    const [mainTab, setMainTab] = useState<MainTab>("정렬 필터");
+    const [mainTab, setMainTab] = useState<MainTab>(initialTab === "filter" ? filterTabName : "정렬 필터");
     const [subTab, setSubTab] = useState<string>(subTabs[0]);
 
     const toggleTag = (tag: string) => {

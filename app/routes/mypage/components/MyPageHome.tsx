@@ -86,11 +86,7 @@ export default function MyPageHome({
         <div className="flex w-full  gap-[10px]">
           <button
             type="button"
-            disabled={isButtonLocked}
-            onClick={() => {
-              if (isButtonLocked) return;
-              onOpenProfileCard();
-            }}    
+            onClick={onOpenProfileCard}
             className="flex h-11 flex-[2] items-center justify-center gap-[10px] rounded-[12px] text-white text-[14px] bg-[#6666E5] font-medium transition-colors active:bg-[#3F40C2]"
           >
             {/* 아이콘 */}
@@ -154,11 +150,17 @@ export default function MyPageHome({
             label="회원정보 변경"
             onClick={onOpenEditProfile}
             py={11}
+            disableActiveBg
           />
         </div>
         <Divider />
 
-        <MenuButton label="알림 설정" onClick={onOpenNotifications} py={16} />
+        <MenuButton
+          label="알림 설정"
+          onClick={onOpenNotifications}
+          py={16}
+          disableActiveBg
+        />
         <Divider />
 
         <MenuButton
@@ -172,6 +174,7 @@ export default function MyPageHome({
             )
           }
           py={11}
+          disableActiveBg
         />
         <Divider />
 
@@ -183,7 +186,7 @@ export default function MyPageHome({
           <button
             type="button"
             onClick={onOpenTerms}
-            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black transition-colors active:bg-[#E6E6EB]"
+            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black"
           >
             약관
           </button>
@@ -191,7 +194,7 @@ export default function MyPageHome({
           <button
             type="button"
             onClick={onOpenPrivacy}
-            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black transition-colors active:bg-[#E6E6EB]"
+            className="w-full py-2 text-left text-[14px] leading-[20px] font-medium text-black"
           >
             개인정보 처리 방침
           </button>
@@ -203,6 +206,7 @@ export default function MyPageHome({
           label="로그아웃"
           onClick={() => setOpenLogout(true)}
           py={16}
+          disableActiveBg
         />
         <Divider />
 
@@ -211,6 +215,7 @@ export default function MyPageHome({
           onClick={() => setOpenWithdraw(true)}
           muted={true}
           py={16}
+          disableActiveBg
         />
       </div>
 

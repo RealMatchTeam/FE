@@ -266,7 +266,7 @@ export const getMatchingCampaigns = async (
 
         applicants: item.campaignTotalRecruit || 0,
 
-        isLiked: item.brandIsLiked || false,
+        isLiked: item.campaignIsLiked ?? false,
         logoUrl: item.brandLogoUrl,
         dDay: item.campaignDDay,
       };

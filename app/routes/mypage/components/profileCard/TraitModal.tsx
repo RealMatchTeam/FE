@@ -12,11 +12,11 @@ export default function TraitModal({
   trait: Trait;
   onClose: () => void;
 }) {
-  const cols = trait.topSummary.length; // 3개 or 4개
+  const cols = trait.topSummary.length;
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4 py-5"
       onClick={onClose}
     >
       <div
@@ -34,25 +34,38 @@ export default function TraitModal({
           className="absolute left-4 top-4 text-[#9B9BA1] active:opacity-70"
           aria-label="close"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+          >
+            <g clipPath="url(#clip0_1168_63046)">
+              <path
+                d="M-1 11L5 5L11 11M11 -1L4.99886 5L-1 -1"
+                stroke="#9B9BA1"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_1168_63046">
+                <rect width="10" height="10" fill="white" />
+              </clipPath>
+            </defs>
           </svg>
         </button>
 
         {/* body */}
-
         <div className="flex flex-col px-4 pt-5 pb-[18px] gap-[10px]">
           <div className="">
             <div className=" flex items-center justify-center gap-2">
               <div className="flex items-center justify-center">
                 <div className="">{trait.icon("w-[46px] h-[47px]")}</div>
               </div>
-              <div className="text-[16px] leading-[20px] font-SemiBold text-[#4A4DFF]">
+              <div className="text-title1 text-core-1">
                 {trait.badge}
               </div>
             </div>
@@ -75,10 +88,10 @@ export default function TraitModal({
                     i === 0 ? "" : "border-l border-[#E8E8FB]",
                   ].join(" ")}
                 >
-                  <div className="text-[10px] leading-[12px] text-[#6666E5] font-SemiBold">
+                  <div className="text-callout2 text-core-1">
                     {item.label}
                   </div>
-                  <div className="mt-1 text-[12px] leading-[16px] text-[#5B5D6B] font-Pretendard">
+                  <div className="mt-1 text-callout1 text-text-gray2">
                     {item.value}
                   </div>
                 </div>
@@ -87,13 +100,13 @@ export default function TraitModal({
           </div>
 
           {/* sections */}
-          <div className="space-y-[10px]">
+          <div className="space-y-[14px]">
             {trait.sections.map((section, i) => (
               <div key={i}>
-                <div className="text-[12px] leading-[16px] font-Medium text-[#6666E5]">
+                <div className="text-callout1 text-core-1">
                   {section.title}
                 </div>
-                <div className="text-[12px] leading-[16px] font-Medium text-[#404252]">
+                <div className="text-callout1 text-text-gray1">
                   {section.items.join(", ")}
                 </div>
               </div>

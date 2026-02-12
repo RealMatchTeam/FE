@@ -73,12 +73,12 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
           </div>
         </div>
 
-        <div className="mt-0.5 text-title5 text-text-gray3">
+        <div className="ml-1 mt-0.5 text-title5 text-text-gray3">
           {item.descText ?? ""}
         </div>
 
         {item.rewardText ? (
-          <div className="mt-0.5 text-callout2 text-core-1">
+          <div className="ml-1 mt-0.5 text-callout2 text-core-1">
             {item.rewardText}
           </div>
         ) : null}
