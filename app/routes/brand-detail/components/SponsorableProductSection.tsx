@@ -41,10 +41,10 @@ export default function SponsorableProductSection({
 
       {isEmpty ? (
         <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
-          <div className="flex h-[126px] w-full flex-col items-start justify-center">
-            <div className="flex w-full flex-col items-start gap-[14px] py-[60px]">
-              <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-                <div className="w-[113px] text-center text-callout1 text-text-gray2">
+          <div className="flex w-full flex-col items-start justify-center">
+            <div className="flex w-full flex-col items-start gap-[0.875rem] py-[3.75rem]">
+              <div className="flex w-full flex-col items-center justify-center gap-[0.625rem]">
+                <div className="w-1 text-center text-callout1 text-text-gray2">
                   협찬 가능한 제품이 없어요
                 </div>
               </div>
@@ -53,7 +53,7 @@ export default function SponsorableProductSection({
         </div>
       ) : (
         <div className="mt-2 -mx-4 overflow-x-hidden">
-          <div className="px-4 overflow-x-auto scrollbar-hide">
+          <div className="overflow-x-auto px-4 scrollbar-hide">
             <div className="flex w-max gap-4">
               {products.map((p, idx) => (
                 <ProductMiniCard

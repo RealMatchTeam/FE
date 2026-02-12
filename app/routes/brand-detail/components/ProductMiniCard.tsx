@@ -6,13 +6,13 @@ export type ProductMiniCardItem = {
 
 type Props = {
   item: ProductMiniCardItem;
-  onClick?: () => void; 
+  onClick?: () => void;
 };
 
 export default function ProductMiniCard({ item, onClick }: Props) {
   return (
     <div
-      className="w-[150px] md:w-[170px] lg:w-[190px] shrink-0 mt-2 mb-2.5 cursor-pointer"
+      className="mt-2 mb-[0.625rem] w-[9.375rem] shrink-0 cursor-pointer"
       onClick={onClick}
       role="button"
     >

@@ -235,7 +235,8 @@ export default function BrandDetailContent({ data }: Props) {
           (p) => {
             const fallback =
               (p.productImageUrls ?? []).find(Boolean) ??
-              (p.thumbnailImageUrl ?? "");
+              p.thumbnailImageUrl ??
+              "";
 
             return {
               productId: p.productId,
@@ -343,12 +344,11 @@ export default function BrandDetailContent({ data }: Props) {
         ? domainParam
         : "beauty";
 
-    const brandIdNum =
-      validBrandId
-        ? brandId
-        : Number.isFinite(Number(data.id)) && Number(data.id) > 0
-          ? Number(data.id)
-          : null;
+    const brandIdNum = validBrandId
+      ? brandId
+      : Number.isFinite(Number(data.id)) && Number(data.id) > 0
+        ? Number(data.id)
+        : null;
 
     if (!brandIdNum) return;
 
@@ -489,14 +489,19 @@ export default function BrandDetailContent({ data }: Props) {
                 const showTitle = showSectionTitle;
 
                 return (
-                  <div key={`${sec.title}-${idx}`} className={idx ? "mt-5" : ""}>
+                  <div
+                    key={`${sec.title}-${idx}`}
+                    className={idx ? "mt-5" : ""}
+                  >
                     {showTitle ? (
                       <div className="text-title3 text-text-black">
                         {sec.title}
                       </div>
                     ) : null}
 
-                    <div className={showTitle ? "mt-2 space-y-1.5" : "space-y-1.5"}>
+                    <div
+                      className={showTitle ? "mt-2 space-y-1.5" : "space-y-1.5"}
+                    >
                       {(sec.groups ?? []).map((g, gi) => (
                         <TagGroup
                           key={`${sec.title}-${g.label}-${gi}`}
@@ -531,94 +536,95 @@ export default function BrandDetailContent({ data }: Props) {
           <DividerBlock />
 
           <section className="py-9">
-  <div className="text-title1 text-text-black">캠페인 내역</div>
+            <div className="text-title1 text-text-black">캠페인 내역</div>
 
-  {histories.length === 0 ? (
-    <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
-      <div className="flex h-[126px] w-full flex-col items-start justify-center">
-        <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
-          <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-            <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
-              진행한 캠페인이 없어요
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ) : (
-    <>
-      <div className="mt-3">
-        {pageItems.map((h) => (
-          <HistoryRow key={h.id} item={h} />
-        ))}
-      </div>
+            {histories.length === 0 ? (
+              <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
+                <div className="flex w-full flex-col items-start justify-center">
+                  <div className="flex w-full flex-col items-start gap-[0.875rem] py-[3.75rem]">
+                    <div className="flex w-full flex-col items-center justify-center gap-[0.625rem]">
+                      <div className="w-[7.0625rem] text-center text-callout1 text-text-gray2">
+                        진행한 캠페인이 없어요
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="mt-3">
+                  {pageItems.map((h) => (
+                    <HistoryRow key={h.id} item={h} />
+                  ))}
+                </div>
 
-      <div className="my-5 flex items-center justify-center gap-3">
-        {page > GROUP_SIZE && (
-          <button
-            type="button"
-            onClick={goPrevGroup}
-            className="grid h-7 w-7 place-items-center text-text-gray3"
-          >
-            <DoubleArrowLeftIcon />
-          </button>
-        )}
+                <div className="my-5 flex items-center justify-center gap-3">
+                  {page > GROUP_SIZE && (
+                    <button
+                      type="button"
+                      onClick={goPrevGroup}
+                      className="grid h-7 w-7 place-items-center text-text-gray3"
+                    >
+                      <DoubleArrowLeftIcon />
+                    </button>
+                  )}
 
-        <button
-          type="button"
-          onClick={goPrev}
-          disabled={!canPrev}
-          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-        >
-          <ArrowLeftIcon />
-        </button>
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    disabled={!canPrev}
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+                  >
+                    <ArrowLeftIcon />
+                  </button>
 
-        <div className="flex items-center gap-3">
-          {displayPages.map((p) => {
-            const disabledPage = p > totalPages && !hasNext;
-            const active = p === page;
+                  <div className="flex items-center gap-3">
+                    {displayPages.map((p) => {
+                      const disabledPage = p > totalPages && !hasNext;
+                      const active = p === page;
 
-            return (
-              <button
-                key={p}
-                type="button"
-                onClick={() => !disabledPage && goPage(p)}
-                disabled={disabledPage}
-                className={
-                  active
-                    ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
-                    : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
-                }
-                style={active ? { backgroundColor: "#A9ADFF" } : undefined}
-              >
-                {p}
-              </button>
-            );
-          })}
-        </div>
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => !disabledPage && goPage(p)}
+                          disabled={disabledPage}
+                          className={
+                            active
+                              ? "h-7 w-7 rounded-md text-[0.8125rem] font-semibold text-white"
+                              : "h-7 w-7 rounded-md text-[0.8125rem] font-medium text-text-gray3 disabled:opacity-30"
+                          }
+                          style={
+                            active ? { backgroundColor: "#A9ADFF" } : undefined
+                          }
+                        >
+                          {p}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-        <button
-          type="button"
-          onClick={goNext}
-          disabled={!canNext}
-          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-        >
-          <ArrowRightIcon />
-        </button>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    disabled={!canNext}
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+                  >
+                    <ArrowRightIcon />
+                  </button>
 
-        <button
-          type="button"
-          onClick={goNextGroup}
-          disabled={!canNextGroup}
-          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-        >
-          <DoubleArrowRightIcon />
-        </button>
-      </div>
-    </>
-  )}
-</section>
-
+                  <button
+                    type="button"
+                    onClick={goNextGroup}
+                    disabled={!canNextGroup}
+                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+                  >
+                    <DoubleArrowRightIcon />
+                  </button>
+                </div>
+              </>
+            )}
+          </section>
         </div>
       </div>
     </div>
