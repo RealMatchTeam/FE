@@ -26,7 +26,11 @@ const fashionBanners: BannerItem[] = [
   { src: bannerFashion3, alt: "패션 배너 3" },
 ];
 
-export default function BannerCarousel({ category }: { category: CategoryKey }) {
+export default function BannerCarousel({
+  category,
+}: {
+  category: CategoryKey;
+}) {
   const banners = category === "beauty" ? beautyBanners : fashionBanners;
 
   const [current, setCurrent] = useState(0);
@@ -51,7 +55,7 @@ export default function BannerCarousel({ category }: { category: CategoryKey }) 
   }, [start, stop]);
 
   return (
-    <div className="-mx-5 mb-4">
+    <div className="-mx-5">
       <div className="relative overflow-hidden">
         <div
           className="flex transition-transform duration-500 ease-in-out"
