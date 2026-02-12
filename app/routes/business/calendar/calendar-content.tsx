@@ -142,7 +142,7 @@ export default function CalendarContent() {
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
-      <div className="flex w-full bg-bg-w border-b border-text-gray5">
+      <div className="flex w-full bg-bg-w border-text-gray5">
         <button
           onClick={() => setMainTab("collaboration")}
           className={`flex-1 py-4 text-[16px] font-medium text-[16px] relative transition-colors ${mainTab === "collaboration" ? "text-core-1" : "text-text-gray3"

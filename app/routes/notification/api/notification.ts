@@ -50,3 +50,18 @@ export const readNotification = async (id: string): Promise<{ isSuccess: boolean
   const response = await axiosInstance.patch(`/v1/notifications/${id}/read`);
   return response.data;
 };
+
+export interface UnreadCountResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    count: number;
+  };
+}
+
+// 미읽음 알림 개수 조회 API 추가
+export const fetchUnreadCount = async (): Promise<UnreadCountResponse> => {
+  const response = await axiosInstance.get("/v1/notifications/unread-count");
+  return response.data;
+};
