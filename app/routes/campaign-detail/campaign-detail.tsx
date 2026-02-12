@@ -130,7 +130,13 @@ export default function CampaignDetailContent({
     ];
   }, [campaign]);
 
-  const ongoing = useMemo(() => brandData.ongoingCampaigns ?? [], [brandData]);
+  const ongoing = useMemo(
+    () =>
+      (brandData.ongoingCampaigns ?? []).filter(
+        (c) => c.campaignId !== campaignId,
+      ),
+    [brandData, campaignId],
+  );
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -316,7 +322,7 @@ export default function CampaignDetailContent({
             </div>
           </section>
 
-          <section className="py-5 mx-4">
+          <section className="py-4 mx-4">
             <div className="text-title1 text-text-black my-3">상세 설명</div>
             <div className="mt-2.5 space-y-3">
               {detailRows.map((row) => (
