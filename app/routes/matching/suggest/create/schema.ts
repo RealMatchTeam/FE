@@ -15,7 +15,16 @@ export const campaignFormSchema = z.object({
   involvement: z.string().min(1, "관여도를 선택해주세요"),
   usageScope: z.string().min(1, "활용 범위를 선택해주세요"),
   sponsorProduct: z.string().min(1, "협찬품을 선택해주세요"),
-  fee: z.string().min(1, "원고료를 입력해주세요"),
+  fee: z
+    .string()
+    .min(1, "원고료를 입력해주세요")
+    .refine(
+      (val) => {
+        const num = Number(val);
+        return num <= 10000000;
+      },
+      { message: "원고료는 1,000만원 이하로 입력해주세요" }
+    ),
   startDate: z.string().min(1, "시작 날짜를 선택해주세요"),
   endDate: z.string().min(1, "끝 날짜를 선택해주세요"),
 });

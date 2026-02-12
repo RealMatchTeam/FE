@@ -388,7 +388,13 @@ export default function CreateCampaignContent() {
               <FeeInput
                 value={formValues.fee ?? ""}
                 onChange={(v) => setValue("fee", v)}
+                maxAmount={10000000}
               />
+              {errors.fee && (
+                <p className="text-callout1 text-error mt-1 ml-1">
+                  {errors.fee.message}
+                </p>
+              )}
             </div>
           </div>
 

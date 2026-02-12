@@ -1,8 +1,11 @@
+import { toast } from "sonner";
+
 interface FeeInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   unit?: string;
+  maxAmount?: number;
 }
 
 // 숫자를 천 단위 콤마 형식으로 변환
@@ -21,11 +24,19 @@ export default function FeeInput({
   onChange,
   placeholder = "",
   unit = "원",
+  maxAmount,
 }: FeeInputProps) {
   const displayValue = formatNumber(value);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = parseNumber(e.target.value);
+
+    // 최대 금액 체크
+    if (maxAmount && Number(rawValue) > maxAmount) {
+      toast.error("더 낮은 금액을 제시해주세요");
+      return;
+    }
+
     onChange(rawValue);
   };
 
