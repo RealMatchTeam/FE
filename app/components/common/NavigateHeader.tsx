@@ -16,9 +16,7 @@ export default function NavigationHeader({
   const bg = bgClassName ?? "bg-[#FFFFFF]";
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full shrink-0 border-b border-black/5 bg-[#FFFFFF] h-[100px] py-[18px] px-4 safe-area-top ${bg}`}
-    >
+    <div className={`nav-header ${bg}`}>
       <button
         type="button"
         onClick={onBack}
@@ -52,6 +50,6 @@ export default function NavigationHeader({
 
       {/* 오른쪽 여백 맞추기 */}
       <div className="w-6" />
-    </header>
+    </div>
   );
 }
