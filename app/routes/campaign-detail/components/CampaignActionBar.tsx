@@ -15,7 +15,7 @@ export default function CampaignActionBar({
 }: Props) {
   return (
     
-    <div className="mt-2 inline-flex w-full items-center gap-2">
+    <div className="inline-flex w-full items-center gap-2">
       <button
         type="button"
         onClick={onChat}
