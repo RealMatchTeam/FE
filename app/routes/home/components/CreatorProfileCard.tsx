@@ -28,7 +28,7 @@ export default function CreatorProfileCard({
   return (
     <section className="text-text-black mt-5 mb-20">
       <div className="text-title1 font-semibold mt-18 mx-2 mb-8">
-        <h1>크레이터 님의 프로필</h1>
+        <h1>크리에이터 님의 프로필</h1>
       </div>
       <div className="text-center text-title3 leading-5">
         <div>
