@@ -105,6 +105,8 @@ export default function ProposalContent() {
                         brandTags={brand?.brandTags || []}
                         brandImageUrl={brand?.brandImageUrl}
                         matchingRate={brand?.matchingRate}
+                        brandId={brand?.brandId || data.brandId}
+                        category={data.contentTags.categories[0]?.name || "beauty"}
                     />
 
                     <div className="flex flex-col gap-4">
