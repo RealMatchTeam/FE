@@ -12,7 +12,7 @@ export default function Header({
   rightElement,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between w-full h-[60px] px-4.5 bg-white border-b border-text-gray5 safe-area-top">
+    <header className="sticky top-0 z-50 flex items-center justify-between w-full min-h-[60px] px-4.5 bg-white border-b border-text-gray5 safe-area-top">
       {/* 왼쪽: 뒤로가기 버튼 */}
       <div className="flex items-center">
         {showBack && (
