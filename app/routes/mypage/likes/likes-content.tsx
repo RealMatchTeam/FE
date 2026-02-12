@@ -416,7 +416,7 @@ export default function MyPageLikes() {
                             <div className="flex items-center gap-2 shrink-0">
                               <div className="text-[#6D6AFE]">
                                 <span className="text-[12px] leading-[16px] font-medium">
-                                  매칭률 {/*수정*/}
+                                  매칭률 
                                 </span>{" "}
                                 <span className="text-[16px] leading-[20px] font-semibold">
                                   {brand.matchRate}%
@@ -451,7 +451,7 @@ export default function MyPageLikes() {
                       key={campaign.id}
                       className="bg-white rounded-[10px] border border-[#E8E8FB] px-[10px] pt-[10px] pb-[6px] flex gap-4 items-start h-[120px]"
                     >
-                      <div className="flex flex-col items-left gap-1">
+                      <div className="flex flex-col items-start gap-1">
                         <div className="w-[80px] h-[80px] rounded-[5px] border border-[#E6E6F3] grid place-items-center text-[#1D1D1F] text-[16px] font-semibold whitespace-pre text-center">
                           {campaign.logoUrl ? (
                             <img
@@ -465,25 +465,24 @@ export default function MyPageLikes() {
                         </div>
                         <div className="flex items- gap-1">
                           {" "}
-                          {/*수정*/}
-                          <span className="px-[2px] py-[1px] rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
+                          <span className="px-[3px] py-[1px] rounded-[5px] border border-[#6666E5] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.dday}
                           </span>
-                          <span className="px-[2px] py-[2px] rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
+                          <span className="px-[3px] py-[2px] rounded-[5px] bg-[#E6E6F3] text-[#6666E5] text-[10px] leading-[14px]">
                             {campaign.applicants}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex-1 min-w-0 py-4">
+                      <div className="flex-1 min-w-0 pt-2">
                         <div className="flex items-start justify-between gap-2">
                           <div className="text-[16px] leading-[20px] font-semibold text-[#171718] truncate">
                             {campaign.brand}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <div className="text-[#6D6AFE]">
+                            <div className="mb-1 text-[#6D6AFE]">
                               <span className="text-[12px] leading-[16px] font-medium">
-                                매칭률 {/*수정*/}
+                                매칭률
                               </span>{" "}
                               <span className="text-[16px] leading-[20px] font-semibold">
                                 {campaign.matchRate}%
@@ -491,7 +490,7 @@ export default function MyPageLikes() {
                             </div>
                             <button
                               type="button"
-                              className="text-[#B7B7F3] text-[24px] leading-none"
+                              className="mb-1 text-[#B7B7F3] text-[24px] leading-none"
                               aria-label="찜 해제"
                               onClick={() => toggleCampaignLike(campaign.id)}
                             >
@@ -501,12 +500,10 @@ export default function MyPageLikes() {
                         </div>
                         <div className="mt-[3px] text-[14px] leading-[20px] font-medium text-[#171718] truncate">
                           {" "}
-                          {/*수정*/}
                           {campaign.title}
                         </div>
                         <div className="mt-[1px] text-[11px] leading-[16px] text-[#6666E5] font-medium">
                           {" "}
-                          {/*수정*/}
                           원고료: {campaign.reward.toLocaleString()}원
                         </div>
                       </div>

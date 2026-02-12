@@ -4,5 +4,5 @@ interface SectionTitleProps {
 }
 
 export default function SectionTitle({ title }: SectionTitleProps) {
-  return <h2 className="text-title text-text-black">{title}</h2>;
+  return <h2 className="text-title font-semibold text-text-black">{title}</h2>;
 }
