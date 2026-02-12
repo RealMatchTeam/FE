@@ -28,7 +28,10 @@ export default function KakaoCallback() {
 
       try {
         const decoded = jwtDecode<JwtPayload>(accessToken);
-        if (decoded.role === "GUEST") {
+        if (decoded.role === "WITHDRAWN") {
+          tokenStorage.clearTokens();
+          navigate("/auth/login?withdrawn=true");
+        } else if (decoded.role === "GUEST") {
           setMe({
             id: decoded.sub,
             name: decoded.name,
@@ -36,7 +39,6 @@ export default function KakaoCallback() {
           });
           navigate(`/auth/signup/terms?provider=kakao`);
         } else {
-          // 유저 정보 store에 저장
           setMe({
             id: decoded.sub,
             name: decoded.name,

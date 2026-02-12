@@ -8,7 +8,6 @@ export default function BannerCarousel() {
   const banners = [
     { src: bannerBeauty, alt: "뷰티 배너" },
     { src: bannerFashion, alt: "패션 배너" },
-    { src: null, alt: "준비중 배너" },
   ];
 
   const [current, setCurrent] = useState(0);
@@ -66,9 +65,8 @@ export default function BannerCarousel() {
                 setCurrent(i);
                 start();
               }}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                i === current ? "bg-white" : "bg-white/50"
-              }`}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/50"
+                }`}
             />
           ))}
         </div>

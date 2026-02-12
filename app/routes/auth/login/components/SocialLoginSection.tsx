@@ -1,5 +1,6 @@
 interface SocialLoginSectionProps {
   lastProvider?: "kakao" | "naver" | "google" | null;
+  isWithdrawn?: boolean;
 }
 
 const Tooltip = () => (
@@ -11,9 +12,20 @@ const Tooltip = () => (
   </div>
 );
 
+const WithdrawnTooltip = () => (
+  <div className="relative w-max animate-slide-up z-10">
+    <div className="relative bg-white px-2 py-1 rounded-[8px] shadow-md border border-gray-100">
+      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b border-r border-gray-100 rotate-45" />
+      <span className="text-callout1 text-text-black relative z-10 text-center block">
+        탈퇴한 사용자입니다<br />접근이 불가능합니다
+      </span>
+    </div>
+  </div>
+);
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export function SocialLoginSection({ lastProvider }: SocialLoginSectionProps) {
+export function SocialLoginSection({ lastProvider, isWithdrawn }: SocialLoginSectionProps) {
   const handleKakaoLogin = () => {
     const redirectUri = import.meta.env.VITE_KAKAO_REDIRECT_URI || `${window.location.origin}/auth/callback/kakao`;
     window.location.href = `${BASE_URL}/oauth2/authorization/kakao?redirect_uri=${encodeURIComponent(redirectUri)}`;
@@ -32,6 +44,8 @@ export function SocialLoginSection({ lastProvider }: SocialLoginSectionProps) {
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <span className="text-text-gray3 text-title3">SNS 계정으로 간편 로그인 하기</span>
+
+      {isWithdrawn && <WithdrawnTooltip />}
 
       <div className="flex gap-5">
         {/* 카카오 로그인 */}

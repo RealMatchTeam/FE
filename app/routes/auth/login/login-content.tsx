@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import LoginLogo from "../../../assets/logo/login-logo.svg";
 import { SocialLoginSection } from "./components/SocialLoginSection";
 
 function LoginContent() {
+  const [searchParams] = useSearchParams();
+  const isWithdrawn = searchParams.get("withdrawn") === "true";
+
   const [lastProvider] = useState<"kakao" | "naver" | "google" | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("lastLoginProvider") as "kakao" | "naver" | "google" | null;
@@ -23,7 +27,8 @@ function LoginContent() {
 
       {/* 소셜 로그인 */}
       <SocialLoginSection
-        lastProvider={lastProvider}
+        lastProvider={isWithdrawn ? null : lastProvider}
+        isWithdrawn={isWithdrawn}
       />
     </div>
   );

@@ -81,9 +81,6 @@ export default function ReSuggestContent() {
 
     // 태그 매핑 보정
     const getMappedId = (name: string) => {
-        if (name === "인스타 포스트" || name === "인스타 포스터") return 172;
-        if (name === "스토리&썰" || name === "스토리/썰") return 178;
-        if (name === "가이드만 제공" || name === "가이드 라인만 제공") return 187;
         return ID_BY_TAG_NAME[name];
     };
 
@@ -164,11 +161,7 @@ export default function ReSuggestContent() {
 
         // Fallback to global tag mapping if value is a numeric ID
         const numericId = Number(value);
-        if (!isNaN(numericId) && TAG_NAME_BY_ID[numericId]) {
-            return TAG_NAME_BY_ID[numericId];
-        }
-
-        return "";
+        return TAG_NAME_BY_ID[numericId] || value;
     };
 
     const onSubmit = () => {
@@ -482,12 +475,14 @@ export default function ReSuggestContent() {
             <ProposalModal
                 isOpen={isConfirmDialogOpen}
                 type="confirm"
+                flowType="suggest"
                 onClose={() => setIsConfirmDialogOpen(false)}
                 onConfirm={handleConfirmSubmit}
             />
             <ProposalModal
                 isOpen={isSuccessModalOpen}
                 type="success"
+                flowType="suggest"
                 onClose={() => navigate("/business/calendar")}
             />
         </div>

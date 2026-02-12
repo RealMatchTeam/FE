@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FilterBottomSheet from "../../../../../components/common/FilterBottomSheet";
 import Button from "../../../../../components/common/Button";
 import { CheckIcon } from "../../../../auth/components/CheckIcon";
@@ -32,6 +32,13 @@ export default function SelectBottomSheet({
   const [selected, setSelected] = useState<string[]>(selectedValues);
   const [customInput, setCustomInput] = useState("");
 
+  // 바텀시트가 열릴 때 현재 선택값으로 동기화
+  useEffect(() => {
+    if (isOpen) {
+      setSelected(selectedValues);
+    }
+  }, [isOpen, selectedValues]);
+
   const handleToggle = (value: string) => {
     if (multiSelect) {
       setSelected((prev) =>
@@ -45,9 +52,10 @@ export default function SelectBottomSheet({
   };
 
   const handleSubmit = () => {
-    const finalValues = customInput
-      ? [...selected.filter((v) => v !== "custom"), customInput]
-      : selected;
+    const finalValues = selected.map((v) => {
+      if (v === "custom") return customInput || "custom";
+      return v;
+    });
     onSubmit(finalValues);
     onClose();
   };

@@ -40,7 +40,14 @@ export default function MatchingApplyContent() {
             await applyToCampaign(proposalData.campaignId, reason);
         } catch (error) {
             console.error("지원 실패:", error);
-            toast.error("캠페인 지원에 실패했습니다. 다시 시도해주세요.");
+
+            const err = error as { code?: string; message?: string };
+            if (err.code === "BUSINESS_CAMPAIGN_APPLY_400_1") {
+                toast.warning("이미 지원한 캠페인입니다.");
+            } else {
+                toast.error(err.message || "캠페인 지원에 실패했습니다. 다시 시도해주세요.");
+            }
+
             setIsSuccessModalOpen(false);
         }
     };

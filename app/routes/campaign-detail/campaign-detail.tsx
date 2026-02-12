@@ -202,7 +202,9 @@ export default function CampaignDetailContent({
       },
     });
 
-    navigate("/matching/suggest");
+    navigate(
+      `/matching/suggest?type=campaign&brandId=${brandIdNum}&campaignId=${campaignId}&domain=${domain}`,
+    );
   };
 
   const handleApply = () => {
@@ -234,7 +236,7 @@ export default function CampaignDetailContent({
       },
     });
 
-    navigate("/matching/apply");
+    navigate(`/matching/apply?campaignId=${campaignId}`);
   };
 
   if (campaignError) {
@@ -384,7 +386,7 @@ export default function CampaignDetailContent({
             </button>
           </div>
 
-          <OngoingCampaignSection campaigns={ongoing} onMore={() => {}} />
+          <OngoingCampaignSection campaigns={ongoing} onMore={() => { }} />
         </div>
       </div>
     </div>

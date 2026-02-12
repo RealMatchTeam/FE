@@ -110,6 +110,7 @@ export default function BrandDetailContent({ data }: Props) {
   const [searchParams] = useSearchParams();
   const brandId = Number(searchParams.get("brandId"));
   const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
+  const setBrandCampaigns = useCampaignProposalStore((state) => state.setBrandCampaigns);
 
   const handleChat = () => {
     const accessToken = tokenStorage.getAccessToken();
@@ -121,7 +122,7 @@ export default function BrandDetailContent({ data }: Props) {
     navigate(`/rooms/brand/${brandId}`);
   };
 
-  const handleSuggest = async () => {
+  const handleSuggest = () => {
     const accessToken = tokenStorage.getAccessToken();
     if (!accessToken) {
       navigate("/auth/login");
@@ -130,32 +131,18 @@ export default function BrandDetailContent({ data }: Props) {
     if (!Number.isFinite(brandId) || brandId <= 0) return;
 
     const domain = searchParams.get("domain");
-    const campaignIdParam = searchParams.get("campaignId");
 
-    // URL에 campaignId가 없으면 recruiting API에서 첫 번째 캠페인 ID 가져오기
-    let campaignId = campaignIdParam ? Number(campaignIdParam) : null;
-
-    if (!campaignId) {
-      try {
-        const { getRecruitingCampaigns } = await import("../matching/api/matching");
-        const campaigns = await getRecruitingCampaigns(brandId);
-        if (campaigns && campaigns.length > 0) {
-          campaignId = campaigns[0].campaignId;
-        }
-      } catch (error) {
-        console.error("모집중인 캠페인 조회 실패:", error);
-      }
-    }
+    // 브랜드 캠페인 목록을 Zustand에 저장
+    setBrandCampaigns(data.rawCampaigns ?? []);
 
     setProposalData({
       brandId,
-      campaignId,
       domain: domain || "beauty",
       brandName: data.name,
       products: (data.products ?? []).map((p) => ({ id: p.id, name: p.title })),
     });
 
-    navigate("/matching/suggest");
+    navigate(`/matching/suggest?type=brand&brandId=${brandId}&domain=${domain || "beauty"}`);
   };
 
   const handleGoSponsorableProducts = () => {
@@ -319,7 +306,7 @@ export default function BrandDetailContent({ data }: Props) {
           ) : (
             <OngoingCampaignSection
               campaigns={data.ongoingCampaigns}
-              onMore={() => {}}
+              onMore={() => { }}
             />
           )}
 

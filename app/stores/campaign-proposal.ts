@@ -1,5 +1,13 @@
 import { create } from "zustand";
 
+export interface BrandCampaignItem {
+  campaignId: number;
+  title: string;
+  recruitStartDate: string;
+  recruitEndDate: string;
+  status: string;
+}
+
 export interface CampaignProposalData {
   brandId: number;
   campaignId?: number;
@@ -28,6 +36,10 @@ type CampaignProposalStore = {
   setProposalData: (data: CampaignProposalData) => void;
   clearProposalData: () => void;
 
+  // 브랜드 캠페인 목록 (브랜드 상세 → 제안하기 플로우용)
+  brandCampaigns: BrandCampaignItem[];
+  setBrandCampaigns: (campaigns: BrandCampaignItem[]) => void;
+
   // 사용자 프로필 정보
   snsAccount: string | null;
   setSnsAccount: (account: string) => void;
@@ -37,6 +49,9 @@ export const useCampaignProposalStore = create<CampaignProposalStore>((set) => (
   proposalData: null,
   setProposalData: (data) => set({ proposalData: data }),
   clearProposalData: () => set({ proposalData: null }),
+
+  brandCampaigns: [],
+  setBrandCampaigns: (campaigns) => set({ brandCampaigns: campaigns }),
 
   snsAccount: null,
   setSnsAccount: (account) => set({ snsAccount: account }),

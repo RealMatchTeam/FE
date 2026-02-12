@@ -22,7 +22,7 @@ export default function OngoingCampaignSection({ campaigns, onMore }: Props) {
     if (domain) params.set("domain", domain);
     params.set("campaignId", String(campaignId));
 
-    navigate(`/campaign-detail?${params.toString()}`);
+    navigate(`/campaign?${params.toString()}`);
   };
 
   return (

@@ -31,7 +31,7 @@ export default function BrandInfo({
           .join(" ")}
       </div>
 
-      <div className="mt-2 text-title3 text-text-gray1">{description}</div>
+      <div className="mt-2 text-title3 text-text-gray1 mb-3.5">{description}</div>
     </div>
   );
 }

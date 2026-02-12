@@ -10,7 +10,7 @@ export interface ApiResponse<T> {
 export type Gender = "MALE" | "FEMALE" | "NONE";
 
 // 역할
-export type Role = "ADMIN" | "GUEST" | "BRAND" | "CREATOR";
+export type Role = "ADMIN" | "GUEST" | "BRAND" | "CREATOR" | "WITHDRAWN";
 
 // 약관 타입
 export type TermType =

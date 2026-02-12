@@ -29,7 +29,10 @@ export default function NaverCallback() {
 
       try {
         const decoded = jwtDecode<JwtPayload>(accessToken);
-        if (decoded.role === "GUEST") {
+        if (decoded.role === "WITHDRAWN") {
+          tokenStorage.clearTokens();
+          navigate("/auth/login?withdrawn=true");
+        } else if (decoded.role === "GUEST") {
           setMe({
             id: decoded.sub,
             name: decoded.name,
@@ -37,7 +40,6 @@ export default function NaverCallback() {
           });
           navigate(`/auth/signup/terms?provider=naver`);
         } else {
-          // 유저 정보 store에 저장
           setMe({
             id: decoded.sub,
             name: decoded.name,

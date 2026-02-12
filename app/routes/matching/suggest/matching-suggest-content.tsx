@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useState } from "react";
 import Button from "../../../components/common/Button";
 import FilterBottomSheet from "../../../components/common/FilterBottomSheet";
@@ -7,21 +7,53 @@ import NewSuggestIcon from "../../../assets/icon/new-suggest.svg";
 import ExistSuggestIcon from "../../../assets/icon/exist-suggest.svg";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { useCampaignProposalStore } from "../../../stores/campaign-proposal";
-import {
-  getRecruitingCampaigns,
-  type RecruitingCampaign,
-} from "../api/matching";
+import { apiClient } from "../../../api/axios";
 import { toast } from "sonner";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 
+interface CampaignTag {
+  id: number;
+  name: string;
+}
+
+interface CampaignDetailApiResponse {
+  isSuccess: boolean;
+  result: {
+    campaignId: number;
+    title: string;
+    description: string;
+    product: string;
+    rewardAmount: number;
+    startDate: string;
+    endDate: string;
+    contentTags: {
+      formats?: CampaignTag[];
+      categories?: CampaignTag[];
+      tones?: CampaignTag[];
+      involvements?: CampaignTag[];
+      usageRanges?: CampaignTag[];
+    };
+  };
+}
+
+/** API 태그 데이터를 그대로 전달 (ID 매핑은 create 폼에서 처리) */
+function mapTag(tag: CampaignTag): { id: number; name: string } {
+  return { id: tag.id, name: tag.name };
+}
+
 export default function MatchingSuggestContent() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
+  const brandId = searchParams.get("brandId");
+  const campaignId = searchParams.get("campaignId");
+  const productId = searchParams.get("productId");
+  const domain = searchParams.get("domain") || "beauty";
+
   const proposalData = useCampaignProposalStore((state) => state.proposalData);
+  const brandCampaigns = useCampaignProposalStore((state) => state.brandCampaigns);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [recruitingCampaigns, setRecruitingCampaigns] = useState<
-    RecruitingCampaign[]
-  >([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(
     null,
   );
@@ -30,58 +62,91 @@ export default function MatchingSuggestContent() {
   useHideBottomTab(isSheetOpen);
 
   const handleNewCampaign = () => {
-    navigate("/matching/suggest/create?type=new");
+    navigate(`/matching/suggest/create?type=new&brandId=${brandId || proposalData?.brandId || ""}&domain=${domain}`);
   };
 
-  const handleExistingCampaign = async () => {
-    if (proposalData?.brandId) {
-      setIsLoading(true);
-      setIsSheetOpen(true);
-
-      try {
-        const campaigns = await getRecruitingCampaigns(proposalData.brandId);
-        setRecruitingCampaigns(campaigns);
-      } catch (error) {
-        console.error("모집중인 캠페인 조회 실패:", error);
-        toast.error("캠페인 목록을 불러오지 못했습니다");
-        setRecruitingCampaigns([]);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
+  const handleExistingCampaign = () => {
+    const activeBrandId = brandId || proposalData?.brandId;
+    if (!activeBrandId) {
       toast.error(
-        "브랜드 정보가 없습니다. 캠페인 상세 페이지에서 제안하기를 눌러주세요",
+        "브랜드 정보가 없습니다. 브랜드 상세 페이지에서 제안하기를 눌러주세요",
       );
+      return;
     }
+
+    if (brandCampaigns.length === 0) {
+      toast.error("해당 브랜드에 캠페인이 없습니다");
+      return;
+    }
+
+    setIsSheetOpen(true);
   };
 
   const handleToggleCampaign = (id: number) => {
     setSelectedCampaignId(id);
   };
 
-  const handleSheetSubmit = () => {
+  const handleSheetSubmit = async () => {
     if (!selectedCampaignId) {
       toast.error("캠페인을 선택해주세요");
       return;
     }
 
-    const selectedCampaign = recruitingCampaigns.find(
+    const selectedCampaign = brandCampaigns.find(
       (c) => c.campaignId === selectedCampaignId,
     );
     if (!selectedCampaign || !proposalData) return;
 
-    // 선택한 캠페인 정보를 proposalData에 업데이트
-    const setProposalData = useCampaignProposalStore.getState().setProposalData;
-    setProposalData({
-      ...proposalData,
-      campaignId: selectedCampaignId,
-      campaignTitle: selectedCampaign.title,
-      rewardAmount: selectedCampaign.rewardAmount,
-    });
+    setIsLoading(true);
 
-    // 선택한 캠페인 정보와 함께 페이지 이동
+    try {
+      const res = await apiClient.get<CampaignDetailApiResponse>(
+        `/api/v1/campaigns/${selectedCampaignId}`,
+      );
+
+      const setProposalData = useCampaignProposalStore.getState().setProposalData;
+
+      if (res.data?.isSuccess && res.data.result) {
+        const c = res.data.result;
+        const tags = c.contentTags;
+
+        setProposalData({
+          ...proposalData,
+          campaignId: selectedCampaignId,
+          campaignTitle: c.title || selectedCampaign.title,
+          campaignDescription: c.description || "",
+          rewardAmount: c.rewardAmount || 0,
+          product: c.product || "",
+          startDate: c.startDate || "",
+          endDate: c.endDate || "",
+          contentTags: {
+            formats: (tags?.formats ?? []).map(mapTag),
+            categories: (tags?.categories ?? []).map(mapTag),
+            tones: (tags?.tones ?? []).map(mapTag),
+            involvements: (tags?.involvements ?? []).map(mapTag),
+            usageRanges: (tags?.usageRanges ?? []).map(mapTag),
+          },
+        });
+      } else {
+        setProposalData({
+          ...proposalData,
+          campaignId: selectedCampaignId,
+          campaignTitle: selectedCampaign.title,
+        });
+      }
+    } catch {
+      const setProposalData = useCampaignProposalStore.getState().setProposalData;
+      setProposalData({
+        ...proposalData,
+        campaignId: selectedCampaignId,
+        campaignTitle: selectedCampaign.title,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+
     navigate(
-      `/matching/suggest/create?type=existing&brandId=${proposalData.brandId}&campaignId=${selectedCampaignId}&domain=${proposalData.domain}`,
+      `/matching/suggest/create?type=existing&brandId=${brandId || proposalData.brandId}&campaignId=${selectedCampaignId}&domain=${domain}`,
     );
   };
 
@@ -138,14 +203,12 @@ export default function MatchingSuggestContent() {
 
           {/* 캠페인 목록 (스크롤 영역) */}
           <div className="flex-1 overflow-y-auto px-5 pt-2.5 pb-4 flex flex-col gap-2.5">
-            {isLoading ? (
-              <LoadingSpinner className="py-8" />
-            ) : recruitingCampaigns.length === 0 ? (
+            {brandCampaigns.length === 0 ? (
               <div className="text-center py-8 text-text-gray2">
-                모집중인 캠페인이 없습니다
+                캠페인이 없습니다
               </div>
             ) : (
-              recruitingCampaigns.map((campaign) => (
+              brandCampaigns.map((campaign) => (
                 <label
                   key={campaign.campaignId}
                   className="flex items-center gap-2.5 cursor-pointer"
@@ -169,9 +232,10 @@ export default function MatchingSuggestContent() {
               variant="primary"
               size="lg"
               onClick={handleSheetSubmit}
+              disabled={isLoading}
               className="text-title7 w-full h-[44px] flex items-center justify-center gap-[10px]"
             >
-              선택 완료
+              {isLoading ? <LoadingSpinner size={24} /> : "선택 완료"}
             </Button>
           </div>
         </div>

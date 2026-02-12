@@ -148,6 +148,7 @@ interface MatchCampaignRawItem {
   campaignTotalRecruit: number;
 
   brandIsLiked: boolean;
+  campaignIsLiked: boolean;
   brandLogoUrl: string;
 
   campaignDDay: number;
@@ -713,9 +714,17 @@ export const applyToCampaign = async (
     );
 
     if (!response.data?.isSuccess) {
-      throw new Error(response.data?.message || "캠페인 지원에 실패했습니다.");
+      const error = new Error(response.data?.message || "캠페인 지원에 실패했습니다.");
+      Object.assign(error, { code: response.data?.code });
+      throw error;
     }
   } catch (error: unknown) {
+    const axiosError = error as ApiThrown;
+    if (axiosError.response?.data) {
+      const serverError = new Error(axiosError.response.data.message || "캠페인 지원에 실패했습니다.");
+      Object.assign(serverError, { code: axiosError.response.data.code });
+      throw serverError;
+    }
     console.error("캠페인 지원 실패:", error);
     throw error;
   }

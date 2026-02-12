@@ -98,6 +98,9 @@ export type BrandDetailData = {
   products: ProductMiniCardItem[];
   histories: HistoryRowItem[];
   historiesHasNext?: boolean;
+
+  /** /api/v1/brands/{id}/campaigns 원본 캠페인 목록 */
+  rawCampaigns: BrandCampaignDto[];
 };
 export type BrandCampaignStatus = "UPCOMING" | "RECRUITING" | "CLOSED";
 

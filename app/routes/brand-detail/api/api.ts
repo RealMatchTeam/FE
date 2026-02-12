@@ -286,6 +286,37 @@ export async function fetchBrandDetail(params: {
     ? recruitingRes.data.result.campaigns
     : [];
 
+  // /recruiting 엔드포인트가 비어있으면 /campaigns에서 UPCOMING/RECRUITING 상태 캠페인을 사용
+  const ongoingCampaigns =
+    recruitingList.length > 0
+      ? recruitingList.map((c) => ({
+          campaignId: c.campaignId,
+          brandName: c.brandName,
+          title: c.title,
+          recruitQuota: c.recruitQuota,
+          rewardAmount: c.rewardAmount,
+          imageUrl: c.imageUrl,
+          dday: c.dday,
+          isLiked: false,
+        }))
+      : historyList
+          .filter((c) => c.status === "UPCOMING" || c.status === "RECRUITING")
+          .map((c) => {
+            const now = new Date();
+            const start = new Date(c.recruitStartDate);
+            const diffMs = start.getTime() - now.getTime();
+            const dday = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+            return {
+              campaignId: c.campaignId,
+              brandName: item.brandName,
+              title: c.title,
+              recruitQuota: 0,
+              rewardAmount: 0,
+              dday,
+              isLiked: false,
+            };
+          });
+
   return {
     id: brandId,
     userId: item.userId,
@@ -306,16 +337,7 @@ export async function fetchBrandDetail(params: {
     categories: buildCategories(safeDomain, item),
     tagSections: buildTagSections(safeDomain, item),
 
-    ongoingCampaigns: recruitingList.map((c) => ({
-      campaignId: c.campaignId,
-      brandName: c.brandName,
-      title: c.title,
-      recruitQuota: c.recruitQuota,
-      rewardAmount: c.rewardAmount,
-      imageUrl: c.imageUrl,
-      dday: c.dday,
-      isLiked: false,
-    })),
+    ongoingCampaigns,
 
     products: productList.map((p) => ({
       id: String(p.id),
@@ -334,5 +356,7 @@ export async function fetchBrandDetail(params: {
     }),
 
     historiesHasNext,
+
+    rawCampaigns: historyList,
   };
 }

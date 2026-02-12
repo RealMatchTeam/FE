@@ -274,14 +274,7 @@ export default function SponsorableDetailContent() {
               size="lg"
               fullWidth
               onClick={() =>
-                navigate("/matching/suggest/create", {
-                  state: {
-                    brandId: data?.brandId,
-                    productId: data?.productId,
-                    brandName: data?.brandName,
-                    productName: data?.productName,
-                  },
-                })
+                navigate(`/matching/suggest?type=product&brandId=${data?.brandId}&productId=${data?.productId}`)
               }
             >
               {buttonText}

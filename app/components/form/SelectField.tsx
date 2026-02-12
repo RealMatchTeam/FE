@@ -16,7 +16,7 @@ export default function SelectField({
       className="flex items-center justify-between w-full h-[44px] pl-4 pr-1 gap-[10px] rounded-md border border-core-2 bg-white/80"
     >
       <span
-        className={`text-title3 ${value ? "text-text-black" : "text-text-gray3"}`}
+        className={`text-title3 truncate ${value ? "text-text-black" : "text-text-gray3"}`}
       >
         {value || placeholder}
       </span>
