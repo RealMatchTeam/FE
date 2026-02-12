@@ -532,93 +532,94 @@ export default function BrandDetailContent({ data }: Props) {
           <DividerBlock />
 
           <section className="py-9">
-            <div className="text-title1 text-text-black">캠페인 내역</div>
+  <div className="text-title1 text-text-black">캠페인 내역</div>
 
-            {histories.length === 0 ? (
-              <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
-                <div className="flex h-[126px] w-full flex-col items-start justify-center">
-                  <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
-                    <div className="flex w-full flex-col items-center justify-center gap-[10px]">
-                      <div className="w-[113px] text-center text-callout1 text-text-gray2">
-                        진행한 캠페인이 없어요
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="mt-3">
-                  {pageItems.map((h) => (
-                    <HistoryRow key={h.id} item={h} />
-                  ))}
-                </div>
+  {histories.length === 0 ? (
+    <div className="mt-2 inline-flex w-full flex-col items-start gap-2 bg-white">
+      <div className="flex h-[126px] w-full flex-col items-start justify-center">
+        <div className="flex w-full flex-col items-start gap-[14px] pb-[60px] pt-[60px]">
+          <div className="flex w-full flex-col items-center justify-center gap-[10px]">
+            <div className="w-[113px] text-center text-[12px] font-medium leading-[16px] text-text-gray2">
+              진행한 캠페인이 없어요
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className="mt-3">
+        {pageItems.map((h) => (
+          <HistoryRow key={h.id} item={h} />
+        ))}
+      </div>
 
-                <div className="my-5 flex items-center justify-center gap-3">
-                  {page > GROUP_SIZE && (
-                    <button
-                      type="button"
-                      onClick={goPrevGroup}
-                      className="grid h-7 w-7 place-items-center text-text-gray3"
-                    >
-                      <DoubleArrowLeftIcon />
-                    </button>
-                  )}
+      <div className="my-5 flex items-center justify-center gap-3">
+        {page > GROUP_SIZE && (
+          <button
+            type="button"
+            onClick={goPrevGroup}
+            className="grid h-7 w-7 place-items-center text-text-gray3"
+          >
+            <DoubleArrowLeftIcon />
+          </button>
+        )}
 
-                  <button
-                    type="button"
-                    onClick={goPrev}
-                    disabled={!canPrev}
-                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-                  >
-                    <ArrowLeftIcon />
-                  </button>
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={!canPrev}
+          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+        >
+          <ArrowLeftIcon />
+        </button>
 
-                  <div className="flex items-center gap-3">
-                    {displayPages.map((p) => {
-                      const disabledPage = p > totalPages && !hasNext;
-                      const active = p === page;
+        <div className="flex items-center gap-3">
+          {displayPages.map((p) => {
+            const disabledPage = p > totalPages && !hasNext;
+            const active = p === page;
 
-                      return (
-                        <button
-                          key={p}
-                          type="button"
-                          onClick={() => !disabledPage && goPage(p)}
-                          disabled={disabledPage}
-                          className={
-                            active
-                              ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
-                              : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
-                          }
-                          style={active ? { backgroundColor: "#A9ADFF" } : undefined}
-                        >
-                          {p}
-                        </button>
-                      );
-                    })}
-                  </div>
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => !disabledPage && goPage(p)}
+                disabled={disabledPage}
+                className={
+                  active
+                    ? "h-7 w-7 rounded-md text-[13px] font-semibold text-white"
+                    : "h-7 w-7 rounded-md text-[13px] font-medium text-text-gray3 disabled:opacity-30"
+                }
+                style={active ? { backgroundColor: "#A9ADFF" } : undefined}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
 
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    disabled={!canNext}
-                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-                  >
-                    <ArrowRightIcon />
-                  </button>
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={!canNext}
+          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+        >
+          <ArrowRightIcon />
+        </button>
 
-                  <button
-                    type="button"
-                    onClick={goNextGroup}
-                    disabled={!canNextGroup}
-                    className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
-                  >
-                    <DoubleArrowRightIcon />
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
+        <button
+          type="button"
+          onClick={goNextGroup}
+          disabled={!canNextGroup}
+          className="grid h-7 w-7 place-items-center text-text-gray3 disabled:opacity-30"
+        >
+          <DoubleArrowRightIcon />
+        </button>
+      </div>
+    </>
+  )}
+</section>
+
         </div>
       </div>
     </div>

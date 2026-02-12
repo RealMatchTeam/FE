@@ -127,11 +127,13 @@ export type SponsorAvailableItem = {
   availableType: string;
   availableQuantity: number;
   availableSize: number;
+  sizeUnit?: string;
   shippingType: SponsorShippingType;
 };
 
 export type SponsorInfo = {
   items: SponsorAvailableItem[];
+  shippingType?: string;
 };
 
 export type SponsorProductsListDto = {
@@ -150,6 +152,11 @@ export type SponsorProductsApiResponse = {
   code: string;
   message: string;
   result: SponsorProductsListDto[];
+};
+
+export type SponsorProductAction = {
+  canProposeCampaign: boolean;
+  proposeCampaignCtaText: string;
 };
 
 export type SponsorProductDetailResult = {
