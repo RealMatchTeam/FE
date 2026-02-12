@@ -52,7 +52,7 @@ export default function HomeIndex() {
     return () => {
       isMounted = false;
     };
-  }, [hasTokens, setMe]);
+  }, [hasTokens, setMe, me?.matchingTestDone]);
 
   // 토큰 없으면 비로그인 홈
   if (!hasTokens) {
