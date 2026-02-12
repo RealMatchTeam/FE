@@ -158,7 +158,7 @@ export default function CreateCampaignContent() {
     return () => {
       alive = false;
     };
-  }, [type, proposalData, searchParams, setValue]);
+  }, [type, proposalData, searchParams, setValue, reset]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
