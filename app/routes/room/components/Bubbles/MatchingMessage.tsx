@@ -59,7 +59,7 @@ export default function MatchedCampaignMessage({
           ].join(" ")}
         >
           <div className="p-[1px] rounded-[12px] bg-gradient-to-r from-[#CBCBF5] via-[#6666E5] to-[#CBCBF5]">
-            <div className="w-[240px] rounded-[12px] bg-[#FFFFFF] px-[10px] py-[10px] flex flex-col gap-[8px]">
+            <div className="max-w-[240px] w-full rounded-[12px] bg-[#FFFFFF] px-[10px] py-[10px] flex flex-col gap-[8px]">
               <div className="text-[12px] leading-[16px] style-Medium text-[#6666E5]">
                 매칭된 캠페인
               </div>

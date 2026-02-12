@@ -179,7 +179,7 @@ export default function ProposalMessage(props: Props) {
             </div>
           ) : null}
 
-          <div className="w-[214px] rounded-[10px] bg-[#B7B7F380] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
+          <div className="max-w-[214px] w-full rounded-[10px] bg-[#B7B7F380] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
             <div className="gap-[2px]">
               <div className="text-[10px] leading-[14px] style-Medium text-[#6666E5]">
                 {kind === "RE_PROPOSAL_CARD" ? "재제안" : "제안"}
@@ -242,7 +242,7 @@ export default function ProposalMessage(props: Props) {
           {/* bubble + time */}
           <div className="flex items-end gap-[8px] max-w-[calc(100%-48px)]">
             {/* 왼쪽 제안 카드 */}
-            <div className="w-[240px] rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
+            <div className="max-w-[240px] w-full rounded-[10px] bg-[#FFFFFFCC] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
               <div className="gap-[2px]">
                 <div className="text-[10px] leading-[14px] style-Medium text-[#6666E5]">
                   제안
