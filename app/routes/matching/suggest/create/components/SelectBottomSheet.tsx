@@ -27,7 +27,7 @@ export default function SelectBottomSheet({
   selectedValues,
   onSubmit,
   multiSelect = false,
-  hasCustomInput = true,
+  hasCustomInput = false,
 }: SelectBottomSheetProps) {
   const [selected, setSelected] = useState<string[]>(selectedValues);
   const [customInput, setCustomInput] = useState("");

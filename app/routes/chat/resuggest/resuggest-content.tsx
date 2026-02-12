@@ -138,7 +138,9 @@ export default function ReSuggestContent() {
 
     const sponsorProductOptions = proposalData?.product
         ? [{ value: proposalData.product, label: proposalData.product }]
-        : (proposalData?.products ?? []).map((p) => ({ value: String(p.id), label: p.name }));
+        : (proposalData?.products ?? [])
+            .filter((p) => p.id && p.name)
+            .map((p) => ({ value: String(p.id), label: p.name }));
 
     const findLabel = (options: { value: string; label: string }[], value?: string) => {
         if (!value) return undefined;
@@ -441,6 +443,7 @@ export default function ReSuggestContent() {
                 selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
                 onSubmit={(values) => setValue("sponsorProduct", values[0] || "", { shouldValidate: true })}
                 multiSelect={false}
+                hasCustomInput={true}
             />
             <DatePickerBottomSheet
                 isOpen={isStartDateSheetOpen}

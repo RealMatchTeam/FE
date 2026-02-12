@@ -162,7 +162,7 @@ export default function CreateCampaignContent() {
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
-  const tags = proposalData?.contentTags;
+  const tags = type === "new" ? undefined : proposalData?.contentTags;
 
   const toOptions = (defaultTags: ProposalTag[], campaignTags?: { id?: number; name: string }[]) => {
     if (campaignTags && campaignTags.length > 0) {
@@ -182,7 +182,11 @@ export default function CreateCampaignContent() {
 
   const sponsorProductOptions = proposalData?.product
     ? [{ value: proposalData.product, label: proposalData.product }]
-    : (proposalData?.products ?? []).map((p) => ({ value: String(p.id), label: p.name }));
+    : type === "new"
+      ? []
+      : (proposalData?.products ?? [])
+        .filter((p) => String(p.id).trim() && String(p.name).trim())
+        .map((p) => ({ value: String(p.id), label: String(p.name).trim() }));
 
   // ID로 label 찾기 헬퍼 함수
   const findLabel = (options: { value: string; label: string }[], value?: string) => {
@@ -482,6 +486,7 @@ export default function CreateCampaignContent() {
         selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
         onSubmit={(values) => setValue("sponsorProduct", values[0] || "")}
         multiSelect={false}
+        hasCustomInput={true}
       />
 
       {/* 시작 날짜 선택 바텀시트 */}
