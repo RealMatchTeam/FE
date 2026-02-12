@@ -28,11 +28,6 @@ export default function BannerCarousel({ category }: { category: CategoryKey }) 
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // 카테고리 변경 시 첫 번째 배너로 리셋
-  useEffect(() => {
-    setCurrent(0);
-  }, [category]);
-
   const start = useCallback(() => {
     timerRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
