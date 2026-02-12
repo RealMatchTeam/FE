@@ -96,7 +96,7 @@ export default function NotificationContent() {
     };
     return (
         <div className="h-screen-full bg-grad-auth ">
-            <div className="h-[60px]">
+            <div className="min-h-[60px]">
                 <NavigationHeader title="알림" onBack={() => navigate(-1)} />
             </div>
 

@@ -559,7 +559,7 @@ export default function TraitsPage() {
   return (
     <div className="h-screen-full bg-[#404252]">
       <div className="w-full bg-white shadow-2xl flex flex-col">
-        <div className="h-[60px]">
+        <div className="min-h-[60px]">
           <NavigationHeader title="내 특성" onBack={() => navigate(-1)} />
         </div>
 

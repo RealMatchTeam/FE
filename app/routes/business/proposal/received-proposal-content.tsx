@@ -118,7 +118,7 @@ export default function ReceivedProposalContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-[var(--color-bg-w)] font-pretendard relative">
-            <div className="h-[60px]">
+            <div className="min-h-[60px]">
                 <NavigationHeader title="제안 보기" onBack={() => navigate(-1)} />
             </div>
 
