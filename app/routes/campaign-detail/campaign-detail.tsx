@@ -178,7 +178,8 @@ export default function CampaignDetailContent({
       navigate("/auth/login");
       return;
     }
-    navigate(`/rooms/brand/${brandData.id}`);
+    if (!brandData.brandUserId) return;
+    navigate(`/rooms/brand/${brandData.brandUserId}`);
   };
 
   const handleToggleHeart = async (next: boolean) => {

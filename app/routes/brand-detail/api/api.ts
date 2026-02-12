@@ -27,6 +27,7 @@ type FashionResponseDto = {
 type BrandDetailItemDto = {
   userId: number;
   brandName: string;
+  brandUserId?: string;
   brandImages: string[];
   logoUrl?: string;
   simpleIntro?: string;
@@ -279,6 +280,7 @@ export async function fetchBrandDetail(params: {
   return {
     id: brandId,
     userId: item.userId,
+    brandUserId: item.brandUserId,
     domain: safeDomain,
 
     name: item.brandName,
