@@ -430,7 +430,7 @@ export default function CampaignDetailContent({
             onToggleHeart={handleToggleHeart}
           />
 
-          <div className="my-4 h-px w-full bg-core-2" />
+          <div className="my-3 h-px w-full bg-core-2" />
 
           <section>
             <div className="my-6 mx-2 overflow-hidden bg-bluegray-1">

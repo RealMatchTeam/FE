@@ -15,13 +15,11 @@ export default function CampaignActionBar({
 }: Props) {
   return (
     
-    // 피그마는 title3인데, 렌더링하면 작아 보여서 title2로 했습니다.
-
     <div className="mt-2 inline-flex w-full items-center gap-2">
       <button
         type="button"
         onClick={onChat}
-        className="flex flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 py-2 text-title2 font-medium leading-[20px] text-text-black"
+        className="flex flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 py-1.5 text-title3 font-medium leading-[20px] text-text-black"
       >
         채팅하기
       </button>
@@ -29,7 +27,7 @@ export default function CampaignActionBar({
       <button
         type="button"
         onClick={onSuggest}
-        className="flex flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 py-2 text-title2 font-medium leading-[20px] text-text-black"
+        className="flex flex-1 items-center justify-center rounded-[6px] bg-[#EBEEFB] px-4 py-1.5 text-title3 font-medium leading-[20px] text-text-black"
       >
         제안하기
       </button>
