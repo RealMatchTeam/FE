@@ -1,10 +1,19 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import NavigationHeader from "../../../../components/common/NavigateHeader";
 import { LayoutContext } from "../../../layout-context";
 import Button from "../../../../components/common/Button";
 import { fetchSponsorProductDetail } from "../../api/api";
 import LoadingSpinner from "../../../../components/common/LoadingSpinner";
+
+const INTERVAL = 3000;
 
 type SponsorAvailableItem = {
   itemId: number;
@@ -39,6 +48,11 @@ type NavState = {
   heroImageUrl?: string;
   productName?: string;
 };
+
+interface BannerItem {
+  src: string;
+  alt: string;
+}
 
 function Pill({ children }: { children: string }) {
   return (
@@ -155,6 +169,43 @@ export default function SponsorableDetailContent() {
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
 
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const banners: BannerItem[] = useMemo(() => {
+    const urls = (data?.productImageUrls ?? [])
+      .map((v) => (v ?? "").toString().trim())
+      .filter(Boolean);
+
+    return urls.map((src, idx) => ({
+      src,
+      alt: `${data?.productName ?? "제품"} 배너 ${idx + 1}`,
+    }));
+  }, [data?.productImageUrls, data?.productName]);
+
+  const start = useCallback(() => {
+    if (timerRef.current) return;
+    if (banners.length <= 1) return;
+
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % banners.length);
+    }, INTERVAL);
+  }, [banners.length]);
+
+  const stop = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    setCurrent(0);
+    stop();
+    start();
+    return stop;
+  }, [banners.length, start, stop]);
+
   useEffect(() => {
     if (!layout) return;
     layout.setHideHeader(true);
@@ -203,8 +254,6 @@ export default function SponsorableDetailContent() {
     };
   }, [brandId, productId, canFetch]);
 
-  const heroUrl = state.heroImageUrl || data?.productImageUrls?.[0] || "";
-
   const itemsText = useMemo(() => {
     if (!data) return "";
     const items = data.sponsorInfo?.items ?? [];
@@ -248,20 +297,47 @@ export default function SponsorableDetailContent() {
 
           {!loading && !errorText && data && (
             <div className="pb-6">
-              {heroUrl ? (
+              {banners.length ? (
                 <div className="relative h-[450px] w-full overflow-hidden bg-bluegray-1">
-                  <img
-                    src={heroUrl}
-                    alt={data.productName}
-                    className="h-full w-full object-cover"
-                    loading="eager"
-                    decoding="async"
-                  />
-                  <div className="pointer-events-none absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2">
-                    <span className="h-[7px] w-[7px] rounded-full bg-white" />
-                    <span className="h-[7px] w-[7px] rounded-full bg-bg-w-60" />
-                    <span className="h-[7px] w-[7px] rounded-full bg-bg-w-60" />
+                  <div
+                    className="flex h-full w-full transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${current * 100}%)` }}
+                  >
+                    {banners.map((banner, i) => (
+                      <div
+                        key={`${data.productId}-banner-${i}`}
+                        className="h-full w-full shrink-0"
+                      >
+                        <img
+                          src={banner.src}
+                          alt={banner.alt}
+                          className="h-full w-full object-cover"
+                          loading={i === 0 ? "eager" : "lazy"}
+                          decoding="async"
+                        />
+                      </div>
+                    ))}
                   </div>
+
+                  {banners.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+                      {banners.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          aria-label={`banner ${i + 1}`}
+                          onClick={() => {
+                            stop();
+                            setCurrent(i);
+                            start();
+                          }}
+                          className={`h-[7px] w-[7px] rounded-full transition-colors ${
+                            i === current ? "bg-white" : "bg-bg-w-60"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="h-[450px] w-full bg-bluegray-1" />
@@ -284,6 +360,7 @@ export default function SponsorableDetailContent() {
                   ) : null}
                 </div>
               </div>
+
               <div className="h-px w-full bg-core-2" />
 
               <div className="flex flex-col gap-5 bg-bg-w px-5 pb-6 pt-6">
@@ -321,7 +398,6 @@ export default function SponsorableDetailContent() {
                 </section>
               </div>
 
-              {/* ✅ 버튼 영역: 컨텐츠와 분리 (피그마: px-6 pt-14 pb-24) */}
               {showButton && (
                 <div className="bg-bg-w px-6 pt-[14px] pb-6 safe-area-bottom">
                   <Button

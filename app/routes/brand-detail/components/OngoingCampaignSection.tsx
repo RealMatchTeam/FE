@@ -20,7 +20,7 @@ export default function OngoingCampaignSection({
   const isEmpty = campaigns.length === 0;
 
   return (
-    <section className="pt-9 pb-9 px-2">
+    <section className="pt-9 pb-9">
       <div className="flex items-center justify-between">
         <div className="text-title1 text-text-black">진행 중인 다른 캠페인</div>
 
