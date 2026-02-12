@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import BottomTab from "../components/layout/BottomTab";
 import { LayoutContext } from "./layout-context";
 import Logo from "../assets/logo/realmatch-logo-line.png";
+import bellIcon from "../assets/icon/icon-bell.svg";
+import redDot from "../assets/icon/red-dot.svg";
 import { tokenStorage } from "../lib/token";
 
 export default function MainLayout() {
@@ -61,7 +63,25 @@ export default function MainLayout() {
               >
                 <img alt="Real Match" draggable="false" src={Logo} />
               </button>
-              <div />
+              <div className="flex items-center justify-end pr-4">
+                <button
+                  type="button"
+                  onClick={() => navigate("/notification")}
+                  className="relative flex h-9 w-9 items-center justify-center rounded-full active:bg-black/5"
+                  aria-label="알림"
+                >
+                  <img
+                    src={bellIcon}
+                    alt="알림"
+                    className="w-6 h-6 object-contain"
+                  />
+                  <img
+                    src={redDot}
+                    alt=""
+                    className="absolute top-[8px] right-[8px] w-2 h-2"
+                  />
+                </button>
+              </div>
             </div>
           </header>
         )}
