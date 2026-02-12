@@ -69,10 +69,10 @@ export default function MatchingCard({
         </div>
 
         <div className="flex justify-between items-center mb-2 gap-2">
-          <span className="text-title1 font-bold text-text-black truncate">
+          <span className="text-title1 font-semibold text-text-black truncate">
             {brand}
           </span>
-          <span className={`text-title3 font-bold ${getStatusStyle()}`}>
+          <span className={`text-title3 font-semibold ${getStatusStyle()}`}>
             {status}
           </span>
         </div>
@@ -81,14 +81,14 @@ export default function MatchingCard({
           {/* 제안 보기 / 지원 보기 / 거절 사유 보기 */}
           <button 
             onClick={onClick} 
-            className="flex-1 py-2 flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-lg transition-all hover:bg-bluegray-3 active:scale-[0.98]"
+            className="flex-1 h-8 py-[6px] flex items-center justify-center gap-1.5 bg-bluegray-2 rounded-[6px] transition-all hover:bg-bluegray-3 active:scale-[0.98]"
           >
             <img src={searchIcon} alt="조회" className="w-3.5 h-3.5" />
             <span className="text-caption1 font-medium text-text-gray2">{actionLabel}</span>
           </button>
 
           {/* 채팅 버튼 */}
-          <button onClick={handleChat} className="w-10 h-10 flex items-center justify-center bg-core-50 rounded-lg transition-opacity hover:opacity-90 flex-shrink-0">
+          <button onClick={handleChat} className="w-8 h-8 flex items-center justify-center bg-core-50 rounded-[6px] transition-opacity hover:opacity-90 flex-shrink-0">
             <img src={chatIcon} alt="채팅" className="w-5 h-5 object-contain" />
           </button>
         </div>
