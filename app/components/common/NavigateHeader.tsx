@@ -17,7 +17,7 @@ export default function NavigationHeader({
 
   return (
     <div
-      className={`h-[60px] flex items-center bg-[#FFFFFF] px-4 py-[10px] ${bg}`}
+      className={`h-[60px] flex items-center bg-[#FFFFFF]  px-4 py-[10px] ${bg}`}
     >
       <button
         type="button"
