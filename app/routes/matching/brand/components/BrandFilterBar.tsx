@@ -16,10 +16,10 @@ export default function BrandFilterBar({ category, onCategoryChange, searchKeywo
                 <div className="flex gap-2 shrink-0">
                     <button
                         className={cn(
-                            "px-[12px] py-[8px] h-10 text-title2 rounded-[8px] whitespace-nowrap cursor-pointer transition-colors",
+                            "px-[10px] py-2 rounded-[8px] text-title2 transition-all",
                             category === "BEAUTY"
                                 ? "bg-core-1 text-white"
-                                : "bg-white text-text-gray3 border border-gray-100"
+                                : "bg-white border border-text-gray5 text-text-gray3"
                         )}
                         onClick={() => onCategoryChange("BEAUTY")}
                     >
@@ -27,10 +27,10 @@ export default function BrandFilterBar({ category, onCategoryChange, searchKeywo
                     </button>
                     <button
                         className={cn(
-                            "px-[12px] py-[8px] h-10 text-title2 rounded-[8px] whitespace-nowrap cursor-pointer transition-colors",
+                            "px-[10px] py-2 rounded-[8px] text-title2 transition-all",
                             category === "FASHION"
                                 ? "bg-core-1 text-white"
-                                : "bg-white text-text-gray3 border border-gray-100"
+                                : "bg-white border border-text-gray5 text-text-gray3"
                         )}
                         onClick={() => onCategoryChange("FASHION")}
                     >
