@@ -34,7 +34,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, className = "" }: T
                                 >
                                     {tab.label}
                                     {isActive && (
-                                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120px] h-[2px] bg-core-1" />
+                                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[150px] h-[2px] bg-core-1" />
                                     )}
                                 </div>
                             )}
@@ -52,7 +52,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, className = "" }: T
                     >
                         {tab.label}
                         {isSelected && (
-                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120px] h-[2px] bg-core-1" />
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[150px] h-[2px] bg-core-1" />
                         )}
                     </button>
                 );
