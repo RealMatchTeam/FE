@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { cn } from "../../../lib/utils";
-import FilterChip from "../../../components/common/FilterChip";
 import SelectChip from "../test/components/SelectChip";
 import {
     SORT_OPTIONS,
@@ -82,7 +81,7 @@ export default function MatchingFilter({
                     <button
                         type="button"
                         className={cn(
-                            "text-title3 font-semibold cursor-pointer transition-colors",
+                            "text-title3 cursor-pointer transition-colors",
                             mainTab === "정렬 필터" ? "text-text-black" : "text-text-gray3",
                         )}
                         onClick={() => setMainTab("정렬 필터")}
@@ -94,7 +93,7 @@ export default function MatchingFilter({
                     <button
                         type="button"
                         className={cn(
-                            "text-title3 font-semibold cursor-pointer transition-colors",
+                            "text-title3 cursor-pointer transition-colors",
                             mainTab === filterTabName ? "text-text-black" : "text-text-gray3",
                         )}
                         onClick={() => setMainTab(filterTabName)}
@@ -162,22 +161,12 @@ export default function MatchingFilter({
                             </button>
                             {(filterData[subTab as keyof typeof filterData] as readonly string[]).map((tag) => {
                                 const selected = currentTags.includes(tag);
-                                if (filterType === "BEAUTY") {
-                                    return (
-                                        <SelectChip
-                                            key={tag}
-                                            label={tag}
-                                            isSelected={selected}
-                                            onToggle={() => toggleTag(tag)}
-                                        />
-                                    );
-                                }
                                 return (
-                                    <FilterChip
+                                    <SelectChip
                                         key={tag}
                                         label={tag}
-                                        selected={selected}
-                                        onClick={() => toggleTag(tag)}
+                                        isSelected={selected}
+                                        onToggle={() => toggleTag(tag)}
                                     />
                                 );
                             })}

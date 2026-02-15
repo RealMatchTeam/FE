@@ -11,6 +11,7 @@ import MatchingCard from "../components/MatchingCard";
 import MatchingTabSection from "../components/MatchingTabSection";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
+import Tabs from "../../../components/common/Tabs";
 
 export default function CalendarContent() {
   const navigate = useNavigate();
@@ -142,28 +143,14 @@ export default function CalendarContent() {
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-bluegray-1">
-      <div className="flex w-full bg-bg-w border-text-gray5">
-        <button
-          onClick={() => setMainTab("collaboration")}
-          className={`flex-1 py-4 text-[16px] font-medium text-[16px] relative transition-colors ${mainTab === "collaboration" ? "text-core-1" : "text-text-gray3"
-            }`}
-        >
-          협업 현황
-          {mainTab === "collaboration" && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120px] h-[2px] bg-core-1" />
-          )}
-        </button>
-        <button
-          onClick={() => setMainTab("matching")}
-          className={`flex-1 py-4 text-[16px] font-medium text-[16px] relative transition-colors ${mainTab === "matching" ? "text-core-1" : "text-text-gray3"
-            }`}
-        >
-          매칭 현황
-          {mainTab === "matching" && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120px] h-[2px] bg-core-1" />
-          )}
-        </button>
-      </div>
+      <Tabs
+        tabs={[
+          { label: "협업 현황", value: "collaboration" },
+          { label: "매칭 현황", value: "matching" },
+        ]}
+        activeTab={mainTab}
+        onTabChange={(value) => setMainTab(value as "collaboration" | "matching")}
+      />
 
       <main className="flex flex-col flex-1">
         {mainTab === "collaboration" ? (

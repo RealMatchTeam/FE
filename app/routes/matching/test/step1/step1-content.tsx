@@ -86,7 +86,7 @@ export default function MatchingTestContent({
     <div className="w-full mx-auto h-full bg-white flex flex-col">
       <MatchingTestTopBar step={1} totalSteps={3} onBack={onBack} />
 
-      <main className="flex-1 px-6 pb-6">
+      <main className="flex-1 px-6 pb-6 bg-white">
         <h1 className="text-title leading-8 text-text-black">
           관심 있는 <span className="text-core-1">뷰티 특성</span>을
           <br />
