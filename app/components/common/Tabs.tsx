@@ -29,7 +29,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, className = "" }: T
                         >
                             {({ isActive }) => (
                                 <div
-                                    className={`py-4 text-title-2 text-center relative transition-colors cursor-pointer ${isActive ? 'text-core-1' : 'text-text-gray3'
+                                    className={`py-4 text-title-2 text-center relative transition-colors cursor-pointer font-semibold ${isActive ? 'text-core-1' : 'text-text-gray3'
                                         }`}
                                 >
                                     {tab.label}
