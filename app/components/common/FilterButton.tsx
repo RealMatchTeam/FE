@@ -16,11 +16,10 @@ export default function FilterButton({
 }: FilterButtonProps) {
   return (
     <button
-      className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border transition-colors cursor-pointer text-[14px] font-Pretendard ${
-        isActive
-          ? "border-core-3 text-core-1 bg-core-2 font-medium"
-          : "border-core-2 text-text-gray2 bg-white text-title3"
-      } ${className}`}
+      className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border transition-colors cursor-pointer text-title3 ${isActive
+        ? "border-core-3 text-core-1 bg-core-70"
+        : "border-core-2 text-text-gray2 bg-white"
+        } ${className}`}
       {...props}
     >
       {truncateLabel(label)}
