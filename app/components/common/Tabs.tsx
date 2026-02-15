@@ -47,7 +47,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, className = "" }: T
                     <button
                         key={tab.value}
                         onClick={() => onTabChange?.(tab.value)}
-                        className={`flex-1 py-4 text-title-1 text-center relative transition-colors select-none ${isSelected ? 'text-core-1' : 'text-text-gray3'
+                        className={`flex-1 py-4 text-title-2 text-center relative transition-colors select-none font-semibold ${isSelected ? 'text-core-1' : 'text-text-gray3'
                             }`}
                     >
                         {tab.label}
