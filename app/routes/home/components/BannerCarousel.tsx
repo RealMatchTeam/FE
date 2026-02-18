@@ -41,19 +41,19 @@ export default function BannerCarousel({
   const [dragOffset, setDragOffset] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const start = useCallback(() => {
-    stop();
-    timerRef.current = setInterval(() => {
-      setCurrent((prev) => prev + 1);
-    }, INTERVAL);
-  }, [banners.length]);
-
   const stop = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
   }, []);
+
+  const start = useCallback(() => {
+    stop();
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => prev + 1);
+    }, INTERVAL);
+  }, [stop]);
 
   useEffect(() => {
     start();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import FilterBottomSheet from "../../../../../components/common/FilterBottomSheet";
 import Button from "../../../../../components/common/Button";
 import { CheckIcon } from "../../../../auth/components/CheckIcon";
@@ -19,7 +19,7 @@ interface SelectBottomSheetProps {
   hasCustomInput?: boolean;
 }
 
-export default function SelectBottomSheet({
+function SelectBottomSheetInner({
   isOpen,
   onClose,
   title,
@@ -31,10 +31,6 @@ export default function SelectBottomSheet({
 }: SelectBottomSheetProps) {
   const [selected, setSelected] = useState<string[]>(selectedValues);
   const [customInput, setCustomInput] = useState("");
-
-  useEffect(() => {
-    setSelected(selectedValues);
-  }, [selectedValues, isOpen]);
 
   const handleToggle = (value: string) => {
     if (multiSelect) {
@@ -57,8 +53,6 @@ export default function SelectBottomSheet({
   };
 
   const handleClose = () => {
-    setSelected(selectedValues);
-    setCustomInput("");
     onClose();
   };
 
@@ -123,4 +117,9 @@ export default function SelectBottomSheet({
       </div>
     </FilterBottomSheet>
   );
+}
+
+export default function SelectBottomSheet(props: SelectBottomSheetProps) {
+  // Reset component state when bottom sheet opens by changing key
+  return <SelectBottomSheetInner key={props.isOpen ? 'open' : 'closed'} {...props} />;
 }
