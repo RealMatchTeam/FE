@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useSearchParams } from "react-router";
 import { useState, useEffect } from "react";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignBrandCard from "../components/CampaignBrandCard";
@@ -15,6 +15,10 @@ import chatIcon from "../../../assets/chat-icon.svg"; // 채팅 아이콘 경로
 export default function CampaignContent() {
   const { campaignId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const isReceived = searchParams.get("type") === "received-campaign";
+
   useHideHeader(true);
   const [isContentOpen, setIsContentOpen] = useState(false);
   const [data, setData] = useState<ProposalDetail | null>(null);
@@ -109,14 +113,13 @@ export default function CampaignContent() {
         </div>
         
         <div className="flex flex-col gap-6 px-4 py-6 bg-[var(--color-bluegray-1)]">
-          {/* 캠페인명 */}
-          <CampaignInfoGroup
-            label="캠페인명"
-          >
-            <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1">
-              {data.title}
-            </div>
-          </CampaignInfoGroup>
+          {!isReceived && (
+            <CampaignInfoGroup label="캠페인명">
+              <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1">
+                {data.title}
+              </div>
+            </CampaignInfoGroup>
+          )}
 
           {/* 캠페인 내용 */}
           <CampaignInfoGroup

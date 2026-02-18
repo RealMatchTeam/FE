@@ -49,6 +49,12 @@ export default function CampaignsSection() {
   const [page, setPage] = useState(1);
   const [isOpen, setIsOpen] = useState(true);
 
+  const typeQueryMap: Record<string, string> = {
+    SENT: "sent-campaign",
+    RECEIVED: "received-campaign",
+    APPLIED: "applied-campaign",
+  };
+
   useEffect(() => {
     let isMounted = true;
     const fetchData = async () => {
@@ -121,19 +127,24 @@ export default function CampaignsSection() {
           <div className="divide-y divide-[#E8E8FB]">
             {pageItems.map((item, idx) => {
               const typeLabel = item.type ? typeLabelMap[item.type] : "";
-              const statusLabel = item.status
-                ? statusLabelMap[item.status]
-                : "";
-              const dateLabel = formatDate(
-                item.endDate ?? item.startDate ?? undefined,
-              );
-              const rightLabel = [dateLabel, statusLabel]
-                .filter(Boolean)
-                .join(" ");
+              const statusLabel = item.status ? statusLabelMap[item.status] : "";
+              const dateLabel = formatDate(item.endDate ?? item.startDate ?? undefined);
+              const rightLabel = [dateLabel, statusLabel].filter(Boolean).join(" ");
               const title = item.title ?? "";
               const brand = item.brandName ? `${item.brandName} - ` : "";
-
+              const idToUse = item.proposalId ?? item.campaignId ?? null;
               const campaignId = item.campaignId ?? null;
+
+              const handleNavigate = () => {
+                if (!idToUse) return;
+
+                // type에 따른 쿼리 스트링 매핑
+                const typeQuery = item.type ? typeQueryMap[item.type] : "sent-campaign";
+
+                // proposalId
+                navigate(`/business/campaign/${idToUse}?type=${typeQuery}`);
+              };
+
               return (
                 <div
                   key={`${item.proposalId ?? item.campaignId ?? idx}`}
@@ -141,11 +152,7 @@ export default function CampaignsSection() {
                     "flex items-center gap-3 py-3",
                     campaignId ? "cursor-pointer" : "",
                   ].join(" ")}
-                  onClick={
-                    campaignId
-                      ? () => navigate(`/business/campaign/${campaignId}`)
-                      : undefined
-                  }
+                  onClick={idToUse ? handleNavigate : undefined}
                   role={campaignId ? "button" : undefined}
                   tabIndex={campaignId ? 0 : -1}
                 >
@@ -153,8 +160,7 @@ export default function CampaignsSection() {
                     {typeLabel}
                   </div>
                   <div className="flex-1 text-[12px] leading-[16px] font-medium text-[#5B5D6B] truncate">
-                    {brand}
-                    {title}
+                    {brand}{title}
                   </div>
                   <div className="text-[12px] leading-[16px] font-medium text-[#9B9BA1] shrink-0">
                     {rightLabel}
