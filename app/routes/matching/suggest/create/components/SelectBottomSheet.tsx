@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FilterBottomSheet from "../../../../../components/common/FilterBottomSheet";
 import Button from "../../../../../components/common/Button";
 import { CheckIcon } from "../../../../auth/components/CheckIcon";
@@ -31,6 +31,10 @@ export default function SelectBottomSheet({
 }: SelectBottomSheetProps) {
   const [selected, setSelected] = useState<string[]>(selectedValues);
   const [customInput, setCustomInput] = useState("");
+
+  useEffect(() => {
+    setSelected(selectedValues);
+  }, [selectedValues, isOpen]);
 
   const handleToggle = (value: string) => {
     if (multiSelect) {

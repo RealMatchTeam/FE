@@ -32,13 +32,19 @@ export default function BannerCarousel({
   category: CategoryKey;
 }) {
   const banners = category === "beauty" ? beautyBanners : fashionBanners;
+  const displayBanners = [banners[banners.length - 1], ...banners, banners[0]];
 
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSilentJumping, setIsSilentJumping] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const start = useCallback(() => {
+    stop();
     timerRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % banners.length);
+      setCurrent((prev) => prev + 1);
     }, INTERVAL);
   }, [banners.length]);
 
@@ -54,19 +60,83 @@ export default function BannerCarousel({
     return stop;
   }, [start, stop]);
 
+  const handleTransitionEnd = () => {
+    if (current === 0) {
+      setIsSilentJumping(true);
+      setCurrent(banners.length);
+    } else if (current === banners.length + 1) {
+      setIsSilentJumping(true);
+      setCurrent(1);
+    }
+  };
+
+  useEffect(() => {
+    if (isSilentJumping) {
+      const timeout = setTimeout(() => {
+        setIsSilentJumping(false);
+      }, 50);
+      return () => clearTimeout(timeout);
+    }
+  }, [isSilentJumping]);
+
+  const handleStart = (clientX: number) => {
+    stop();
+    setIsDragging(true);
+    setStartX(clientX);
+    setDragOffset(0);
+  };
+
+  const handleMove = (clientX: number) => {
+    if (!isDragging) return;
+    const offset = clientX - startX;
+    setDragOffset(offset);
+  };
+
+  const handleEnd = () => {
+    if (!isDragging) return;
+
+    const threshold = 50;
+    if (dragOffset > threshold) {
+      setCurrent((prev) => prev - 1);
+    } else if (dragOffset < -threshold) {
+      setCurrent((prev) => prev + 1);
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+    start();
+  };
+
+  const activeDotIndex = (current - 1 + banners.length) % banners.length;
+
   return (
     <div className="-mx-5">
-      <div className="relative overflow-hidden">
+      <div
+        className="relative overflow-hidden cursor-grab active:cursor-grabbing touch-pan-y"
+        onMouseDown={(e) => handleStart(e.clientX)}
+        onMouseMove={(e) => handleMove(e.clientX)}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+        onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+        onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+        onTouchEnd={handleEnd}
+      >
         <div
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${current * 100}%)` }}
+          className={`flex ${isDragging || isSilentJumping ? "" : "transition-transform duration-500 ease-in-out"}`}
+          style={{
+            transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
+          }}
+          onTransitionEnd={handleTransitionEnd}
         >
-          {banners.map((banner, i) => (
-            <div key={`${category}-${i}`} className="w-full shrink-0">
+          {displayBanners.map((banner, i) => (
+            <div
+              key={`${category}-${i}`}
+              className="w-full shrink-0 select-none"
+            >
               <img
                 src={banner.src}
                 alt={banner.alt}
-                className="h-62.5 w-full object-cover"
+                className="h-62.5 w-full object-cover pointer-events-none"
               />
             </div>
           ))}
@@ -77,14 +147,14 @@ export default function BannerCarousel({
             <button
               key={i}
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 stop();
-                setCurrent(i);
+                setCurrent(i + 1);
                 start();
               }}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                i === current ? "bg-white" : "bg-white/50"
-              }`}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${i === activeDotIndex ? "bg-white" : "bg-white/50"
+                }`}
             />
           ))}
         </div>
