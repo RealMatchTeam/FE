@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { searchCollaborations, type CampaignCollaboration } from "../calendar/api/calendar"; 
 import searchIcon from "../../../assets/search2.svg";
 import closeIcon from "../../../assets/cancel.svg"; 
@@ -33,7 +33,7 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
   const [isLoading, setIsLoading] = useState(false);
 
   // 캠페인 검색 함수
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     if (!keyword.trim()) return;
     setIsLoading(true);
     try {
@@ -47,7 +47,7 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [keyword, subTab]);
 
   // 검색 상태에 따라 캠페인 검색
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function MatchingTabSection({ subTab, setSubTab, receivedCount, k
     } else {
       setCampaigns([]);
     }
-  }, [isSearching, keyword, subTab]);
+  }, [isSearching, keyword, subTab, fetchCampaigns]);
 
   if (isSearching) {
     return (

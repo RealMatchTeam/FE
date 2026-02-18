@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -85,37 +85,6 @@ export default function CreateCampaignContent() {
 
     let alive = true;
 
-    // proposalData가 있으면 우선 사용
-    if (proposalData) {
-      if (proposalData.campaignTitle) setValue("campaignName", proposalData.campaignTitle);
-      if (proposalData.campaignDescription) setValue("description", proposalData.campaignDescription);
-
-      // 태그 매핑 (ID를 문자열로 변환하여 사용)
-      if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
-        setValue("format", String(proposalData.contentTags.formats[0].id));
-      }
-      if (proposalData.contentTags?.categories && proposalData.contentTags.categories.length > 0) {
-        setValue("category", String(proposalData.contentTags.categories[0].id));
-      }
-      if (proposalData.contentTags?.tones && proposalData.contentTags.tones.length > 0) {
-        setValue("tone", String(proposalData.contentTags.tones[0].id));
-      }
-      if (proposalData.contentTags?.involvements && proposalData.contentTags.involvements.length > 0) {
-        setValue("involvement", String(proposalData.contentTags.involvements[0].id));
-      }
-      if (proposalData.contentTags?.usageRanges && proposalData.contentTags.usageRanges.length > 0) {
-        setValue("usageScope", String(proposalData.contentTags.usageRanges[0].id));
-      }
-
-      const reward = proposalData.rewardAmount?.toString();
-      if (reward) setValue("fee", reward);
-
-      if (proposalData.product) setValue("sponsorProduct", proposalData.product);
-      if (proposalData.startDate) setValue("startDate", proposalData.startDate);
-      if (proposalData.endDate) setValue("endDate", proposalData.endDate);
-      return;
-    }
-
     // URL 파라미터로 캠페인 조회 (기존 캠페인 제안 시)
     const campaignIdParam = searchParams.get("campaignId");
 
@@ -131,24 +100,24 @@ export default function CreateCampaignContent() {
             setValue("campaignName", detail.title);
             setValue("description", detail.description);
             setValue("fee", detail.rewardAmount.toString());
-            setValue("sponsorProduct", detail.product);
+            setValue("sponsorProduct", detail.product ? [detail.product] : []);
             if (detail.startDate) setValue("startDate", detail.startDate);
             if (detail.endDate) setValue("endDate", detail.endDate);
 
             if (detail.contentTags?.formats?.length > 0) {
-              setValue("format", String(detail.contentTags.formats[0].id));
+              setValue("format", detail.contentTags.formats.map(f => String(f.id)));
             }
             if (detail.contentTags?.categories?.length > 0) {
-              setValue("category", String(detail.contentTags.categories[0].id));
+              setValue("category", detail.contentTags.categories.map(c => String(c.id)));
             }
             if (detail.contentTags?.tones?.length > 0) {
-              setValue("tone", String(detail.contentTags.tones[0].id));
+              setValue("tone", detail.contentTags.tones.map(t => String(t.id)));
             }
             if (detail.contentTags?.involvements?.length > 0) {
-              setValue("involvement", String(detail.contentTags.involvements[0].id));
+              setValue("involvement", detail.contentTags.involvements.map(i => String(i.id)));
             }
             if (detail.contentTags?.usageRanges?.length > 0) {
-              setValue("usageScope", String(detail.contentTags.usageRanges[0].id));
+              setValue("usageScope", detail.contentTags.usageRanges.map(u => String(u.id)));
             }
           } catch (error) {
             console.error("캠페인 상세 조회 실패:", error);
@@ -156,6 +125,38 @@ export default function CreateCampaignContent() {
           }
         })();
       }
+      return () => {
+        alive = false;
+      };
+    }
+
+    if (proposalData) {
+      if (proposalData.campaignTitle) setValue("campaignName", proposalData.campaignTitle);
+      if (proposalData.campaignDescription) setValue("description", proposalData.campaignDescription);
+
+      // 태그 매핑 (ID를 문자열로 변환하여 배열로 사용)
+      if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
+        setValue("format", proposalData.contentTags.formats.map(f => String(f.id)));
+      }
+      if (proposalData.contentTags?.categories && proposalData.contentTags.categories.length > 0) {
+        setValue("category", proposalData.contentTags.categories.map(c => String(c.id)));
+      }
+      if (proposalData.contentTags?.tones && proposalData.contentTags.tones.length > 0) {
+        setValue("tone", proposalData.contentTags.tones.map(t => String(t.id)));
+      }
+      if (proposalData.contentTags?.involvements && proposalData.contentTags.involvements.length > 0) {
+        setValue("involvement", proposalData.contentTags.involvements.map(i => String(i.id)));
+      }
+      if (proposalData.contentTags?.usageRanges && proposalData.contentTags.usageRanges.length > 0) {
+        setValue("usageScope", proposalData.contentTags.usageRanges.map(u => String(u.id)));
+      }
+
+      const reward = proposalData.rewardAmount?.toString();
+      if (reward) setValue("fee", reward);
+
+      if (proposalData.product) setValue("sponsorProduct", [proposalData.product]);
+      if (proposalData.startDate) setValue("startDate", proposalData.startDate);
+      if (proposalData.endDate) setValue("endDate", proposalData.endDate);
     }
 
     return () => {
@@ -183,19 +184,33 @@ export default function CreateCampaignContent() {
   const involvementOptions = toOptions(INVOLVEMENT_TAGS, tags?.involvements);
   const usageScopeOptions = toOptions(USAGE_RANGE_TAGS, tags?.usageRanges);
 
-  const sponsorProductOptions = proposalData?.product
-    ? [{ value: proposalData.product, label: proposalData.product }]
-    : type === "new"
-      ? []
-      : (proposalData?.products ?? [])
-        .filter((p) => String(p.id).trim() && String(p.name).trim())
-        .map((p) => ({ value: String(p.id), label: String(p.name).trim() }));
+  const sponsorProductOptions = useMemo(() => {
+    const baseOptions = proposalData?.product
+      ? [{ value: proposalData.product, label: proposalData.product }]
+      : type === "new"
+        ? []
+        : (proposalData?.products ?? [])
+          .filter((p) => String(p.id).trim() && String(p.name).trim())
+          .map((p) => ({ value: String(p.id), label: String(p.name).trim() }));
 
-  // ID로 label 찾기 헬퍼 함수
-  const findLabel = (options: { value: string; label: string }[], value?: string) => {
-    if (!value) return undefined;
-    const found = options.find((opt) => opt.value === value);
-    return found?.label || value;
+    // formValues.sponsorProduct 배열에 있는데 options에 없는 항목들 추가
+    const missingOptions = (formValues.sponsorProduct || [])
+      .filter(sp => !baseOptions.find(opt => opt.value === sp))
+      .map(sp => ({ value: sp, label: sp }));
+
+    return [...missingOptions, ...baseOptions];
+  }, [proposalData, type, formValues.sponsorProduct]);
+
+  // ID 배열로 label들 찾기 헬퍼 함수
+  const findLabels = (options: { value: string; label: string }[], values?: string[]) => {
+    if (!values || values.length === 0) return undefined;
+    const labels = values
+      .map(value => {
+        const found = options.find((opt) => opt.value === value);
+        return found?.label || value;
+      })
+      .filter(Boolean);
+    return labels.length > 0 ? labels.join(", ") : undefined;
   };
 
   const onSubmit = () => {
@@ -229,13 +244,13 @@ export default function CreateCampaignContent() {
       campaignId,
       campaignName: formData.campaignName || "",
       description: formData.description || "",
-      formats: formData.format ? [{ id: Number(formData.format) }] : [],
-      categories: formData.category ? [{ id: Number(formData.category) }] : [],
-      tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
-      involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
-      usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
+      formats: formData.format?.map(f => ({ id: Number(f) })) || [],
+      categories: formData.category?.map(c => ({ id: Number(c) })) || [],
+      tones: formData.tone?.map(t => ({ id: Number(t) })) || [],
+      involvements: formData.involvement?.map(i => ({ id: Number(i) })) || [],
+      usageRanges: formData.usageScope?.map(u => ({ id: Number(u) })) || [],
       rewardAmount: Number(formData.fee) || 0,
-      productId: Number(formData.sponsorProduct) || 0,
+      productId: Number(formData.sponsorProduct?.[0]) || 0,
       startDate: formData.startDate || "",
       endDate: formData.endDate || "",
     };
@@ -324,8 +339,9 @@ export default function CreateCampaignContent() {
             <p className="text-callout1 text-text-gray2 mt-4 mb-2 ml-2">형식</p>
             <SelectField
               placeholder="형식 선택"
-              value={findLabel(formatOptions, formValues.format)}
+              value={findLabels(formatOptions, formValues.format)}
               onClick={() => setIsFormatSheetOpen(true)}
+              noTruncate={true}
             />
 
             {/* 종류 / 톤 */}
@@ -334,7 +350,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2 ml-2">종류</p>
                 <SelectField
                   placeholder="종류 선택"
-                  value={findLabel(categoryOptions, formValues.category)}
+                  value={findLabels(categoryOptions, formValues.category)}
                   onClick={() => setIsCategorySheetOpen(true)}
                 />
               </div>
@@ -342,7 +358,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2 ml-2">톤</p>
                 <SelectField
                   placeholder="톤 선택"
-                  value={findLabel(toneOptions, formValues.tone)}
+                  value={findLabels(toneOptions, formValues.tone)}
                   onClick={() => setIsToneSheetOpen(true)}
                 />
               </div>
@@ -354,7 +370,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2 ml-2">관여도</p>
                 <SelectField
                   placeholder="관여도 선택"
-                  value={findLabel(involvementOptions, formValues.involvement)}
+                  value={findLabels(involvementOptions, formValues.involvement)}
                   onClick={() => setIsInvolvementSheetOpen(true)}
                 />
               </div>
@@ -362,7 +378,7 @@ export default function CreateCampaignContent() {
                 <p className="text-callout1 text-text-gray2 mb-2 ml-2">활용 범위</p>
                 <SelectField
                   placeholder="활용 범위 선택"
-                  value={findLabel(usageScopeOptions, formValues.usageScope)}
+                  value={findLabels(usageScopeOptions, formValues.usageScope)}
                   onClick={() => setIsUsageScopeSheetOpen(true)}
                 />
               </div>
@@ -377,7 +393,7 @@ export default function CreateCampaignContent() {
               </label>
               <SelectField
                 placeholder="협찬품 선택"
-                value={findLabel(sponsorProductOptions, formValues.sponsorProduct)}
+                value={findLabels(sponsorProductOptions, formValues.sponsorProduct)}
                 onClick={() => setIsSponsorProductSheetOpen(true)}
               />
             </div>
@@ -434,9 +450,9 @@ export default function CreateCampaignContent() {
         onClose={() => setIsFormatSheetOpen(false)}
         title="형식"
         options={formatOptions}
-        selectedValues={formValues.format ? [formValues.format] : []}
-        onSubmit={(values) => setValue("format", values[0] || "")}
-        multiSelect={false}
+        selectedValues={formValues.format || []}
+        onSubmit={(values) => setValue("format", values)}
+        multiSelect={true}
       />
 
       {/* 종류 선택 바텀시트 */}
@@ -445,9 +461,9 @@ export default function CreateCampaignContent() {
         onClose={() => setIsCategorySheetOpen(false)}
         title="종류"
         options={categoryOptions}
-        selectedValues={formValues.category ? [formValues.category] : []}
-        onSubmit={(values) => setValue("category", values[0] || "")}
-        multiSelect={false}
+        selectedValues={formValues.category || []}
+        onSubmit={(values) => setValue("category", values)}
+        multiSelect={true}
       />
 
       {/* 톤 선택 바텀시트 */}
@@ -456,9 +472,9 @@ export default function CreateCampaignContent() {
         onClose={() => setIsToneSheetOpen(false)}
         title="톤"
         options={toneOptions}
-        selectedValues={formValues.tone ? [formValues.tone] : []}
-        onSubmit={(values) => setValue("tone", values[0] || "")}
-        multiSelect={false}
+        selectedValues={formValues.tone || []}
+        onSubmit={(values) => setValue("tone", values)}
+        multiSelect={true}
       />
 
       {/* 관여도 선택 바텀시트 */}
@@ -467,9 +483,9 @@ export default function CreateCampaignContent() {
         onClose={() => setIsInvolvementSheetOpen(false)}
         title="관여도"
         options={involvementOptions}
-        selectedValues={formValues.involvement ? [formValues.involvement] : []}
-        onSubmit={(values) => setValue("involvement", values[0] || "")}
-        multiSelect={false}
+        selectedValues={formValues.involvement || []}
+        onSubmit={(values) => setValue("involvement", values)}
+        multiSelect={true}
       />
 
       {/* 활용 범위 선택 바텀시트 */}
@@ -478,9 +494,9 @@ export default function CreateCampaignContent() {
         onClose={() => setIsUsageScopeSheetOpen(false)}
         title="활용 범위"
         options={usageScopeOptions}
-        selectedValues={formValues.usageScope ? [formValues.usageScope] : []}
-        onSubmit={(values) => setValue("usageScope", values[0] || "")}
-        multiSelect={false}
+        selectedValues={formValues.usageScope || []}
+        onSubmit={(values) => setValue("usageScope", values)}
+        multiSelect={true}
       />
 
       {/* 협찬품 선택 바텀시트 */}
@@ -489,9 +505,9 @@ export default function CreateCampaignContent() {
         onClose={() => setIsSponsorProductSheetOpen(false)}
         title="협찬품 선택"
         options={sponsorProductOptions}
-        selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
-        onSubmit={(values) => setValue("sponsorProduct", values[0] || "")}
-        multiSelect={false}
+        selectedValues={formValues.sponsorProduct || []}
+        onSubmit={(values) => setValue("sponsorProduct", values)}
+        multiSelect={true}
         hasCustomInput={true}
       />
 

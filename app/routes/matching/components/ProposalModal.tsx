@@ -44,8 +44,8 @@ export default function ProposalModal({
 
                     <h3 className="text-callout3 text-text-black text-center">
                         {isConfirm
-                            ? (isSuggest ? "캠페인을 제안하시겠습니까?" : "지원하시겠습니까?")
-                            : (isSuggest ? "제안하기 완료" : "지원 완료")}
+                            ? (isSuggest ? "제안하시겠습니까?" : "지원하시겠습니까?")
+                            : (isSuggest ? "제안 완료" : "지원 완료")}
                     </h3>
 
                     {!isConfirm && (
@@ -72,7 +72,7 @@ export default function ProposalModal({
                                 className="flex-[4] h-11 text-title7 rounded-xl"
                                 onClick={onConfirm}
                             >
-                                지원하기
+                                {isSuggest ? "제안하기" : "지원하기"}
                             </Button>
                         </>
                     ) : (
