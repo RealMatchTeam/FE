@@ -17,7 +17,7 @@ import useChatLayout from "./hooks/useChatLayout";
 import useChatStomp from "./hooks/useChatStomp";
 import useChatActions from "./hooks/useChatActions";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
-import CampaignListBottomSheet from "../chat/components/CampaignListBottomSheet";
+import CampaignProposalBottomSheet from "../chat/components/CampaignProposalBottomSheet";
 import { getMyCollaborations } from "../business/calendar/api/calendar";
 
 type Props = {
@@ -178,6 +178,8 @@ export default function ChattingRoom({ roomId }: Props) {
       >
         <div className="w-full">
           <div className="w-full space-y-2">
+
+            {/* 채팅마다 나오는 말풍선 (Bubble) */}
             {messages.map((m, idx) => {
               const isMe = m.senderType === "USER" && m.senderId === myUserId;
               const { dateText, timeText } = formatKoreanDateTime(m.createdAt);
@@ -229,14 +231,16 @@ export default function ChattingRoom({ roomId }: Props) {
         height={sheetHeight}
       />
 
-      <CampaignListBottomSheet
+      {/* 캠페인 재 제안하기 버튼 */}
+      <CampaignProposalBottomSheet
         isOpen={isCampaignSheetOpen}
         onClose={() => setIsCampaignSheetOpen(false)}
+        brandId={detail?.brandId}
         onSelect={(campaign) => {
           setProposalData({
             proposalId: campaign.proposalId,
             campaignId: campaign.campaignId,
-            brandId: campaign.brandId,
+            brandId: detail?.brandId || campaign.brandId,
             campaignTitle: campaign.title,
             campaignDescription: campaign.description,
             rewardAmount: campaign.rewardAmount,
