@@ -257,7 +257,7 @@ export default function MatchingTestStep2Content({
             />
             <FormField
               label="하의 사이즈 (in)"
-              value={bottomValue}
+              value={bottomValue ? `${bottomValue} in` : ""}
               placeholder="입력하기"
               onClick={() => {
                 setBottomInput(bottomValue);

@@ -129,28 +129,40 @@ export default function MatchingResultContent() {
 
   return (
     <div className="h-full w-full overflow-hidden bg-[linear-gradient(180deg,#EAEAFF_0%,#EFEFFE_39%,#FAFAFD_100%)]">
-      <div className="mx-auto h-full w-full max-w-[560px]">
-        <div className="h-full w-full flex flex-col">
-          <div className="flex-1 min-h-0 flex flex-col items-center justify-end gap-[clamp(20px,4vh,36px)] px-[clamp(16px,5vw,24px)] pt-[clamp(24px,6vh,56px)]">
-            <div className="w-full flex flex-col items-center gap-[clamp(18px,3.5vh,24px)]">
-              <div className="w-full flex flex-col items-center gap-[clamp(10px,2vh,14px)]">
-                <div className="w-full flex flex-col gap-[clamp(6px,1.2vh,8px)]">
-                  <p className="text-center text-[clamp(13px,3.2vw,14px)] leading-5 font-medium text-text-gray2">
-                    <span className="font-semibold text-core-1">
+      <div className="mx-auto h-full w-full max-w-md">
+        <div className="flex h-full w-full flex-col overflow-hidden">
+          <div
+            className="flex min-h-0 flex-1 flex-col items-center px-4"
+            style={{
+              paddingTop: "clamp(3.5rem, 14dvh, 7rem)",
+              paddingBottom: "clamp(1rem, 2.5dvh, 1.5rem)",
+            }}
+          >
+            <div
+              className="flex w-full flex-1 min-h-0 flex-col items-center"
+              style={{ gap: "clamp(1.25rem, 3dvh, 2rem)" }}
+            >
+              <div
+                className="flex w-full flex-col items-center"
+                style={{ gap: "clamp(0.75rem, 2dvh, 1rem)" }}
+              >
+                <div className="flex w-full flex-col gap-2">
+                  <p className="text-center text-title3 text-text-gray1">
+                    <span className="text-title3 text-core-1">
                       {data.userName}
                     </span>{" "}
                     님의 매칭 결과
                   </p>
-                  <h1 className="text-center text-[clamp(22px,6.2vw,28px)] leading-[1.07] font-extrabold text-[#382FE4]">
+                  <h1 className="text-center text-headline1 bg-[linear-gradient(90deg,#382FE4_0%,#5D5DFF_48%,#3915DA_95%)] bg-clip-text text-transparent font-extrabold">
                     {data.userType}
                   </h1>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-[clamp(3px,0.8vh,4px)]">
+                <div className="flex flex-wrap items-center justify-center gap-1">
                   {data.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full border border-bluegray-2 bg-white/80 px-[clamp(8px,2.2vw,12px)] py-[clamp(3px,0.9vh,4px)] text-[clamp(11px,2.8vw,12px)] leading-4 font-medium text-text-gray2"
+                      className="rounded-full border border-bluegray-2 bg-white/80 px-3 py-1 text-callout1 text-text-gray2"
                     >
                       #{tag}
                     </span>
@@ -158,35 +170,42 @@ export default function MatchingResultContent() {
                 </div>
               </div>
 
-              <div className="relative w-[min(56vw,210px)] aspect-[7/6]">
-                <img
-                  src={userTypeIconSrc}
-                  alt={data.userType}
-                  className="absolute left-0 top-[-12%] h-[112%] w-full select-none object-contain"
-                  draggable={false}
-                />
+              <div className="flex w-full flex-1 min-h-0 items-center justify-center">
+                <div className="relative aspect-[7/6] w-[min(56vw,13.125rem)]">
+                  <img
+                    src={userTypeIconSrc}
+                    alt={data.userType}
+                    className="absolute left-0 top-[-12%] h-[112%] w-full select-none object-contain"
+                    style={{
+                      imageRendering: "auto",
+                      transform: "translateZ(0)",
+                      backfaceVisibility: "hidden",
+                      WebkitFontSmoothing: "antialiased",
+                    }}
+                    draggable={false}
+                  />
+                </div>
               </div>
 
-              {loading ? (
-                <p className="text-[clamp(11px,2.8vw,12px)] leading-4 font-medium text-text-gray2">
-                  불러오는 중…
-                </p>
-              ) : null}
-              {error ? (
-                <p className="text-[clamp(11px,2.8vw,12px)] leading-4 font-medium text-red-500">
-                  {error}
-                </p>
-              ) : null}
+              <div
+                className="flex w-full flex-col items-center"
+                style={{ gap: "clamp(0.5rem, 1.5dvh, 0.75rem)" }}
+              >
+                {loading ? (
+                  <p className="text-callout1 text-text-gray2">불러오는 중…</p>
+                ) : null}
+                {error ? (
+                  <p className="text-callout1 text-red-500">{error}</p>
+                ) : null}
 
-              <div className="w-full flex flex-col items-center gap-[clamp(6px,1.3vh,8px)]">
-                <p className="text-center text-[clamp(13px,3.2vw,14px)] leading-[18px] font-semibold text-text-gray2">
+                <p className="text-center text-title3 text-text-gray2">
                   나와 어울리는 TOP3 브랜드
                 </p>
 
-                <div className="flex items-start justify-center gap-[clamp(8px,2.2vw,12px)]">
+                <div className="flex items-start justify-center gap-3">
                   {data.brands.map((b) => (
-                    <div key={b.brandId} className="w-[clamp(64px,18vw,72px)]">
-                      <div className="h-[clamp(64px,18vw,72px)] w-full rounded-[5px] bg-bluegray-2 p-[1px]">
+                    <div key={b.brandId} className="w-[min(22vw,5rem)]">
+                      <div className="aspect-square w-full rounded-[5px] bg-bluegray-2 p-[1px]">
                         <div className="h-full w-full overflow-hidden rounded-[4px] bg-white">
                           {b.logoUrl ? (
                             <img
@@ -196,18 +215,18 @@ export default function MatchingResultContent() {
                               draggable={false}
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center px-1 text-center text-[clamp(9px,2.2vw,10px)] font-semibold text-text-black">
+                            <div className="flex h-full w-full items-center justify-center px-1 text-center text-title7 text-text-gray2">
                               {short5(b.brandName)}
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <div className="mt-[clamp(4px,1vh,6px)] flex items-center justify-between">
-                        <span className="min-w-0 truncate pr-1 text-[clamp(9px,2.2vw,10px)] leading-3 font-semibold text-text-gray2">
+                      <div className="mt-1 flex items-center justify-between">
+                        <span className="min-w-0 truncate pr-1 text-callout2 text-text-gray1">
                           {short5(b.brandName)}
                         </span>
-                        <span className="shrink-0 text-[clamp(9px,2.2vw,10px)] leading-3 font-semibold text-core-1">
+                        <span className="shrink-0 text-callout2 text-core-1">
                           {b.matchingRatio}%
                         </span>
                       </div>
@@ -215,7 +234,7 @@ export default function MatchingResultContent() {
                   ))}
                 </div>
 
-                <div className="w-full px-[clamp(16px,5.3vw,20px)] pt-[clamp(20px,3.7vh,30px)] pb-[clamp(10px,1.6vh,10px)]">
+                <div className="w-full px-4 pt-6 pb-2">
                   <Button
                     variant="primary"
                     size="lg"
@@ -223,13 +242,13 @@ export default function MatchingResultContent() {
                     withLogo
                     onClick={onStart}
                     disabled={loading}
-                    className="h-[clamp(44px,6vh,44px)] rounded-[12px]"
+                    className="h-[44px] rounded-[12px]"
                   >
                     RealMatch 시작하기
                   </Button>
                 </div>
 
-                <div className="h-[clamp(28px,5vh,36px)]" />
+                <div style={{ height: "clamp(1rem, 2.5dvh, 2rem)" }} />
               </div>
             </div>
           </div>

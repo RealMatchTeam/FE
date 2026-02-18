@@ -16,7 +16,6 @@ import type {
   CampaignDetailApiResponse,
 } from "../campaign-detail/types";
 
-import informationIconUrl from "../../assets/information-icon.svg?url";
 import CampaignDetailSkeleton from "./components/CampaignDetailSkeleton";
 import { toggleCampaignLike } from "./campaign-like";
 
@@ -406,23 +405,28 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="my-3 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
+          <div className="my-3 flex items-center gap-2 text-core-1">
             <MetaItem
               icon={
-                <img
-                  src={informationIconUrl}
-                  alt=""
-                  className="block h-4 w- select-none"
-                  draggable={false}
-                />
+                <span className="relative block h-[1.125rem] w-4 shrink-0">
+                  <span className="absolute left-0 top-0.5 h-4 w-4 rounded-full border-[0.09375rem] border-core-1" />
+                  <span className="absolute left-1/2 top-[0.22rem] -translate-x-1/2 text-[0.8125rem] font-semibold leading-none text-core-1">
+                    i
+                  </span>
+                </span>
               }
               text={toDdayText(campaign.dday)}
             />
 
-            <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">{campaign.quota}명</span>
-            <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">
+            <span className="h-2.5 w-px bg-core-3" />
+
+            <span className="font-semibold leading-5 text-core-1">
+              {campaign.quota}명
+            </span>
+
+            <span className="h-2.5 w-px bg-core-3" />
+
+            <span className="font-semibold leading-5 text-core-1">
               {toKoreanCategory(campaign.category)}
             </span>
           </div>
@@ -555,11 +559,9 @@ function DetailRow({
 
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
-    <span className="flex items-center gap-1">
-      {icon ? (
-        <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
-      ) : null}
-      <span className="leading-none">{text}</span>
+    <span className="inline-flex items-center gap-2">
+      {icon ? <span className="shrink-0">{icon}</span> : null}
+      <span className="leading-5 font-semibold text-core-1">{text}</span>
     </span>
   );
 }
