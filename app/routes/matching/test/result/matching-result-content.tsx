@@ -176,6 +176,12 @@ export default function MatchingResultContent() {
                     src={userTypeIconSrc}
                     alt={data.userType}
                     className="absolute left-0 top-[-12%] h-[112%] w-full select-none object-contain"
+                    style={{
+                      imageRendering: "auto",
+                      transform: "translateZ(0)",
+                      backfaceVisibility: "hidden",
+                      WebkitFontSmoothing: "antialiased",
+                    }}
                     draggable={false}
                   />
                 </div>
