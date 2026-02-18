@@ -12,6 +12,7 @@ import { LayoutContext } from "../../../layout-context";
 import Button from "../../../../components/common/Button";
 import { fetchSponsorProductDetail } from "../../api/api";
 import LoadingSpinner from "../../../../components/common/LoadingSpinner";
+import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 
 const INTERVAL = 3000;
 
@@ -152,6 +153,7 @@ export default function SponsorableDetailContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sp] = useSearchParams();
+  const setProposalData = useCampaignProposalStore((state) => state.setProposalData);
 
   const layout = useContext(LayoutContext);
   const state = (location.state ?? {}) as NavState;
@@ -404,16 +406,16 @@ export default function SponsorableDetailContent() {
                     variant="primary"
                     size="lg"
                     fullWidth
-                    onClick={() =>
-                      navigate("/matching/suggest/create", {
-                        state: {
-                          brandId: data?.brandId,
-                          productId: data?.productId,
-                          brandName: data?.brandName,
-                          productName: data?.productName,
-                        },
-                      })
-                    }
+                    onClick={() => {
+                      setProposalData({
+                        brandId: data?.brandId ?? 0,
+                        brandName: data?.brandName,
+                        product: data?.productName,
+                        productId: data?.productId,
+                        domain: "BEAUTY",
+                      });
+                      navigate("/matching/suggest/create?type=new");
+                    }}
                   >
                     {buttonText}
                   </Button>

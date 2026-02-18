@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { fetchNotifications, readNotification, readAllNotifications, type NotificationItem as NotificationType } from "./api/notification";
 import { useHideHeader } from "../../hooks/useHideHeader";
 import NavigationHeader from "../../components/common/NavigateHeader";
@@ -29,7 +29,7 @@ export default function NotificationContent() {
 
     useHideHeader(true);
 
-    const fetchNotificationsData = async () => {
+    const fetchNotificationsData = useCallback(async () => {
         setLoading(true);
         try {
             const data = await fetchNotifications(activeTab);
@@ -42,11 +42,11 @@ export default function NotificationContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeTab]);
 
     useEffect(() => {
         fetchNotificationsData();
-    }, [activeTab]);
+    }, [fetchNotificationsData]);
 
     // 전체 읽기 핸들러
     const handleReadAll = async () => {

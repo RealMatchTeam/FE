@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -84,36 +84,26 @@ export default function ReSuggestContent() {
             setValue("description", proposalData.campaignDescription || "");
 
             if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
-                const t = proposalData.contentTags.formats[0];
-                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
-                if (id) setValue("format", String(id));
+                setValue("format", proposalData.contentTags.formats.map(f => String(f.id ?? PROPOSAL_TAG_ID_BY_NAME[f.name])));
             }
             if (proposalData.contentTags?.categories && proposalData.contentTags.categories.length > 0) {
-                const t = proposalData.contentTags.categories[0];
-                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
-                if (id) setValue("category", String(id));
+                setValue("category", proposalData.contentTags.categories.map(c => String(c.id ?? PROPOSAL_TAG_ID_BY_NAME[c.name])));
             }
             if (proposalData.contentTags?.tones && proposalData.contentTags.tones.length > 0) {
-                const t = proposalData.contentTags.tones[0];
-                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
-                if (id) setValue("tone", String(id));
+                setValue("tone", proposalData.contentTags.tones.map(t => String(t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name])));
             }
             if (proposalData.contentTags?.involvements && proposalData.contentTags.involvements.length > 0) {
-                const t = proposalData.contentTags.involvements[0];
-                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
-                if (id) setValue("involvement", String(id));
+                setValue("involvement", proposalData.contentTags.involvements.map(i => String(i.id ?? PROPOSAL_TAG_ID_BY_NAME[i.name])));
             }
             if (proposalData.contentTags?.usageRanges && proposalData.contentTags.usageRanges.length > 0) {
-                const t = proposalData.contentTags.usageRanges[0];
-                const id = t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name];
-                if (id) setValue("usageScope", String(id));
+                setValue("usageScope", proposalData.contentTags.usageRanges.map(u => String(u.id ?? PROPOSAL_TAG_ID_BY_NAME[u.name])));
             }
 
             setValue("fee", proposalData.rewardAmount?.toString() || "");
             const productIdValue = proposalData.productId && proposalData.productId > 0
                 ? proposalData.productId.toString()
-                : (proposalData.product || "");
-            setValue("sponsorProduct", productIdValue || "");
+                : (proposalData.product && proposalData.product !== "0" ? proposalData.product : "");
+            setValue("sponsorProduct", productIdValue ? [productIdValue] : []);
             setValue("startDate", proposalData.startDate || "");
             setValue("endDate", proposalData.endDate || "");
         }
@@ -136,16 +126,31 @@ export default function ReSuggestContent() {
     const involvementOptions = INVOLVEMENT_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
     const usageScopeOptions = USAGE_RANGE_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
 
-    const sponsorProductOptions = proposalData?.product
-        ? [{ value: proposalData.product, label: proposalData.product }]
-        : (proposalData?.products ?? [])
-            .filter((p) => p.id && p.name)
-            .map((p) => ({ value: String(p.id), label: p.name }));
+    const sponsorProductOptions = useMemo(() => {
+        const baseOptions = proposalData?.product && proposalData.product !== "0"
+            ? [{ value: proposalData.product, label: proposalData.product }]
+            : (proposalData?.products ?? [])
+                .filter((p) => p.id && p.name && String(p.id) !== "0")
+                .map((p) => ({ value: String(p.id), label: p.name }));
 
-    const findLabel = (options: { value: string; label: string }[], value?: string) => {
-        if (!value) return undefined;
-        const option = options.find((opt) => opt.value === value);
-        return option?.label || "";
+        // formValues.sponsorProduct 배열에 있는데 options에 없는 항목들 추가 (0 제외)
+        const missingOptions = (formValues.sponsorProduct || [])
+            .filter(sp => sp !== "0" && !baseOptions.find(opt => opt.value === sp))
+            .map(sp => ({ value: sp, label: sp }));
+
+        return [...missingOptions, ...baseOptions];
+    }, [proposalData, formValues.sponsorProduct]);
+
+    // ID 배열로 label들 찾기 헬퍼 함수
+    const findLabels = (options: { value: string; label: string }[], values?: string[]) => {
+        if (!values || values.length === 0) return undefined;
+        const labels = values
+            .map(value => {
+                const found = options.find((opt) => opt.value === value);
+                return found?.label || value;
+            })
+            .filter(Boolean);
+        return labels.length > 0 ? labels.join(", ") : undefined;
     };
 
     const onSubmit = () => {
@@ -167,13 +172,13 @@ export default function ReSuggestContent() {
             campaignId: proposalData?.campaignId || null,
             campaignName: formData.campaignName || "",
             description: formData.description || "",
-            formats: formData.format ? [{ id: Number(formData.format) }] : [],
-            categories: formData.category ? [{ id: Number(formData.category) }] : [],
-            tones: formData.tone ? [{ id: Number(formData.tone) }] : [],
-            involvements: formData.involvement ? [{ id: Number(formData.involvement) }] : [],
-            usageRanges: formData.usageScope ? [{ id: Number(formData.usageScope) }] : [],
+            formats: formData.format?.map(f => ({ id: Number(f) })) || [],
+            categories: formData.category?.map(c => ({ id: Number(c) })) || [],
+            tones: formData.tone?.map(t => ({ id: Number(t) })) || [],
+            involvements: formData.involvement?.map(i => ({ id: Number(i) })) || [],
+            usageRanges: formData.usageScope?.map(u => ({ id: Number(u) })) || [],
             rewardAmount: Number(formData.fee) || 0,
-            productId: Number(formData.sponsorProduct) || 0,
+            productId: Number(formData.sponsorProduct?.[0]) || 0,
             startDate: formData.startDate || "",
             endDate: formData.endDate || "",
         };
@@ -188,46 +193,47 @@ export default function ReSuggestContent() {
     };
     return (
         <div className="flex flex-col h-full bg-white">
-            <NavigationHeader title="제안 하기" onBack={() => navigate(-1)} />
+            <NavigationHeader title="재 제안" onBack={() => navigate(-1)} />
 
             <div className="flex-1 overflow-y-auto scrollbar-hide px-5 pt-4">
                 {/* 커스텀 브랜드 카드 디자인 */}
-                <div className="flex justify-between items-start w-full py-4 mb-2">
-                    <div className="flex gap-4">
-                        {/* 로고 영역 */}
-                        <div className="w-[84px] h-[84px] rounded-[12px] border border-bluegray-2 overflow-hidden bg-white flex items-center justify-center p-2.5">
-                            <img
-                                src={brandDetail?.logoImageUrl || ""}
-                                className="w-full h-full object-contain"
-                                alt="logo"
-                            />
-                        </div>
+                <div className="flex gap-4 w-full py-4 mb-2">
+                    {/* 로고 영역 */}
+                    <div className="w-[64px] h-[64px] rounded-[5px] border border-[#E6E6F3] overflow-hidden bg-white flex items-center justify-center p-2.5">
+                        <img
+                            src={brandDetail?.logoImageUrl || ""}
+                            className="w-full h-full object-contain"
+                            alt="logo"
+                        />
+                    </div>
 
-                        {/* 정보 영역 */}
-                        <div className="flex flex-col justify-center gap-1.5">
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-title7 text-text-black">
+                    {/* 정보 영역 */}
+                    <div className="flex-1 flex flex-col justify-center gap-1.5">
+                        {/* 첫 번째 줄: 브랜드명 및 매칭률 */}
+                        <div className="flex justify-between items-start w-full">
+                            <div className="flex items-center gap-1.5 pt-0.5">
+                                <span className="text-title1 text-text-black">
                                     {brandDetail?.name || proposalData?.brandName || ""}
                                 </span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#667085" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667085" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="9 18 15 12 9 6"></polyline>
                                 </svg>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <div className="flex flex-wrap gap-1">
-                                    {(brandDetail?.hashtags || []).map((tag) => (
-                                        <span key={tag} className="text-callout1 text-text-gray3">#{tag}</span>
-                                    ))}
-                                </div>
-                                <span className="text-callout1 text-[#A7B8FC] tracking-tight">검토 중</span>
+                            <div className="flex items-baseline gap-0.5">
+                                <span className="text-callout2 text-core-1">매칭률</span>
+                                <span className="text-title1 text-core-1">{brandDetail?.matchRate ?? 99}%</span>
                             </div>
                         </div>
-                    </div>
 
-                    {/* 매칭률 영역 */}
-                    <div className="flex items-baseline gap-0.5 pt-2">
-                        <span className="text-callout2 text-core-1">매칭률</span>
-                        <span className="text-title1 text-core-1">{brandDetail?.matchRate ?? 99}%</span>
+                        {/* 해시태그 및 상태값 */}
+                        <div className="flex justify-between items-end w-full">
+                            <div className="flex flex-wrap gap-1">
+                                {(brandDetail?.hashtags || []).map((tag) => (
+                                    <span key={tag} className="text-callout1 text-text-gray3">#{tag}</span>
+                                ))}
+                            </div>
+                            <span className="text-callout1 text-[#A7B8FC] tracking-tight">검토 중</span>
+                        </div>
                     </div>
                 </div>
 
@@ -249,7 +255,7 @@ export default function ReSuggestContent() {
                         {/* 캠페인명 */}
                         <div className="w-full">
                             <label className="text-title3 text-text-black mb-2 block ml-2">
-                                캠페인명<span className="text-error text-base">*</span>
+                                캠페인명
                             </label>
                             <TextInput
                                 placeholder="캠페인 제안 내용을 자세히 입력해주세요"
@@ -266,8 +272,11 @@ export default function ReSuggestContent() {
 
                         {/* 캠페인 내용 */}
                         <div className="w-full">
-                            <label className="text-title3 text-text-black mb-2 block ml-2">
-                                캠페인 내용<span className="text-error text-base">*</span>
+                            <label className="flex items-center gap-1 text-title3 text-text-black mb-2 block ml-2">
+                                캠페인 내용
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 15L12 9.5L6 15" stroke="#171718" stroke-width="1.5" />
+                                </svg>
                             </label>
 
                             <p className="text-callout1 text-text-gray2 mb-2 w-full ml-2">설명</p>
@@ -286,8 +295,9 @@ export default function ReSuggestContent() {
                             <p className="text-callout1 text-text-gray2 mt-4 mb-2 ml-2">형식</p>
                             <SelectField
                                 placeholder="형식 선택"
-                                value={findLabel(formatOptions, formValues.format)}
+                                value={findLabels(formatOptions, formValues.format)}
                                 onClick={() => setIsFormatSheetOpen(true)}
+                                noTruncate={true}
                             />
 
                             <div className="grid grid-cols-2 gap-3 mt-4">
@@ -295,7 +305,7 @@ export default function ReSuggestContent() {
                                     <p className="text-callout1 text-text-gray2 mb-2 ml-2">종류</p>
                                     <SelectField
                                         placeholder="종류 선택"
-                                        value={findLabel(categoryOptions, formValues.category)}
+                                        value={findLabels(categoryOptions, formValues.category)}
                                         onClick={() => setIsCategorySheetOpen(true)}
                                     />
                                 </div>
@@ -303,7 +313,7 @@ export default function ReSuggestContent() {
                                     <p className="text-callout1 text-text-gray2 mb-2 ml-2">톤</p>
                                     <SelectField
                                         placeholder="톤 선택"
-                                        value={findLabel(toneOptions, formValues.tone)}
+                                        value={findLabels(toneOptions, formValues.tone)}
                                         onClick={() => setIsToneSheetOpen(true)}
                                     />
                                 </div>
@@ -314,7 +324,7 @@ export default function ReSuggestContent() {
                                     <p className="text-callout1 text-text-gray2 mb-2 ml-2">관여도</p>
                                     <SelectField
                                         placeholder="관여도 선택"
-                                        value={findLabel(involvementOptions, formValues.involvement)}
+                                        value={findLabels(involvementOptions, formValues.involvement)}
                                         onClick={() => setIsInvolvementSheetOpen(true)}
                                     />
                                 </div>
@@ -322,7 +332,7 @@ export default function ReSuggestContent() {
                                     <p className="text-callout1 text-text-gray2 mb-2 ml-2">활용 범위</p>
                                     <SelectField
                                         placeholder="활용 범위 선택"
-                                        value={findLabel(usageScopeOptions, formValues.usageScope)}
+                                        value={findLabels(usageScopeOptions, formValues.usageScope)}
                                         onClick={() => setIsUsageScopeSheetOpen(true)}
                                     />
                                 </div>
@@ -333,17 +343,17 @@ export default function ReSuggestContent() {
                         <div className="grid grid-cols-2 gap-3 w-full">
                             <div>
                                 <label className="text-title3 text-text-black mb-2 block ml-2">
-                                    협찬품<span className="text-error text-base">*</span>
+                                    협찬품
                                 </label>
                                 <SelectField
                                     placeholder="협찬품 선택"
-                                    value={findLabel(sponsorProductOptions, formValues.sponsorProduct)}
+                                    value={formValues.sponsorProduct?.[0] === "0" ? "" : findLabels(sponsorProductOptions, formValues.sponsorProduct)}
                                     onClick={() => setIsSponsorProductSheetOpen(true)}
                                 />
                             </div>
                             <div>
                                 <label className="text-title3 text-text-black mb-2 block ml-2">
-                                    원고료<span className="text-error text-base">*</span>
+                                    원고료
                                 </label>
                                 <FeeInput
                                     value={formValues.fee ?? ""}
@@ -361,7 +371,7 @@ export default function ReSuggestContent() {
                         {/* 제작 기간 */}
                         <div className="w-full">
                             <label className="text-title3 text-text-black mb-2 block ml-2">
-                                제작 기간<span className="text-error text-base">*</span>
+                                제작 기간
                             </label>
                             <div className="flex items-center gap-2">
                                 <DateField
@@ -401,54 +411,54 @@ export default function ReSuggestContent() {
                 onClose={() => setIsFormatSheetOpen(false)}
                 title="형식"
                 options={formatOptions}
-                selectedValues={formValues.format ? [formValues.format] : []}
-                onSubmit={(values) => setValue("format", values[0] || "", { shouldValidate: true })}
-                multiSelect={false}
+                selectedValues={formValues.format || []}
+                onSubmit={(values) => setValue("format", values, { shouldValidate: true })}
+                multiSelect={true}
             />
             <SelectBottomSheet
                 isOpen={isCategorySheetOpen}
                 onClose={() => setIsCategorySheetOpen(false)}
                 title="종류"
                 options={categoryOptions}
-                selectedValues={formValues.category ? [formValues.category] : []}
-                onSubmit={(values) => setValue("category", values[0] || "", { shouldValidate: true })}
-                multiSelect={false}
+                selectedValues={formValues.category || []}
+                onSubmit={(values) => setValue("category", values, { shouldValidate: true })}
+                multiSelect={true}
             />
             <SelectBottomSheet
                 isOpen={isToneSheetOpen}
                 onClose={() => setIsToneSheetOpen(false)}
                 title="톤"
                 options={toneOptions}
-                selectedValues={formValues.tone ? [formValues.tone] : []}
-                onSubmit={(values) => setValue("tone", values[0] || "", { shouldValidate: true })}
-                multiSelect={false}
+                selectedValues={formValues.tone || []}
+                onSubmit={(values) => setValue("tone", values, { shouldValidate: true })}
+                multiSelect={true}
             />
             <SelectBottomSheet
                 isOpen={isInvolvementSheetOpen}
                 onClose={() => setIsInvolvementSheetOpen(false)}
                 title="관여도"
                 options={involvementOptions}
-                selectedValues={formValues.involvement ? [formValues.involvement] : []}
-                onSubmit={(values) => setValue("involvement", values[0] || "", { shouldValidate: true })}
-                multiSelect={false}
+                selectedValues={formValues.involvement || []}
+                onSubmit={(values) => setValue("involvement", values, { shouldValidate: true })}
+                multiSelect={true}
             />
             <SelectBottomSheet
                 isOpen={isUsageScopeSheetOpen}
                 onClose={() => setIsUsageScopeSheetOpen(false)}
                 title="활용 범위"
                 options={usageScopeOptions}
-                selectedValues={formValues.usageScope ? [formValues.usageScope] : []}
-                onSubmit={(values) => setValue("usageScope", values[0] || "", { shouldValidate: true })}
-                multiSelect={false}
+                selectedValues={formValues.usageScope || []}
+                onSubmit={(values) => setValue("usageScope", values, { shouldValidate: true })}
+                multiSelect={true}
             />
             <SelectBottomSheet
                 isOpen={isSponsorProductSheetOpen}
                 onClose={() => setIsSponsorProductSheetOpen(false)}
                 title="협찬품 선택"
                 options={sponsorProductOptions}
-                selectedValues={formValues.sponsorProduct ? [formValues.sponsorProduct] : []}
-                onSubmit={(values) => setValue("sponsorProduct", values[0] || "", { shouldValidate: true })}
-                multiSelect={false}
+                selectedValues={formValues.sponsorProduct || []}
+                onSubmit={(values) => setValue("sponsorProduct", values, { shouldValidate: true })}
+                multiSelect={true}
                 hasCustomInput={true}
             />
             <DatePickerBottomSheet
@@ -466,6 +476,7 @@ export default function ReSuggestContent() {
             <ProposalModal
                 isOpen={isConfirmDialogOpen}
                 type="confirm"
+                variant="suggest"
                 onClose={() => setIsConfirmDialogOpen(false)}
                 onConfirm={handleConfirmSubmit}
             />

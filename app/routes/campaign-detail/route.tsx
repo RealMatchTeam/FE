@@ -124,7 +124,7 @@ export default function CampaignDetailRoute() {
     return () => {
       alive = false;
     };
-  }, [resolvedBrandId, resolvedDomain]);
+  }, [resolvedBrandId, resolvedDomain, matchRateParam]);
 
   if (!campaignId) {
     return (

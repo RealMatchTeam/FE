@@ -26,7 +26,7 @@ export default function BrandContent() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // 검색 상태
-    const [searchKeyword, setSearchKeyword] = useState("");
+    const [searchKeyword, setSearchKeyword] = useState(searchParams.get("search") || "");
     const deferredKeyword = useDeferredValue(searchKeyword);
 
     // 정렬 옵션 매핑
@@ -126,7 +126,6 @@ export default function BrandContent() {
         return category === "BEAUTY" ? "뷰티 필터" : "패션 필터";
     };
 
-    // 로딩 중
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
