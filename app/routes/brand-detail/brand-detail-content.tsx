@@ -520,7 +520,11 @@ export default function BrandDetailContent({ data }: Props) {
 
           <OngoingCampaignSection
             campaigns={ongoingCampaigns}
-            onMore={() => {}}
+            onMore={() => {
+              const domain = searchParams.get("domain");
+              const categoryParam = domain === "fashion" ? "FASHION" : "BEAUTY";
+              navigate(`/matching/brand?type=${categoryParam}&search=${encodeURIComponent(data.name)}`);
+            }}
             onCampaignClick={goOngoingCampaignDetail}
             onLikeToggle={handleOngoingLikeToggle}
           />
