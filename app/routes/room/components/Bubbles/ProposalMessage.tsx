@@ -47,12 +47,14 @@ export default function ProposalMessage(props: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionDone, setActionDone] = useState<"accepted" | "rejected" | null>(null);
   const [modalState, setModalState] = useState<"confirm" | "success" | null>(null);
+  const [acceptFlowStarted, setAcceptFlowStarted] = useState(false);
 
   const isAlreadyProcessed = proposalStatus === "MATCHED" || proposalStatus === "REJECTED" || proposalStatus === "CANCELED";
   const showButtons = proposalDirection === "BRAND_TO_CREATOR" && !isAlreadyProcessed && !actionDone;
 
   const handleAcceptClick = () => {
     if (isProcessing) return;
+    setAcceptFlowStarted(true);
     setModalState("confirm");
   };
 
@@ -65,11 +67,13 @@ export default function ProposalMessage(props: Props) {
         setActionDone("accepted");
       } else {
         setModalState(null);
+        setAcceptFlowStarted(false);
         alert(response.message || "수락 처리 중 오류가 발생했습니다.");
       }
     } catch (error) {
       console.error("제안 수락 실패:", error);
       setModalState(null);
+      setAcceptFlowStarted(false);
       alert("서버와 통신 중 에러가 발생했습니다.");
     } finally {
       setIsProcessing(false);
@@ -77,10 +81,20 @@ export default function ProposalMessage(props: Props) {
   };
 
   const handleReject = () => {
+    if (isProcessing) return;
+    if (acceptFlowStarted) return;
+    if (actionDone === "accepted") return;
+
     navigate(`/business/proposal?type=received&proposalId=${proposalId}`, {
       state: { openReject: true },
     });
   };
+
+  const closeAcceptModal = () => {
+  if (isProcessing) return;
+  setModalState(null);
+  setAcceptFlowStarted(false); 
+};
 
   const AcceptModal = () => {
     if (!modalState) return null;
@@ -89,14 +103,14 @@ export default function ProposalMessage(props: Props) {
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div
           className="absolute inset-0 bg-black/40"
-          onClick={() => !isProcessing && setModalState(null)}
+          onClick={() => !isProcessing && closeAcceptModal()}
         />
 
         <div className="relative bg-white rounded-[20px] w-[calc(100%-48px)] max-w-[400px] px-6 pt-6 pb-8 flex flex-col items-center">
           {modalState === "confirm" && (
             <button
               type="button"
-              onClick={() => setModalState(null)}
+              onClick={() => closeAcceptModal()}
               className="absolute top-5 left-5 w-8 h-8 flex items-center justify-center"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -118,7 +132,7 @@ export default function ProposalMessage(props: Props) {
               <div className="w-full flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setModalState(null)}
+                  onClick={() => closeAcceptModal()}
                   className="w-[120px] h-[54px] rounded-[14px] border border-[#B7B7F3] text-[#6666E5] text-[17px] font-semibold shrink-0"
                 >
                   취소
@@ -144,7 +158,7 @@ export default function ProposalMessage(props: Props) {
 
               <button
                 type="button"
-                onClick={() => setModalState(null)}
+                onClick={closeAcceptModal}
                 className="w-full h-[54px] rounded-[14px] bg-[#6666E5] text-white text-[17px] font-semibold"
               >
                 완료하기
@@ -169,6 +183,52 @@ export default function ProposalMessage(props: Props) {
     </button>
   );
 
+  if (kind === "APPLY_CARD") {
+    return (
+      <div className="flex w-full justify-end">
+        <div className="inline-flex items-end gap-[8px]">
+          {timeText ? (
+            <div className="text-[10px] leading-[12px] text-[#9B9BA1] text-right whitespace-pre-line">
+              {timeText}
+            </div>
+          ) : null}
+
+          <div className="w-[214px] rounded-[10px] bg-[#B7B7F380] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
+            <div className="gap-[2px]">
+              <div className="text-[10px] leading-[14px] style-Medium text-[#6666E5]">
+                지원
+              </div>
+
+              <div className="gap-[5px]">
+                <div className="text-[12px] leading-[16px] style-Medium text-black">
+                  캠페인 명
+                </div>
+
+                <div className="flex items-center">
+                  <div className="min-w-0 text-[14px] leading-[20px] style-Medium text-[#404252] truncate">
+                    {campaignName}
+                  </div>
+                  <ArrowButton onClick={() => navigate(`/business/proposal?type=sent&proposalId=${proposalId}`)} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-[12px] leading-[16px] style-Medium text-black">
+                지원 내용
+              </div>
+
+              <div className="mt-[2px] text-[10px] leading-[14px] text-[#404252] truncate">
+                {bodyText}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   if (proposalDirection == "CREATOR_TO_BRAND") {
     return (
       <div className="flex w-full justify-end">
@@ -179,7 +239,7 @@ export default function ProposalMessage(props: Props) {
             </div>
           ) : null}
 
-          <div className="max-w-[214px] w-full rounded-[10px] bg-[#B7B7F380] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
+          <div className="w-[214px] rounded-[10px] bg-[#B7B7F380] px-[10px] py-[10px] text-left break-words whitespace-pre-line gap-[10px] flex flex-col">
             <div className="gap-[2px]">
               <div className="text-[10px] leading-[14px] style-Medium text-[#6666E5]">
                 {kind === "RE_PROPOSAL_CARD" ? "재제안" : "제안"}
@@ -288,7 +348,7 @@ export default function ProposalMessage(props: Props) {
                   <button
                     type="button"
                     onClick={handleReject}
-                    disabled={isProcessing}
+                    disabled={isProcessing || acceptFlowStarted || actionDone === "accepted"}
                     className="w-[72px] h-[32px] rounded-[6px] bg-white text-[#6666E5] text-[14px] leading-[20px] style-Medium border border-[#B7B7F3] disabled:opacity-50"
                   >
                     거절하기

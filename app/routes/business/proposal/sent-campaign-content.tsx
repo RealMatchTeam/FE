@@ -3,10 +3,11 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { getProposalDetail, type ProposalDetail } from "./api/proposal";
 import { axiosInstance } from "../../../api/axios";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
-import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
+import { useHideHeader } from "../../../hooks/useHideHeader";
+import NavigationHeader from "../../../components/common/NavigateHeader";
 
 import dropdownIcon from "../../../assets/arrow-down.svg";
 import dropupIcon from "../../../assets/arrow-up.svg";
@@ -23,6 +24,7 @@ export default function SentCampaignContent() {
     const [brandUserId, setBrandUserId] = useState<string | null>(null);
     const [brandCategory, setBrandCategory] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    useHideHeader(true);
 
     const proposalId = searchParams.get("proposalId");
 
@@ -63,7 +65,7 @@ export default function SentCampaignContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
-            <Header title="캠페인 보기" />
+            <NavigationHeader title="캠페인 보기" onBack={() => navigate(-1)} />
 
             <main className="flex flex-col pb-24">
                 {/* 상단 브랜드 정보 및 채팅 섹션 */}

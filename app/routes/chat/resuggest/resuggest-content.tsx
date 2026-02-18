@@ -199,7 +199,7 @@ export default function ReSuggestContent() {
                 {/* 커스텀 브랜드 카드 디자인 */}
                 <div className="flex gap-4 w-full py-4 mb-2">
                     {/* 로고 영역 */}
-                    <div className="w-[84px] h-[84px] rounded-[12px] border border-bluegray-2 overflow-hidden bg-white flex items-center justify-center p-2.5">
+                    <div className="w-[64px] h-[64px] rounded-[5px] border border-[#E6E6F3] overflow-hidden bg-white flex items-center justify-center p-2.5">
                         <img
                             src={brandDetail?.logoImageUrl || ""}
                             className="w-full h-full object-contain"
@@ -212,7 +212,7 @@ export default function ReSuggestContent() {
                         {/* 첫 번째 줄: 브랜드명 및 매칭률 */}
                         <div className="flex justify-between items-start w-full">
                             <div className="flex items-center gap-1.5 pt-0.5">
-                                <span className="text-title7 text-text-black">
+                                <span className="text-title1 text-text-black">
                                     {brandDetail?.name || proposalData?.brandName || ""}
                                 </span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667085" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
