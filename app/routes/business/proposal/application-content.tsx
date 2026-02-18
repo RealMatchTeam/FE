@@ -5,8 +5,9 @@ import { useLocation } from "react-router-dom";
 import { getAppliedCampaignDetail, cancelCampaignApply, type AppliedCampaignDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import { getProfileCard, type ProfileCard } from "./api/user";
+import { useHideHeader } from "../../../hooks/useHideHeader";
+import NavigationHeader from "../../../components/common/NavigateHeader";
 import Modal from "../../../components/common/Modal";
-import Header from "../../../components/layout/Header";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
@@ -28,8 +29,11 @@ export default function ApplicationContent() {
     const [modalStep, setModalStep] = useState<"CONFIRM" | "COMPLETE">("CONFIRM");
 
     const applicationId = searchParams.get("applicationId");
+    const navigate = useNavigate();
     const location = useLocation();
     const brandIdFromList = location.state?.brandId;
+
+    useHideHeader(true);
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -103,8 +107,6 @@ export default function ApplicationContent() {
         }
     };
 
-    const navigate = useNavigate();
-
     const handleComplete = () => {
         setIsModalOpen(false);
         navigate(-1);
@@ -125,7 +127,9 @@ export default function ApplicationContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
-            <Header title="지원 상세 보기" />
+            <div className="min-h-[60px]">
+                <NavigationHeader title="지원 보기" onBack={() => navigate(-1)} />
+            </div>
 
             <main className="flex flex-col pb-24">
                 {/* 상단 브랜드 정보 섹션 */}
