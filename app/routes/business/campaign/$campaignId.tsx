@@ -118,7 +118,7 @@ export default function CampaignContent() {
           <div className="grid grid-cols-2 gap-4">
             <CampaignInfoGroup label="협찬품">
               <div className="w-full p-4 bg-[var(--color-bg-w)] border border-[var(--color-text-gray5)] rounded-lg text-body1 flex justify-between items-center">
-                상품 ID: {data.productId}
+                {data.productId}
                 <img src={arrowRightIcon} alt="arrow" className="w-4 h-4" />
               </div>
             </CampaignInfoGroup>

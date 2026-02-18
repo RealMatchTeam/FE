@@ -143,7 +143,7 @@ export default function CampaignsSection() {
                   ].join(" ")}
                   onClick={
                     campaignId
-                      ? () => navigate(`/business/campaign/${campaignId}`)
+                      ? () => navigate(`/business/campaign/${campaignId}?type=sent-campaign`)
                       : undefined
                   }
                   role={campaignId ? "button" : undefined}
