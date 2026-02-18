@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getMyCollaborations } from "./api/calendar";
-import type { CampaignCollaboration } from "./api/calendar";
+import { getMyCollaborations, searchCollaborations } from "./api/calendar";
+import type { CampaignCollaboration, } from "./api/calendar";
 import FilterBottomSheet from "../components/FilterBottomSheet";
 import WeeklyCalendar from "../components/WeeklyCalendar";
 import MonthlyCalendar from "../components/MonthlyCalendar";
@@ -30,25 +30,31 @@ export default function CalendarContent() {
   const isFiltered = activeFilter !== "전체";
 
   useEffect(() => {
-    const fetchAllCampaigns = async () => {
+    const fetchCampaigns = async () => {
       try {
         setIsLoading(true);
 
+        // 1. 키워드가 있을 때는 searchCollaborations API 사용
+        // 2. 키워드가 없을 때는 getMyCollaborations API 사용
+
+        const fetchFunction = keyword.trim() ? searchCollaborations : getMyCollaborations;
+
         const [applied, sent, received] = await Promise.all([
-          getMyCollaborations({ type: "APPLIED", keyword: keyword.trim() || undefined }),
-          getMyCollaborations({ type: "SENT", keyword: keyword.trim() || undefined }),
-          getMyCollaborations({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
+          fetchFunction({ type: "APPLIED", keyword: keyword.trim() || undefined }),
+          fetchFunction({ type: "SENT", keyword: keyword.trim() || undefined }),
+          fetchFunction({ type: "RECEIVED", keyword: keyword.trim() || undefined }),
         ]);
 
         setCampaigns([...applied, ...sent, ...received]);
       } catch (error) {
-        console.error("로드 실패:", error);
+        console.error("데이터 로드 실패:", error);
+        setCampaigns([]); // 에러 시 빈 배열 처리
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAllCampaigns();
+    fetchCampaigns();
   }, [keyword, location.key]);
 
   // 날짜 계산을 별도 useMemo로 분리
@@ -92,8 +98,11 @@ export default function CalendarContent() {
     }
   };
 
+  // CalendarContent.tsx 내부 matchingList
+
   const matchingList = useMemo(() => {
     return campaigns.filter((item) => {
+      // 탭 필터링
       const isCorrectSubTab =
         matchingSubTab === "sent" ? item.type === "SENT" :
           matchingSubTab === "received" ? item.type === "RECEIVED" :
@@ -101,18 +110,14 @@ export default function CalendarContent() {
 
       if (!isCorrectSubTab) return false;
 
-      if (activeFilter === "전체") return true;
+      // 상태 필터링 (activeFilter가 "전체"가 아닐 때만 적용)
+      if (activeFilter !== "전체") {
+        return getStatusLabel(item.status) === activeFilter;
+      }
 
-      const statusMatches = getStatusLabel(item.status) === activeFilter;
-
-      const keywordMatches = keyword ? item.brandName.includes(keyword) : true;
-
-      return statusMatches && keywordMatches;
-
-
-
+      return true;
     });
-  }, [campaigns, matchingSubTab, activeFilter, keyword]);
+  }, [campaigns, matchingSubTab, activeFilter]); // keyword는 이제 API 결과(campaigns)에 반영되어 있으므로 제외 가능
 
   console.log("전체 데이터:", campaigns);
   console.log("필터된 데이터:", matchingList);
@@ -226,20 +231,18 @@ export default function CalendarContent() {
                 <h2 className="text-title1 font-semibold text-text-black">매칭 현황</h2>
                 <button
                   onClick={() => setIsFilterOpen(true)}
-                  className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-medium text-[#5B5D6B] ${
-                    isFiltered
+                  className={`flex items-center w-fit h-7 pl-3 pr-1.5 rounded-full border text-[14px] font-medium text-[#5B5D6B] ${isFiltered
                       ? "border-core-70 text-core-1 bg-core-70"
                       : "border-core-2 text-gray-2 bg-white"
-                  }`}
+                    }`}
                 >
                   {activeFilter}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="none"
-                    className={`w-6 h-6 ${
-                      isFiltered ? "text-core-1" : "text-text-gray2"
-                    }`}
+                    className={`w-6 h-6 ${isFiltered ? "text-core-1" : "text-text-gray2"
+                      }`}
                   >
                     <path
                       d="M6 8L10 12L14 8"
