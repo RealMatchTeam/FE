@@ -16,10 +16,12 @@ import dropupIcon from "../../../assets/arrow-up.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
+import ConfirmModal from "../../../components/common/ConfirmModal";
 
 export default function ProposalContent() {
     const [searchParams] = useSearchParams();
     const [isContentOpen, setIsContentOpen] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const navigate = useNavigate();
     useHideHeader(true);
 
@@ -29,6 +31,8 @@ export default function ProposalContent() {
     const [isLoading, setIsLoading] = useState(true);
 
     const proposalId = searchParams.get("proposalId");
+
+    useHideHeader(true);
 
     const STATUS_TEXT_MAP: Record<string, string> = {
         REVIEWING: "검토 중",
@@ -73,30 +77,19 @@ export default function ProposalContent() {
 
     const getTagNames = (tags: { name: string }[]) => tags.map(t => t.name).join(", ");
 
-    const handleCancel = async () => {
+    const handleCancelSubmit = async () => {
         if (!proposalId) return;
-
-        if (!window.confirm("제안을 취소하시겠습니까?")) return;
 
         try {
             const response = await cancelCampaignProposal(proposalId);
-
             if (response.isSuccess) {
-                alert("캠페인 제안을 취소했습니다.");
+                // 성공 시 모달 닫고 바로 이전 페이지로 이동
+                setIsConfirmOpen(false);
                 navigate(-1);
             }
-        } catch (error: unknown) {
+        } catch (error) {
             console.error("제안 취소 실패:", error);
-
-            let errorMessage = "취소 중 오류가 발생했습니다.";
-
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            } else if (typeof error === "string") {
-                errorMessage = error;
-            }
-
-            alert(errorMessage);
+            setIsConfirmOpen(false);
         }
     };
 
@@ -221,13 +214,22 @@ export default function ProposalContent() {
                     {/* 상태가 REVIEWING일 때만 취소 버튼 */}
                     {data.status === "REVIEWING" && (
                         <button
-                            onClick={handleCancel}
+                            onClick={() => setIsConfirmOpen(true)}
                             className="px-4 py-2 bg-bg-w border border-core-3 rounded-xl text-core-1 text-title3 hover:bg-bluegray-1 transition-colors"
                         >
                             취소하기
                         </button>
                     )}
                 </div>
+
+                <ConfirmModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleCancelSubmit}
+                title="제안을 취소하시겠습니까?"
+            />
+
+                
             </main>
         </div>
     );
