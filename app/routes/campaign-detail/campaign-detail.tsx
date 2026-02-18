@@ -405,23 +405,28 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="my-3 flex items-center gap-2 text-title1 text-core-1">
+          <div className="my-3 flex items-center gap-2 text-core-1">
             <MetaItem
               icon={
-                <div className="relative h-[18px] w-[16px]">
-                  <div className="absolute top-[2px] h-[16px] w-[16px] rounded-full border-[1.5px] border-core-1" />
-                  <span className="absolute top-[2px] left-1/2 -translate-x-1/2 text-[13px] font-semibold text-core-1 leading-none">
+                <span className="relative block h-[1.125rem] w-4 shrink-0">
+                  <span className="absolute left-0 top-0.5 h-4 w-4 rounded-full border-[0.09375rem] border-core-1" />
+                  <span className="absolute left-1/2 top-[0.22rem] -translate-x-1/2 text-[0.8125rem] font-semibold leading-none text-core-1">
                     i
                   </span>
-                </div>
+                </span>
               }
               text={toDdayText(campaign.dday)}
             />
 
-            <div className="h-px w-[10px] rotate-90 bg-core-3" />
-            <span className="text-title1 text-core-1">{campaign.quota}명</span>
-            <div className="h-px w-[10px] rotate-90 bg-core-3" />
-            <span className="text-title1 text-core-1">
+            <span className="h-2.5 w-px bg-core-3" />
+
+            <span className="font-semibold leading-5 text-core-1">
+              {campaign.quota}명
+            </span>
+
+            <span className="h-2.5 w-px bg-core-3" />
+
+            <span className="font-semibold leading-5 text-core-1">
               {toKoreanCategory(campaign.category)}
             </span>
           </div>
@@ -550,11 +555,9 @@ function DetailRow({
 
 function MetaItem({ icon, text }: { icon?: React.ReactNode; text: string }) {
   return (
-    <span className="flex items-center gap-1">
-      {icon ? (
-        <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
-      ) : null}
-      <span className="leading-none">{text}</span>
+    <span className="inline-flex items-center gap-2">
+      {icon ? <span className="shrink-0">{icon}</span> : null}
+      <span className="leading-5 font-semibold text-core-1">{text}</span>
     </span>
   );
 }
