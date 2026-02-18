@@ -4,8 +4,9 @@ import { getProposalDetail, type ProposalDetail } from "./api/proposal";
 import { getBrandSummary, type BrandSummary } from "./api/brand";
 import { getProfileCard, type ProfileCard } from "./api/user";
 import { cancelCampaignProposal } from "./api/proposal";
+import { useHideHeader } from "../../../hooks/useHideHeader";
 
-import Header from "../../../components/layout/Header";
+import NavigationHeader from "../../../components/common/NavigateHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
@@ -20,6 +21,7 @@ export default function ProposalContent() {
     const [searchParams] = useSearchParams();
     const [isContentOpen, setIsContentOpen] = useState(false);
     const navigate = useNavigate();
+    useHideHeader(true);
 
     const [data, setData] = useState<ProposalDetail | null>(null);
     const [brand, setBrand] = useState<BrandSummary | null>(null);
@@ -100,7 +102,7 @@ export default function ProposalContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
-            <Header title="제안 보기" />
+            <NavigationHeader title="제안 보기" onBack={() => navigate(-1)} />
 
             <main className="flex flex-col pb-24">
                 {/* 브랜드 카드 및 제안 프로필 */}
