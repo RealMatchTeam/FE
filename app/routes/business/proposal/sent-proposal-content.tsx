@@ -5,7 +5,8 @@ import { getBrandSummary, type BrandSummary } from "./api/brand";
 import { getProfileCard, type ProfileCard } from "./api/user";
 import { cancelCampaignProposal } from "./api/proposal";
 
-import Header from "../../../components/layout/Header";
+import { useHideHeader } from "../../../hooks/useHideHeader";
+import NavigationHeader from "../../../components/common/NavigateHeader";
 import CampaignBrandCard from "../components/CampaignBrandCard";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import CampaignInfoGroup from "../components/CampaignInfoGroup";
@@ -27,6 +28,8 @@ export default function ProposalContent() {
     const [isLoading, setIsLoading] = useState(true);
 
     const proposalId = searchParams.get("proposalId");
+
+    useHideHeader(true);
 
     const STATUS_TEXT_MAP: Record<string, string> = {
         REVIEWING: "검토 중",
@@ -100,7 +103,9 @@ export default function ProposalContent() {
 
     return (
         <div className="flex flex-col w-full min-h-screen bg-bg-w font-pretendard">
-            <Header title="제안 보기" />
+            <div className="min-h-[60px]">
+                <NavigationHeader title="제안 보기" onBack={() => navigate(-1)} />
+            </div>
 
             <main className="flex flex-col pb-24">
                 {/* 브랜드 카드 및 제안 프로필 */}
