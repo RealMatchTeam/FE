@@ -11,9 +11,10 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     onSelect: (detail: ProposalDetail) => void;
+    brandId?: number;
 }
 
-export default function CampaignListBottomSheet({ isOpen, onClose, onSelect }: Props) {
+export default function CampaignProposalBottomSheet({ isOpen, onClose, onSelect, brandId }: Props) {
     const [campaigns, setCampaigns] = useState<CampaignCollaboration[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingDetail, setLoadingDetail] = useState(false);
@@ -29,7 +30,10 @@ export default function CampaignListBottomSheet({ isOpen, onClose, onSelect }: P
                         status: "REVIEWING",
                         endDate: today,
                     });
-                    setCampaigns(data || []);
+                    const filtered = brandId
+                        ? (data || []).filter((c) => c.brandId === brandId)
+                        : (data || []);
+                    setCampaigns(filtered);
                 } catch (error) {
                     console.error("Failed to fetch campaigns:", error);
                 } finally {
@@ -38,7 +42,7 @@ export default function CampaignListBottomSheet({ isOpen, onClose, onSelect }: P
             };
             fetchCampaigns();
         }
-    }, [isOpen]);
+    }, [isOpen, brandId]);
 
     const options = campaigns
         .filter((c) => c.proposalId)
@@ -56,10 +60,8 @@ export default function CampaignListBottomSheet({ isOpen, onClose, onSelect }: P
 
         setLoadingDetail(true);
         try {
-            // Revert back to using proposal API
             const detail = await getProposalDetail(proposalId);
 
-            // Pass campaignId from collaboration list
             const result: ProposalDetail = {
                 ...detail,
                 campaignId: originalCampaign.campaignId

@@ -282,20 +282,16 @@ export default function ProposalMessage(props: Props) {
         <div className="w-fit flex items-start gap-[10px] max-w-full">
           {/* avatar */}
           <div
-            className="shrink-0 rounded-[10px] bg-white overflow-hidden"
+            className="shrink-0 rounded-[10px] overflow-hidden"
             style={{ width: 38, height: 38 }}
           >
-            {avatarSrc ? (
+            {avatarSrc && (
               <img
                 src={avatarSrc}
                 alt="avatar"
                 className="w-full h-full object-cover"
                 draggable={false}
               />
-            ) : (
-              <div className="w-full h-full grid place-items-center text-[12px] text-[#5B5D6B]">
-                logo
-              </div>
             )}
           </div>
 

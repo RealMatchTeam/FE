@@ -157,12 +157,17 @@ export default function ReSuggestContent() {
         setIsConfirmDialogOpen(true);
     };
 
-    const handleConfirmSubmit = () => {
+    const handleConfirmSubmit = async () => {
         const formData = formValues;
         const userId = tokenStorage.getUserId();
 
         if (!userId) {
             toast.error("로그인이 필요합니다.");
+            return;
+        }
+
+        if (!proposalData?.proposalId) {
+            toast.error("제안 정보가 없습니다. 다시 시도해주세요.");
             return;
         }
 
@@ -183,13 +188,14 @@ export default function ReSuggestContent() {
             endDate: formData.endDate || "",
         };
 
-        setIsConfirmDialogOpen(false);
-        setIsSuccessModalOpen(true);
-
-        reRequestCampaignProposal(proposalData!.proposalId!, requestData).catch((error: unknown) => {
+        try {
+            await reRequestCampaignProposal(proposalData.proposalId, requestData);
+            setIsConfirmDialogOpen(false);
+            setIsSuccessModalOpen(true);
+        } catch (error: unknown) {
             console.error("캠페인 재제안 실패:", error);
             toast.error("캠페인 재제안에 실패했습니다. 다시 시도해주세요.");
-        });
+        }
     };
     return (
         <div className="flex flex-col h-full bg-white">
