@@ -133,7 +133,7 @@ export default function CampaignsSection() {
               const title = item.title ?? "";
               const brand = item.brandName ? `${item.brandName} - ` : "";
               const idToUse = item.proposalId ?? item.campaignId ?? null;
-              const campaignId = item.campaignId ?? null;
+              //const campaignId = item.campaignId ?? null;
 
               const handleNavigate = () => {
                 if (!idToUse) return;
@@ -150,11 +150,11 @@ export default function CampaignsSection() {
                   key={`${item.proposalId ?? item.campaignId ?? idx}`}
                   className={[
                     "flex items-center gap-3 py-3",
-                    campaignId ? "cursor-pointer" : "",
+                    idToUse ? "cursor-pointer" : "",
                   ].join(" ")}
                   onClick={idToUse ? handleNavigate : undefined}
-                  role={campaignId ? "button" : undefined}
-                  tabIndex={campaignId ? 0 : -1}
+                  role={idToUse ? "button" : undefined}
+                  tabIndex={idToUse ? 0 : -1}
                 >
                   <div className="min-w-[72px] text-[#6666E5] underline underline-offset-2 text-[12px] leading-[16px] font-medium">
                     {typeLabel}
