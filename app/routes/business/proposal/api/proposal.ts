@@ -13,10 +13,13 @@ export interface ProposalDetail {
   proposalId: number;
   brandId: number;
   creatorId: number;
+  campaignId: number | null;     
+  campaignName: string | null;
   title: string;
   description: string;
   rewardAmount: number;
   productId: number;
+  product?: string;
   startDate: string | null;
   endDate: string | null;
   status: string;
