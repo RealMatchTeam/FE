@@ -16,7 +16,6 @@ import type {
   CampaignDetailApiResponse,
 } from "../campaign-detail/types";
 
-import informationIconUrl from "../../assets/information-icon.svg?url";
 import CampaignDetailSkeleton from "./components/CampaignDetailSkeleton";
 import { toggleCampaignLike } from "./campaign-like";
 
@@ -406,23 +405,23 @@ export default function CampaignDetailContent({
             description={brandData.description}
           />
 
-          <div className="my-3 flex items-center gap-2 text-title1 text-core-1 font-[16px]">
+          <div className="my-3 flex items-center gap-2 text-title1 text-core-1">
             <MetaItem
               icon={
-                <img
-                  src={informationIconUrl}
-                  alt=""
-                  className="block h-4 w- select-none"
-                  draggable={false}
-                />
+                <div className="relative h-[18px] w-[16px]">
+                  <div className="absolute top-[2px] h-[16px] w-[16px] rounded-full border-[1.5px] border-core-1" />
+                  <span className="absolute top-[2px] left-1/2 -translate-x-1/2 text-[13px] font-semibold text-core-1 leading-none">
+                    i
+                  </span>
+                </div>
               }
               text={toDdayText(campaign.dday)}
             />
 
-            <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">{campaign.quota}명</span>
-            <span className="px-1 text-core-3">|</span>
-            <span className="text-core-1">
+            <div className="h-px w-[10px] rotate-90 bg-core-3" />
+            <span className="text-title1 text-core-1">{campaign.quota}명</span>
+            <div className="h-px w-[10px] rotate-90 bg-core-3" />
+            <span className="text-title1 text-core-1">
               {toKoreanCategory(campaign.category)}
             </span>
           </div>
