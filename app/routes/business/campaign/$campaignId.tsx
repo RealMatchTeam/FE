@@ -94,15 +94,15 @@ export default function CampaignContent() {
         {/* 상단 통합 영역: 브랜드 카드 + 캠페인 제목 + 채팅하기 */}
         <div className="flex flex-col bg-white px-4 pt-6 pb-2">
           <CampaignBrandCard
-  showChatSection={false}
-  statusText={getStatusLabel(data.status)}
-  brandName={brand?.brandName}
-  brandTags={brand?.brandTags || []} 
-  brandImageUrl={brand?.brandImageUrl}
-  matchingRate={brand?.matchingRate}
-  brandId={brand?.brandId || (data as any).brandId}
-  category={proposalData?.contentTags?.categories?.[0]?.name || "beauty"}
-/>
+            showChatSection={false}
+            statusText={getStatusLabel(data.status)}
+            brandName={brand?.brandName}
+            brandTags={brand?.brandTags || []}
+            brandImageUrl={brand?.brandImageUrl}
+            matchingRate={brand?.matchingRate}
+            brandId={brand?.brandId || (data).brandId}
+            category={proposalData?.contentTags?.categories?.[0]?.name || "beauty"}
+          />
 
           <div className="flex justify-between items-center mt-5 mb-0">
             <div className="flex flex-col gap-1">
