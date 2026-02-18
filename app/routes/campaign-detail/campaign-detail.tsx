@@ -506,7 +506,11 @@ export default function CampaignDetailContent({
           <OngoingCampaignSection
             campaigns={ongoingCampaigns}
             brandLogoUrl={brandData.logoImageUrl}
-            onMore={() => {}}
+            onMore={() => {
+              const domain = searchParams.get("domain");
+              const categoryParam = domain === "fashion" ? "FASHION" : "BEAUTY";
+              navigate(`/matching/campaign?type=${categoryParam}&search=${encodeURIComponent(brandData.name)}`);
+            }}
             onCampaignClick={goOngoingCampaignDetail}
             onLikeToggle={handleOngoingLikeToggle}
           />
