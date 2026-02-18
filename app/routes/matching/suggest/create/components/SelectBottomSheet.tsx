@@ -19,7 +19,7 @@ interface SelectBottomSheetProps {
   hasCustomInput?: boolean;
 }
 
-export default function SelectBottomSheet({
+function SelectBottomSheetInner({
   isOpen,
   onClose,
   title,
@@ -53,8 +53,6 @@ export default function SelectBottomSheet({
   };
 
   const handleClose = () => {
-    setSelected(selectedValues);
-    setCustomInput("");
     onClose();
   };
 
@@ -119,4 +117,9 @@ export default function SelectBottomSheet({
       </div>
     </FilterBottomSheet>
   );
+}
+
+export default function SelectBottomSheet(props: SelectBottomSheetProps) {
+  // Reset component state when bottom sheet opens by changing key
+  return <SelectBottomSheetInner key={props.isOpen ? 'open' : 'closed'} {...props} />;
 }
