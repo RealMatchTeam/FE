@@ -27,7 +27,7 @@ export default function CampaignContent() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // 검색 상태
-    const [searchKeyword, setSearchKeyword] = useState("");
+    const [searchKeyword, setSearchKeyword] = useState(searchParams.get("search") || "");
     const deferredKeyword = useDeferredValue(searchKeyword);
 
     // 정렬 옵션 매핑
@@ -49,14 +49,14 @@ export default function CampaignContent() {
         hasNextPage,
         isFetchingNextPage
     } = useInfiniteQuery({
-        queryKey: ["matching-campaigns", category, sortOption, selectedTags, deferredKeyword],
+        queryKey: ["matching-campaigns", category, sortOption, selectedTags],
         queryFn: async ({ pageParam = 0 }) => {
             const tagsToSend = selectedTags.length > 0 ? selectedTags : await getTagNamesByCategory();
             const response = await getMatchingCampaigns(
                 sortBy,
                 category,
                 tagsToSend,
-                deferredKeyword || undefined,
+                undefined,
                 pageParam,
                 20
             );
@@ -83,6 +83,17 @@ export default function CampaignContent() {
         return data?.pages.flatMap(page => page.campaigns) || [];
     }, [data]);
 
+    // 검색어 필터링
+    const filteredCampaigns = useMemo(() => {
+        return campaigns.filter(campaign => {
+            const matchesSearch = deferredKeyword === "" ||
+                campaign.brandName?.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
+                campaign.campaignName?.toLowerCase().includes(deferredKeyword.toLowerCase()) ||
+                campaign.title?.toLowerCase().includes(deferredKeyword.toLowerCase());
+            return matchesSearch;
+        });
+    }, [campaigns, deferredKeyword]);
+
     // 바텀탭 숨기기
     useHideBottomTab(isFilterOpen);
 
@@ -91,7 +102,7 @@ export default function CampaignContent() {
     };
 
     const toggleLike = async (id: number) => {
-        const queryKey = ["matching-campaigns", category, sortOption, selectedTags, deferredKeyword];
+        const queryKey = ["matching-campaigns", category, sortOption, selectedTags];
 
         // 낙관적 업데이트
         queryClient.setQueryData(queryKey, (oldData: { pages: { campaigns: MatchingCampaign[] }[] } | undefined) => {
@@ -133,8 +144,6 @@ export default function CampaignContent() {
         setSortApplied(true);
     };
 
-
-
     const getFilterButtonLabel = () => {
         if (selectedTags.length > 0) {
             return selectedTags.slice(0, 2).join(", ") + (selectedTags.length > 2 ? "..." : "");
@@ -142,7 +151,6 @@ export default function CampaignContent() {
         return "콘텐츠 필터";
     };
 
-    // 로딩 중
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
@@ -151,8 +159,8 @@ export default function CampaignContent() {
         );
     }
 
-    // 매칭 결과가 없거나 에러
-    if (error || (campaigns.length === 0 && !isLoading)) {
+    // 매칭 검사를 안한 경우
+    if (error || (campaigns.length === 0 && !isLoading && !deferredKeyword)) {
         if (error) console.error("Failed to fetch matching campaigns:", error);
 
         return <EmptyMatchState
@@ -163,7 +171,6 @@ export default function CampaignContent() {
         />
     }
 
-    // 매칭 결과가 있을 때
     return (
         <div className="flex flex-col h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
             {/* 뷰티/패션 필터 & 검색창 */}
@@ -196,7 +203,7 @@ export default function CampaignContent() {
 
                 {/* 캠페인 리스트 */}
                 <div className="space-y-3 pb-20">
-                    {campaigns.map((campaign) => (
+                    {filteredCampaigns.map((campaign) => (
                         <CampaignCard
                             key={campaign.id}
                             brandName={campaign.brandName}
