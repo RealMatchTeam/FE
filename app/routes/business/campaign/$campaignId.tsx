@@ -27,27 +27,41 @@ export default function CampaignContent() {
   const [brand, setBrand] = useState<BrandSummary | null>(null);
 
   useEffect(() => {
-    console.log("1. 현재 주소창에서 가져온 ID:", campaignId);
     if (!campaignId) return;
 
     const loadData = async () => {
       try {
-        let res;
+        let res: ProposalDetail | AppliedCampaignDetail;
+
         if (isApplied) {
-          // 지원한 캠페인 API 호출
+          // 지원한 캠페인일 경우
           res = await getAppliedCampaignDetail(campaignId);
         } else {
-          // 보낸/받은 제안 API 호출
+          // 제안받은/보낸 캠페인일 경우
           res = await getProposalDetail(campaignId);
         }
+
+        console.log("실제 받아온 데이터 구조:", res); // 여기서 brandId가 어떤 키로 들어오는지 꼭 확인하세요!
         setData(res);
 
-        if (res.brandId) {
-          const brandResult = await getBrandSummary(Number(res.brandId));
+        // brandId 추출 로직 (우선순위 부여)
+        let targetId: number | undefined;
+
+        if ('brandId' in res && res.brandId) {
+          targetId = Number(res.brandId);
+        } else if ('brand' in res && res.brand && typeof res.brand === 'object' && 'id' in res.brand) {
+          // 만약 brand: { id: 123 } 구조로 올 경우
+          targetId = Number((res.brand as { id: number }).id);
+        }
+
+        if (targetId) {
+          const brandResult = await getBrandSummary(targetId);
           setBrand(brandResult);
+        } else {
+          console.warn("현재 데이터에서 brandId를 추출할 수 없습니다.");
         }
       } catch (err) {
-        console.error("데이터 호출 에러:", err);
+        console.error("데이터 로딩 중 에러:", err);
       }
     };
 
@@ -96,11 +110,11 @@ export default function CampaignContent() {
           <CampaignBrandCard
             showChatSection={false}
             statusText={getStatusLabel(data.status)}
-            brandName={brand?.brandName}
+            brandName={brand?.brandName || (data as AppliedCampaignDetail)?.brandName || "브랜드 정보"}
             brandTags={brand?.brandTags || []}
             brandImageUrl={brand?.brandImageUrl}
             matchingRate={brand?.matchingRate}
-            brandId={brand?.brandId || (data).brandId}
+            brandId={brand?.brandId || (data as any).brandId || 0} 
             category={proposalData?.contentTags?.categories?.[0]?.name || "beauty"}
           />
 

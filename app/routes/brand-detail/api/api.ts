@@ -1,7 +1,7 @@
 import { apiClient } from "../../../api/axios";
-import realmatchDetailLogo from "../../../assets/ad/ad-realmatch-detail-logo.png";
-import realmatchDetailBanner from "../../../assets/ad/ad-realtmatch-detail-banner.png";
-import realmatchDetailCampaign from "../../../assets/ad/ad-realmatch-detail-campagin.png";
+//import realmatchDetailLogo from "../../../assets/ad/ad-realmatch-detail-logo.png";
+//import realmatchDetailBanner from "../../../assets/ad/ad-realtmatch-detail-banner.png";
+//import realmatchDetailCampaign from "../../../assets/ad/ad-realmatch-detail-campagin.png";
 import type {
   BrandDomain,
   BrandDetailData,
@@ -179,7 +179,7 @@ export async function fetchSponsorProductList(params: {
 }): Promise<SponsorProductsListDto[]> {
   const { brandId } = params;
 
-  if (brandId === "0") {
+  /*if (brandId === "0") {
     return [
       {
         brandId: 0,
@@ -202,7 +202,7 @@ export async function fetchSponsorProductList(params: {
         },
       },
     ];
-  }
+  }*/
 
   const res = await apiClient.get<SponsorProductsApiResponse>(
     `/api/v1/brands/${brandId}/sponsor-products`,
@@ -223,7 +223,7 @@ export async function fetchSponsorProductDetail(params: {
 }): Promise<SponsorProductDetailResult> {
   const { brandId, productId } = params;
 
-  if (brandId === "0" && String(productId) === "0") {
+  /*if (brandId === "0" && String(productId) === "0") {
     return {
       brandId: 0,
       brandName: "리얼매치",
@@ -243,7 +243,7 @@ export async function fetchSponsorProductDetail(params: {
         ],
       },
     };
-  }
+  }*/
 
   const res = await apiClient.get<SponsorProductDetailApiResponse>(
     `/api/v1/brands/${brandId}/sponsor-products/${productId}`,
@@ -264,7 +264,7 @@ export async function fetchBrandDetail(params: {
 }): Promise<BrandDetailData> {
   const { brandId, domain } = params;
 
-  if (brandId === "0") {
+  /*if (brandId === "0") {
     return {
       id: "0",
       userId: 0,
@@ -294,7 +294,7 @@ export async function fetchBrandDetail(params: {
       histories: [],
       historiesHasNext: false,
     };
-  }
+  }*/
 
   const detailRes = await apiClient.get<BrandDetailApiResponse>(
     `/api/v1/brands/${brandId}`,
