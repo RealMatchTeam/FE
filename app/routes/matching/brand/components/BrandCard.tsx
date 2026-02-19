@@ -7,6 +7,7 @@ interface BrandCardProps {
     tags: string[];
     isLiked?: boolean;
     logoUrl?: string;
+    isAd?: boolean;
     onLike?: () => void;
     onClick?: () => void;
 }
@@ -17,6 +18,7 @@ export default function BrandCard({
     tags,
     isLiked = false,
     logoUrl,
+    isAd = false,
     onLike,
     onClick
 }: BrandCardProps) {
@@ -35,7 +37,7 @@ export default function BrandCard({
                         <div className="flex justify-between items-start">
                             <h3 className="text-title1 text-text-black truncate">{name}</h3>
                             <div className="flex items-center gap-2">
-                                <span className="text-core-1"><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></span>
+                                <span className="text-core-1">{isAd ? <span className="text-title1 font-bold">광고</span> : <><span className="text-callout1">매칭률 </span><span className="text-title1 font-bold">{matchRate}%</span></>}</span>
                                 <button onClick={(e) => { e.stopPropagation(); onLike?.(); }} className="flex-shrink-0 cursor-pointer">
                                     {isLiked ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 14" fill="none">

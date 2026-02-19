@@ -1,4 +1,6 @@
 import { apiClient } from "../../../api/axios";
+import realmatchDetailLogo from "../../../assets/ad/ad-realmatch-detail-logo.png";
+import realmatchDetailBanner from "../../../assets/ad/ad-realtmatch-detail-banner.png";
 import type {
   BrandDomain,
   BrandDetailData,
@@ -213,6 +215,32 @@ export async function fetchBrandDetail(params: {
   domain?: BrandDomain;
 }): Promise<BrandDetailData> {
   const { brandId, domain } = params;
+
+  if (brandId === "0") {
+    return {
+      id: "0",
+      userId: 0,
+      brandUserId: undefined,
+      domain: domain ?? "beauty",
+      name: "리얼매치",
+      matchRate: 0,
+      heroImageUrl: realmatchDetailBanner,
+      brandImages: [realmatchDetailBanner],
+      logoText: "리얼매치",
+      logoImageUrl: realmatchDetailLogo,
+      homepageUrl: undefined,
+      simpleIntro: "크리에이터와 브랜드를 정밀 매칭하는 플랫폼",
+      hashtags: ["정밀매칭", "원스톱협업", "쌍방향제안"],
+      description: "크리에이터와 브랜드를 정밀 매칭하는 플랫폼",
+      categories: [],
+      tagSections: [],
+      isLiked: false,
+      ongoingCampaigns: [],
+      products: [],
+      histories: [],
+      historiesHasNext: false,
+    };
+  }
 
   const detailRes = await apiClient.get<BrandDetailApiResponse>(
     `/api/v1/brands/${brandId}`,

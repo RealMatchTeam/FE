@@ -11,6 +11,7 @@ import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { getMatchingBrands, toggleBrandLike, type MatchingBrand, MatchingTestRequiredError } from "../api/matching";
+import realmatchLogo from "../../../assets/ad/ad-realmatch-logo.png";
 
 export default function BrandContent() {
     const [searchParams] = useSearchParams();
@@ -128,8 +129,40 @@ export default function BrandContent() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
-                <LoadingSpinner />
+            <div className="flex flex-col h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
+                <BrandFilterBar
+                    category={category}
+                    onCategoryChange={handleCategoryChange}
+                    searchKeyword={searchKeyword}
+                    onSearchChange={setSearchKeyword}
+                />
+                <div className="flex-1 px-4 py-6 overflow-y-auto">
+                    <div className="mb-4">
+                        <div className="h-6 w-28 animate-pulse rounded bg-gray-200 mb-4" />
+                        <div className="flex gap-2">
+                            <div className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />
+                            <div className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />
+                        </div>
+                    </div>
+                    <div className="space-y-3 pb-20">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <div key={`sk-${i}`} className="flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px]">
+                                <div className="mr-3 w-[80px] h-[80px] animate-pulse rounded-xl bg-gray-200 flex-shrink-0" />
+                                <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                                    <div className="flex justify-between">
+                                        <div className="h-5 w-24 animate-pulse rounded bg-gray-200" />
+                                        <div className="h-5 w-16 animate-pulse rounded bg-gray-200" />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <div className="h-4 w-14 animate-pulse rounded bg-gray-200" />
+                                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />
+                                        <div className="h-4 w-18 animate-pulse rounded bg-gray-200" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }
@@ -187,6 +220,16 @@ export default function BrandContent() {
 
                 {/* 브랜드 리스트 */}
                 <div className="space-y-3 pb-20">
+                    <BrandCard
+                        key="realmatch"
+                        name="리얼매치"
+                        matchRate={0}
+                        tags={["정밀매칭", "원스톱협업", "쌍방향제안"]}
+                        isLiked={false}
+                        isAd
+                        onClick={() => navigate(`/brand?brandId=0&domain=${category.toLowerCase()}`)}
+                        logoUrl={realmatchLogo}
+                    />
                     {filteredBrands.map((brand) => (
                         <BrandCard
                             key={brand.id}

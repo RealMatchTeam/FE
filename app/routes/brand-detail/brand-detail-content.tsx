@@ -172,7 +172,7 @@ export default function BrandDetailContent({ data }: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const brandId = Number(searchParams.get("brandId"));
-  const validBrandId = Number.isFinite(brandId) && brandId > 0;
+  const validBrandId = Number.isFinite(brandId) && brandId >= 0;
 
   const setProposalData = useCampaignProposalStore(
     (state) => state.setProposalData,
@@ -459,6 +459,7 @@ export default function BrandDetailContent({ data }: Props) {
             matchRate={data.matchRate}
             hashtags={(data.hashtags ?? []).slice(0, 2)}
             description={data.description}
+            isAd={brandId === 0}
           />
 
           <div className="mt-3.5">
