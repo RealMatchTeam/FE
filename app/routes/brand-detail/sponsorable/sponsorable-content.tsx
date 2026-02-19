@@ -5,6 +5,7 @@ import ProductListCard from "../components/ProductListCard";
 import { LayoutContext } from "../../layout-context";
 import { fetchSponsorProductList } from "../../brand-detail/api/api";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
+import realmatchDetailCampaign from "../../../assets/ad/ad-realmatch-detail-campagin.png";
 
 import type { SponsorProductsListDto } from "../../brand-detail/types";
 
@@ -51,7 +52,7 @@ const buildSubtitle = (dto: SponsorProductsListDto) => {
           ? `${it.availableSize}ml`
           : "";
 
-      const left = [name, type, qty].filter(Boolean).join(" ").trim();
+      const left = [name, qty].filter(Boolean).join(" ").trim();
       const right = size.trim();
 
       return [left, right].filter(Boolean).join(" / ");
@@ -90,7 +91,7 @@ export default function SponsorableContent() {
   const layout = useContext(LayoutContext);
 
   const canFetch = useMemo(
-    () => Number.isFinite(brandId) && (brandId ?? 0) > 0,
+    () => Number.isFinite(brandId) && brandId !== undefined,
     [brandId],
   );
 
@@ -102,7 +103,7 @@ export default function SponsorableContent() {
   }, [layout]);
 
   useEffect(() => {
-    if (!canFetch || !brandId) return;
+    if (!canFetch || brandId === undefined) return;
 
     let cancelled = false;
 
@@ -110,6 +111,21 @@ export default function SponsorableContent() {
       try {
         setLoading(true);
         setErrorText(null);
+
+        // brandId=0일 때 하드코딩된 데이터 사용
+        if (brandId === 0) {
+          if (cancelled) return;
+          setProducts([
+            {
+              productId: 0,
+              productName: "리얼이 캐릭터 크림",
+              imageUrl: realmatchDetailCampaign,
+              subtitle: "리얼이 캐릭터 크림 1개",
+            },
+          ]);
+          setLoading(false);
+          return;
+        }
 
         const list = await fetchSponsorProductList({
           brandId: String(brandId),
@@ -136,8 +152,8 @@ export default function SponsorableContent() {
   }, [brandId, canFetch]);
 
   const goDetail = (product: UiSponsorProduct) => {
-    if (!brandId || !Number.isFinite(brandId) || brandId <= 0) return;
-    if (!Number.isFinite(product.productId) || product.productId <= 0) return;
+    if (brandId === undefined || !Number.isFinite(brandId)) return;
+    if (!Number.isFinite(product.productId)) return;
 
     navigate(
       `/products/sponsorable/detail?brandId=${brandId}&productId=${product.productId}`,

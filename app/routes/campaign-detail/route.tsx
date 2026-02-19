@@ -96,7 +96,7 @@ export default function CampaignDetailRoute() {
 
   // brand detail fetch
   useEffect(() => {
-    if (!resolvedBrandId) return;
+    if (resolvedBrandId === null) return;
 
     let alive = true;
 

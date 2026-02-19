@@ -221,13 +221,17 @@ export default function BrandDetailContent({ data }: Props) {
     ProductMiniCardItem[]
   >([]);
 
-  const sponsorProducts = useMemo<ProductMiniCardItem[]>(
-    () => (validBrandId ? sponsorProductsRaw : []),
-    [validBrandId, sponsorProductsRaw],
-  );
+  const sponsorProducts = useMemo<ProductMiniCardItem[]>(() => {
+    if (!validBrandId) return [];
+    // brandId=0일 때는 data.products를 직접 사용
+    if (brandId === 0) return data.products ?? [];
+    return sponsorProductsRaw;
+  }, [validBrandId, brandId, data.products, sponsorProductsRaw]);
 
   useEffect(() => {
     if (!validBrandId) return;
+    // brandId=0일 때는 API 호출 건너뛰기 (data.products 사용)
+    if (brandId === 0) return;
 
     let alive = true;
 
@@ -319,7 +323,7 @@ export default function BrandDetailContent({ data }: Props) {
 
   const handleSponsorableProductClick = (productId: number) => {
     if (!validBrandId) return;
-    if (!Number.isFinite(productId) || productId <= 0) return;
+    if (!Number.isFinite(productId)) return;
 
     navigate(
       `/products/sponsorable/detail?brandId=${brandId}&productId=${productId}`,

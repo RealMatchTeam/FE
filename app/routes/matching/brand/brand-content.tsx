@@ -76,7 +76,24 @@ export default function BrandContent() {
         });
     }, [brands, deferredKeyword]);
 
+    const [realmatchLiked, setRealmatchLiked] = useState(false);
+
     const toggleLike = async (id: number) => {
+        // 리얼매치 브랜드 처리
+        if (id === 0) {
+            const prev = realmatchLiked;
+            const next = !prev;
+            setRealmatchLiked(next);
+
+            try {
+                await toggleBrandLike(id);
+            } catch (error) {
+                console.error("리얼매치 브랜드 좋아요 토글 실패:", error);
+                setRealmatchLiked(prev);
+            }
+            return;
+        }
+
         const queryKey = ["matching-brands", category, sortOption, selectedTags];
 
         // 낙관적 업데이트
@@ -225,9 +242,10 @@ export default function BrandContent() {
                         name="리얼매치"
                         matchRate={0}
                         tags={["정밀매칭", "원스톱협업", "쌍방향제안"]}
-                        isLiked={false}
+                        isLiked={realmatchLiked}
                         isAd
                         onClick={() => navigate(`/brand?brandId=0&domain=${category.toLowerCase()}`)}
+                        onLike={() => toggleLike(0)}
                         logoUrl={realmatchLogo}
                     />
                     {filteredBrands.map((brand) => (

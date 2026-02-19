@@ -89,6 +89,7 @@ export default function HomeAfterMatchPage() {
     [],
   );
   const [homeCoreLoading, setHomeCoreLoading] = useState(true);
+  const [realmatchLiked, setRealmatchLiked] = useState(false);
 
   const [profileCard, setProfileCard] = useState<ProfileCardResult | null>(
     null,
@@ -248,7 +249,27 @@ export default function HomeAfterMatchPage() {
 
   const handleBrandLikeToggle = async (id: string) => {
     const brandId = Number(id);
-    if (!Number.isFinite(brandId) || brandId <= 0) return;
+    if (!Number.isFinite(brandId) || brandId < 0) return;
+
+    // 리얼매치 브랜드 처리
+    if (brandId === 0) {
+      if (brandLikeInFlight.current.has(0)) return;
+      brandLikeInFlight.current.add(0);
+
+      const prev = realmatchLiked;
+      const next = !prev;
+      setRealmatchLiked(next);
+
+      try {
+        await toggleBrandLike(0);
+      } catch (e: unknown) {
+        setRealmatchLiked(prev);
+        console.error("리얼매치 브랜드 좋아요 토글 실패:", e);
+      } finally {
+        brandLikeInFlight.current.delete(0);
+      }
+      return;
+    }
 
     if (brandLikeInFlight.current.has(brandId)) return;
     brandLikeInFlight.current.add(brandId);
@@ -497,11 +518,12 @@ export default function HomeAfterMatchPage() {
                     subText: "#정밀매칭 #원스톱협업",
                     badgeText: "모집중",
                     domain: category,
-                    isLiked: false,
+                    isLiked: realmatchLiked,
                   }}
                   onClick={() =>
                     navigate(`/brand?brandId=0&domain=${category}`)
                   }
+                  onLikeToggle={handleBrandLikeToggle}
                 />
                 {brands.map((brand, i) => (
                   <BrandCard

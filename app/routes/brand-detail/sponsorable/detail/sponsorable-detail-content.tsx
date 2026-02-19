@@ -163,9 +163,8 @@ export default function SponsorableDetailContent() {
 
   const canFetch =
     Number.isFinite(brandId) &&
-    (brandId ?? 0) > 0 &&
-    Number.isFinite(productId) &&
-    productId > 0;
+    brandId !== undefined &&
+    Number.isFinite(productId);
 
   const [data, setData] = useState<SponsorProductDetailResult | null>(null);
   const [loading, setLoading] = useState(false);
