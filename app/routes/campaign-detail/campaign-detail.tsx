@@ -10,6 +10,8 @@ import { tokenStorage } from "../../lib/token";
 import { apiClient } from "../../api/axios";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
+import adCampaignImage from "../../assets/ad/ad-realmatch-detail-campagin.png";
+
 import type { BrandDetailData } from "../brand-detail/types";
 import type {
   CampaignDetail,
@@ -76,6 +78,49 @@ const getBrandIdFromOngoing = (c: OngoingCampaign): number | null =>
   getNumberField(c, ["brandId", "brand_id"]) ??
   getNestedNumberField(c, "brand", ["brandId", "id"]);
 
+const AD_CAMPAIGN: CampaignDetail = {
+  campaignId: 0,
+  title: "'리얼이 캐릭터 크림' 론칭 리뷰",
+  description:
+    "'리얼이 캐릭터 크림'\n겟레디윗미 영상에서 자연스럽게 노출",
+  imageUrl: adCampaignImage,
+  category: "BEAUTY",
+  preferredSkills:
+    "인스타 뷰티 분야 크리에이터 우대\n1~5만 마이크로 크리에이터 우대",
+  schedule:
+    "모집 : 2025년 1월 5~10일\n피드백 : 2025년 1월 17일\n업로드 : 2025년 1월 20~22일",
+  videoSpec: "개수: 영상 1개 | 길이: 30초~1분",
+  product: "리얼이 캐릭터 크림 1개",
+  rewardAmount: 200000,
+  startDate: "2025-01-05",
+  endDate: "2025-01-22",
+  recruitStartDate: "2025-01-05",
+  recruitEndDate: "2025-01-10",
+  dday: 0,
+  quota: 10,
+  contentTags: {
+    viewerGenders: [],
+    viewerAges: [],
+    avgVideoLengths: [],
+    avgVideoViews: [],
+    formats: [{ id: 1, name: "인스타 릴스" }],
+    categories: [
+      { id: 1, name: "리뷰형" },
+      { id: 2, name: "겟레디윗미" },
+    ],
+    tones: [
+      { id: 1, name: "일상적인" },
+      { id: 2, name: "수다적인" },
+    ],
+    usageRanges: [
+      { id: 1, name: "크리에이터 1차 활용" },
+      { id: 2, name: "브랜드 2차 활용" },
+    ],
+    involvements: [{ id: 1, name: "가이드라인만 제공" }],
+  },
+  like: false,
+};
+
 export default function CampaignDetailContent({
   brandData,
   campaignId,
@@ -92,7 +137,11 @@ export default function CampaignDetailContent({
 
   const [isCampaignLiked, setIsCampaignLiked] = useState(false);
 
-  const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
+  const isAdCampaign = campaignId === 0;
+
+  const [campaign, setCampaign] = useState<CampaignDetail | null>(
+    isAdCampaign ? AD_CAMPAIGN : null,
+  );
   const [campaignError, setCampaignError] = useState<string | null>(null);
 
   const [ongoingCampaigns, setOngoingCampaigns] = useState<OngoingCampaign[]>(
@@ -106,6 +155,12 @@ export default function CampaignDetailContent({
   const ongoingLikeInFlight = useRef<Set<number>>(new Set());
 
   useEffect(() => {
+    if (isAdCampaign) {
+      setCampaign(AD_CAMPAIGN);
+      setIsCampaignLiked(false);
+      return;
+    }
+
     let alive = true;
 
     (async () => {
@@ -137,7 +192,7 @@ export default function CampaignDetailContent({
     return () => {
       alive = false;
     };
-  }, [campaignId]);
+  }, [campaignId, isAdCampaign]);
 
   const detailRows = useMemo(() => {
     if (!campaign) return [];
@@ -401,8 +456,9 @@ export default function CampaignDetailContent({
           <BrandInfo
             name={brandData.name}
             matchRate={brandData.matchRate}
-            hashtags={(brandData.hashtags ?? []).slice(0, 2)}
+            hashtags={brandData.hashtags ?? []}
             description={brandData.description}
+            isAd={isAdCampaign}
           />
 
           <div className="my-3 flex items-center gap-2 text-core-1">

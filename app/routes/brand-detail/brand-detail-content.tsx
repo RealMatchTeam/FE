@@ -178,6 +178,8 @@ export default function BrandDetailContent({ data }: Props) {
     (state) => state.setProposalData,
   );
 
+  const isHardcodedBeauty = brandId === 0 && searchParams.get("domain") === "beauty";
+
   const baseOngoingCampaigns = useMemo<OngoingCampaign[]>(
     () => data.ongoingCampaigns ?? [],
     [data.ongoingCampaigns],
@@ -187,11 +189,20 @@ export default function BrandDetailContent({ data }: Props) {
     Record<number, boolean>
   >({});
 
+  const adCampaign: OngoingCampaign = {
+    campaignId: 0,
+    brandName: "리얼매치",
+    title: "'리얼이 커버터 크림' 론칭...",
+    recruitQuota: 10,
+    rewardAmount: 200000,
+    dday: 0,
+    isLiked: false,
+  };
+
   const ongoingCampaigns = useMemo<OngoingCampaign[]>(() => {
-    if (baseOngoingCampaigns.length === 0) return [];
     const overrides = ongoingLikeOverrides;
 
-    return baseOngoingCampaigns.map((c) => {
+    const real = baseOngoingCampaigns.map((c) => {
       const cid = getCampaignIdFromOngoing(c);
       if (!cid) return c;
 
@@ -200,7 +211,9 @@ export default function BrandDetailContent({ data }: Props) {
       }
       return c;
     });
-  }, [baseOngoingCampaigns, ongoingLikeOverrides]);
+
+    return brandId === 0 ? [adCampaign, ...real] : real;
+  }, [baseOngoingCampaigns, ongoingLikeOverrides, brandId]);
 
   const ongoingLikeInFlight = useRef<Set<number>>(new Set());
 
@@ -335,8 +348,8 @@ export default function BrandDetailContent({ data }: Props) {
   };
 
   const goOngoingCampaignDetail = (c: OngoingCampaign) => {
-    const cid = getCampaignIdFromOngoing(c);
-    if (!cid) return;
+    const cid = getCampaignIdFromOngoing(c) ?? (c.campaignId === 0 ? 0 : null);
+    if (cid === null) return;
 
     const domainParam = searchParams.get("domain");
     const domain =
@@ -346,11 +359,11 @@ export default function BrandDetailContent({ data }: Props) {
 
     const brandIdNum = validBrandId
       ? brandId
-      : Number.isFinite(Number(data.id)) && Number(data.id) > 0
+      : Number.isFinite(Number(data.id)) && Number(data.id) >= 0
         ? Number(data.id)
         : null;
 
-    if (!brandIdNum) return;
+    if (brandIdNum === null) return;
 
     navigate(
       `/campaign?brandId=${brandIdNum}&campaignId=${cid}&domain=${domain}`,
@@ -391,8 +404,27 @@ export default function BrandDetailContent({ data }: Props) {
   const PAGE_SIZE = 4;
   const GROUP_SIZE = 4;
 
-  const histories = data.histories ?? [];
-  const hasNext = !!data.historiesHasNext;
+  const histories = useMemo(() => {
+    if (isHardcodedBeauty) {
+      return [
+        {
+          id: "h1",
+          title: "'리얼이 캐릭터 세럼' 론칭 리뷰",
+          rightText: "1월 15일 진행예정",
+          highlight: true,
+        },
+        {
+          id: "h2",
+          title: "'리얼이 캐릭터 토너' 론칭 리뷰",
+          rightText: "12/15/24 완료",
+          highlight: false,
+        },
+      ];
+    }
+    return data.histories ?? [];
+  }, [isHardcodedBeauty, data.histories]);
+
+  const hasNext = isHardcodedBeauty ? false : !!data.historiesHasNext;
 
   const [page, setPage] = useState(1);
 
@@ -457,7 +489,7 @@ export default function BrandDetailContent({ data }: Props) {
           <BrandInfo
             name={data.name}
             matchRate={data.matchRate}
-            hashtags={(data.hashtags ?? []).slice(0, 2)}
+            hashtags={data.hashtags ?? []}
             description={data.description}
             isAd={brandId === 0}
           />
@@ -477,7 +509,10 @@ export default function BrandDetailContent({ data }: Props) {
             <section className="pb-5">
               <div className="text-title1 text-text-black">카테고리</div>
               <div className="mt-2.5 flex flex-wrap gap-1">
-                {(data.categories ?? []).map((c) => (
+                {(isHardcodedBeauty
+                  ? ["스킨케어"]
+                  : (data.categories ?? [])
+                ).map((c) => (
                   <PillChip key={c} variant="filled">
                     {c}
                   </PillChip>
@@ -486,8 +521,22 @@ export default function BrandDetailContent({ data }: Props) {
             </section>
 
             <section>
-              {(tagSections ?? []).map((sec, idx) => {
-                const showTitle = showSectionTitle;
+              {(brandId === 0 && searchParams.get("domain") === "beauty"
+                ? [
+                  {
+                    title: "스킨케어 태그",
+                    groups: [
+                      { label: "피부타입", chips: ["건성", "지성"] },
+                      { label: "주요 기능", chips: ["수분/보습", "진정"] },
+                    ],
+                  },
+                ]
+                : (tagSections ?? [])
+              ).map((sec, idx) => {
+                const showTitle =
+                  brandId === 0 && searchParams.get("domain") === "beauty"
+                    ? true
+                    : showSectionTitle;
 
                 return (
                   <div

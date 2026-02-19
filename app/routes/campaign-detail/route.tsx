@@ -25,14 +25,14 @@ export default function CampaignDetailRoute() {
 
   const campaignId = useMemo(() => {
     const n = campaignIdParam ? Number(campaignIdParam) : NaN;
-    return Number.isFinite(n) && n > 0 ? n : null;
+    return Number.isFinite(n) && n >= 0 ? n : null;
   }, [campaignIdParam]);
 
   const queryBrandId = useMemo(() => {
     const raw = brandIdParam?.trim();
     if (!raw) return null;
     const n = Number(raw);
-    return Number.isFinite(n) && n > 0 ? n : null;
+    return Number.isFinite(n) && n >= 0 ? n : null;
   }, [brandIdParam]);
 
   const queryDomain: BrandDomain | null =
@@ -52,7 +52,8 @@ export default function CampaignDetailRoute() {
 
   // campaignId만 있고 brandId/domain이 없으면 campaign detail로 brandId/domain 확보
   useEffect(() => {
-    if (!campaignId) return;
+    if (campaignId === null) return;
+    if (campaignId === 0) return; // 광고 캠페인은 API 호출 불필요
     if (queryBrandId && queryDomain) return; // query로 충분하면 스킵
     if (fallbackBrandId && fallbackDomain) return; // 이미 확보했으면 스킵
 
@@ -126,7 +127,7 @@ export default function CampaignDetailRoute() {
     };
   }, [resolvedBrandId, resolvedDomain, matchRateParam]);
 
-  if (!campaignId) {
+  if (campaignId === null) {
     return (
       <div className="min-h-screen bg-white px-5 py-6">
         campaignId가 없어요.
@@ -138,7 +139,7 @@ export default function CampaignDetailRoute() {
     return <div className="min-h-screen bg-white px-5 py-6">{error}</div>;
   }
 
-  if (!resolvedBrandId || !data) {
+  if (resolvedBrandId === null || !data) {
     return <CampaignDetailSkeleton />;
   }
 
