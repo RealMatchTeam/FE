@@ -55,7 +55,7 @@ const getNumberField = (
   const rec = obj as Record<string, unknown>;
   for (const k of keys) {
     const v = rec[k];
-    if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0) return v;
   }
   return null;
 };
@@ -103,20 +103,20 @@ const AD_CAMPAIGN: CampaignDetail = {
     viewerAges: [],
     avgVideoLengths: [],
     avgVideoViews: [],
-    formats: [{ id: 1, name: "인스타 릴스" }],
+    formats: [{ id: 3, name: "인스타 릴스" }],
     categories: [
-      { id: 1, name: "리뷰형" },
-      { id: 2, name: "겟레디윗미" },
+      { id: 6, name: "리뷰" },
+      { id: 7, name: "겟레디윗미" },
     ],
     tones: [
-      { id: 1, name: "일상적인" },
-      { id: 2, name: "수다적인" },
+      { id: 16, name: "일상적인" },
+      { id: 17, name: "수다적인" },
     ],
     usageRanges: [
-      { id: 1, name: "크리에이터 1차 활용" },
-      { id: 2, name: "브랜드 2차 활용" },
+      { id: 24, name: "크리에이터 1차활용" },
+      { id: 25, name: "브랜드 2차활용" },
     ],
-    involvements: [{ id: 1, name: "가이드라인만 제공" }],
+    involvements: [{ id: 20, name: "가이드만 제공" }],
   },
   like: false,
 };
@@ -247,7 +247,7 @@ export default function CampaignDetailContent({
     }
 
     const campaignIdNum = Number(campaignId);
-    if (!Number.isFinite(campaignIdNum) || campaignIdNum <= 0) return;
+    if (!Number.isFinite(campaignIdNum) || campaignIdNum < 0) return;
 
     const prev = isCampaignLiked;
 
@@ -272,7 +272,7 @@ export default function CampaignDetailContent({
     }
 
     const clickedId = Number(id);
-    if (!Number.isFinite(clickedId) || clickedId <= 0) return;
+    if (!Number.isFinite(clickedId) || clickedId < 0) return;
 
     const currentItem = ongoingCampaigns.find((c) => {
       const cid = getCampaignIdFromOngoing(c);
@@ -335,7 +335,7 @@ export default function CampaignDetailContent({
     if (!campaign) return;
 
     const brandIdNum = Number(brandData.id);
-    if (!Number.isFinite(brandIdNum) || brandIdNum <= 0) return;
+    if (!Number.isFinite(brandIdNum) || brandIdNum < 0) return;
 
     const domainParam = searchParams.get("domain");
     const domain =

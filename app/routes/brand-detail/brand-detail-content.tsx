@@ -11,7 +11,7 @@ import HistoryRow from "./components/HistoryRow";
 import SponsorableProductSection from "./components/SponsorableProductSection";
 
 import { tokenStorage } from "../../lib/token";
-import { toggleBrandLike } from "../matching/api/matching";
+import { toggleBrandLike, toggleCampaignLike } from "../matching/api/matching";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import { apiClient } from "../../api/axios";
@@ -143,7 +143,7 @@ const getNumberField = (
   const rec = obj as Record<string, unknown>;
   for (const k of keys) {
     const v = rec[k];
-    if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0) return v;
   }
   return null;
 };
@@ -189,22 +189,13 @@ export default function BrandDetailContent({ data }: Props) {
     Record<number, boolean>
   >({});
 
-  const adCampaign: OngoingCampaign = {
-    campaignId: 0,
-    brandName: "리얼매치",
-    title: "'리얼이 커버터 크림' 론칭...",
-    recruitQuota: 10,
-    rewardAmount: 200000,
-    dday: 0,
-    isLiked: false,
-  };
 
   const ongoingCampaigns = useMemo<OngoingCampaign[]>(() => {
     const overrides = ongoingLikeOverrides;
 
     const real = baseOngoingCampaigns.map((c) => {
       const cid = getCampaignIdFromOngoing(c);
-      if (!cid) return c;
+      if (cid === null) return c;
 
       if (Object.prototype.hasOwnProperty.call(overrides, cid)) {
         return { ...(c as object), isLiked: overrides[cid] } as OngoingCampaign;
@@ -213,7 +204,7 @@ export default function BrandDetailContent({ data }: Props) {
     });
 
     return real;
-  }, [baseOngoingCampaigns, ongoingLikeOverrides, brandId]);
+  }, [baseOngoingCampaigns, ongoingLikeOverrides]);
 
   const ongoingLikeInFlight = useRef<Set<number>>(new Set());
 
@@ -295,16 +286,53 @@ export default function BrandDetailContent({ data }: Props) {
 
     const domain = searchParams.get("domain");
 
-    setProposalData({
-      brandId,
-      campaignId: 0,
-      domain: domain || "beauty",
-      brandName: data.name,
-      products: sponsorProducts.map((p) => ({
-        id: String(p.productId),
-        name: p.productName,
-      })),
-    });
+    // brandId=0일 때는 광고 캠페인 정보 포함
+    if (brandId === 0) {
+      setProposalData({
+        brandId,
+        campaignId: 0,
+        domain: domain || "beauty",
+        brandName: data.name,
+        campaignTitle: "'리얼이 캐릭터 크림' 론칭 리뷰",
+        campaignDescription: "'리얼이 캐릭터 크림'\n겟레디윗미 영상에서 자연스럽게 노출",
+        rewardAmount: 200000,
+        product: "리얼이 캐릭터 크림 1개",
+        startDate: "2025-01-05",
+        endDate: "2025-01-22",
+        contentTags: {
+          formats: [{ id: 3, name: "인스타 릴스" }],
+          categories: [
+            { id: 6, name: "리뷰" },
+            { id: 7, name: "겟레디윗미" },
+          ],
+          tones: [
+            { id: 16, name: "일상적인" },
+            { id: 17, name: "수다적인" },
+          ],
+          usageRanges: [
+            { id: 24, name: "크리에이터 1차활용" },
+            { id: 25, name: "브랜드 2차활용" },
+          ],
+          involvements: [{ id: 20, name: "가이드만 제공" }],
+        },
+        products: sponsorProducts.map((p) => ({
+          id: String(p.productId),
+          name: p.productName,
+        })),
+      });
+    } else {
+      // 일반 브랜드는 기존 로직 유지
+      setProposalData({
+        brandId,
+        campaignId: 0,
+        domain: domain || "beauty",
+        brandName: data.name,
+        products: sponsorProducts.map((p) => ({
+          id: String(p.productId),
+          name: p.productName,
+        })),
+      });
+    }
 
     navigate("/matching/suggest");
   };
@@ -382,7 +410,7 @@ export default function BrandDetailContent({ data }: Props) {
     }
 
     const clickedId = Number(id);
-    if (!Number.isFinite(clickedId) || clickedId <= 0) return;
+    if (!Number.isFinite(clickedId) || clickedId < 0) return;
 
     const currentItem = ongoingCampaigns.find((c) => {
       const cid = getCampaignIdFromOngoing(c);
@@ -391,7 +419,7 @@ export default function BrandDetailContent({ data }: Props) {
     if (!currentItem) return;
 
     const cid = getCampaignIdFromOngoing(currentItem);
-    if (!cid) return;
+    if (cid === null) return;
 
     if (ongoingLikeInFlight.current.has(cid)) return;
     ongoingLikeInFlight.current.add(cid);
@@ -402,15 +430,22 @@ export default function BrandDetailContent({ data }: Props) {
 
     setOngoingLikeOverrides((m) => ({ ...m, [cid]: next }));
 
-    ongoingLikeInFlight.current.delete(cid);
+    try {
+      await toggleCampaignLike(cid);
+    } catch (error) {
+      console.error("Failed to toggle campaign like:", error);
+      setOngoingLikeOverrides((m) => ({ ...m, [cid]: prev }));
+    } finally {
+      ongoingLikeInFlight.current.delete(cid);
+    }
   };
 
   const PAGE_SIZE = 4;
   const GROUP_SIZE = 4;
 
   const histories = useMemo(() => {
-  return data.histories ?? [];
-}, [data.histories]);
+    return data.histories ?? [];
+  }, [data.histories]);
 
   const hasNext = isHardcodedBeauty ? false : !!data.historiesHasNext;
 

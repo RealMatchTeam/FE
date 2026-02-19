@@ -114,7 +114,7 @@ export default function CampaignContent() {
             brandTags={brand?.brandTags || []}
             brandImageUrl={brand?.brandImageUrl}
             matchingRate={brand?.matchingRate}
-            brandId={brand?.brandId || (data as any).brandId || 0} 
+            brandId={brand?.brandId || (data && 'brandId' in data ? data.brandId : 0) || 0} 
             category={proposalData?.contentTags?.categories?.[0]?.name || "beauty"}
           />
 

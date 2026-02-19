@@ -9,7 +9,6 @@ import BottomSheet from "../../../components/common/BottomSheet";
 import MatchingFilter from "../components/MatchingFilter";
 import { useHideBottomTab } from "../../../hooks/useHideBottomTab";
 import EmptyMatchState from "../../../components/common/EmptyMatchState";
-import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import { getMatchingBrands, toggleBrandLike, type MatchingBrand, MatchingTestRequiredError } from "../api/matching";
 import realmatchLogo from "../../../assets/ad/ad-realmatch-logo.png";
 

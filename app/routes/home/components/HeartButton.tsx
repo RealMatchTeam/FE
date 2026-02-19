@@ -24,7 +24,7 @@ export default function HeartButton({
       onClick={handleClick}
       aria-label={pressed ? "좋아요 취소" : "좋아요"}
       className={[
-        "inline-flex h-6 w-6 items-center justify-center",
+        "inline-flex h-6 w-6 items-center justify-center cursor-pointer",
         className,
       ].join(" ")}
     >

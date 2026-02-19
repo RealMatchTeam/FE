@@ -8,6 +8,7 @@ import { tokenStorage } from "../../../../lib/token";
 import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 import { useAuthStore } from "../../../../stores/auth-store";
 import Button from "../../../../components/common/Button";
+import { axiosInstance } from "../../../../api/axios";
 
 import {
   TextInput,
@@ -41,10 +42,10 @@ export default function CreateCampaignContent() {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const proposalData = useCampaignProposalStore((state) => state.proposalData);
-  const snsAccount = useCampaignProposalStore((state) => state.snsAccount);
   const me = useAuthStore((state) => state.me);
 
-  // 바텀시트 상태
+  // 프로필 정보 상태
+  const [userSnsAccount, setUserSnsAccount] = useState<string | null>(null);
 
   // 각 필드별 바텀시트 상태
   const [isFormatSheetOpen, setIsFormatSheetOpen] = useState(false);
@@ -76,6 +77,34 @@ export default function CreateCampaignContent() {
     defaultValues: defaultCampaignFormValues,
   });
 
+  // 프로필 정보 가져오기
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchProfile = async () => {
+      try {
+        const response = await axiosInstance.get<{
+          isSuccess: boolean;
+          result: { snsAccount?: string | null };
+        }>("/api/v1/users/me/profile-card");
+
+        if (!isMounted) return;
+
+        if (response.data?.isSuccess && response.data.result?.snsAccount) {
+          setUserSnsAccount(response.data.result.snsAccount);
+        }
+      } catch (error) {
+        console.error("프로필 정보 조회 실패:", error);
+      }
+    };
+
+    fetchProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     // 신규 제안 시 폼 초기화
     if (type !== "existing") {
@@ -91,6 +120,7 @@ export default function CreateCampaignContent() {
     if (campaignIdParam) {
       const campaignId = Number(campaignIdParam);
 
+      // campaignId가 0보다 큰 경우에만 API 호출 (0은 광고 캠페인이므로 proposalData 사용)
       if (Number.isFinite(campaignId) && campaignId > 0) {
         (async () => {
           try {
@@ -124,10 +154,11 @@ export default function CreateCampaignContent() {
             toast.error("캠페인 정보를 불러오지 못했습니다");
           }
         })();
+
+        return () => {
+          alive = false;
+        };
       }
-      return () => {
-        alive = false;
-      };
     }
 
     if (proposalData) {
@@ -154,7 +185,24 @@ export default function CreateCampaignContent() {
       const reward = proposalData.rewardAmount?.toString();
       if (reward) setValue("fee", reward);
 
-      if (proposalData.product) setValue("sponsorProduct", [proposalData.product]);
+      // products 배열이 있으면 id가 0이 아닌 첫 번째 제품을 선택, 없으면 단일 product 사용
+      let productSet = false;
+      if (proposalData.products && proposalData.products.length > 0) {
+        const validProduct = proposalData.products.find(p => {
+          const id = Number(p.id);
+          return Number.isFinite(id) && id > 0;
+        });
+        if (validProduct) {
+          setValue("sponsorProduct", [String(validProduct.id)]);
+          productSet = true;
+        }
+      }
+
+      // products에서 유효한 제품을 찾지 못했거나 products가 없으면 product 필드 사용
+      if (!productSet && proposalData.product) {
+        setValue("sponsorProduct", [proposalData.product]);
+      }
+
       if (proposalData.startDate) setValue("startDate", proposalData.startDate);
       if (proposalData.endDate) setValue("endDate", proposalData.endDate);
     }
@@ -185,17 +233,40 @@ export default function CreateCampaignContent() {
   const usageScopeOptions = toOptions(USAGE_RANGE_TAGS, tags?.usageRanges);
 
   const sponsorProductOptions = useMemo(() => {
-    const baseOptions = proposalData?.product
-      ? [{ value: proposalData.product, label: proposalData.product }]
-      : type === "new"
-        ? []
-        : (proposalData?.products ?? [])
-          .filter((p) => String(p.id).trim() && String(p.name).trim())
-          .map((p) => ({ value: String(p.id), label: String(p.name).trim() }));
+    const options: { value: string; label: string }[] = [];
 
-    // formValues.sponsorProduct 배열에 있는데 options에 없는 항목들 추가
+    // product 필드가 있으면 추가 (문자열 값)
+    if (proposalData?.product) {
+      options.push({ value: proposalData.product, label: proposalData.product });
+    }
+
+    // products 배열이 있으면 추가 (id > 0인 것만)
+    if (proposalData?.products && proposalData.products.length > 0) {
+      const validProducts = proposalData.products
+        .filter((p) => {
+          const id = String(p.id).trim();
+          const name = String(p.name).trim();
+          // id가 0이 아니고, id와 name이 모두 있는 경우만 포함
+          return id && name && id !== "0";
+        })
+        .map((p) => ({ value: String(p.id), label: String(p.name).trim() }));
+      options.push(...validProducts);
+    }
+
+    // 중복 제거 (value 기준)
+    const uniqueOptions = options.reduce((acc, current) => {
+      const exists = acc.find(opt => opt.value === current.value);
+      if (!exists) {
+        acc.push(current);
+      }
+      return acc;
+    }, [] as { value: string; label: string }[]);
+
+    const baseOptions = type === "new" ? [] : uniqueOptions;
+
+    // formValues.sponsorProduct 배열에 있는데 options에 없는 항목들 추가 (id가 0이 아닌 경우만)
     const missingOptions = (formValues.sponsorProduct || [])
-      .filter(sp => !baseOptions.find(opt => opt.value === sp))
+      .filter(sp => sp !== "0" && !baseOptions.find(opt => opt.value === sp))
       .map(sp => ({ value: sp, label: sp }));
 
     return [...missingOptions, ...baseOptions];
@@ -238,17 +309,27 @@ export default function CreateCampaignContent() {
       ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || null))
       : null;
 
+    // campaignId가 0이면 null로 변환 (광고 캠페인은 실제 캠페인이 아니므로)
+    const finalCampaignId = campaignId === 0 ? null : campaignId;
+
+    // 중복 제거 헬퍼 함수
+    const uniqueTagIds = (tags?: string[]) => {
+      if (!tags) return [];
+      const uniqueIds = Array.from(new Set(tags.map(t => Number(t)))).filter(id => Number.isFinite(id));
+      return uniqueIds.map(id => ({ id }));
+    };
+
     const requestData = {
       brandId,
       creatorId: Number(userId),
-      campaignId,
+      campaignId: finalCampaignId,
       campaignName: formData.campaignName || "",
       description: formData.description || "",
-      formats: formData.format?.map(f => ({ id: Number(f) })) || [],
-      categories: formData.category?.map(c => ({ id: Number(c) })) || [],
-      tones: formData.tone?.map(t => ({ id: Number(t) })) || [],
-      involvements: formData.involvement?.map(i => ({ id: Number(i) })) || [],
-      usageRanges: formData.usageScope?.map(u => ({ id: Number(u) })) || [],
+      formats: uniqueTagIds(formData.format),
+      categories: uniqueTagIds(formData.category),
+      tones: uniqueTagIds(formData.tone),
+      involvements: uniqueTagIds(formData.involvement),
+      usageRanges: uniqueTagIds(formData.usageScope),
       rewardAmount: Number(formData.fee) || 0,
       productId: Number(formData.sponsorProduct?.[0]) || 0,
       startDate: formData.startDate || "",
@@ -292,7 +373,7 @@ export default function CreateCampaignContent() {
           <label className="text-title3 text-text-gray1 mb-1 block ml-2">
             제안 프로필<span className="text-error text-base">*</span>
           </label>
-          <ProfileSelector username={snsAccount ? `@${snsAccount}` : (me?.roleText ?? me?.name ?? undefined)} onClick={() => navigate("/mypage/profileCard")} />
+          <ProfileSelector username={userSnsAccount ? `@${userSnsAccount}` : (me?.roleText ?? me?.name ?? undefined)} onClick={() => navigate("/mypage/profileCard")} />
         </div>
 
 

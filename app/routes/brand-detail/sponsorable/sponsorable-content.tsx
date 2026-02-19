@@ -21,17 +21,6 @@ type NavState = {
   brandName?: string;
 };
 
-const mapType = (t: string) => {
-  switch (t) {
-    case "FULL":
-      return "본품";
-    case "SAMPLE":
-      return "샘플";
-    default:
-      return t;
-  }
-};
-
 const buildSubtitle = (dto: SponsorProductsListDto) => {
   const name = (dto.productName ?? "").toString();
   const items = dto.sponsorInfo?.items ?? [];
@@ -40,8 +29,6 @@ const buildSubtitle = (dto: SponsorProductsListDto) => {
 
   const parts = items
     .map((it) => {
-      const type = mapType((it.availableType ?? "").toString().trim());
-
       const qty =
         typeof it.availableQuantity === "number" && it.availableQuantity > 0
           ? `${it.availableQuantity}개`

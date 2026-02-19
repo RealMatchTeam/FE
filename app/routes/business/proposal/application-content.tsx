@@ -165,7 +165,7 @@ export default function ApplicationContent() {
                                         <img src={profileIcon} alt="profile" className="w-full h-full" />
                                     </div>
                                     <span className="text-callout1 text-text-black">
-                                        {profileCard ? `@${profileCard.snsAccount}` : `@${data.creatorId || "ivveeee"}`}
+                                        {profileCard ? `@${profileCard.snsAccount}` : `@${data.creatorId}`}
                                     </span>
                                 </div>
                                 <img src={arrowPurpleIcon} alt="arrow" />
