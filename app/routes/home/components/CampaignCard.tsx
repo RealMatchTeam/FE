@@ -14,7 +14,7 @@ export default function CampaignCard({ item, onClick, onLikeToggle }: Props) {
   return (
     <div onClick={onClick} className="w-29.5 shrink-0 cursor-pointer text-left">
       <div className="relative aspect-square rounded-xl border border-core-2 bg-white overflow-hidden">
-        <div className="absolute left-2 right-2 top-2 flex items-center justify-between">
+        <div className="absolute left-2 right-2 top-2 z-10 flex items-center justify-between">
           <div className="flex h-6 min-w-0 items-center">
             <div className="ml-1.5 flex items-center overflow-visible -translate-x-1.5 -translate-y-1.5">
               {applicantsBadge ? <BadgePill text={applicantsBadge} /> : null}

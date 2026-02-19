@@ -3,6 +3,7 @@ type Props = {
   matchRate: number;
   hashtags: string[];
   description: string;
+  isAd?: boolean;
 };
 
 export default function BrandInfo({
@@ -10,6 +11,7 @@ export default function BrandInfo({
   matchRate,
   hashtags,
   description,
+  isAd = false,
 }: Props) {
   return (
     <div className="pt-11.5">
@@ -17,11 +19,16 @@ export default function BrandInfo({
         <div className="text-title text-text-black">{name}</div>
 
         <div className="flex items-center gap-2">
-          <span className="text-callout1 text-core-1 leading-none">매칭률</span>
-
-          <span className="text-title text-core-1 leading-none">
-            {matchRate}%
-          </span>
+          {isAd ? (
+            <span className="text-title text-core-1 leading-none">광고</span>
+          ) : (
+            <>
+              <span className="text-callout1 text-core-1 leading-none">매칭률</span>
+              <span className="text-title text-core-1 leading-none">
+                {matchRate}%
+              </span>
+            </>
+          )}
         </div>
       </div>
 

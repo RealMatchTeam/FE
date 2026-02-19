@@ -58,25 +58,12 @@ export default function OngoingCampaignSection({
         <div className="mt-4 -mx-4 overflow-x-auto px-5 scrollbar-hide">
           <div className="flex gap-3">
             {campaigns.map((c) => (
-              <div
+              <CampaignCard
                 key={c.campaignId}
-                role="button"
-                tabIndex={0}
+                item={toCampaignItem(c, brandLogoUrl)}
                 onClick={() => onCampaignClick?.(c)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onCampaignClick?.(c);
-                  }
-                }}
-                className="text-left"
-              >
-                <CampaignCard
-                  item={toCampaignItem(c, brandLogoUrl)}
-                  onClick={() => onCampaignClick?.(c)}
-                  onLikeToggle={onLikeToggle}
-                />
-              </div>
+                onLikeToggle={onLikeToggle}
+              />
             ))}
           </div>
         </div>

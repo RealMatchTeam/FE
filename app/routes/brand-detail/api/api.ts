@@ -1,4 +1,7 @@
 import { apiClient } from "../../../api/axios";
+//import realmatchDetailLogo from "../../../assets/ad/ad-realmatch-detail-logo.png";
+//import realmatchDetailBanner from "../../../assets/ad/ad-realtmatch-detail-banner.png";
+//import realmatchDetailCampaign from "../../../assets/ad/ad-realmatch-detail-campagin.png";
 import type {
   BrandDomain,
   BrandDetailData,
@@ -176,6 +179,31 @@ export async function fetchSponsorProductList(params: {
 }): Promise<SponsorProductsListDto[]> {
   const { brandId } = params;
 
+  /*if (brandId === "0") {
+    return [
+      {
+        brandId: 0,
+        brandName: "리얼매치",
+        productId: 0,
+        productName: "리얼이 캐릭터 크림",
+        thumbnailImageUrl: realmatchDetailCampaign,
+        productImageUrls: [realmatchDetailCampaign],
+        categories: ["스킨케어"],
+        sponsorInfo: {
+          items: [
+            {
+              itemId: 0,
+              availableType: "FULL",
+              availableQuantity: 1,
+              availableSize: 0,
+              shippingType: "CREATOR_PAY",
+            },
+          ],
+        },
+      },
+    ];
+  }*/
+
   const res = await apiClient.get<SponsorProductsApiResponse>(
     `/api/v1/brands/${brandId}/sponsor-products`,
   );
@@ -195,6 +223,28 @@ export async function fetchSponsorProductDetail(params: {
 }): Promise<SponsorProductDetailResult> {
   const { brandId, productId } = params;
 
+  /*if (brandId === "0" && String(productId) === "0") {
+    return {
+      brandId: 0,
+      brandName: "리얼매치",
+      productId: 0,
+      productName: "리얼이 캐릭터 크림",
+      productImageUrls: [realmatchDetailCampaign],
+      categories: ["스킨케어"],
+      sponsorInfo: {
+        items: [
+          {
+            itemId: 0,
+            availableType: "FULL",
+            availableQuantity: 1,
+            availableSize: 0,
+            shippingType: "CREATOR_PAY",
+          },
+        ],
+      },
+    };
+  }*/
+
   const res = await apiClient.get<SponsorProductDetailApiResponse>(
     `/api/v1/brands/${brandId}/sponsor-products/${productId}`,
   );
@@ -213,6 +263,38 @@ export async function fetchBrandDetail(params: {
   domain?: BrandDomain;
 }): Promise<BrandDetailData> {
   const { brandId, domain } = params;
+
+  /*if (brandId === "0") {
+    return {
+      id: "0",
+      userId: 0,
+      brandUserId: undefined,
+      domain: domain ?? "beauty",
+      name: "리얼매치",
+      matchRate: 0,
+      heroImageUrl: realmatchDetailBanner,
+      brandImages: [realmatchDetailBanner],
+      logoText: "리얼매치",
+      logoImageUrl: realmatchDetailLogo,
+      homepageUrl: undefined,
+      simpleIntro: "크리에이터와 브랜드를 정밀 매칭하는 플랫폼",
+      hashtags: ["정밀매칭", "원스톱협업", "쌍방향제안"],
+      description: "크리에이터와 브랜드를 정밀 매칭하는 플랫폼",
+      categories: [],
+      tagSections: [],
+      isLiked: false,
+      ongoingCampaigns: [],
+      products: [
+        {
+          productId: 0,
+          productName: "리얼이 캐릭터 크림",
+          thumbnailImageUrl: realmatchDetailCampaign,
+        },
+      ],
+      histories: [],
+      historiesHasNext: false,
+    };
+  }*/
 
   const detailRes = await apiClient.get<BrandDetailApiResponse>(
     `/api/v1/brands/${brandId}`,

@@ -50,7 +50,7 @@ export default function BrandCard({ item, onClick, onLikeToggle }: Props) {
         <div className="flex items-baseline justify-between">
           <div className="text-title7 text-text-black">{item.name}</div>
           <div className="text-[14px] font-semibold text-core-1">
-            {item.matchRate}%
+            {item.id === "0" ? "광고" : `${item.matchRate}%`}
           </div>
         </div>
 

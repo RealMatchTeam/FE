@@ -153,8 +153,43 @@ export default function CampaignContent() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
-                <LoadingSpinner />
+            <div className="flex flex-col h-full" style={{ background: "linear-gradient(180deg, #F6F6FF 0%, #F3F3FA 48.08%, #E8E8FB 100%)" }}>
+                <CampaignFilterBar
+                    category={category}
+                    onCategoryChange={handleCategoryChange}
+                    searchKeyword={searchKeyword}
+                    onSearchChange={setSearchKeyword}
+                />
+                <div className="flex-1 px-4 py-6 overflow-y-auto">
+                    <div className="mb-4">
+                        <div className="h-6 w-28 animate-pulse rounded bg-gray-200 mb-4" />
+                        <div className="flex gap-2">
+                            <div className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />
+                            <div className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />
+                        </div>
+                    </div>
+                    <div className="space-y-3 pb-20">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <div key={`sk-${i}`} className="relative flex w-full p-2.5 bg-white/80 border border-bluegray-2 rounded-[10px]">
+                                <div className="mr-4 flex-shrink-0 flex flex-col items-center gap-2 w-[100px]">
+                                    <div className="w-[80px] h-[80px] animate-pulse rounded-xl bg-gray-200" />
+                                    <div className="flex gap-1 ml-6">
+                                        <div className="h-5 w-10 animate-pulse rounded bg-gray-200" />
+                                        <div className="h-5 w-10 animate-pulse rounded bg-gray-200" />
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+                                    <div className="flex justify-between">
+                                        <div className="h-5 w-20 animate-pulse rounded bg-gray-200" />
+                                        <div className="h-5 w-16 animate-pulse rounded bg-gray-200" />
+                                    </div>
+                                    <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+                                    <div className="h-4 w-24 animate-pulse rounded bg-gray-200" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }

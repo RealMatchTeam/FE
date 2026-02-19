@@ -14,7 +14,7 @@ export default function CampaignActionBar({
   onToggleHeart,
 }: Props) {
   return (
-    
+
     <div className="inline-flex w-full items-center gap-2">
       <button
         type="button"

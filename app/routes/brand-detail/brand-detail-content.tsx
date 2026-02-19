@@ -11,7 +11,7 @@ import HistoryRow from "./components/HistoryRow";
 import SponsorableProductSection from "./components/SponsorableProductSection";
 
 import { tokenStorage } from "../../lib/token";
-import { toggleBrandLike } from "../matching/api/matching";
+import { toggleBrandLike, toggleCampaignLike } from "../matching/api/matching";
 import { useCampaignProposalStore } from "../../stores/campaign-proposal";
 
 import { apiClient } from "../../api/axios";
@@ -143,7 +143,7 @@ const getNumberField = (
   const rec = obj as Record<string, unknown>;
   for (const k of keys) {
     const v = rec[k];
-    if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0) return v;
   }
   return null;
 };
@@ -172,11 +172,13 @@ export default function BrandDetailContent({ data }: Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const brandId = Number(searchParams.get("brandId"));
-  const validBrandId = Number.isFinite(brandId) && brandId > 0;
+  const validBrandId = Number.isFinite(brandId) && brandId >= 0;
 
   const setProposalData = useCampaignProposalStore(
     (state) => state.setProposalData,
   );
+
+  const isHardcodedBeauty = brandId === 0 && searchParams.get("domain") === "beauty";
 
   const baseOngoingCampaigns = useMemo<OngoingCampaign[]>(
     () => data.ongoingCampaigns ?? [],
@@ -187,19 +189,21 @@ export default function BrandDetailContent({ data }: Props) {
     Record<number, boolean>
   >({});
 
+
   const ongoingCampaigns = useMemo<OngoingCampaign[]>(() => {
-    if (baseOngoingCampaigns.length === 0) return [];
     const overrides = ongoingLikeOverrides;
 
-    return baseOngoingCampaigns.map((c) => {
+    const real = baseOngoingCampaigns.map((c) => {
       const cid = getCampaignIdFromOngoing(c);
-      if (!cid) return c;
+      if (cid === null) return c;
 
       if (Object.prototype.hasOwnProperty.call(overrides, cid)) {
         return { ...(c as object), isLiked: overrides[cid] } as OngoingCampaign;
       }
       return c;
     });
+
+    return real;
   }, [baseOngoingCampaigns, ongoingLikeOverrides]);
 
   const ongoingLikeInFlight = useRef<Set<number>>(new Set());
@@ -208,13 +212,17 @@ export default function BrandDetailContent({ data }: Props) {
     ProductMiniCardItem[]
   >([]);
 
-  const sponsorProducts = useMemo<ProductMiniCardItem[]>(
-    () => (validBrandId ? sponsorProductsRaw : []),
-    [validBrandId, sponsorProductsRaw],
-  );
+  const sponsorProducts = useMemo<ProductMiniCardItem[]>(() => {
+    if (!validBrandId) return [];
+    // brandId=0일 때는 data.products를 직접 사용
+    if (brandId === 0) return data.products ?? [];
+    return sponsorProductsRaw;
+  }, [validBrandId, brandId, data.products, sponsorProductsRaw]);
 
   useEffect(() => {
     if (!validBrandId) return;
+    // brandId=0일 때는 API 호출 건너뛰기 (data.products 사용)
+    //if (brandId === 0) return;
 
     let alive = true;
 
@@ -278,16 +286,53 @@ export default function BrandDetailContent({ data }: Props) {
 
     const domain = searchParams.get("domain");
 
-    setProposalData({
-      brandId,
-      campaignId: 0,
-      domain: domain || "beauty",
-      brandName: data.name,
-      products: sponsorProducts.map((p) => ({
-        id: String(p.productId),
-        name: p.productName,
-      })),
-    });
+    // brandId=0일 때는 광고 캠페인 정보 포함
+    if (brandId === 0) {
+      setProposalData({
+        brandId,
+        campaignId: 0,
+        domain: domain || "beauty",
+        brandName: data.name,
+        campaignTitle: "'리얼이 캐릭터 크림' 론칭 리뷰",
+        campaignDescription: "'리얼이 캐릭터 크림'\n겟레디윗미 영상에서 자연스럽게 노출",
+        rewardAmount: 200000,
+        product: "리얼이 캐릭터 크림 1개",
+        startDate: "2025-01-05",
+        endDate: "2025-01-22",
+        contentTags: {
+          formats: [{ id: 3, name: "인스타 릴스" }],
+          categories: [
+            { id: 6, name: "리뷰" },
+            { id: 7, name: "겟레디윗미" },
+          ],
+          tones: [
+            { id: 16, name: "일상적인" },
+            { id: 17, name: "수다적인" },
+          ],
+          usageRanges: [
+            { id: 24, name: "크리에이터 1차활용" },
+            { id: 25, name: "브랜드 2차활용" },
+          ],
+          involvements: [{ id: 20, name: "가이드만 제공" }],
+        },
+        products: sponsorProducts.map((p) => ({
+          id: String(p.productId),
+          name: p.productName,
+        })),
+      });
+    } else {
+      // 일반 브랜드는 기존 로직 유지
+      setProposalData({
+        brandId,
+        campaignId: 0,
+        domain: domain || "beauty",
+        brandName: data.name,
+        products: sponsorProducts.map((p) => ({
+          id: String(p.productId),
+          name: p.productName,
+        })),
+      });
+    }
 
     navigate("/matching/suggest");
   };
@@ -306,7 +351,7 @@ export default function BrandDetailContent({ data }: Props) {
 
   const handleSponsorableProductClick = (productId: number) => {
     if (!validBrandId) return;
-    if (!Number.isFinite(productId) || productId <= 0) return;
+    if (!Number.isFinite(productId)) return;
 
     navigate(
       `/products/sponsorable/detail?brandId=${brandId}&productId=${productId}`,
@@ -335,8 +380,8 @@ export default function BrandDetailContent({ data }: Props) {
   };
 
   const goOngoingCampaignDetail = (c: OngoingCampaign) => {
-    const cid = getCampaignIdFromOngoing(c);
-    if (!cid) return;
+    const cid = getCampaignIdFromOngoing(c) ?? (c.campaignId === 0 ? 0 : null);
+    if (cid === null) return;
 
     const domainParam = searchParams.get("domain");
     const domain =
@@ -346,11 +391,11 @@ export default function BrandDetailContent({ data }: Props) {
 
     const brandIdNum = validBrandId
       ? brandId
-      : Number.isFinite(Number(data.id)) && Number(data.id) > 0
+      : Number.isFinite(Number(data.id)) && Number(data.id) >= 0
         ? Number(data.id)
         : null;
 
-    if (!brandIdNum) return;
+    if (brandIdNum === null) return;
 
     navigate(
       `/campaign?brandId=${brandIdNum}&campaignId=${cid}&domain=${domain}`,
@@ -365,7 +410,7 @@ export default function BrandDetailContent({ data }: Props) {
     }
 
     const clickedId = Number(id);
-    if (!Number.isFinite(clickedId) || clickedId <= 0) return;
+    if (!Number.isFinite(clickedId) || clickedId < 0) return;
 
     const currentItem = ongoingCampaigns.find((c) => {
       const cid = getCampaignIdFromOngoing(c);
@@ -374,7 +419,7 @@ export default function BrandDetailContent({ data }: Props) {
     if (!currentItem) return;
 
     const cid = getCampaignIdFromOngoing(currentItem);
-    if (!cid) return;
+    if (cid === null) return;
 
     if (ongoingLikeInFlight.current.has(cid)) return;
     ongoingLikeInFlight.current.add(cid);
@@ -385,14 +430,24 @@ export default function BrandDetailContent({ data }: Props) {
 
     setOngoingLikeOverrides((m) => ({ ...m, [cid]: next }));
 
-    ongoingLikeInFlight.current.delete(cid);
+    try {
+      await toggleCampaignLike(cid);
+    } catch (error) {
+      console.error("Failed to toggle campaign like:", error);
+      setOngoingLikeOverrides((m) => ({ ...m, [cid]: prev }));
+    } finally {
+      ongoingLikeInFlight.current.delete(cid);
+    }
   };
 
   const PAGE_SIZE = 4;
   const GROUP_SIZE = 4;
 
-  const histories = data.histories ?? [];
-  const hasNext = !!data.historiesHasNext;
+  const histories = useMemo(() => {
+    return data.histories ?? [];
+  }, [data.histories]);
+
+  const hasNext = isHardcodedBeauty ? false : !!data.historiesHasNext;
 
   const [page, setPage] = useState(1);
 
@@ -457,8 +512,9 @@ export default function BrandDetailContent({ data }: Props) {
           <BrandInfo
             name={data.name}
             matchRate={data.matchRate}
-            hashtags={(data.hashtags ?? []).slice(0, 2)}
+            hashtags={data.hashtags ?? []}
             description={data.description}
+            isAd={brandId === 0}
           />
 
           <div className="mt-3.5">
@@ -486,6 +542,7 @@ export default function BrandDetailContent({ data }: Props) {
 
             <section>
               {(tagSections ?? []).map((sec, idx) => {
+
                 const showTitle = showSectionTitle;
 
                 return (

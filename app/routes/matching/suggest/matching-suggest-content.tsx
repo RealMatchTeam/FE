@@ -34,7 +34,7 @@ export default function MatchingSuggestContent() {
   };
 
   const handleExistingCampaign = async () => {
-    if (proposalData?.brandId) {
+    if (proposalData && typeof proposalData.brandId === 'number') {
       setIsLoading(true);
       setIsSheetOpen(true);
 
@@ -60,7 +60,7 @@ export default function MatchingSuggestContent() {
   };
 
   const handleSheetSubmit = () => {
-    if (!selectedCampaignId) {
+    if (selectedCampaignId === null) {
       toast.error("캠페인을 선택해주세요");
       return;
     }
