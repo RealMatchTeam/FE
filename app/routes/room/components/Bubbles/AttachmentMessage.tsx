@@ -81,10 +81,10 @@ export default function AttachmentMessage({
             </div>
 
             <div className="min-w-0 flex flex-col">
-              <div className="text-[14px] leading-[20px] style-Medium text-[#404252] truncate">
+              <div className="text-[14px] leading-[20px] text-medium text-[#404252] truncate">
                 {fileName}
               </div>
-              <div className="text-[12px] leading-[16px] text-[#9B9BA1] truncate">
+              <div className="text-[12px] leading-[16px] text-medium text-[#9B9BA1] truncate">
                 {ext}
               </div>
             </div>
