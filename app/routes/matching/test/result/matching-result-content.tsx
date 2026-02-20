@@ -171,11 +171,26 @@ export default function MatchingResultContent() {
               </div>
 
               <div className="flex w-full flex-1 min-h-0 items-center justify-center">
-                <div className="relative aspect-[7/6] w-[min(56vw,13.125rem)]">
+                <div
+                  className={[
+                    "relative aspect-[7/6] w-[min(56vw,13.125rem)]",
+                    "[@media(max-height:700px)]:w-[min(50vw,11.5rem)]",
+                    "[@media(max-height:667px)]:w-[min(46vw,10.5rem)]",
+                  ].join(" ")}
+                >
                   <img
                     src={userTypeIconSrc}
                     alt={data.userType}
-                    className="absolute left-0 top-[-12%] h-[112%] w-full select-none object-contain"
+                    className={[
+                      "absolute left-0 w-full select-none object-contain",
+                      "top-[-12%] h-[112%]",
+                      "[@media(max-height:700px)]:top-0",
+                      "[@media(max-height:700px)]:h-full",
+                      "[@media(max-height:667px)]:w-full",
+                      "[@media(max-height:667px)]:top-0",
+                      "[@media(max-height:667px)]:h-full",
+                      "[@media(max-height:667px)]:translate-y-[3px]",
+                    ].join(" ")}
                     style={{
                       imageRendering: "auto",
                       transform: "translateZ(0)",
