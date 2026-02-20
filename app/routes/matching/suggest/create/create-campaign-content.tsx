@@ -161,7 +161,7 @@ export default function CreateCampaignContent() {
 
     const brandId = brandIdParam
       ? Number(brandIdParam)
-      : proposalData?.brandId || 1;
+      : (type === "new" ? 0 : (proposalData?.brandId ?? 1));
 
     const campaignId = type === "existing"
       ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || null))
