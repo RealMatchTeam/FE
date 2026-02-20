@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createCampaignProposal, getCampaignDetail } from "../../api/matching";
+import { createCampaignProposal } from "../../api/matching";
 import { tokenStorage } from "../../../../lib/token";
 import { useCampaignProposalStore } from "../../../../stores/campaign-proposal";
 import { useAuthStore } from "../../../../stores/auth-store";
@@ -28,7 +28,6 @@ import {
   TONE_TAGS,
   INVOLVEMENT_TAGS,
   USAGE_RANGE_TAGS,
-  PROPOSAL_TAG_ID_BY_NAME,
   type ProposalTag,
 } from "../../../../data/proposalTags";
 import {
@@ -106,171 +105,30 @@ export default function CreateCampaignContent() {
   }, []);
 
   useEffect(() => {
-    // 신규 제안 시 폼 초기화
-    if (type !== "existing") {
-      reset(defaultCampaignFormValues);
-      return;
-    }
-
-    let alive = true;
-
-    // URL 파라미터로 캠페인 조회 (기존 캠페인 제안 시)
-    const campaignIdParam = searchParams.get("campaignId");
-
-    if (campaignIdParam) {
-      const campaignId = Number(campaignIdParam);
-
-      // campaignId가 0보다 큰 경우에만 API 호출 (0은 광고 캠페인이므로 proposalData 사용)
-      if (Number.isFinite(campaignId) && campaignId > 0) {
-        (async () => {
-          try {
-            const detail = await getCampaignDetail(campaignId);
-            if (!alive) return;
-
-            setValue("campaignName", detail.title);
-            setValue("description", detail.description);
-            setValue("fee", detail.rewardAmount.toString());
-            setValue("sponsorProduct", detail.product ? [detail.product] : []);
-            if (detail.startDate) setValue("startDate", detail.startDate);
-            if (detail.endDate) setValue("endDate", detail.endDate);
-
-            if (detail.contentTags?.formats?.length > 0) {
-              setValue("format", detail.contentTags.formats.map(f => String(f.id)));
-            }
-            if (detail.contentTags?.categories?.length > 0) {
-              setValue("category", detail.contentTags.categories.map(c => String(c.id)));
-            }
-            if (detail.contentTags?.tones?.length > 0) {
-              setValue("tone", detail.contentTags.tones.map(t => String(t.id)));
-            }
-            if (detail.contentTags?.involvements?.length > 0) {
-              setValue("involvement", detail.contentTags.involvements.map(i => String(i.id)));
-            }
-            if (detail.contentTags?.usageRanges?.length > 0) {
-              setValue("usageScope", detail.contentTags.usageRanges.map(u => String(u.id)));
-            }
-          } catch (error) {
-            console.error("캠페인 상세 조회 실패:", error);
-            toast.error("캠페인 정보를 불러오지 못했습니다");
-          }
-        })();
-
-        return () => {
-          alive = false;
-        };
-      }
-    }
-
-    if (proposalData) {
-      if (proposalData.campaignTitle) setValue("campaignName", proposalData.campaignTitle);
-      if (proposalData.campaignDescription) setValue("description", proposalData.campaignDescription);
-
-      // 태그 매핑 (ID를 문자열로 변환하여 배열로 사용)
-      if (proposalData.contentTags?.formats && proposalData.contentTags.formats.length > 0) {
-        setValue("format", proposalData.contentTags.formats.map(f => String(f.id)));
-      }
-      if (proposalData.contentTags?.categories && proposalData.contentTags.categories.length > 0) {
-        setValue("category", proposalData.contentTags.categories.map(c => String(c.id)));
-      }
-      if (proposalData.contentTags?.tones && proposalData.contentTags.tones.length > 0) {
-        setValue("tone", proposalData.contentTags.tones.map(t => String(t.id)));
-      }
-      if (proposalData.contentTags?.involvements && proposalData.contentTags.involvements.length > 0) {
-        setValue("involvement", proposalData.contentTags.involvements.map(i => String(i.id)));
-      }
-      if (proposalData.contentTags?.usageRanges && proposalData.contentTags.usageRanges.length > 0) {
-        setValue("usageScope", proposalData.contentTags.usageRanges.map(u => String(u.id)));
-      }
-
-      const reward = proposalData.rewardAmount?.toString();
-      if (reward) setValue("fee", reward);
-
-      // products 배열이 있으면 id가 0이 아닌 첫 번째 제품을 선택, 없으면 단일 product 사용
-      let productSet = false;
-      if (proposalData.products && proposalData.products.length > 0) {
-        const validProduct = proposalData.products.find(p => {
-          const id = Number(p.id);
-          return Number.isFinite(id) && id > 0;
-        });
-        if (validProduct) {
-          setValue("sponsorProduct", [String(validProduct.id)]);
-          productSet = true;
-        }
-      }
-
-      // products에서 유효한 제품을 찾지 못했거나 products가 없으면 product 필드 사용
-      if (!productSet && proposalData.product) {
-        setValue("sponsorProduct", [proposalData.product]);
-      }
-
-      if (proposalData.startDate) setValue("startDate", proposalData.startDate);
-      if (proposalData.endDate) setValue("endDate", proposalData.endDate);
-    }
-
-    return () => {
-      alive = false;
-    };
-  }, [type, proposalData, searchParams, setValue, reset]);
+    // 신규/기존 모두 폼 초기화 (기존 제안도 빈 폼으로 시작)
+    reset(defaultCampaignFormValues);
+  }, [type, reset]);
 
   const formValues = useWatch({ control, defaultValue: defaultCampaignFormValues });
 
-  const tags = type === "new" ? undefined : proposalData?.contentTags;
-
-  const toOptions = (defaultTags: ProposalTag[], campaignTags?: { id?: number; name: string }[]) => {
-    if (campaignTags && campaignTags.length > 0) {
-      return campaignTags.map((t) => ({
-        value: String(t.id ?? PROPOSAL_TAG_ID_BY_NAME[t.name] ?? t.name),
-        label: t.name,
-      }));
-    }
+  const toOptions = (defaultTags: ProposalTag[]) => {
     return defaultTags.map((t) => ({ value: String(t.id), label: t.name }));
   };
 
-  const formatOptions = toOptions(FORMAT_TAGS, tags?.formats);
-  const categoryOptions = toOptions(CATEGORY_TAGS, tags?.categories);
-  const toneOptions = toOptions(TONE_TAGS, tags?.tones);
-  const involvementOptions = toOptions(INVOLVEMENT_TAGS, tags?.involvements);
-  const usageScopeOptions = toOptions(USAGE_RANGE_TAGS, tags?.usageRanges);
+  const formatOptions = toOptions(FORMAT_TAGS);
+  const categoryOptions = toOptions(CATEGORY_TAGS);
+  const toneOptions = toOptions(TONE_TAGS);
+  const involvementOptions = toOptions(INVOLVEMENT_TAGS);
+  const usageScopeOptions = toOptions(USAGE_RANGE_TAGS);
 
   const sponsorProductOptions = useMemo(() => {
-    const options: { value: string; label: string }[] = [];
-
-    // product 필드가 있으면 추가 (문자열 값)
-    if (proposalData?.product) {
-      options.push({ value: proposalData.product, label: proposalData.product });
-    }
-
-    // products 배열이 있으면 추가 (id > 0인 것만)
-    if (proposalData?.products && proposalData.products.length > 0) {
-      const validProducts = proposalData.products
-        .filter((p) => {
-          const id = String(p.id).trim();
-          const name = String(p.name).trim();
-          // id가 0이 아니고, id와 name이 모두 있는 경우만 포함
-          return id && name && id !== "0";
-        })
-        .map((p) => ({ value: String(p.id), label: String(p.name).trim() }));
-      options.push(...validProducts);
-    }
-
-    // 중복 제거 (value 기준)
-    const uniqueOptions = options.reduce((acc, current) => {
-      const exists = acc.find(opt => opt.value === current.value);
-      if (!exists) {
-        acc.push(current);
-      }
-      return acc;
-    }, [] as { value: string; label: string }[]);
-
-    const baseOptions = type === "new" ? [] : uniqueOptions;
-
-    // formValues.sponsorProduct 배열에 있는데 options에 없는 항목들 추가 (id가 0이 아닌 경우만)
-    const missingOptions = (formValues.sponsorProduct || [])
-      .filter(sp => sp !== "0" && !baseOptions.find(opt => opt.value === sp))
+    // 사용자가 직접 입력한 협찬품 항목만 표시
+    const customOptions = (formValues.sponsorProduct || [])
+      .filter(sp => sp !== "0")
       .map(sp => ({ value: sp, label: sp }));
 
-    return [...missingOptions, ...baseOptions];
-  }, [proposalData, type, formValues.sponsorProduct]);
+    return customOptions;
+  }, [formValues.sponsorProduct]);
 
   // ID 배열로 label들 찾기 헬퍼 함수
   const findLabels = (options: { value: string; label: string }[], values?: string[]) => {
