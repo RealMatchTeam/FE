@@ -33,12 +33,6 @@ export default function BannerCarousel({
   category: CategoryKey;
   loading?: boolean;
 }) {
-  if (loading) {
-    return (
-      <div className="-mx-5 h-62.5 animate-pulse bg-gray-100" />
-    );
-  }
-
   const banners = category === "beauty" ? beautyBanners : fashionBanners;
   const displayBanners = [banners[banners.length - 1], ...banners, banners[0]];
 
@@ -86,6 +80,12 @@ export default function BannerCarousel({
       return () => clearTimeout(timeout);
     }
   }, [isSilentJumping]);
+
+  if (loading) {
+    return (
+      <div className="-mx-5 h-62.5 animate-pulse bg-gray-100" />
+    );
+  }
 
   const handleStart = (clientX: number) => {
     stop();
