@@ -3,18 +3,18 @@ import chatIcon from "../../../assets/chat-icon.svg";
 import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 
 interface CampaignBrandCardProps {
-  showChatSection?: boolean; 
-  statusText?: string;     
-  brandName?: string;     
-  brandTags?: string[]; 
-  brandImageUrl?: string; 
+  showChatSection?: boolean;
+  statusText?: string;
+  brandName?: string;
+  brandTags?: string[];
+  brandImageUrl?: string;
   matchingRate?: number;
   brandId?: number | string;
   category?: string;
 }
 
-export default function CampaignBrandCard({ 
-  showChatSection, 
+export default function CampaignBrandCard({
+  showChatSection,
   statusText,
   brandName,
   brandTags,
@@ -23,9 +23,9 @@ export default function CampaignBrandCard({
   brandId,
   category
 }: CampaignBrandCardProps) {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const handleBrandClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     if (brandId && category) {
       navigate(`/brand?brandId=${brandId}&domain=${category}`);
     } else {
@@ -41,13 +41,12 @@ export default function CampaignBrandCard({
           <div className="w-[64px] h-[64px] flex items-center justify-center overflow-hidden border border-text-gray5 rounded-lg">
             <img src={brandImageUrl} alt={brandName} className="w-full h-full object-cover" />
           </div>
-
           <div className="flex flex-col justify-center gap-1">
             <div className="flex items-center gap-1">
               <h2 className="text-title1 text-text-black leading-tight">
-                {brandName || "브랜드명"}
+                {brandName || "리얼매치"}
               </h2>
-              <button 
+              <button
                 type="button"
                 onClick={handleBrandClick}
                 className="flex items-center justify-center active:scale-90 transition-transform p-1"
@@ -57,18 +56,24 @@ export default function CampaignBrandCard({
               </button>
             </div>
             <p className="text-callout1 text-text-gray3 mt-1">
-              {brandTags && brandTags.length > 0 
-                ? brandTags.map(tag => `#${tag}`).join(" ") 
-                : "#태그정보없음"}
+              {brandTags && brandTags.length > 0
+                ? brandTags.map(tag => `#${tag}`).join(" ")
+                : "#정밀매칭 #원스톱협업 #쌍방향제안"}
             </p>
           </div>
         </div>
 
         <div className="flex flex-col items-end justify-center h-[64px]">
-          <div className="flex items-baseline gap-1">
-            <span className="text-title5 text-core-1">매칭률</span>
-            <span className="text-title6 text-core-1">{matchingRate || 0}%</span>
-          </div>
+          {matchingRate === 0 ? (
+            <div className="flex items-baseline gap-1">
+              <span className="text-title6 text-core-1">광고</span>
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-1">
+              <span className="text-title5 text-core-1">매칭률</span>
+              <span className="text-title6 text-core-1">{matchingRate || 0}%</span>
+            </div>
+          )}
           <span className="text-callout1 text-core-1 mt-3">{statusText}</span>
         </div>
       </div>

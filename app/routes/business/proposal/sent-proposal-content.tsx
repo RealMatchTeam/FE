@@ -17,6 +17,7 @@ import arrowRightIcon from "../../../assets/icon/arrow-right.svg";
 import arrowPurpleIcon from "../../../assets/arrow-purple.svg";
 import profileIcon from "../../../assets/icon-profile.svg";
 import ConfirmModal from "../../../components/common/ConfirmModal";
+import adRealmatchLogo from "../../../assets/ad/ad-realmatch-logo.png";
 
 export default function ProposalContent() {
     const [searchParams] = useSearchParams();
@@ -54,7 +55,16 @@ export default function ProposalContent() {
                 const proposalResult = await getProposalDetail(proposalId);
                 setData(proposalResult);
 
-                if (proposalResult.brandId) {
+                if (proposalResult.brandId === 0) {
+                    // brandId가 0이면 리얼매치 광고로 하드코딩
+                    setBrand({
+                        brandId: 0,
+                        brandName: "리얼매치",
+                        brandTags: ["정밀매칭", "원스톱협업", "쌍방향제안"],
+                        brandImageUrl: adRealmatchLogo,
+                        matchingRate: 0
+                    });
+                } else if (proposalResult.brandId) {
                     const brandResult = await getBrandSummary(proposalResult.brandId);
                     setBrand(brandResult);
                 }
@@ -184,7 +194,7 @@ export default function ProposalContent() {
                     <div className="grid grid-cols-2 gap-4">
                         <CampaignInfoGroup label="협찬품">
                             <div className="w-full p-4 bg-bg-w border border-text-gray5 rounded-xl text-body1 flex justify-between items-center text-text-gray1">
-                                <span className="truncate">{data.productId}</span>
+                                <span className="truncate">{data.productId !== 0 ? data.productId : ""}</span>
                                 <img src={arrowRightIcon} alt="arrow" className="w-4 h-4 opacity-30" />
                             </div>
                         </CampaignInfoGroup>

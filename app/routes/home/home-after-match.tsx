@@ -481,7 +481,7 @@ export default function HomeAfterMatchPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white px-5 pt-0 pb-[calc(116px+env(safe-area-inset-bottom))]">
-        <BannerCarousel key={category} category={category} />
+        <BannerCarousel key={category} category={category} loading={homeCoreLoading} />
 
         <CategoryTabs value={category} onChange={setCategory} />
 
@@ -561,46 +561,46 @@ export default function HomeAfterMatchPage() {
           <div className="-mr-5 mt-3 flex gap-3 overflow-x-auto pb-2 pr-5">
             {homeCoreLoading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={`camp-sk-${i}`} className="w-29.5 shrink-0">
-                    <div className="relative aspect-square animate-pulse rounded-xl border border-core-2 bg-gray-200" />
-                    <div className="mt-2 space-y-1.5">
-                      <div className="flex items-baseline justify-between">
-                        <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
-                        <div className="h-4 w-8 animate-pulse rounded bg-gray-200" />
-                      </div>
-                      <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-                      <div className="h-3 w-16 animate-pulse rounded bg-gray-200" />
+                <div key={`camp-sk-${i}`} className="w-29.5 shrink-0">
+                  <div className="relative aspect-square animate-pulse rounded-xl border border-core-2 bg-gray-200" />
+                  <div className="mt-2 space-y-1.5">
+                    <div className="flex items-baseline justify-between">
+                      <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
+                      <div className="h-4 w-8 animate-pulse rounded bg-gray-200" />
                     </div>
+                    <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
+                    <div className="h-3 w-16 animate-pulse rounded bg-gray-200" />
                   </div>
-                ))
+                </div>
+              ))
               : campaigns.map((campaign, i) => {
-                  const safeCampaignId = getCampaignId(campaign);
-                  if (!safeCampaignId) return null;
+                const safeCampaignId = getCampaignId(campaign);
+                if (!safeCampaignId) return null;
 
-                  return (
-                    <CampaignCard
-                      key={`match-${safeCampaignId}-${i}`}
-                      item={{
-                        id: String(safeCampaignId),
-                        brandName: campaign.brandName,
-                        matchRate: campaign.matchRate || 0,
-                        descText: campaign.name || campaign.title || "",
-                        rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
-                        ddayLabel:
-                          campaign.dDay === 0
-                            ? "D-DAY"
-                            : campaign.dDay
-                              ? `D-${campaign.dDay}`
-                              : "",
-                        progressText: String(campaign.applicants),
-                        isLiked: campaign.isLiked,
-                        logoUrl: campaign.logoUrl,
-                      }}
-                      onClick={() => goCampaignDetail(campaign)}
-                      onLikeToggle={handleCampaignLikeToggle}
-                    />
-                  );
-                })}
+                return (
+                  <CampaignCard
+                    key={`match-${safeCampaignId}-${i}`}
+                    item={{
+                      id: String(safeCampaignId),
+                      brandName: campaign.brandName,
+                      matchRate: campaign.matchRate || 0,
+                      descText: campaign.name || campaign.title || "",
+                      rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
+                      ddayLabel:
+                        campaign.dDay === 0
+                          ? "D-DAY"
+                          : campaign.dDay
+                            ? `D-${campaign.dDay}`
+                            : "",
+                      progressText: String(campaign.applicants),
+                      isLiked: campaign.isLiked,
+                      logoUrl: campaign.logoUrl,
+                    }}
+                    onClick={() => goCampaignDetail(campaign)}
+                    onLikeToggle={handleCampaignLikeToggle}
+                  />
+                );
+              })}
           </div>
         </section>
         {profileModel && (
@@ -623,46 +623,46 @@ export default function HomeAfterMatchPage() {
           <div className="-mr-5 mt-3 flex gap-0.5 overflow-x-auto pb-2 pr-5">
             {homeCoreLoading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={`pop-sk-${i}`} className="w-29.5 shrink-0">
-                    <div className="relative aspect-square animate-pulse rounded-xl border border-core-2 bg-gray-200" />
-                    <div className="mt-2 space-y-1.5">
-                      <div className="flex items-baseline justify-between">
-                        <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
-                        <div className="h-4 w-8 animate-pulse rounded bg-gray-200" />
-                      </div>
-                      <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-                      <div className="h-3 w-16 animate-pulse rounded bg-gray-200" />
+                <div key={`pop-sk-${i}`} className="w-29.5 shrink-0">
+                  <div className="relative aspect-square animate-pulse rounded-xl border border-core-2 bg-gray-200" />
+                  <div className="mt-2 space-y-1.5">
+                    <div className="flex items-baseline justify-between">
+                      <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
+                      <div className="h-4 w-8 animate-pulse rounded bg-gray-200" />
                     </div>
+                    <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
+                    <div className="h-3 w-16 animate-pulse rounded bg-gray-200" />
                   </div>
-                ))
+                </div>
+              ))
               : popularCampaigns.map((campaign, i) => {
-                  const safeCampaignId = getCampaignId(campaign);
-                  if (!safeCampaignId) return null;
+                const safeCampaignId = getCampaignId(campaign);
+                if (!safeCampaignId) return null;
 
-                  return (
-                    <CampaignCard
-                      key={`popular-${safeCampaignId}-${i}`}
-                      item={{
-                        id: String(safeCampaignId),
-                        brandName: campaign.brandName,
-                        matchRate: 0,
-                        descText: campaign.name || campaign.title || "",
-                        rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
-                        ddayLabel:
-                          campaign.dDay === 0
-                            ? "D-DAY"
-                            : campaign.dDay
-                              ? `D-${campaign.dDay}`
-                              : "",
-                        progressText: String(campaign.applicants),
-                        isLiked: campaign.isLiked,
-                        logoUrl: campaign.logoUrl,
-                      }}
-                      onClick={() => goCampaignDetail(campaign)}
-                      onLikeToggle={handleCampaignLikeToggle}
-                    />
-                  );
-                })}
+                return (
+                  <CampaignCard
+                    key={`popular-${safeCampaignId}-${i}`}
+                    item={{
+                      id: String(safeCampaignId),
+                      brandName: campaign.brandName,
+                      matchRate: 0,
+                      descText: campaign.name || campaign.title || "",
+                      rewardText: `원고료 ${campaign.reward?.toLocaleString()}원`,
+                      ddayLabel:
+                        campaign.dDay === 0
+                          ? "D-DAY"
+                          : campaign.dDay
+                            ? `D-${campaign.dDay}`
+                            : "",
+                      progressText: String(campaign.applicants),
+                      isLiked: campaign.isLiked,
+                      logoUrl: campaign.logoUrl,
+                    }}
+                    onClick={() => goCampaignDetail(campaign)}
+                    onLikeToggle={handleCampaignLikeToggle}
+                  />
+                );
+              })}
           </div>
         </section>
       </div>
