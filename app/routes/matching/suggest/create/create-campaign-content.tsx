@@ -105,7 +105,6 @@ export default function CreateCampaignContent() {
   }, []);
 
   useEffect(() => {
-    // 신규/기존 모두 폼 초기화 (기존 제안도 빈 폼으로 시작)
     reset(defaultCampaignFormValues);
   }, [type, reset]);
 
@@ -122,13 +121,21 @@ export default function CreateCampaignContent() {
   const usageScopeOptions = toOptions(USAGE_RANGE_TAGS);
 
   const sponsorProductOptions = useMemo(() => {
-    // 사용자가 직접 입력한 협찬품 항목만 표시
-    const customOptions = (formValues.sponsorProduct || [])
-      .filter(sp => sp !== "0")
+    // 이전 페이지에서 받아온 협찬품 목록 표시
+    const baseOptions = (proposalData?.products ?? [])
+      .filter((p) => p.id && p.name && String(p.id) !== "0" && p.name !== "0")
+      .map((p) => ({ value: String(p.id), label: p.name }));
+
+    if (proposalData?.product && proposalData.product !== "0" && !baseOptions.find(opt => opt.label === proposalData.product)) {
+      baseOptions.unshift({ value: proposalData.product, label: proposalData.product });
+    }
+
+    const missingOptions = (formValues.sponsorProduct || [])
+      .filter(sp => sp !== "0" && !baseOptions.find(opt => opt.value === sp))
       .map(sp => ({ value: sp, label: sp }));
 
-    return customOptions;
-  }, [formValues.sponsorProduct]);
+    return [...baseOptions, ...missingOptions];
+  }, [proposalData, formValues.sponsorProduct]);
 
   // ID 배열로 label들 찾기 헬퍼 함수
   const findLabels = (options: { value: string; label: string }[], values?: string[]) => {
@@ -161,7 +168,12 @@ export default function CreateCampaignContent() {
 
     const brandId = brandIdParam
       ? Number(brandIdParam)
-      : proposalData?.brandId || 1;
+      : proposalData?.brandId;
+
+    if (!brandId) {
+      toast.error("브랜드 정보가 없습니다. 다시 시도해주세요.");
+      return;
+    }
 
     const campaignId = type === "existing"
       ? (campaignIdParam ? Number(campaignIdParam) : (proposalData?.campaignId || null))

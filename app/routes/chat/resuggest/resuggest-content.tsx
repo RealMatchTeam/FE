@@ -127,18 +127,19 @@ export default function ReSuggestContent() {
     const usageScopeOptions = USAGE_RANGE_TAGS.map((t) => ({ value: String(t.id), label: t.name }));
 
     const sponsorProductOptions = useMemo(() => {
-        const baseOptions = proposalData?.product && proposalData.product !== "0"
-            ? [{ value: proposalData.product, label: proposalData.product }]
-            : (proposalData?.products ?? [])
-                .filter((p) => p.id && p.name && String(p.id) !== "0")
-                .map((p) => ({ value: String(p.id), label: p.name }));
+        const baseOptions = (proposalData?.products ?? [])
+            .filter((p) => p.id && p.name && String(p.id) !== "0" && p.name !== "0")
+            .map((p) => ({ value: String(p.id), label: p.name }));
 
-        // formValues.sponsorProduct 배열에 있는데 options에 없는 항목들 추가 (0 제외)
+        if (proposalData?.product && proposalData.product !== "0" && !baseOptions.find(opt => opt.label === proposalData.product)) {
+            baseOptions.unshift({ value: proposalData.product, label: proposalData.product });
+        }
+
         const missingOptions = (formValues.sponsorProduct || [])
             .filter(sp => sp !== "0" && !baseOptions.find(opt => opt.value === sp))
             .map(sp => ({ value: sp, label: sp }));
 
-        return [...missingOptions, ...baseOptions];
+        return [...baseOptions, ...missingOptions];
     }, [proposalData, formValues.sponsorProduct]);
 
     // ID 배열로 label들 찾기 헬퍼 함수
@@ -171,8 +172,13 @@ export default function ReSuggestContent() {
             return;
         }
 
+        if (!proposalData?.brandId) {
+            toast.error("브랜드 정보가 없습니다. 다시 시도해주세요.");
+            return;
+        }
+
         const requestData = {
-            brandId: proposalData?.brandId || 1,
+            brandId: proposalData.brandId,
             creatorId: Number(userId),
             campaignId: proposalData?.campaignId || null,
             campaignName: formData.campaignName || "",
