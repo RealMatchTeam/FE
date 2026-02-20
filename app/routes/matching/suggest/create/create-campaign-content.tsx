@@ -168,9 +168,9 @@ export default function CreateCampaignContent() {
 
     const brandId = brandIdParam
       ? Number(brandIdParam)
-      : proposalData?.brandId;
+      : proposalData?.brandId ?? 0;
 
-    if (!brandId) {
+    if (brandId == null) {
       toast.error("브랜드 정보가 없습니다. 다시 시도해주세요.");
       return;
     }
