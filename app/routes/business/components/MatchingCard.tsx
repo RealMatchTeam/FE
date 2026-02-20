@@ -48,7 +48,7 @@ export default function MatchingCard({
     const chatId = brandUserId ?? brandId;
     if (!Number.isFinite(chatId) || chatId <= 0) return;
     navigate(`/rooms/brand/${chatId}`);
-  };
+  }; 
 
   return (
     <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-bluegray-1">

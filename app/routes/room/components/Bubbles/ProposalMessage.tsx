@@ -43,6 +43,7 @@ export default function ProposalMessage(props: Props) {
   const proposalId = kind === "APPLY_CARD" ? (props as ApplyCardProps).applyId : (props as ProposalCardProps).proposalId;
   const timeText = createdAt ?? "";
   const navigate = useNavigate();
+  const applyId = (props as ApplyCardProps).applyId;
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionDone, setActionDone] = useState<"accepted" | "rejected" | null>(null);
@@ -208,7 +209,7 @@ export default function ProposalMessage(props: Props) {
                   <div className="min-w-0 text-[14px] leading-[20px] style-Medium text-[#404252] truncate">
                     {campaignName}
                   </div>
-                  <ArrowButton onClick={() => navigate(`/business/proposal?type=sent&proposalId=${proposalId}`)} />
+                  <ArrowButton onClick={() => navigate(`/business/campaign/${applyId}?type=applied-campaign`)} />
                 </div>
               </div>
             </div>
