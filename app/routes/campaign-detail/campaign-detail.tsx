@@ -334,7 +334,7 @@ export default function CampaignDetailContent({
 
     if (!campaign) return;
 
-    const brandIdNum = Number(brandData.id);
+    const brandIdNum = Number(searchParams.get("brandId"));
     if (!Number.isFinite(brandIdNum) || brandIdNum < 0) return;
 
     const domainParam = searchParams.get("domain");

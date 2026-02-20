@@ -30,7 +30,7 @@ export default function MatchingSuggestContent() {
   useHideBottomTab(isSheetOpen);
 
   const handleNewCampaign = () => {
-    navigate("/matching/suggest/create?type=new");
+    navigate(`/matching/suggest/create?type=new&brandId=${proposalData?.brandId}&domain=${proposalData?.domain}`);
   };
 
   const handleExistingCampaign = async () => {
