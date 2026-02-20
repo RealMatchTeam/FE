@@ -74,8 +74,9 @@ function SelectBottomSheetInner({
           <label
             key={option.value}
             className="flex items-center gap-2.5 cursor-pointer"
+            onClick={() => handleToggle(option.value)}
           >
-            <div onClick={() => handleToggle(option.value)}>
+            <div>
               <CheckIcon checked={selected.includes(option.value)} />
             </div>
             <span className="text-title3 text-text-gray1">{option.label}</span>
@@ -85,8 +86,8 @@ function SelectBottomSheetInner({
         {/* 그 외 입력 */}
         {hasCustomInput && (
           <div>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <div onClick={() => handleToggle("custom")}>
+            <label className="flex items-center gap-2.5 cursor-pointer" onClick={() => handleToggle("custom")}>
+              <div>
                 <CheckIcon checked={selected.includes("custom")} />
               </div>
               <span className="text-title3 text-text-gray1">그 외 입력</span>
